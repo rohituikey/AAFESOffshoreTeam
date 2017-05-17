@@ -1,0 +1,3135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://www.aafes.com" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://www.aafes.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">® AAFES is a registered trademark of the Army and Air Force Exchange Service. The Army and Air Force Exchange Service (AAFES) website is an unofficial Department of Defense (DoD) website published and maintained by AAFES with non-appropriated funds. For more information regarding these Web Services please contact the AAFES Webmaster (webmaster@aafes.com).&lt;style type="text/css"&gt;.main{font-family:Verdana;color:black;}.mainred{font-family:Verdana;color:red;}.mainblue{font-family:Verdana;color:blue;}&lt;/style&gt;</wsdl:documentation>
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://www.aafes.com">
+      <s:element name="PauseMethod">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="boolPauseMethod" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PauseMethodResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="PauseMethodResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsMethodPaused">
+        <s:complexType />
+      </s:element>
+      <s:element name="IsMethodPausedResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="IsMethodPausedResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CustInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strCustInfoInputXML" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CustInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CustInfoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CustInfoBySSN">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strCustInfoInputXML" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CustInfoBySSNResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CustInfoBySSNResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsQACustomer">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strCustomerCID" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsQACustomerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="IsQACustomerResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnCustInfoInputXML">
+        <s:complexType />
+      </s:element>
+      <s:element name="ReturnCustInfoInputXMLResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnCustInfoInputXMLResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnMilitaryStatusName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strMilitaryStatus" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strBranchOfService" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnMilitaryStatusNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnMilitaryStatusNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnBranchOfServiceName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strBranchOfService" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnBranchOfServiceNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnBranchOfServiceNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnEligibilityCodeName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strEligibilityCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnEligibilityCodeNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnEligibilityCodeNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnPersonIdentifierName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnPersonIdentifierNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnPersonIdentifierNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnMaritalStatusName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnMaritalStatusNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnMaritalStatusNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnSexName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnSexNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnSexNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnRaceName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnRaceNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnRaceNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnEthnicityName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnEthnicityNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnEthnicityNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnPersonnelCategoryName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnPersonnelCategoryNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnPersonnelCategoryNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnReserveCategoryName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnReserveCategoryNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnReserveCategoryNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnPayPlanName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnPayPlanNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnPayPlanNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnExchangeBenefitsName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnExchangeBenefitsNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnExchangeBenefitsNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnCommissaryBenefitsName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnCommissaryBenefitsNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnCommissaryBenefitsNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnTheaterBenefitsName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnTheaterBenefitsNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnTheaterBenefitsNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnMedicalBenefitsName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnMedicalBenefitsNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnMedicalBenefitsNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnLifeStyleMarketName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnLifeStyleMarketNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnLifeStyleMarketNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnPersonAssociationName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnPersonAssociationNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnPersonAssociationNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnMatchReasonName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnMatchReasonNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnMatchReasonNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnStateName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strStateAbbr" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="boolIncludeStateAbbreviation" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnStateNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnStateNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnPersonIdentifierTypeName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSystemType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnPersonIdentifierTypeNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnPersonIdentifierTypeNameResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnFormattedDate">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strJulianDate" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnFormattedDateResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnFormattedDateResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="boolean" type="s:boolean" />
+      <s:element name="string" nillable="true" type="s:string" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="PauseMethodSoapIn">
+    <wsdl:part name="parameters" element="tns:PauseMethod" />
+  </wsdl:message>
+  <wsdl:message name="PauseMethodSoapOut">
+    <wsdl:part name="parameters" element="tns:PauseMethodResponse" />
+  </wsdl:message>
+  <wsdl:message name="IsMethodPausedSoapIn">
+    <wsdl:part name="parameters" element="tns:IsMethodPaused" />
+  </wsdl:message>
+  <wsdl:message name="IsMethodPausedSoapOut">
+    <wsdl:part name="parameters" element="tns:IsMethodPausedResponse" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:CustInfo" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:CustInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoBySSNSoapIn">
+    <wsdl:part name="parameters" element="tns:CustInfoBySSN" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoBySSNSoapOut">
+    <wsdl:part name="parameters" element="tns:CustInfoBySSNResponse" />
+  </wsdl:message>
+  <wsdl:message name="IsQACustomerSoapIn">
+    <wsdl:part name="parameters" element="tns:IsQACustomer" />
+  </wsdl:message>
+  <wsdl:message name="IsQACustomerSoapOut">
+    <wsdl:part name="parameters" element="tns:IsQACustomerResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnCustInfoInputXMLSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnCustInfoInputXML" />
+  </wsdl:message>
+  <wsdl:message name="ReturnCustInfoInputXMLSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnCustInfoInputXMLResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMilitaryStatusNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnMilitaryStatusName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMilitaryStatusNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnMilitaryStatusNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnBranchOfServiceNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnBranchOfServiceName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnBranchOfServiceNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnBranchOfServiceNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEligibilityCodeNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnEligibilityCodeName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEligibilityCodeNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnEligibilityCodeNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnPersonIdentifierName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnPersonIdentifierNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMaritalStatusNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnMaritalStatusName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMaritalStatusNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnMaritalStatusNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnSexNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnSexName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnSexNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnSexNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnRaceNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnRaceName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnRaceNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnRaceNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEthnicityNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnEthnicityName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEthnicityNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnEthnicityNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonnelCategoryNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnPersonnelCategoryName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonnelCategoryNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnPersonnelCategoryNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnReserveCategoryNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnReserveCategoryName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnReserveCategoryNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnReserveCategoryNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPayPlanNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnPayPlanName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPayPlanNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnPayPlanNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnExchangeBenefitsNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnExchangeBenefitsName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnExchangeBenefitsNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnExchangeBenefitsNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnCommissaryBenefitsNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnCommissaryBenefitsName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnCommissaryBenefitsNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnCommissaryBenefitsNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnTheaterBenefitsNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnTheaterBenefitsName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnTheaterBenefitsNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnTheaterBenefitsNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMedicalBenefitsNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnMedicalBenefitsName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMedicalBenefitsNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnMedicalBenefitsNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnLifeStyleMarketNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnLifeStyleMarketName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnLifeStyleMarketNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnLifeStyleMarketNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonAssociationNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnPersonAssociationName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonAssociationNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnPersonAssociationNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMatchReasonNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnMatchReasonName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMatchReasonNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnMatchReasonNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnStateNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnStateName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnStateNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnStateNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierTypeNameSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnPersonIdentifierTypeName" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierTypeNameSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnPersonIdentifierTypeNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnFormattedDateSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnFormattedDate" />
+  </wsdl:message>
+  <wsdl:message name="ReturnFormattedDateSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnFormattedDateResponse" />
+  </wsdl:message>
+  <wsdl:message name="PauseMethodHttpGetIn">
+    <wsdl:part name="boolPauseMethod" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="PauseMethodHttpGetOut">
+    <wsdl:part name="Body" element="tns:boolean" />
+  </wsdl:message>
+  <wsdl:message name="IsMethodPausedHttpGetIn" />
+  <wsdl:message name="IsMethodPausedHttpGetOut">
+    <wsdl:part name="Body" element="tns:boolean" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoHttpGetIn">
+    <wsdl:part name="strCustInfoInputXML" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoBySSNHttpGetIn">
+    <wsdl:part name="strCustInfoInputXML" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoBySSNHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="IsQACustomerHttpGetIn">
+    <wsdl:part name="strCustomerCID" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="IsQACustomerHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnCustInfoInputXMLHttpGetIn" />
+  <wsdl:message name="ReturnCustInfoInputXMLHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMilitaryStatusNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strMilitaryStatus" type="s:string" />
+    <wsdl:part name="strBranchOfService" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMilitaryStatusNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnBranchOfServiceNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strBranchOfService" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnBranchOfServiceNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEligibilityCodeNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strEligibilityCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEligibilityCodeNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMaritalStatusNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMaritalStatusNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnSexNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnSexNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnRaceNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnRaceNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEthnicityNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEthnicityNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonnelCategoryNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonnelCategoryNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnReserveCategoryNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnReserveCategoryNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPayPlanNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPayPlanNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnExchangeBenefitsNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnExchangeBenefitsNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnCommissaryBenefitsNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnCommissaryBenefitsNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnTheaterBenefitsNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnTheaterBenefitsNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMedicalBenefitsNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMedicalBenefitsNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnLifeStyleMarketNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnLifeStyleMarketNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonAssociationNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonAssociationNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMatchReasonNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMatchReasonNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnStateNameHttpGetIn">
+    <wsdl:part name="strStateAbbr" type="s:string" />
+    <wsdl:part name="boolIncludeStateAbbreviation" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnStateNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierTypeNameHttpGetIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierTypeNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnFormattedDateHttpGetIn">
+    <wsdl:part name="strJulianDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnFormattedDateHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="PauseMethodHttpPostIn">
+    <wsdl:part name="boolPauseMethod" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="PauseMethodHttpPostOut">
+    <wsdl:part name="Body" element="tns:boolean" />
+  </wsdl:message>
+  <wsdl:message name="IsMethodPausedHttpPostIn" />
+  <wsdl:message name="IsMethodPausedHttpPostOut">
+    <wsdl:part name="Body" element="tns:boolean" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoHttpPostIn">
+    <wsdl:part name="strCustInfoInputXML" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoBySSNHttpPostIn">
+    <wsdl:part name="strCustInfoInputXML" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="CustInfoBySSNHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="IsQACustomerHttpPostIn">
+    <wsdl:part name="strCustomerCID" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="IsQACustomerHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnCustInfoInputXMLHttpPostIn" />
+  <wsdl:message name="ReturnCustInfoInputXMLHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMilitaryStatusNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strMilitaryStatus" type="s:string" />
+    <wsdl:part name="strBranchOfService" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMilitaryStatusNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnBranchOfServiceNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strBranchOfService" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnBranchOfServiceNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEligibilityCodeNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strEligibilityCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEligibilityCodeNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMaritalStatusNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMaritalStatusNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnSexNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnSexNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnRaceNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnRaceNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEthnicityNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnEthnicityNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonnelCategoryNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonnelCategoryNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnReserveCategoryNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnReserveCategoryNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPayPlanNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPayPlanNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnExchangeBenefitsNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnExchangeBenefitsNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnCommissaryBenefitsNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnCommissaryBenefitsNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnTheaterBenefitsNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnTheaterBenefitsNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMedicalBenefitsNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMedicalBenefitsNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnLifeStyleMarketNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnLifeStyleMarketNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonAssociationNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonAssociationNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMatchReasonNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMatchReasonNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnStateNameHttpPostIn">
+    <wsdl:part name="strStateAbbr" type="s:string" />
+    <wsdl:part name="boolIncludeStateAbbreviation" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnStateNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierTypeNameHttpPostIn">
+    <wsdl:part name="strSystemType" type="s:string" />
+    <wsdl:part name="strCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnPersonIdentifierTypeNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnFormattedDateHttpPostIn">
+    <wsdl:part name="strJulianDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ReturnFormattedDateHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:portType name="clsCustInfoSoap">
+    <wsdl:operation name="PauseMethod">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will pause the CustInfo method.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;boolean&lt;/span&gt; PauseMethod(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;boolPauseMethod&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A boolean indicating if the pause worked.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;boolPauseMethod&lt;/i&gt;&lt;br/&gt;  A boolean indicating if the MQ service is to be paused.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:PauseMethodSoapIn" />
+      <wsdl:output message="tns:PauseMethodSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsMethodPaused">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return the status of the MQ service.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;boolean&lt;/span&gt; IsMethodPaused(&lt;/b&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A boolean indicating if the MQ service is paused.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:IsMethodPausedSoapIn" />
+      <wsdl:output message="tns:IsMethodPausedSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CustInfo">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This Web Service is used to acquire Customer Information from the IMS Database using either DOD_EDI_Number, CID or SSN + DOB.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; CustInfo(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCustInfoInputXML&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the XML with the customer information.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strCustInfoInputXML&lt;/i&gt;&lt;br/&gt;  The Customer Info Key(s): DOD_EDI_Number, CID, SSN, or SSN &amp; DOB.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:CustInfoSoapIn" />
+      <wsdl:output message="tns:CustInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CustInfoBySSN">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This Web Service is used to acquire Customer Information from the IMS Database using SSN.&lt;br /&gt;&lt;br /&gt;
+			&lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+			&lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; CustInfo(&lt;/b&gt;&lt;br/&gt;
+			&lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCustInfoInputXML&lt;/em&gt;&lt;br/&gt;
+			&lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+			&lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+			&lt;i&gt;A string containing the XML with the customer information.&lt;/i&gt;
+			&lt;br/&gt;&lt;br/&gt;
+			&lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+			&lt;i&gt;strCustInfoInputXML&lt;/i&gt;&lt;br/&gt;  The Customer Info Key(s): SSN.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:CustInfoBySSNSoapIn" />
+      <wsdl:output message="tns:CustInfoBySSNSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsQACustomer">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This Web Service is used to determine whether we have a QA customer&lt;br /&gt;&lt;br /&gt;
+			&lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+			&lt;b&gt;public &lt;span class="mainblue"&gt;string&lt;/span&gt; IsQACustomer&lt;/b&gt;(&lt;br /&gt;
+			&lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCustomerCID&lt;/em&gt;&lt;br /&gt;
+			&lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br /&gt;
+			&lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+			&lt;span class="main"&gt;  QA flag for this Customer 'Y' or 'N'&lt;/span&gt;&lt;br /&gt;
+			&lt;br /&gt;
+			&lt;b&gt;Parameters&lt;/b&gt;&lt;br /&gt;
+			&lt;i&gt;strCustomerCID&lt;/i&gt;&lt;br /&gt;  CID of the Customer&lt;br /&gt;&lt;br /&gt;</wsdl:documentation>
+      <wsdl:input message="tns:IsQACustomerSoapIn" />
+      <wsdl:output message="tns:IsQACustomerSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCustInfoInputXML">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return the input XML document.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;string&lt;/span&gt; ReturnCustInfoInputXML(&lt;/b&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;An Xml document containing the CustInfo input XML.&lt;/i&gt;
+            &lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnCustInfoInputXMLSoapIn" />
+      <wsdl:output message="tns:ReturnCustInfoInputXMLSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMilitaryStatusName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return a string containing the code(wrapped in brackets) AND the Military Status description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMilitaryStatusName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strMilitaryStatus&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strBranchOfService&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Military Status description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strMilitaryStatus&lt;/i&gt;&lt;br/&gt;  The Military Status code.&lt;br/&gt;
+            &lt;i&gt;strBranchOfService&lt;/i&gt;&lt;br/&gt;  The Branch Of Service code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMilitaryStatusNameSoapIn" />
+      <wsdl:output message="tns:ReturnMilitaryStatusNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnBranchOfServiceName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return a string containing the code(wrapped in brackets) AND the Branch of Service description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnBranchOfServiceName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strBranchOfService&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Branch of Service description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strBranchOfService&lt;/i&gt;&lt;br/&gt;  The Branch Of Service code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnBranchOfServiceNameSoapIn" />
+      <wsdl:output message="tns:ReturnBranchOfServiceNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEligibilityCodeName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Eligibility code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnEligibilityCodeName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strEligibilityCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Eligibility code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strEligibilityCode&lt;/i&gt;&lt;br/&gt;  The Eligibility code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnEligibilityCodeNameSoapIn" />
+      <wsdl:output message="tns:ReturnEligibilityCodeNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Person Identifier code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPersonIdentifierName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Person Identifier code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Person Identifier code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonIdentifierNameSoapIn" />
+      <wsdl:output message="tns:ReturnPersonIdentifierNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMaritalStatusName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Marital Status code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMaritalStatusName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Marital Status code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Marital Status code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMaritalStatusNameSoapIn" />
+      <wsdl:output message="tns:ReturnMaritalStatusNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnSexName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Sex code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnSexName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Sex code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Sex code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnSexNameSoapIn" />
+      <wsdl:output message="tns:ReturnSexNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnRaceName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Race code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnRaceName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Race code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Race code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnRaceNameSoapIn" />
+      <wsdl:output message="tns:ReturnRaceNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEthnicityName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Ethnicity/Natural Origin code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnEthnicityName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Ethnicity/Natural Origin code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Ethnicity/Natural Origin code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnEthnicityNameSoapIn" />
+      <wsdl:output message="tns:ReturnEthnicityNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonnelCategoryName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Personnel Category code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPersonnelCategoryName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Personnel Category code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Personnel Category code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonnelCategoryNameSoapIn" />
+      <wsdl:output message="tns:ReturnPersonnelCategoryNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnReserveCategoryName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Reserve Category code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnReserveCategoryName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Reserve Category code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Reserve Category code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnReserveCategoryNameSoapIn" />
+      <wsdl:output message="tns:ReturnReserveCategoryNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPayPlanName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Pay Plan code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPayPlanName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Pay Plan code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Pay Plan code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPayPlanNameSoapIn" />
+      <wsdl:output message="tns:ReturnPayPlanNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnExchangeBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Exchange Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnExchangeBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Exchange Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Exchange Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnExchangeBenefitsNameSoapIn" />
+      <wsdl:output message="tns:ReturnExchangeBenefitsNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCommissaryBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Commissary Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnCommissaryBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Commissary Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Commissary Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnCommissaryBenefitsNameSoapIn" />
+      <wsdl:output message="tns:ReturnCommissaryBenefitsNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnTheaterBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Theater Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnTheaterBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Theater Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Theater Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnTheaterBenefitsNameSoapIn" />
+      <wsdl:output message="tns:ReturnTheaterBenefitsNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMedicalBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Medical Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMedicalBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Medical Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Medical Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMedicalBenefitsNameSoapIn" />
+      <wsdl:output message="tns:ReturnMedicalBenefitsNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnLifeStyleMarketName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Life Style Market code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnLifeStyleMarketName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Life Style Market code code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Life Style Market code code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnLifeStyleMarketNameSoapIn" />
+      <wsdl:output message="tns:ReturnLifeStyleMarketNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonAssociationName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Person Association code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPersonAssociationName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Person Association code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Person Association code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonAssociationNameSoapIn" />
+      <wsdl:output message="tns:ReturnPersonAssociationNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMatchReasonName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Match Reason code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMatchReasonName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Match Reason code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Match Reason code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMatchReasonNameSoapIn" />
+      <wsdl:output message="tns:ReturnMatchReasonNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnStateName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns the Name of the State for the code passed in.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnStateName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strStateAbbr&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;boolIncludeStateAbbreviation&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;The Name of the State.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strStateAbbr&lt;/i&gt;&lt;br/&gt;  The abbreviation of the State.&lt;br/&gt;
+            &lt;i&gt;boolIncludeStateAbbreviation&lt;/i&gt;&lt;br/&gt;  Do we include the abbreviation of the state after the state name in brackets.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnStateNameSoapIn" />
+      <wsdl:output message="tns:ReturnStateNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierTypeName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">The code that represents a specific kind of person identifier</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonIdentifierTypeNameSoapIn" />
+      <wsdl:output message="tns:ReturnPersonIdentifierTypeNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnFormattedDate">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns an empty string or a MM/DD/YYYY string for a Julian date passed in.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnFormattedDate(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strJulianDate&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;The Name of the State.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strJulianDate&lt;/i&gt;&lt;br/&gt;  The Julian Date to convert to MM/DD/YYYY date string.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnFormattedDateSoapIn" />
+      <wsdl:output message="tns:ReturnFormattedDateSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="clsCustInfoHttpGet">
+    <wsdl:operation name="PauseMethod">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will pause the CustInfo method.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;boolean&lt;/span&gt; PauseMethod(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;boolPauseMethod&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A boolean indicating if the pause worked.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;boolPauseMethod&lt;/i&gt;&lt;br/&gt;  A boolean indicating if the MQ service is to be paused.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:PauseMethodHttpGetIn" />
+      <wsdl:output message="tns:PauseMethodHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsMethodPaused">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return the status of the MQ service.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;boolean&lt;/span&gt; IsMethodPaused(&lt;/b&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A boolean indicating if the MQ service is paused.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:IsMethodPausedHttpGetIn" />
+      <wsdl:output message="tns:IsMethodPausedHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CustInfo">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This Web Service is used to acquire Customer Information from the IMS Database using either DOD_EDI_Number, CID or SSN + DOB.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; CustInfo(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCustInfoInputXML&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the XML with the customer information.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strCustInfoInputXML&lt;/i&gt;&lt;br/&gt;  The Customer Info Key(s): DOD_EDI_Number, CID, SSN, or SSN &amp; DOB.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:CustInfoHttpGetIn" />
+      <wsdl:output message="tns:CustInfoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CustInfoBySSN">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This Web Service is used to acquire Customer Information from the IMS Database using SSN.&lt;br /&gt;&lt;br /&gt;
+			&lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+			&lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; CustInfo(&lt;/b&gt;&lt;br/&gt;
+			&lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCustInfoInputXML&lt;/em&gt;&lt;br/&gt;
+			&lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+			&lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+			&lt;i&gt;A string containing the XML with the customer information.&lt;/i&gt;
+			&lt;br/&gt;&lt;br/&gt;
+			&lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+			&lt;i&gt;strCustInfoInputXML&lt;/i&gt;&lt;br/&gt;  The Customer Info Key(s): SSN.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:CustInfoBySSNHttpGetIn" />
+      <wsdl:output message="tns:CustInfoBySSNHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsQACustomer">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This Web Service is used to determine whether we have a QA customer&lt;br /&gt;&lt;br /&gt;
+			&lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+			&lt;b&gt;public &lt;span class="mainblue"&gt;string&lt;/span&gt; IsQACustomer&lt;/b&gt;(&lt;br /&gt;
+			&lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCustomerCID&lt;/em&gt;&lt;br /&gt;
+			&lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br /&gt;
+			&lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+			&lt;span class="main"&gt;  QA flag for this Customer 'Y' or 'N'&lt;/span&gt;&lt;br /&gt;
+			&lt;br /&gt;
+			&lt;b&gt;Parameters&lt;/b&gt;&lt;br /&gt;
+			&lt;i&gt;strCustomerCID&lt;/i&gt;&lt;br /&gt;  CID of the Customer&lt;br /&gt;&lt;br /&gt;</wsdl:documentation>
+      <wsdl:input message="tns:IsQACustomerHttpGetIn" />
+      <wsdl:output message="tns:IsQACustomerHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCustInfoInputXML">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return the input XML document.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;string&lt;/span&gt; ReturnCustInfoInputXML(&lt;/b&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;An Xml document containing the CustInfo input XML.&lt;/i&gt;
+            &lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnCustInfoInputXMLHttpGetIn" />
+      <wsdl:output message="tns:ReturnCustInfoInputXMLHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMilitaryStatusName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return a string containing the code(wrapped in brackets) AND the Military Status description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMilitaryStatusName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strMilitaryStatus&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strBranchOfService&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Military Status description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strMilitaryStatus&lt;/i&gt;&lt;br/&gt;  The Military Status code.&lt;br/&gt;
+            &lt;i&gt;strBranchOfService&lt;/i&gt;&lt;br/&gt;  The Branch Of Service code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMilitaryStatusNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnMilitaryStatusNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnBranchOfServiceName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return a string containing the code(wrapped in brackets) AND the Branch of Service description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnBranchOfServiceName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strBranchOfService&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Branch of Service description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strBranchOfService&lt;/i&gt;&lt;br/&gt;  The Branch Of Service code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnBranchOfServiceNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnBranchOfServiceNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEligibilityCodeName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Eligibility code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnEligibilityCodeName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strEligibilityCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Eligibility code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strEligibilityCode&lt;/i&gt;&lt;br/&gt;  The Eligibility code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnEligibilityCodeNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnEligibilityCodeNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Person Identifier code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPersonIdentifierName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Person Identifier code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Person Identifier code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonIdentifierNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnPersonIdentifierNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMaritalStatusName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Marital Status code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMaritalStatusName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Marital Status code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Marital Status code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMaritalStatusNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnMaritalStatusNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnSexName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Sex code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnSexName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Sex code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Sex code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnSexNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnSexNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnRaceName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Race code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnRaceName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Race code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Race code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnRaceNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnRaceNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEthnicityName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Ethnicity/Natural Origin code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnEthnicityName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Ethnicity/Natural Origin code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Ethnicity/Natural Origin code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnEthnicityNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnEthnicityNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonnelCategoryName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Personnel Category code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPersonnelCategoryName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Personnel Category code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Personnel Category code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonnelCategoryNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnPersonnelCategoryNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnReserveCategoryName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Reserve Category code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnReserveCategoryName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Reserve Category code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Reserve Category code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnReserveCategoryNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnReserveCategoryNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPayPlanName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Pay Plan code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPayPlanName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Pay Plan code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Pay Plan code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPayPlanNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnPayPlanNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnExchangeBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Exchange Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnExchangeBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Exchange Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Exchange Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnExchangeBenefitsNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnExchangeBenefitsNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCommissaryBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Commissary Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnCommissaryBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Commissary Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Commissary Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnCommissaryBenefitsNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnCommissaryBenefitsNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnTheaterBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Theater Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnTheaterBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Theater Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Theater Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnTheaterBenefitsNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnTheaterBenefitsNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMedicalBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Medical Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMedicalBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Medical Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Medical Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMedicalBenefitsNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnMedicalBenefitsNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnLifeStyleMarketName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Life Style Market code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnLifeStyleMarketName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Life Style Market code code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Life Style Market code code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnLifeStyleMarketNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnLifeStyleMarketNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonAssociationName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Person Association code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPersonAssociationName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Person Association code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Person Association code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonAssociationNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnPersonAssociationNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMatchReasonName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Match Reason code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMatchReasonName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Match Reason code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Match Reason code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMatchReasonNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnMatchReasonNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnStateName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns the Name of the State for the code passed in.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnStateName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strStateAbbr&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;boolIncludeStateAbbreviation&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;The Name of the State.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strStateAbbr&lt;/i&gt;&lt;br/&gt;  The abbreviation of the State.&lt;br/&gt;
+            &lt;i&gt;boolIncludeStateAbbreviation&lt;/i&gt;&lt;br/&gt;  Do we include the abbreviation of the state after the state name in brackets.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnStateNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnStateNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierTypeName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">The code that represents a specific kind of person identifier</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonIdentifierTypeNameHttpGetIn" />
+      <wsdl:output message="tns:ReturnPersonIdentifierTypeNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnFormattedDate">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns an empty string or a MM/DD/YYYY string for a Julian date passed in.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnFormattedDate(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strJulianDate&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;The Name of the State.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strJulianDate&lt;/i&gt;&lt;br/&gt;  The Julian Date to convert to MM/DD/YYYY date string.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnFormattedDateHttpGetIn" />
+      <wsdl:output message="tns:ReturnFormattedDateHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="clsCustInfoHttpPost">
+    <wsdl:operation name="PauseMethod">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will pause the CustInfo method.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;boolean&lt;/span&gt; PauseMethod(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;boolPauseMethod&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A boolean indicating if the pause worked.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;boolPauseMethod&lt;/i&gt;&lt;br/&gt;  A boolean indicating if the MQ service is to be paused.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:PauseMethodHttpPostIn" />
+      <wsdl:output message="tns:PauseMethodHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsMethodPaused">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return the status of the MQ service.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;boolean&lt;/span&gt; IsMethodPaused(&lt;/b&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A boolean indicating if the MQ service is paused.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:IsMethodPausedHttpPostIn" />
+      <wsdl:output message="tns:IsMethodPausedHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CustInfo">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This Web Service is used to acquire Customer Information from the IMS Database using either DOD_EDI_Number, CID or SSN + DOB.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; CustInfo(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCustInfoInputXML&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the XML with the customer information.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strCustInfoInputXML&lt;/i&gt;&lt;br/&gt;  The Customer Info Key(s): DOD_EDI_Number, CID, SSN, or SSN &amp; DOB.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:CustInfoHttpPostIn" />
+      <wsdl:output message="tns:CustInfoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CustInfoBySSN">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This Web Service is used to acquire Customer Information from the IMS Database using SSN.&lt;br /&gt;&lt;br /&gt;
+			&lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+			&lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; CustInfo(&lt;/b&gt;&lt;br/&gt;
+			&lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCustInfoInputXML&lt;/em&gt;&lt;br/&gt;
+			&lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+			&lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+			&lt;i&gt;A string containing the XML with the customer information.&lt;/i&gt;
+			&lt;br/&gt;&lt;br/&gt;
+			&lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+			&lt;i&gt;strCustInfoInputXML&lt;/i&gt;&lt;br/&gt;  The Customer Info Key(s): SSN.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:CustInfoBySSNHttpPostIn" />
+      <wsdl:output message="tns:CustInfoBySSNHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsQACustomer">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This Web Service is used to determine whether we have a QA customer&lt;br /&gt;&lt;br /&gt;
+			&lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+			&lt;b&gt;public &lt;span class="mainblue"&gt;string&lt;/span&gt; IsQACustomer&lt;/b&gt;(&lt;br /&gt;
+			&lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCustomerCID&lt;/em&gt;&lt;br /&gt;
+			&lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br /&gt;
+			&lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+			&lt;span class="main"&gt;  QA flag for this Customer 'Y' or 'N'&lt;/span&gt;&lt;br /&gt;
+			&lt;br /&gt;
+			&lt;b&gt;Parameters&lt;/b&gt;&lt;br /&gt;
+			&lt;i&gt;strCustomerCID&lt;/i&gt;&lt;br /&gt;  CID of the Customer&lt;br /&gt;&lt;br /&gt;</wsdl:documentation>
+      <wsdl:input message="tns:IsQACustomerHttpPostIn" />
+      <wsdl:output message="tns:IsQACustomerHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCustInfoInputXML">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return the input XML document.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;string&lt;/span&gt; ReturnCustInfoInputXML(&lt;/b&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;An Xml document containing the CustInfo input XML.&lt;/i&gt;
+            &lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnCustInfoInputXMLHttpPostIn" />
+      <wsdl:output message="tns:ReturnCustInfoInputXMLHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMilitaryStatusName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return a string containing the code(wrapped in brackets) AND the Military Status description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMilitaryStatusName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strMilitaryStatus&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strBranchOfService&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Military Status description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strMilitaryStatus&lt;/i&gt;&lt;br/&gt;  The Military Status code.&lt;br/&gt;
+            &lt;i&gt;strBranchOfService&lt;/i&gt;&lt;br/&gt;  The Branch Of Service code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMilitaryStatusNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnMilitaryStatusNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnBranchOfServiceName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method will return a string containing the code(wrapped in brackets) AND the Branch of Service description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnBranchOfServiceName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strBranchOfService&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Branch of Service description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strBranchOfService&lt;/i&gt;&lt;br/&gt;  The Branch Of Service code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnBranchOfServiceNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnBranchOfServiceNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEligibilityCodeName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Eligibility code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnEligibilityCodeName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strEligibilityCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Eligibility code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strEligibilityCode&lt;/i&gt;&lt;br/&gt;  The Eligibility code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnEligibilityCodeNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnEligibilityCodeNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Person Identifier code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPersonIdentifierName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Person Identifier code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Person Identifier code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonIdentifierNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnPersonIdentifierNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMaritalStatusName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Marital Status code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMaritalStatusName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Marital Status code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Marital Status code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMaritalStatusNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnMaritalStatusNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnSexName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Sex code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnSexName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Sex code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Sex code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnSexNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnSexNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnRaceName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Race code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnRaceName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Race code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Race code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnRaceNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnRaceNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEthnicityName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Ethnicity/Natural Origin code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnEthnicityName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Ethnicity/Natural Origin code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Ethnicity/Natural Origin code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnEthnicityNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnEthnicityNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonnelCategoryName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Personnel Category code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPersonnelCategoryName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Personnel Category code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Personnel Category code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonnelCategoryNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnPersonnelCategoryNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnReserveCategoryName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Reserve Category code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnReserveCategoryName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Reserve Category code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Reserve Category code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnReserveCategoryNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnReserveCategoryNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPayPlanName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Pay Plan code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPayPlanName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Pay Plan code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Pay Plan code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPayPlanNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnPayPlanNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnExchangeBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Exchange Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnExchangeBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Exchange Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Exchange Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnExchangeBenefitsNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnExchangeBenefitsNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCommissaryBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Commissary Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnCommissaryBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Commissary Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Commissary Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnCommissaryBenefitsNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnCommissaryBenefitsNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnTheaterBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Theater Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnTheaterBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Theater Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Theater Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnTheaterBenefitsNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnTheaterBenefitsNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMedicalBenefitsName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Medical Benefits code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMedicalBenefitsName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Medical Benefits code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Medical Benefits code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMedicalBenefitsNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnMedicalBenefitsNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnLifeStyleMarketName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Life Style Market code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnLifeStyleMarketName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Life Style Market code code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Life Style Market code code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnLifeStyleMarketNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnLifeStyleMarketNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonAssociationName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Person Association code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnPersonAssociationName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Person Association code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Person Association code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonAssociationNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnPersonAssociationNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMatchReasonName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">A string containing the code(wrapped in brackets) AND the Match Reason code description.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnMatchReasonName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strSystemType&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strCode&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;A string containing the code(wrapped in brackets) AND the Match Reason code description.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strSystemType&lt;/i&gt;&lt;br/&gt;  The system the code is from.  Values are "CCD" and "RBS".&lt;br/&gt;
+            &lt;i&gt;strCode&lt;/i&gt;&lt;br/&gt;  The Match Reason code.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnMatchReasonNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnMatchReasonNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnStateName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns the Name of the State for the code passed in.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnStateName(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strStateAbbr&lt;/em&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;boolIncludeStateAbbreviation&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;The Name of the State.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strStateAbbr&lt;/i&gt;&lt;br/&gt;  The abbreviation of the State.&lt;br/&gt;
+            &lt;i&gt;boolIncludeStateAbbreviation&lt;/i&gt;&lt;br/&gt;  Do we include the abbreviation of the state after the state name in brackets.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnStateNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnStateNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierTypeName">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">The code that represents a specific kind of person identifier</wsdl:documentation>
+      <wsdl:input message="tns:ReturnPersonIdentifierTypeNameHttpPostIn" />
+      <wsdl:output message="tns:ReturnPersonIdentifierTypeNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnFormattedDate">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns an empty string or a MM/DD/YYYY string for a Julian date passed in.&lt;br /&gt;&lt;br /&gt;
+            &lt;table border="0"&gt;&lt;tr&gt;&lt;td&gt;
+            &lt;b&gt;public &lt;span class="mainblue"&gt;bool&lt;/span&gt; ReturnFormattedDate(&lt;/b&gt;&lt;br/&gt;
+            &lt;span class="mainblue"&gt;string&lt;/span&gt; &lt;em&gt;strJulianDate&lt;/em&gt;&lt;br/&gt;
+            &lt;b&gt;);&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br/&gt;
+            &lt;b&gt;Returns&lt;/b&gt;&lt;br /&gt;
+            &lt;i&gt;The Name of the State.&lt;/i&gt;
+            &lt;br/&gt;&lt;br/&gt;
+            &lt;b&gt;Parameters&lt;/b&gt;&lt;br/&gt;
+            &lt;i&gt;strJulianDate&lt;/i&gt;&lt;br/&gt;  The Julian Date to convert to MM/DD/YYYY date string.&lt;br/&gt;</wsdl:documentation>
+      <wsdl:input message="tns:ReturnFormattedDateHttpPostIn" />
+      <wsdl:output message="tns:ReturnFormattedDateHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="clsCustInfoSoap" type="tns:clsCustInfoSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="PauseMethod">
+      <soap:operation soapAction="http://www.aafes.com/PauseMethod" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsMethodPaused">
+      <soap:operation soapAction="http://www.aafes.com/IsMethodPaused" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustInfo">
+      <soap:operation soapAction="http://www.aafes.com/CustInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustInfoBySSN">
+      <soap:operation soapAction="http://www.aafes.com/CustInfoBySSN" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsQACustomer">
+      <soap:operation soapAction="http://www.aafes.com/IsQACustomer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCustInfoInputXML">
+      <soap:operation soapAction="http://www.aafes.com/ReturnCustInfoInputXML" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMilitaryStatusName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnMilitaryStatusName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnBranchOfServiceName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnBranchOfServiceName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEligibilityCodeName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnEligibilityCodeName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnPersonIdentifierName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMaritalStatusName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnMaritalStatusName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnSexName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnSexName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnRaceName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnRaceName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEthnicityName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnEthnicityName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonnelCategoryName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnPersonnelCategoryName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnReserveCategoryName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnReserveCategoryName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPayPlanName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnPayPlanName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnExchangeBenefitsName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnExchangeBenefitsName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCommissaryBenefitsName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnCommissaryBenefitsName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnTheaterBenefitsName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnTheaterBenefitsName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMedicalBenefitsName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnMedicalBenefitsName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnLifeStyleMarketName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnLifeStyleMarketName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonAssociationName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnPersonAssociationName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMatchReasonName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnMatchReasonName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnStateName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnStateName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierTypeName">
+      <soap:operation soapAction="http://www.aafes.com/ReturnPersonIdentifierTypeName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnFormattedDate">
+      <soap:operation soapAction="http://www.aafes.com/ReturnFormattedDate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="clsCustInfoSoap12" type="tns:clsCustInfoSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="PauseMethod">
+      <soap12:operation soapAction="http://www.aafes.com/PauseMethod" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsMethodPaused">
+      <soap12:operation soapAction="http://www.aafes.com/IsMethodPaused" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustInfo">
+      <soap12:operation soapAction="http://www.aafes.com/CustInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustInfoBySSN">
+      <soap12:operation soapAction="http://www.aafes.com/CustInfoBySSN" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsQACustomer">
+      <soap12:operation soapAction="http://www.aafes.com/IsQACustomer" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCustInfoInputXML">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnCustInfoInputXML" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMilitaryStatusName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnMilitaryStatusName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnBranchOfServiceName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnBranchOfServiceName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEligibilityCodeName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnEligibilityCodeName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnPersonIdentifierName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMaritalStatusName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnMaritalStatusName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnSexName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnSexName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnRaceName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnRaceName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEthnicityName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnEthnicityName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonnelCategoryName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnPersonnelCategoryName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnReserveCategoryName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnReserveCategoryName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPayPlanName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnPayPlanName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnExchangeBenefitsName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnExchangeBenefitsName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCommissaryBenefitsName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnCommissaryBenefitsName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnTheaterBenefitsName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnTheaterBenefitsName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMedicalBenefitsName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnMedicalBenefitsName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnLifeStyleMarketName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnLifeStyleMarketName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonAssociationName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnPersonAssociationName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMatchReasonName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnMatchReasonName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnStateName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnStateName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierTypeName">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnPersonIdentifierTypeName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnFormattedDate">
+      <soap12:operation soapAction="http://www.aafes.com/ReturnFormattedDate" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="clsCustInfoHttpGet" type="tns:clsCustInfoHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="PauseMethod">
+      <http:operation location="/PauseMethod" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsMethodPaused">
+      <http:operation location="/IsMethodPaused" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustInfo">
+      <http:operation location="/CustInfo" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustInfoBySSN">
+      <http:operation location="/CustInfoBySSN" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsQACustomer">
+      <http:operation location="/IsQACustomer" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCustInfoInputXML">
+      <http:operation location="/ReturnCustInfoInputXML" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMilitaryStatusName">
+      <http:operation location="/ReturnMilitaryStatusName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnBranchOfServiceName">
+      <http:operation location="/ReturnBranchOfServiceName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEligibilityCodeName">
+      <http:operation location="/ReturnEligibilityCodeName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierName">
+      <http:operation location="/ReturnPersonIdentifierName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMaritalStatusName">
+      <http:operation location="/ReturnMaritalStatusName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnSexName">
+      <http:operation location="/ReturnSexName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnRaceName">
+      <http:operation location="/ReturnRaceName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEthnicityName">
+      <http:operation location="/ReturnEthnicityName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonnelCategoryName">
+      <http:operation location="/ReturnPersonnelCategoryName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnReserveCategoryName">
+      <http:operation location="/ReturnReserveCategoryName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPayPlanName">
+      <http:operation location="/ReturnPayPlanName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnExchangeBenefitsName">
+      <http:operation location="/ReturnExchangeBenefitsName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCommissaryBenefitsName">
+      <http:operation location="/ReturnCommissaryBenefitsName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnTheaterBenefitsName">
+      <http:operation location="/ReturnTheaterBenefitsName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMedicalBenefitsName">
+      <http:operation location="/ReturnMedicalBenefitsName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnLifeStyleMarketName">
+      <http:operation location="/ReturnLifeStyleMarketName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonAssociationName">
+      <http:operation location="/ReturnPersonAssociationName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMatchReasonName">
+      <http:operation location="/ReturnMatchReasonName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnStateName">
+      <http:operation location="/ReturnStateName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierTypeName">
+      <http:operation location="/ReturnPersonIdentifierTypeName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnFormattedDate">
+      <http:operation location="/ReturnFormattedDate" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="clsCustInfoHttpPost" type="tns:clsCustInfoHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="PauseMethod">
+      <http:operation location="/PauseMethod" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsMethodPaused">
+      <http:operation location="/IsMethodPaused" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustInfo">
+      <http:operation location="/CustInfo" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustInfoBySSN">
+      <http:operation location="/CustInfoBySSN" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsQACustomer">
+      <http:operation location="/IsQACustomer" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCustInfoInputXML">
+      <http:operation location="/ReturnCustInfoInputXML" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMilitaryStatusName">
+      <http:operation location="/ReturnMilitaryStatusName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnBranchOfServiceName">
+      <http:operation location="/ReturnBranchOfServiceName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEligibilityCodeName">
+      <http:operation location="/ReturnEligibilityCodeName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierName">
+      <http:operation location="/ReturnPersonIdentifierName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMaritalStatusName">
+      <http:operation location="/ReturnMaritalStatusName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnSexName">
+      <http:operation location="/ReturnSexName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnRaceName">
+      <http:operation location="/ReturnRaceName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnEthnicityName">
+      <http:operation location="/ReturnEthnicityName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonnelCategoryName">
+      <http:operation location="/ReturnPersonnelCategoryName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnReserveCategoryName">
+      <http:operation location="/ReturnReserveCategoryName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPayPlanName">
+      <http:operation location="/ReturnPayPlanName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnExchangeBenefitsName">
+      <http:operation location="/ReturnExchangeBenefitsName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnCommissaryBenefitsName">
+      <http:operation location="/ReturnCommissaryBenefitsName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnTheaterBenefitsName">
+      <http:operation location="/ReturnTheaterBenefitsName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMedicalBenefitsName">
+      <http:operation location="/ReturnMedicalBenefitsName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnLifeStyleMarketName">
+      <http:operation location="/ReturnLifeStyleMarketName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonAssociationName">
+      <http:operation location="/ReturnPersonAssociationName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMatchReasonName">
+      <http:operation location="/ReturnMatchReasonName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnStateName">
+      <http:operation location="/ReturnStateName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnPersonIdentifierTypeName">
+      <http:operation location="/ReturnPersonIdentifierTypeName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnFormattedDate">
+      <http:operation location="/ReturnFormattedDate" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="clsCustInfo">
+    <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">® AAFES is a registered trademark of the Army and Air Force Exchange Service. The Army and Air Force Exchange Service (AAFES) website is an unofficial Department of Defense (DoD) website published and maintained by AAFES with non-appropriated funds. For more information regarding these Web Services please contact the AAFES Webmaster (webmaster@aafes.com).&lt;style type="text/css"&gt;.main{font-family:Verdana;color:black;}.mainred{font-family:Verdana;color:red;}.mainblue{font-family:Verdana;color:blue;}&lt;/style&gt;</wsdl:documentation>
+    <wsdl:port name="clsCustInfoSoap" binding="tns:clsCustInfoSoap">
+      <soap:address location="http://gecko-hqws02-qa.aafes.com/wsECS/clsCustInfo.asmx" />
+    </wsdl:port>
+    <wsdl:port name="clsCustInfoSoap12" binding="tns:clsCustInfoSoap12">
+      <soap12:address location="http://gecko-hqws02-qa.aafes.com/wsECS/clsCustInfo.asmx" />
+    </wsdl:port>
+    <wsdl:port name="clsCustInfoHttpGet" binding="tns:clsCustInfoHttpGet">
+      <http:address location="http://gecko-hqws02-qa.aafes.com/wsECS/clsCustInfo.asmx" />
+    </wsdl:port>
+    <wsdl:port name="clsCustInfoHttpPost" binding="tns:clsCustInfoHttpPost">
+      <http:address location="http://gecko-hqws02-qa.aafes.com/wsECS/clsCustInfo.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

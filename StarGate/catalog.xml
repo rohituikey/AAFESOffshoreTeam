@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="file:/home/ganjis/Shailendra/ECOMM/Projects/stargate/StarGate/../../../Docs/CreditMessage12S1.xsd" uri="src/main/resources/jaxb/creditmessage/CreditMessage12S1.xsd"/>
+</catalog>

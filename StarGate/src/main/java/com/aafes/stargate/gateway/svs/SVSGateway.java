@@ -53,33 +53,22 @@ public class SVSGateway extends Gateway {
     }
 
     private boolean validateTransaction(Transaction t) throws GatewayException {
-
-        if(t.getCurrencycode() == null || t.getCurrencycode().trim().isEmpty()){
-            buildErrorResponse(t, "", "CURRENCY IS NULL");
-            return false;
-        }
-        
-        if(!RequestType.ISSUE.equals(t.getRequestType())){
+         LOG.info("Method validateTransaction started. Class Name SVSGateway");
+        if(RequestType.INQUIRY.equals(t.getRequestType()) ||
+               RequestType.PREAUTH.equals(t.getRequestType()) ||
+                    RequestType.FINAL_AUTH.equals(t.getRequestType())){
             if(t.getAccount() == null || t.getAccount().trim().isEmpty()){
                 buildErrorResponse(t, "", "CARD NUMBER IS NULL");
                 return false;
             } else if(t.getGcpin() == null || t.getGcpin().trim().isEmpty()){
                 buildErrorResponse(t, "", "PIN NUMBER IS NULL");
                 return false;
-            }
+            } else if(t.getTransactionId() == null || t.getTransactionId().trim().isEmpty()){
+                buildErrorResponse(t, "", "TRANSACTION ID IS NULL");
+                return false;
+            } 
         }   
-        
-        if(t.getLocalDateTime() == null || t.getLocalDateTime().trim().isEmpty()){
-            buildErrorResponse(t, "", "TRANSACITON DATE IS NULL");
-            return false;
-        } else if(t.getOrderNumber() == null || t.getOrderNumber().isEmpty()){
-            buildErrorResponse(t, "", "INVOICE NUMBER IS NULL");
-            return false;
-        } else if(!RequestType.ISSUE.equals(t.getRequestType()) && (t.getTransactionId() == null || t.getTransactionId().trim().isEmpty())){
-            buildErrorResponse(t, "", "TRANSACTION ID IS NULL");
-            return false;
-        } 
-        
+        LOG.info("Method validateTransaction ended. Class Name SVSGateway");
         return true;
     }
 
@@ -92,5 +81,4 @@ public class SVSGateway extends Gateway {
     public void setSvsgp(SVSGatewayProcessor svsgp) {
         this.svsgp = svsgp;
     }
-
 }

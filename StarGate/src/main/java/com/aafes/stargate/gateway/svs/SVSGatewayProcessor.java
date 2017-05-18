@@ -11,7 +11,13 @@ import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.dao.SVSDAO;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
-import java.math.BigDecimal;
+import com.svs.svsxml.beans.Amount;
+import com.svs.svsxml.beans.BalanceInquiryRequest;
+import com.svs.svsxml.beans.BalanceInquiryResponse;
+import com.svs.svsxml.beans.Card;
+import com.svs.svsxml.beans.Merchant;
+import com.svs.svsxml.service.SVSXMLWay;
+import com.svs.svsxml.service.SVSXMLWayService;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.ejb.EJB;
@@ -42,7 +48,9 @@ public class SVSGatewayProcessor {
                     processBalanceInquiry(t);
                     break;
                 case RequestType.PREAUTH:
-                    preAuth(t);
+                    //preAuth(t);
+                    PreAuthorizationProcessor preAuthorizationProcessorObj = new PreAuthorizationProcessor();
+                    preAuthorizationProcessorObj.preAuth(t);
                     break;
                 case RequestType.FINAL_AUTH:
                     preAuthComplete(t);

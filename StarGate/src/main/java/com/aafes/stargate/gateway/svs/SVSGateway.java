@@ -75,7 +75,7 @@ public class SVSGateway extends Gateway {
         } else if(t.getOrderNumber() == null || t.getOrderNumber().isEmpty()){
             buildErrorResponse(t, "", "INVOICE NUMBER IS NULL");
             return false;
-        } else if(t.getTransactionId() == null || t.getTransactionId().trim().isEmpty()){
+        } else if(!RequestType.ISSUE.equals(t.getRequestType()) && (t.getTransactionId() == null || t.getTransactionId().trim().isEmpty())){
             buildErrorResponse(t, "", "TRANSACTION ID IS NULL");
             return false;
         } 

@@ -56,7 +56,8 @@ public class SVSGatewayProcessor {
                     reverseTran(t);
                     break;
                 case RequestType.ISSUE:
-                    issueGiftCard(t);
+                    SVSIssue sVSIssue = new SVSIssue();
+                    sVSIssue.issueGiftCard(t);
                     break;
                 default:
                     log.info("No Matching request type found.");

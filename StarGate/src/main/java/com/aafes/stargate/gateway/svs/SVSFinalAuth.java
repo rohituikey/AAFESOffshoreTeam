@@ -73,7 +73,7 @@ public class SVSFinalAuth {
             if(transaction.getOrderNumber().length()<8){
                 int zeroesToBeAppended = 8-transaction.getOrderNumber().length();
                 for(int i=0 ; i<zeroesToBeAppended ; i++){
-                    transaction.getOrderNumber()="0"+ transaction.getOrderNumber();
+                    transaction.setOrderNumber("0"+ transaction.getOrderNumber());
                 }
             }
             request.setInvoiceNumber(transaction.getOrderNumber().substring(transaction.getOrderNumber().length() - 8));

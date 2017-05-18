@@ -7,22 +7,13 @@ package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.GiftCard;
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.dao.SVSDAO;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
-import com.svs.svsxml.beans.Amount;
-import com.svs.svsxml.beans.BalanceInquiryRequest;
-import com.svs.svsxml.beans.BalanceInquiryResponse;
-import com.svs.svsxml.beans.Card;
-import com.svs.svsxml.beans.Merchant;
-import com.svs.svsxml.service.SVSXMLWay;
-import com.svs.svsxml.service.SVSXMLWayService;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -31,6 +22,8 @@ import org.slf4j.LoggerFactory;
  */
 @Stateless
 public class SVSGatewayProcessor {
+
+    private SVSFinalAuth finalAuth;
 
     private static final org.slf4j.Logger log
             = LoggerFactory.getLogger(SVSGatewayProcessor.class.getSimpleName());
@@ -55,7 +48,9 @@ public class SVSGatewayProcessor {
                     preAuthorizationProcessorObj.preAuth(t);
                     break;
                 case RequestType.FINAL_AUTH:
-                    preAuthComplete(t);
+                    //preAuthComplete(t);
+                    finalAuth = new SVSFinalAuth();
+                    finalAuth.completePreAuth(t);
                     break;
                 case RequestType.REVERSAL:
                     reverseTran(t);
@@ -193,5 +188,13 @@ public class SVSGatewayProcessor {
         t.setDescriptionField("INVALID_CARD");
         t.setReasonCode("201");
 
+    }
+
+    public SVSFinalAuth getFinalAuth() {
+        return finalAuth;
+    }
+
+    public void setFinalAuth(SVSFinalAuth finalAuth) {
+        this.finalAuth = finalAuth;
     }
 }

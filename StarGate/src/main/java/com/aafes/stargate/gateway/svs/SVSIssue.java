@@ -51,6 +51,8 @@ public class SVSIssue {
         request.setMerchant(merchant);
         request.setRoutingID(StarGateConstants.ROUTING_ID);//("6006491571000000000");  transaction.routingId is not available
         request.setStan(t.getSTAN());
+        request.setTransactionID(t.getTransactionId());
+        
         //   request.setTransactionID(t.getTransactionId());
         // how to check with duplicate value
         request.setCheckForDuplicate(StarGateConstants.CHECK_FOR_DUPLICATE);

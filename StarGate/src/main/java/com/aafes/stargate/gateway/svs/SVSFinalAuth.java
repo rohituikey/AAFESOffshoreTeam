@@ -6,6 +6,7 @@
 package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.util.StarGateConstants;
 import com.aafes.stargate.util.SvsUtil;
 import com.svs.svsxml.beans.Amount;
@@ -40,27 +41,21 @@ public class SVSFinalAuth {
             card.setPinNumber(transaction.getGcpin());
             card.setCardTrackOne(transaction.getTrack1());
             card.setCardTrackTwo(transaction.getTrack2());
-            LOGGER.info("Card Details are : Card number :" + card.getCardNumber() + " Git card pin number would be : " + card.getPinNumber());
             request.setCard(card);
-            LOGGER.info("Date " + "2017-05-14T15:37:01" + " Stan: " + transaction.getSTAN());
-            request.setDate(transaction.getLocalDateTime());
+            request.setDate(SvsUtil.formatLocalDateTime());
 
-            //Default it to FALSE. Boolean value present in the SOAP request which specifies the desired SVS 
-//        webservices processing style; DUP-CHECK processing is used when checkForDuplicate=TRUE, REVERSAL
-//            processing when checkForDuplicate=FALSE
-            request.setCheckForDuplicate(StarGateConstants.CHECK_FOR_DUPLICATE);
-//        utilized when checkForDuplicate is FALSE
-//Systems Trace Audit Number. 
-            request.setStan(transaction.getSTAN());
+         
+            request.setCheckForDuplicate(StarGateConstants.TRUE);
+
+            //request.setStan(transaction.getSTAN());
 
             //Merchant details 
             Merchant merchant = new Merchant();
-            merchant.setDivision(transaction.getDivisionnumber());
-            merchant.setMerchantName(transaction.getMerchantOrg());
+            merchant.setDivision(StarGateConstants.MERCHANT_DIVISION_NUMBER);
+            merchant.setMerchantName(StarGateConstants.MERCHANT_NAME);
             merchant.setMerchantNumber(StarGateConstants.MERCHANT_NUMBER);
             merchant.setStoreNumber(StarGateConstants.STORE_NUMBER);
             request.setMerchant(merchant);
-            LOGGER.info("merchant details: division :" + merchant.getDivision() + " name : " + merchant.getMerchantName() + " merchant number : " + merchant.getMerchantNumber() + " Store Number : " + merchant.getStoreNumber());
 
             request.setRoutingID(StarGateConstants.ROUTING_ID);
             Amount amount = new Amount();
@@ -69,29 +64,27 @@ public class SVSFinalAuth {
             request.setTransactionAmount(amount);
             request.setTransactionID(transaction.getTransactionId());
             //invoice number should be last 8 digits of order Number
-            
-            if(transaction.getOrderNumber().length()<8){
-                int zeroesToBeAppended = 8-transaction.getOrderNumber().length();
-                for(int i=0 ; i<zeroesToBeAppended ; i++){
-                    transaction.setOrderNumber("0"+ transaction.getOrderNumber());
-                }
-            }
             request.setInvoiceNumber(transaction.getOrderNumber().substring(transaction.getOrderNumber().length() - 8));
+            LOGGER.info("Amount Details : " + amount.getCurrency() + amount.getAmount() + "Transacion ID: " + transaction.getTransactionId() + " Invoice Number : " + request.getInvoiceNumber());
             
-            LOGGER.info("Amount Details : " + amount.getCurrency() + amount.getAmount());
-            LOGGER.info("Transacion ID: " + transaction.getTransactionId());
-
             PreAuthCompleteResponse response = sVSXMLWay.preAuthComplete(request);
-
-            if (null != response.getAuthorizationCode() && null != response.getReturnCode().getReturnCode() && null != response.getReturnCode().getReturnDescription()) {
+            
+            //approved amount
+            transaction.setAmtPreAuthorized((long) response.getApprovedAmount().getAmount());
+            //balance amount
+            transaction.setBalanceAmount((long) response.getBalanceAmount().getAmount());
+            transaction.setCurrencycode(StarGateConstants.CURRENCY);
+            transaction.setCardReferenceID(response.getCard().getCardNumber());
+           
                 transaction.setAuthoriztionCode(response.getAuthorizationCode());
                 transaction.setReasonCode(response.getReturnCode().getReturnCode());
                 transaction.setDescriptionField(response.getReturnCode().getReturnDescription());
-            }
-
+           
             LOGGER.info("response : Authorization code :" + response.getAuthorizationCode());
         } catch (Exception e) {
             LOGGER.error("Unexpected exception: " + e.getMessage());
+            throw new GatewayException ("INTERNAL SYSTEM ERROR");
+            
         }
     }
 }

@@ -51,7 +51,7 @@ public class BalanceInquiryProcessor {
         merchant.setStoreNumber(StarGateConstants.STORE_NUMBER);
         balanceInquiryRequest.setMerchant(merchant);
 
-        balanceInquiryRequest.setCheckForDuplicate(StarGateConstants.CHECK_FOR_DUPLICATE);
+        balanceInquiryRequest.setCheckForDuplicate(StarGateConstants.TRUE);
         balanceInquiryRequest.setTransactionID(t.getTransactionId());
         balanceInquiryRequest.setDate(t.getLocalDateTime());
         //log.info(t.getOrderNumber().substring(t.getOrderNumber().length()-8));

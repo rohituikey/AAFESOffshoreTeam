@@ -17,5 +17,5 @@ public class StarGateConstants {
     public static final String MERCHANT_NUMBER = "061571";
     public static final String STORE_NUMBER = "0000012345";
     public static final String ROUTING_ID = "6006491571000000000";
-    public static final boolean CHECK_FOR_DUPLICATE = true;
+    public static final boolean TRUE = true;
 }

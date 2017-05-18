@@ -119,7 +119,7 @@ public class PreAuthorizationProcessor {
             // utilized when checkForDuplicate is FALSE. checkForDuplicate defauly is TRUE (SVSXMLSpecReviewV1.2.docx)
             //preAuthRequest.setStan(t.getSTAN()); 
             preAuthRequest.setTransactionID(t.getTransactionId());
-            preAuthRequest.setCheckForDuplicate(StarGateConstants.CHECK_FOR_DUPLICATE);
+            preAuthRequest.setCheckForDuplicate(StarGateConstants.TRUE);
 
             processPreAuthRequest(t);
             

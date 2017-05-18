@@ -1,34 +1,52 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
+/* To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
- * REQUEST SHOULD HAVE FOLLOWING FIELDS AS PER DOCUMENT SHARED ON 17-MAY-2017
-    <requestedAmount>			
-	amount          Mandatory
-	currency	Mandatory
-    </requestedAmount>			
-    <card>			
-        cardNumber	Mandatory
-        pinNumber	Mandatory
-        cardTrackOne	Non-Mandatory
-        cardTrackTwo	Non-Mandatory
-    </card>			
-    date                Mandatory
-    invoiceNumber	Mandatory
-    <merchant>			
-        merchantName	Mandatory
-        merchantNumber	Mandatory
-        storeNumber	Mandatory
-        division	Non-Mandatory
-    </merchant>			
-    routingID           Mandatory
-    stan                Non-Mandatory
-    transactionID	Mandatory
-    checkForDuplicate	Mandatory
+ * REQUEST SHOULD HAVE FOLLOWING FIELDS AS PER DOCUMENT SVSXMLSpecReviewV1.2.docx SHARED ON 17-MAY-2017
+    <?xml version="1.0" encoding="UTF-8"?>
+    <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://service.svsxml.svs.com" 
+    xmlns:ns2="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+   <SOAP-ENV:Header>
+      <ns2:Security SOAP-ENV:mustUnderstand="1">
+         <ns2:UsernameToken>
+            <ns2:Username>*** Username***</ns2:Username>
+            <ns2:Password>***Password***</ns2:Password>
+         </ns2:UsernameToken>
+      </ns2:Security>
+   </SOAP-ENV:Header>
+   <SOAP-ENV:Body>
+      <ns1:balanceInquiry>
+         <request>
+            <date>2017-01-13T15:37:01</date>
+            <invoiceNumber>9999</invoiceNumber>
+            <merchant>
+               <merchantName>IT-D VP OFFICE</merchantName>
+               <merchantNumber>061571</merchantNumber>
+               <storeNumber>F00500</storeNumber>
+               <division />
+            </merchant>
+            <routingID>6006491571000000000</routingID>
+            <stan />
+            <transactionID>7115060003730886</transactionID>
+            <checkForDuplicate>true</checkForDuplicate>
+            <card>
+               <cardCurrency>USD</cardCurrency>
+               <cardNumber>6006496628299904508</cardNumber>
+               <pinNumber>2496</pinNumber>
+               <cardExpiration />
+            </card>
+            <amount>
+               <amount>0.00</amount>
+               <currency>USD</currency>
+            </amount>
+         </request>
+      </ns1:balanceInquiry>
+   </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
  */
 package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StarGateConstants;
 import com.aafes.stargate.util.SvsUtil;
 import com.svs.svsxml.beans.Amount;
@@ -51,14 +69,17 @@ public class PreAuthorizationProcessor {
     String sMethodName = "";
     final String CLASS_NAME = PreAuthorizationProcessor.this.getClass().getSimpleName();
     boolean validationErrFlg = false;
-    double approvedAmount;
+    private double approvedAmount;
+    private PreAuthResponse preAuthResponseObj = null;
+    private PreAuthRequest preAuthRequest = null;
+    private SVSXMLWay sVSXMLWay = null;
 
     public void preAuth(Transaction t) {
         sMethodName = "preAuth";
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         try {
-            SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
-            PreAuthRequest preAuthRequest = new PreAuthRequest();
+            sVSXMLWay = SvsUtil.setUserNamePassword();
+            preAuthRequest = new PreAuthRequest();
 
             Amount amountObj = new Amount();
             if(String.valueOf(t.getAmount()) != null){
@@ -95,12 +116,27 @@ public class PreAuthorizationProcessor {
             preAuthRequest.setMerchant(merchant);
             
             preAuthRequest.setRoutingID(StarGateConstants.ROUTING_ID);
-            preAuthRequest.setStan(t.getSTAN());
+            // utilized when checkForDuplicate is FALSE. checkForDuplicate defauly is TRUE (SVSXMLSpecReviewV1.2.docx)
+            //preAuthRequest.setStan(t.getSTAN()); 
             preAuthRequest.setTransactionID(t.getTransactionId());
             preAuthRequest.setCheckForDuplicate(StarGateConstants.CHECK_FOR_DUPLICATE);
 
-            PreAuthResponse preAuthResponseObj = sVSXMLWay.preAuth(preAuthRequest);
-
+            processPreAuthRequest(t);
+            
+        } catch (Exception e) {
+            LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
+            t.setReasonCode("");
+            t.setResponseType(ResponseType.DECLINED);
+            t.setDescriptionField("INTERNAL SYSTEM ERROR");
+        }
+        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+    }
+    
+    private void processPreAuthRequest(Transaction t){
+        sMethodName = "processPreAuthRequest";
+        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        try{
+            preAuthResponseObj = sVSXMLWay.preAuth(preAuthRequest);
             if(preAuthResponseObj != null){
                 if(preAuthResponseObj.getReturnCode() != null){
                     LOGGER.info("ReturnCode : " + String.valueOf(preAuthResponseObj.getReturnCode().getReturnCode()));
@@ -112,37 +148,37 @@ public class PreAuthorizationProcessor {
                 
                 if(preAuthResponseObj.getApprovedAmount() != null){
                     approvedAmount = preAuthResponseObj.getApprovedAmount().getAmount();
-                    LOGGER.info("ApprovedAmount : " + String.valueOf(approvedAmount));
-                    LOGGER.info("Currency : " + preAuthResponseObj.getApprovedAmount().getCurrency());
+                    //LOGGER.info("ApprovedAmount : " + String.valueOf(approvedAmount));
+                    //LOGGER.info("Currency : " + preAuthResponseObj.getApprovedAmount().getCurrency());
                     t.setAmount((long) approvedAmount);
                     t.setCurrencycode(preAuthResponseObj.getApprovedAmount().getCurrency());
                     t.setAmtPreAuthorized((long) approvedAmount);
                 }
                 
                 if(preAuthResponseObj.getBalanceAmount() != null){
-                    LOGGER.info("BalanceAmount : " + String.valueOf(preAuthResponseObj.getBalanceAmount().getAmount()));
+                    //LOGGER.info("BalanceAmount : " + String.valueOf(preAuthResponseObj.getBalanceAmount().getAmount()));
                     t.setBalanceAmount((long) preAuthResponseObj.getBalanceAmount().getAmount());
-                    LOGGER.info("Currency : " + preAuthResponseObj.getBalanceAmount().getCurrency());
+                    //LOGGER.info("Currency : " + preAuthResponseObj.getBalanceAmount().getCurrency());
                 }
                 
                 LOGGER.info("AuthorizationCode : " + preAuthResponseObj.getAuthorizationCode());
                 if(preAuthResponseObj.getReturnCode() != null) LOGGER.info("ReturnCode : " + preAuthResponseObj.getReturnCode().getReturnCode());
 
                 if(preAuthResponseObj.getCard() != null){
-                    LOGGER.info("CardNumber : " + preAuthResponseObj.getCard().getCardNumber());
+                    //LOGGER.info("CardNumber : " + preAuthResponseObj.getCard().getCardNumber());
                     t.setCardSequenceNumber(preAuthResponseObj.getCard().getCardNumber());
-                    LOGGER.info("CardHolderName : " + preAuthResponseObj.getCard().getCardNumber());
-                    LOGGER.info("CardCurrency : " + preAuthResponseObj.getCard().getCardCurrency());
-                    LOGGER.info("CardExpiration : " + preAuthResponseObj.getCard().getCardExpiration());
-                    LOGGER.info("CardTrackOne : " + preAuthResponseObj.getCard().getCardTrackOne());
-                    LOGGER.info("CardTrackTwo : " + preAuthResponseObj.getCard().getCardTrackTwo());
-                    LOGGER.info("EovDate : " + preAuthResponseObj.getCard().getEovDate());
-                    LOGGER.info("PinNumber : " + preAuthResponseObj.getCard().getPinNumber());
+                    //LOGGER.info("CardHolderName : " + preAuthResponseObj.getCard().getCardNumber());
+                    //LOGGER.info("CardCurrency : " + preAuthResponseObj.getCard().getCardCurrency());
+                    //LOGGER.info("CardExpiration : " + preAuthResponseObj.getCard().getCardExpiration());
+                    //LOGGER.info("CardTrackOne : " + preAuthResponseObj.getCard().getCardTrackOne());
+                    //LOGGER.info("CardTrackTwo : " + preAuthResponseObj.getCard().getCardTrackTwo());
+                    //LOGGER.info("EovDate : " + preAuthResponseObj.getCard().getEovDate());
+                    //LOGGER.info("PinNumber : " + preAuthResponseObj.getCard().getPinNumber());
                 } 
-                LOGGER.info("ConversionRate : " + preAuthResponseObj.getConversionRate());
-                LOGGER.info("Stan : " + preAuthResponseObj.getStan());
-                LOGGER.info("TransactionID : " +  preAuthResponseObj.getTransactionID());
-                LOGGER.info("Sku : " + preAuthResponseObj.getSku());
+                //LOGGER.info("ConversionRate : " + preAuthResponseObj.getConversionRate());
+                //LOGGER.info("Stan : " + preAuthResponseObj.getStan());
+                //LOGGER.info("TransactionID : " +  preAuthResponseObj.getTransactionID());
+                //LOGGER.info("Sku : " + preAuthResponseObj.getSku());
                 
                 t.setAuthoriztionCode(preAuthResponseObj.getAuthorizationCode());
                 t.setSTAN(preAuthResponseObj.getStan());
@@ -151,31 +187,10 @@ public class PreAuthorizationProcessor {
             }
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
-            e.printStackTrace();
+            t.setReasonCode("");
+            t.setResponseType(ResponseType.DECLINED);
+            t.setDescriptionField("INTERNAL SYSTEM ERROR");
         }
-//        GiftCard giftCard = svsdao.find(t.getAccount(), t.getGcpin());
-//
-//        if (giftCard == null) {
-//            this.handleError(t);
-//            return;
-//        }
-//
-//        long gcAmount = 0;
-//
-//        if (giftCard.getBalanceAmount() != null) {
-//            gcAmount = Long.parseLong(giftCard.getBalanceAmount());
-//        }
-//
-//        if (t.getAmount() <= gcAmount) {
-//            t.setResponseType(ResponseType.APPROVED);
-//            t.setReasonCode("100");
-//            t.setAmtPreAuthorized(t.getAmount());
-//            t.setBalanceAmount(gcAmount - t.getAmount());
-//        } else {
-//            t.setResponseType(ResponseType.DECLINED);
-//            t.setDescriptionField("INSUFFICIENT_FUNDS");
-//            t.setReasonCode("202");
-//        }
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
     }
 }

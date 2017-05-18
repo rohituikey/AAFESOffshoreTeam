@@ -45,7 +45,9 @@ public class SVSGatewayProcessor {
 
             switch (t.getRequestType()) {
                 case RequestType.INQUIRY:
-                    processBalanceInquiry(t);
+                    //BI
+                    BalanceInquiryProcessor balanceInquiryProcessor = new BalanceInquiryProcessor();
+                    balanceInquiryProcessor.processBalanceInquiry(t);
                     break;
                 case RequestType.PREAUTH:
                     //preAuth(t);

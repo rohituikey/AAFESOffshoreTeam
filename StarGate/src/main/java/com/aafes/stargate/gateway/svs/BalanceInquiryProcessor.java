@@ -54,13 +54,8 @@ public class BalanceInquiryProcessor {
         balanceInquiryRequest.setCheckForDuplicate(StarGateConstants.TRUE);
         balanceInquiryRequest.setTransactionID(t.getTransactionId());
         balanceInquiryRequest.setDate(t.getLocalDateTime());
-        //log.info(t.getOrderNumber().substring(t.getOrderNumber().length()-8));
-         if(t.getOrderNumber().length()<8){
-                int zeroesToBeAppended = 8-t.getOrderNumber().length();
-                for(int i=0 ; i<zeroesToBeAppended ; i++){
-                    t.setOrderNumber("0"+ t.getOrderNumber());
-                }
-            }
+        log.info(t.getOrderNumber().substring(t.getOrderNumber().length()-8));
+         
         balanceInquiryRequest.setRoutingID(StarGateConstants.ROUTING_ID);
         balanceInquiryRequest.setStan(t.getSTAN());
 

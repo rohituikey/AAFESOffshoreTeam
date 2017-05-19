@@ -139,7 +139,7 @@
             <version>7.0</version>
             <scope>provided</scope>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.9</version>
@@ -155,7 +155,7 @@
             <artifactId>resteasy-jackson-provider</artifactId>
             <version>2.3.4.Final</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>com.offbytwo.keyczar</groupId>
             <artifactId>keyczar</artifactId>
             <version>0.71g</version>
@@ -222,11 +222,11 @@
                         <exclude>com/firstdata/cmpwsapi/schemas/cmpapi/**/*</exclude>
                         <exclude>com/firstdata/cmpwsapi/schemas/cmpmsg/**/*</exclude>
                         <exclude>com/aafes/stargate/tokenizer/**/*</exclude>
-                        <exclude>com/aafes/stargate/gateway/svs/**/*</exclude>
+                        <!--exclude>com/aafes/stargate/gateway/svs/**/*</exclude-->
                         <exclude>com/svs/svsxml/beans/**/*</exclude>
-                         <exclude>com/svs/svsxml/service/**/*</exclude>
+                        <exclude>com/svs/svsxml/service/**/*</exclude>
                         <exclude>com/aafes/stargate/dao/SVSDAO.*</exclude>
-                     </excludes><!--
+                    </excludes><!--
 	   -->
                 </configuration>
                 <executions>
@@ -244,7 +244,6 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
-                    
                             <rules>
                                 <!--  implmentation is needed only for Maven 2  -->
                                 <rule implementation="org.jacoco.maven.RuleConfiguration">
@@ -266,6 +265,19 @@
                             </rules>
                         </configuration>
                     </execution>
+                    <!-- BELOW CHANGES WILL GENERATE JACOCO CODE COVERAGE REPORT -->
+                    <execution>            
+                        <id>post-integration-test</id>            
+                        <phase>post-integration-test</phase>            
+                        <goals>                
+                            <goal>report</goal>            
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                            <outputDirectory>${project.build.directory}/Report</outputDirectory>            
+                        </configuration>        
+                    </execution>
+                    <!-- ABOVE CHANGES WILL GENERATE JACOCO CODE COVERAGE REPORT -->
                 </executions>
             </plugin>
             <plugin>
@@ -356,7 +368,7 @@
                         <id>wsimport-generate-clsCustInfo.asmx</id>
                         <phase>generate-sources</phase>
                     </execution>
-                       <execution>
+                    <execution>
                         <goals>
                             <goal>wsimport</goal>
                         </goals>
@@ -365,14 +377,14 @@
                                 <wsdlFile>order.wsdl</wsdlFile>
                             </wsdlFiles>
                             <packageName></packageName>
-<!--                            <wsdlLocation>file:${project.basedir}/src/wsdl/order.wsdl</wsdlLocation>-->
-                        <wsdlLocation>https://merchanttest.ctexmloma.compass-xml.com/cmpwsapi/services/order.wsdl</wsdlLocation>
+                            <!--                            <wsdlLocation>file:${project.basedir}/src/wsdl/order.wsdl</wsdlLocation>-->
+                            <wsdlLocation>https://merchanttest.ctexmloma.compass-xml.com/cmpwsapi/services/order.wsdl</wsdlLocation>
                             <staleFile>${project.build.directory}/jaxws/stale/order.stale</staleFile>
                         </configuration>
                         <id>wsimport-generate-order</id>
                         <phase>generate-sources</phase>
                     </execution>
-                      <execution>
+                    <execution>
                         <goals>
                             <goal>wsimport</goal>
                         </goals>
@@ -381,8 +393,8 @@
                                 <wsdlFile>SVSXMLWay.wsdl</wsdlFile>
                             </wsdlFiles>
                             <packageName></packageName>
-<!--                            <wsdlLocation>file:${project.basedir}/src/wsdl/SVSXMLWay.wsdl</wsdlLocation>-->
-                        <wsdlLocation>https://webservices-cert.storedvalue.com/svsxml/v1/services/SVSXMLWay/wsdl/SVSXMLWay.wsdl</wsdlLocation>
+                            <!--                            <wsdlLocation>file:${project.basedir}/src/wsdl/SVSXMLWay.wsdl</wsdlLocation>-->
+                            <wsdlLocation>https://webservices-cert.storedvalue.com/svsxml/v1/services/SVSXMLWay/wsdl/SVSXMLWay.wsdl</wsdlLocation>
                             <staleFile>${project.build.directory}/jaxws/stale/SVSXMLWay.stale</staleFile>
                         </configuration>
                         <id>wsimport-generate-SVSXMLWay</id>

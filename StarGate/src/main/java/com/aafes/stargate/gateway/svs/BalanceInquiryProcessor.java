@@ -41,7 +41,7 @@ public class BalanceInquiryProcessor {
         Card card = new Card();
         card.setCardCurrency(StarGateConstants.CURRENCY);
         card.setCardNumber(t.getAccount());
-        card.setPinNumber(t.getGcpin());
+        card.setPinNumber("0000"+t.getGcpin());
         balanceInquiryRequest.setCard(card);
 
         Merchant merchant = new Merchant();

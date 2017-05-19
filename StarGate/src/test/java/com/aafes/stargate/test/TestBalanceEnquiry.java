@@ -37,22 +37,19 @@ public class TestBalanceEnquiry {
         transaction.setMedia(MediaType.GIFT_CARD);
         transaction.setRequestType(RequestType.INQUIRY);
         transaction.setInputType(InputType.KEYED);
-        transaction.setPan("12121221121212");
+    
         transaction.setAccount("6006491572010002439");
         transaction.setExpiration("2113");
         transaction.setAmount((long) 25.00);
         transaction.setCurrencycode("USD");
         transaction.setGcpin("00007020");
-        transaction.setLocalDateTime(SvsUtil.formatLocalDateTime());
+      
         transaction.setOrderNumber("55548741536");
 
 
         transaction.setSTAN(SvsUtil.generateStan());
         transaction.setTransactionId("326598985232");
-        transaction.setCurrencycode(StarGateConstants.CURRENCY);
-        transaction.setDivisionnumber(StarGateConstants.MERCHANT_DIVISION_NUMBER);
-        transaction.setMerchantOrg(StarGateConstants.MERCHANT_NAME);
-    
+
     }
 
     @Test
@@ -105,10 +102,6 @@ public class TestBalanceEnquiry {
         System.out.println(t.getReasonCode());
         Assert.assertEquals(t.getDescriptionField(), "TRANSACTION ID IS NULL");
     }
-
-   
-
-
-
+ 
 
 }

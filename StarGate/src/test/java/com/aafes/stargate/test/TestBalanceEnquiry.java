@@ -42,7 +42,7 @@ public class TestBalanceEnquiry {
         transaction.setExpiration("2113");
         transaction.setAmount((long) 25.00);
         transaction.setCurrencycode("USD");
-        transaction.setGcpin("00007020");
+        transaction.setGcpin("7020");
       
         transaction.setOrderNumber("55548741536");
 

@@ -35,28 +35,25 @@ public class TestPreAuthorization {
      
     @Before
     public void getKeyedMILSTARSaleRequestatPOS() throws DatatypeConfigurationException {
-        
         transaction.setMedia(MediaType.GIFT_CARD);
         transaction.setRequestType(RequestType.PREAUTH);
         transaction.setInputType(InputType.KEYED);
         transaction.setPan("12121221121212");
-//        transaction.setAccount("6006491572010002421");
-//        transaction.setGcpin("00003685");
         transaction.setAccount("6006491572010002439");
-        transaction.setGcpin("00007020");
+        transaction.setGcpin("7020");
         transaction.setExpiration("2113");
-        transaction.setAmount((long) 500.00);
-        transaction.setCurrencycode("USD");
+        transaction.setTrack1("");
+        transaction.setTrack2("");
+
+        transaction.setAmount((long) 50.00);
+        transaction.setCurrencycode(StarGateConstants.CURRENCY);
         transaction.setLocalDateTime(SvsUtil.formatLocalDateTime());
         transaction.setOrderNumber("55548741536");
         transaction.setSTAN(SvsUtil.generateStan());
         transaction.setTransactionId("326598985232");
         transaction.setCurrencycode(StarGateConstants.CURRENCY);
-        // FOR MERCHANT
         transaction.setDivisionnumber(StarGateConstants.MERCHANT_DIVISION_NUMBER);
         transaction.setMerchantOrg(StarGateConstants.MERCHANT_NAME);
-        transaction.setTrack1("");
-        transaction.setTrack2("");
         // GET routingID IN PROCESSOR CLASS
         // GET checkForDuplicate IN PROCESSOR CLASS
     }
@@ -83,7 +80,7 @@ public class TestPreAuthorization {
         SVSGateway gateway = new SVSGateway();
         SVSGatewayProcessor svsgp = new SVSGatewayProcessor();
         gateway.setSvsgp(svsgp);
-        transaction.setGcpin("313");
+        transaction.setGcpin("3130");
         Transaction t = gateway.processMessage(transaction);
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         LOGGER.info("-------------------------------------------------------------------------");
@@ -104,21 +101,8 @@ public class TestPreAuthorization {
         LOGGER.info("-------------------------------------------------------------------------");
         Assert.assertEquals(t.getReasonCode(), "29");
     }
-//    @Ignore
-//    @Test
-//    public void testNullCurrencyCode() throws MalformedURLException {
-//        sMethodName = "testNullCurrencyCode";
-//        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-//        SVSGateway gateway = new SVSGateway();
-//        SVSGatewayProcessor svsgp = new SVSGatewayProcessor();
-//        gateway.setSvsgp(svsgp);
-//        transaction.setCurrencycode(null);
-//        Transaction t = gateway.processMessage(transaction);
-//        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-//        LOGGER.info("-------------------------------------------------------------------------");
-//        Assert.assertEquals(t.getResponseType(), ResponseType.DECLINED);
-//    }
 
+    @Ignore
     @Test
     public void testNullAccount() throws MalformedURLException {
         sMethodName = "testNullAccount";
@@ -133,6 +117,7 @@ public class TestPreAuthorization {
         Assert.assertEquals(t.getResponseType(), ResponseType.DECLINED);
     }
     
+    @Ignore
     @Test
     public void testNullGCPin() throws MalformedURLException {
         sMethodName = "testNullGCPin";
@@ -147,35 +132,6 @@ public class TestPreAuthorization {
         Assert.assertEquals(t.getResponseType(), ResponseType.DECLINED);
     }
     
-//    @Ignore
-//    @Test
-//    public void testNullDate() throws MalformedURLException {
-//        sMethodName = "testNullDate";
-//        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-//        SVSGateway gateway = new SVSGateway();
-//        SVSGatewayProcessor svsgp = new SVSGatewayProcessor();
-//        gateway.setSvsgp(svsgp);
-//        transaction.setLocalDateTime(null);
-//        Transaction t = gateway.processMessage(transaction);
-//        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-//        LOGGER.info("-------------------------------------------------------------------------");
-//        Assert.assertEquals(t.getResponseType(), ResponseType.DECLINED);
-//    }
-    
-//    @Ignore
-//    @Test
-//    public void testNullOrderNumber() throws MalformedURLException {
-//        sMethodName = "testNullOrderNumber";
-//        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-//        SVSGateway gateway = new SVSGateway();
-//        SVSGatewayProcessor svsgp = new SVSGatewayProcessor();
-//        gateway.setSvsgp(svsgp);
-//        transaction.setOrderNumber(null);
-//        Transaction t = gateway.processMessage(transaction);
-//        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-//        LOGGER.info("-------------------------------------------------------------------------");
-//        Assert.assertEquals(t.getResponseType(), ResponseType.DECLINED);
-//    }
     @Ignore
     @Test
     public void testNullTransactionId() throws MalformedURLException {

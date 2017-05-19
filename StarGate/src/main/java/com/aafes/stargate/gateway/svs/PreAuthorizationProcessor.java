@@ -47,7 +47,6 @@ package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.GatewayException;
-import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StarGateConstants;
 import com.aafes.stargate.util.SvsUtil;
 import com.svs.svsxml.beans.Amount;
@@ -64,9 +63,7 @@ import org.slf4j.LoggerFactory;
  * This message type should always be followed by a Pre-Authorization Completion transaction.
  */
 public class PreAuthorizationProcessor {
-
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PreAuthorizationProcessor.class.getSimpleName());
-
     String sMethodName = "";
     final String CLASS_NAME = PreAuthorizationProcessor.this.getClass().getSimpleName();
 
@@ -90,6 +87,12 @@ public class PreAuthorizationProcessor {
             Card card = new Card();
             card.setCardCurrency(StarGateConstants.CURRENCY);
             card.setCardNumber(t.getAccount());
+            
+            //The second subfield is 4 digits to be used identify the PIN.. Each Sub-field should be right justified left zero filled
+            if(t.getGcpin() != null && t.getGcpin().trim().length() == 4){
+                t.setGcpin("0000" + t.getGcpin());
+            }
+            
             card.setPinNumber(t.getGcpin());
             card.setCardTrackOne(t.getTrack1());
             card.setCardTrackTwo(t.getTrack2());
@@ -99,11 +102,6 @@ public class PreAuthorizationProcessor {
             // GET LAST EIGHT DIGIT OF ORDER NUMBER
             if(t.getOrderNumber() != null && t.getOrderNumber().length() >= 8)
                 preAuthRequest.setInvoiceNumber(t.getOrderNumber().substring((t.getOrderNumber().length() - 8))); 
-            
-            //The second subfield is 4 digits to be used identify the PIN.. Each Sub-field should be right justified left zero filled
-            if(t.getGcpin() != null && t.getGcpin().trim().length() == 4){
-                t.setGcpin("0000" + t.getGcpin());
-            }
             
             Merchant merchant = new Merchant();
             merchant.setMerchantName(StarGateConstants.MERCHANT_NAME);
@@ -122,9 +120,9 @@ public class PreAuthorizationProcessor {
            if(preAuthResponseObj != null){
                 if(preAuthResponseObj.getReturnCode() != null){
                     LOGGER.info("ReturnCode : " + String.valueOf(preAuthResponseObj.getReturnCode().getReturnCode()));
-                    t.setReasonCode(preAuthResponseObj.getReturnCode().getReturnCode());
-               
                     LOGGER.info("ReturnDescription : " + String.valueOf(preAuthResponseObj.getReturnCode().getReturnDescription()));
+                    
+                    t.setReasonCode(preAuthResponseObj.getReturnCode().getReturnCode());
                     t.setDescriptionField(preAuthResponseObj.getReturnCode().getReturnDescription());
                     t.setResponseType(preAuthResponseObj.getReturnCode().getReturnDescription());
                 }
@@ -140,23 +138,14 @@ public class PreAuthorizationProcessor {
                     t.setBalanceAmount((long) preAuthResponseObj.getBalanceAmount().getAmount());
                
                 LOGGER.info("AuthorizationCode : " + preAuthResponseObj.getAuthorizationCode());
-                //if(preAuthResponseObj.getReturnCode() != null) LOGGER.info("ReturnCode : " + preAuthResponseObj.getReturnCode().getReturnCode());
 
-                if(preAuthResponseObj.getCard() != null){
-                    t.setCardSequenceNumber(preAuthResponseObj.getCard().getCardNumber());
-                } 
+                if(preAuthResponseObj.getCard() != null) t.setCardSequenceNumber(preAuthResponseObj.getCard().getCardNumber());
                 t.setAuthoriztionCode(preAuthResponseObj.getAuthorizationCode());
                 t.setSTAN(preAuthResponseObj.getStan());
                 t.setTransactionId(preAuthResponseObj.getTransactionID());
-                
-            }else{
-                LOGGER.error("Response Object is NULL " + sMethodName + " " + CLASS_NAME);
-            }
+            }else LOGGER.error("Response Object is NULL " + sMethodName + " " + CLASS_NAME);
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
-            t.setReasonCode("000");
-            t.setResponseType(ResponseType.DECLINED);
-            t.setDescriptionField("INTERNAL SYSTEM ERROR");
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);

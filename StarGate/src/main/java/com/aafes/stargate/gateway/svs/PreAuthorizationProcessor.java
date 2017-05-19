@@ -46,6 +46,7 @@
 package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StarGateConstants;
 import com.aafes.stargate.util.SvsUtil;
@@ -68,13 +69,13 @@ public class PreAuthorizationProcessor {
 
     String sMethodName = "";
     final String CLASS_NAME = PreAuthorizationProcessor.this.getClass().getSimpleName();
-    boolean validationErrFlg = false;
-    private double approvedAmount;
-    private PreAuthResponse preAuthResponseObj = null;
-    private PreAuthRequest preAuthRequest = null;
-    private SVSXMLWay sVSXMLWay = null;
 
     public void preAuth(Transaction t) {
+        PreAuthResponse preAuthResponseObj;
+        PreAuthRequest preAuthRequest;
+        SVSXMLWay sVSXMLWay;
+        double approvedAmount;
+        
         sMethodName = "preAuth";
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         try {
@@ -82,26 +83,22 @@ public class PreAuthorizationProcessor {
             preAuthRequest = new PreAuthRequest();
 
             Amount amountObj = new Amount();
-            if(String.valueOf(t.getAmount()) != null){
-                amountObj.setAmount(t.getAmount());
-                LOGGER.info("Pre-Auth Amount : " + String.valueOf(t.getAmount()));
-            } else validationErrFlg = true;
-            
-            if(t.getCurrencycode() != null) amountObj.setCurrency(t.getCurrencycode());
-            else validationErrFlg = true;
+            amountObj.setAmount(t.getAmount());
+            amountObj.setCurrency(t.getCurrencycode());
             preAuthRequest.setRequestedAmount(amountObj);
             
             Card card = new Card();
-            card.setCardCurrency(t.getCurrencycode());
+            card.setCardCurrency(StarGateConstants.CURRENCY);
             card.setCardNumber(t.getAccount());
             card.setPinNumber(t.getGcpin());
             card.setCardTrackOne(t.getTrack1());
             card.setCardTrackTwo(t.getTrack2());
             preAuthRequest.setCard(card);
             
-            preAuthRequest.setDate(t.getLocalDateTime());
+            preAuthRequest.setDate(SvsUtil.formatLocalDateTime());
             // GET LAST EIGHT DIGIT OF ORDER NUMBER
-            preAuthRequest.setInvoiceNumber(t.getOrderNumber().substring((t.getOrderNumber().length() - 8))); 
+            if(t.getOrderNumber() != null && t.getOrderNumber().length() >= 8)
+                preAuthRequest.setInvoiceNumber(t.getOrderNumber().substring((t.getOrderNumber().length() - 8))); 
             
             //The second subfield is 4 digits to be used identify the PIN.. Each Sub-field should be right justified left zero filled
             if(t.getGcpin() != null && t.getGcpin().trim().length() == 4){
@@ -109,10 +106,10 @@ public class PreAuthorizationProcessor {
             }
             
             Merchant merchant = new Merchant();
-            merchant.setMerchantName(t.getMerchantOrg());
+            merchant.setMerchantName(StarGateConstants.MERCHANT_NAME);
             merchant.setMerchantNumber(StarGateConstants.MERCHANT_NUMBER);
             merchant.setStoreNumber(StarGateConstants.STORE_NUMBER);
-            merchant.setDivision(t.getDivisionnumber());
+            merchant.setDivision(StarGateConstants.MERCHANT_DIVISION_NUMBER);
             preAuthRequest.setMerchant(merchant);
             
             preAuthRequest.setRoutingID(StarGateConstants.ROUTING_ID);
@@ -121,75 +118,46 @@ public class PreAuthorizationProcessor {
             preAuthRequest.setTransactionID(t.getTransactionId());
             preAuthRequest.setCheckForDuplicate(StarGateConstants.TRUE);
 
-            processPreAuthRequest(t);
-            
-        } catch (Exception e) {
-            LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
-            t.setReasonCode("");
-            t.setResponseType(ResponseType.DECLINED);
-            t.setDescriptionField("INTERNAL SYSTEM ERROR");
-        }
-        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-    }
-    
-    private void processPreAuthRequest(Transaction t){
-        sMethodName = "processPreAuthRequest";
-        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        try{
-            preAuthResponseObj = sVSXMLWay.preAuth(preAuthRequest);
-            if(preAuthResponseObj != null){
+           preAuthResponseObj = sVSXMLWay.preAuth(preAuthRequest);
+           if(preAuthResponseObj != null){
                 if(preAuthResponseObj.getReturnCode() != null){
                     LOGGER.info("ReturnCode : " + String.valueOf(preAuthResponseObj.getReturnCode().getReturnCode()));
                     t.setReasonCode(preAuthResponseObj.getReturnCode().getReturnCode());
                
                     LOGGER.info("ReturnDescription : " + String.valueOf(preAuthResponseObj.getReturnCode().getReturnDescription()));
                     t.setDescriptionField(preAuthResponseObj.getReturnCode().getReturnDescription());
+                    t.setResponseType(preAuthResponseObj.getReturnCode().getReturnDescription());
                 }
                 
                 if(preAuthResponseObj.getApprovedAmount() != null){
                     approvedAmount = preAuthResponseObj.getApprovedAmount().getAmount();
-                    //LOGGER.info("ApprovedAmount : " + String.valueOf(approvedAmount));
-                    //LOGGER.info("Currency : " + preAuthResponseObj.getApprovedAmount().getCurrency());
                     t.setAmount((long) approvedAmount);
                     t.setCurrencycode(preAuthResponseObj.getApprovedAmount().getCurrency());
                     t.setAmtPreAuthorized((long) approvedAmount);
                 }
                 
-                if(preAuthResponseObj.getBalanceAmount() != null){
-                    //LOGGER.info("BalanceAmount : " + String.valueOf(preAuthResponseObj.getBalanceAmount().getAmount()));
+                if(preAuthResponseObj.getBalanceAmount() != null)
                     t.setBalanceAmount((long) preAuthResponseObj.getBalanceAmount().getAmount());
-                    //LOGGER.info("Currency : " + preAuthResponseObj.getBalanceAmount().getCurrency());
-                }
-                
+               
                 LOGGER.info("AuthorizationCode : " + preAuthResponseObj.getAuthorizationCode());
-                if(preAuthResponseObj.getReturnCode() != null) LOGGER.info("ReturnCode : " + preAuthResponseObj.getReturnCode().getReturnCode());
+                //if(preAuthResponseObj.getReturnCode() != null) LOGGER.info("ReturnCode : " + preAuthResponseObj.getReturnCode().getReturnCode());
 
                 if(preAuthResponseObj.getCard() != null){
-                    //LOGGER.info("CardNumber : " + preAuthResponseObj.getCard().getCardNumber());
                     t.setCardSequenceNumber(preAuthResponseObj.getCard().getCardNumber());
-                    //LOGGER.info("CardHolderName : " + preAuthResponseObj.getCard().getCardNumber());
-                    //LOGGER.info("CardCurrency : " + preAuthResponseObj.getCard().getCardCurrency());
-                    //LOGGER.info("CardExpiration : " + preAuthResponseObj.getCard().getCardExpiration());
-                    //LOGGER.info("CardTrackOne : " + preAuthResponseObj.getCard().getCardTrackOne());
-                    //LOGGER.info("CardTrackTwo : " + preAuthResponseObj.getCard().getCardTrackTwo());
-                    //LOGGER.info("EovDate : " + preAuthResponseObj.getCard().getEovDate());
-                    //LOGGER.info("PinNumber : " + preAuthResponseObj.getCard().getPinNumber());
                 } 
-                //LOGGER.info("ConversionRate : " + preAuthResponseObj.getConversionRate());
-                //LOGGER.info("Stan : " + preAuthResponseObj.getStan());
-                //LOGGER.info("TransactionID : " +  preAuthResponseObj.getTransactionID());
-                //LOGGER.info("Sku : " + preAuthResponseObj.getSku());
-                
                 t.setAuthoriztionCode(preAuthResponseObj.getAuthorizationCode());
                 t.setSTAN(preAuthResponseObj.getStan());
+                t.setTransactionId(preAuthResponseObj.getTransactionID());
+                
             }else{
                 LOGGER.error("Response Object is NULL " + sMethodName + " " + CLASS_NAME);
             }
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
-            t.setReasonCode("");
+            t.setReasonCode("000");
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField("INTERNAL SYSTEM ERROR");
+            throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
     }

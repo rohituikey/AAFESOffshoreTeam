@@ -69,16 +69,21 @@ public class SVSFinalAuth {
             
             PreAuthCompleteResponse response = sVSXMLWay.preAuthComplete(request);
             
+            if(null!=response.getReturnCode())
+            {
+            transaction.setReasonCode(response.getReturnCode().getReturnCode());
+            transaction.setDescriptionField(response.getReturnCode().getReturnDescription());
+            }
+            transaction.setAuthoriztionCode(response.getAuthorizationCode());            
             //approved amount
-            transaction.setAmtPreAuthorized((long) response.getApprovedAmount().getAmount());
+            if(response.getApprovedAmount()!=null)
+            transaction.setAmtPreAuthorized((long)response.getApprovedAmount().getAmount());
             //balance amount
+            if(response.getBalanceAmount()!=null)
             transaction.setBalanceAmount((long) response.getBalanceAmount().getAmount());
             transaction.setCurrencycode(StarGateConstants.CURRENCY);
+            if(response.getCard().getCardNumber()!=null)
             transaction.setCardReferenceID(response.getCard().getCardNumber());
-           
-                transaction.setAuthoriztionCode(response.getAuthorizationCode());
-                transaction.setReasonCode(response.getReturnCode().getReturnCode());
-                transaction.setDescriptionField(response.getReturnCode().getReturnDescription());
            
             LOGGER.info("response : Authorization code :" + response.getAuthorizationCode());
         } catch (Exception e) {

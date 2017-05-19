@@ -80,21 +80,7 @@ public class TestBalanceEnquiry {
         Assert.assertEquals(t.getReasonCode(), "20");
 
     }
-    /*
-    *we are not setting stan in balance inquiry request so i ignored it...
-    */
-    @Ignore
-    @Test
-    public void testBalanceInqueryFailForWrongStan() throws MalformedURLException {
-
-        SVSGateway gateway = new SVSGateway();
-        SVSGatewayProcessor svsgp = new SVSGatewayProcessor();
-        gateway.setSvsgp(svsgp);
-        transaction.setSTAN("ss");
-        Transaction t = gateway.processMessage(transaction);
-        Assert.assertEquals(t.getReasonCode(), "15");
-
-    }
+ 
 
     @Test
     public void testForTransactionFailedDueToInvalidCardNumber() throws MalformedURLException {
@@ -108,6 +94,19 @@ public class TestBalanceEnquiry {
         Assert.assertEquals(t.getReasonCode(), "04");
 
     }
+    @Test
+    public void testForNullTranscationId(){
+        LOGGER.info("method...." + "testForNullTranscationId");
+        SVSGateway sVSGateway = new SVSGateway();
+        SVSGatewayProcessor svsgp = new SVSGatewayProcessor();
+        sVSGateway.setSvsgp(svsgp);
+        transaction.setTransactionId("");
+        Transaction t = sVSGateway.processMessage(transaction);
+        System.out.println(t.getReasonCode());
+        Assert.assertEquals(t.getDescriptionField(), "TRANSACTION ID IS NULL");
+    }
+
+   
 
 
 

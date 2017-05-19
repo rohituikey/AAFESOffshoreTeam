@@ -7,10 +7,11 @@ package com.aafes.stargate.test;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.svs.SVSGateway;
 import com.aafes.stargate.gateway.svs.SVSGatewayProcessor;
+import com.aafes.stargate.util.ResponseType;
 import javax.xml.datatype.DatatypeConfigurationException;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -19,15 +20,13 @@ import org.junit.Test;
  */
 public class SVSIssueCardTest {
 
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TestPreAuthorization.class.getSimpleName());
+    String sMethodName = "";
+    final String CLASS_NAME = SVSIssueCardTest.this.getClass().getSimpleName();
     public Transaction svsIssueinit() throws DatatypeConfigurationException {
         Transaction transaction = new Transaction();
-        transaction.setAmount((long) 100.00);
-        transaction.setCurrencycode("USD");
-        transaction.setDivisionnumber("99999");
+        transaction.setAmount((long) 0.00);
         transaction.setOrderNumber("00009999");
-        transaction.setLocalDateTime("2017-05-14T00:09:04");
-        transaction.setMerchantOrg("IT-D VP OFFICE");
-        transaction.setSTAN("112233");
         transaction.setRequestType("Issue");
         transaction.setMedia("GiftCard");
         transaction.setTransactionId("326598985232 ");
@@ -45,31 +44,20 @@ public class SVSIssueCardTest {
         Assert.assertEquals("01", t.getReasonCode());
     }
 
-    @Ignore
     @Test
-    public void issueCard_invalidTransaction() throws DatatypeConfigurationException {
+    public void issueCardNullTransactionId() throws DatatypeConfigurationException {
+        sMethodName="issueCardNullTransactionId";
         SVSGateway sGateway = new SVSGateway();
         SVSGatewayProcessor gatewayProcessor = new SVSGatewayProcessor();
         sGateway.setSvsgp(gatewayProcessor);
         Transaction tranReq = svsIssueinit();
-        tranReq.setSTAN("wrongStan");
+        tranReq.setTransactionId(null);
         Transaction t = sGateway.processMessage(tranReq);
-        System.out.println(t.getDescriptionField());
-        Assert.assertEquals("07", t.getReasonCode());
+        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+        LOGGER.info("-------------------------------------------------------------------------");
+        Assert.assertEquals(t.getResponseType(), ResponseType.DECLINED);
     }
 
-    @Ignore
-    @Test
-    public void issueCard_invalid() throws DatatypeConfigurationException {
-        SVSGateway sGateway = new SVSGateway();
-        SVSGatewayProcessor gatewayProcessor = new SVSGatewayProcessor();
-        sGateway.setSvsgp(gatewayProcessor);
-        Transaction tranReq = svsIssueinit();
-        tranReq.setCurrencycode(null);
-        Transaction t = sGateway.processMessage(tranReq);
-        System.out.println(t.getDescriptionField());
-        Assert.assertEquals("07", t.getReasonCode());
-    }
 
 }
 

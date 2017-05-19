@@ -29,14 +29,17 @@ public class SVSFinalAuthTest {
 
     @Before
     public void init() throws DatatypeConfigurationException{
+        
+        sVSGateway = new SVSGateway();
+        SVSGatewayProcessor gatewayProcessor = new SVSGatewayProcessor();
+        sVSGateway.setSvsgp(gatewayProcessor);
+        
         transaction.setMedia(MediaType.GIFT_CARD);
-        transaction.setRequestType(RequestType.FINAL_AUTH);
+        transaction.setRequestType(RequestType.PREAUTH);
         transaction.setInputType(InputType.KEYED);
-        transaction.setPan("12121221121212");
         transaction.setAccount("6006491572010002421");
         transaction.setExpiration("2113");
         transaction.setAmount((long) 25.00);
-        transaction.setCurrencycode("USD");
         transaction.setGcpin("00003685");
         transaction.setTrack1("");
         transaction.setTrack2("");
@@ -44,7 +47,6 @@ public class SVSFinalAuthTest {
         transaction.setLocalDateTime(SvsUtil.formatLocalDateTime());
         transaction.setOrderNumber("55548741536");
         // GET routingID IN PROCESSOR CLASS
-        transaction.setSTAN("105014");
         transaction.setTransactionId("326598985232");
         transaction.setDivisionnumber("99999");
         transaction.setMerchantOrg("IT-D VP OFFICE");
@@ -53,33 +55,58 @@ public class SVSFinalAuthTest {
     
     @Test
     public void testPreAuthFinal_success(){
-        sVSGateway = new SVSGateway();
-        SVSGatewayProcessor gatewayProcessor = new SVSGatewayProcessor();
-        sVSGateway.setSvsgp(gatewayProcessor);
+        Transaction preAuthResponse = sVSGateway.processMessage(transaction);
+        if(preAuthResponse.getReasonCode().equals("01")){
+        transaction.setRequestType(RequestType.FINAL_AUTH);
         Transaction resultTransaction = sVSGateway.processMessage(transaction);
         Assert.assertEquals("01", resultTransaction.getReasonCode());
-    }
-    
-    @Ignore
-    @Test
-    public void testPreAuthFinal_notPreAuthoized_wrongStan(){
-        transaction.setSTAN("456532");
-        sVSGateway = new SVSGateway();
-        SVSGatewayProcessor gatewayProcessor = new SVSGatewayProcessor();
-        sVSGateway.setSvsgp(gatewayProcessor);
-        Transaction resultTransaction = sVSGateway.processMessage(transaction);
-        Assert.assertEquals("10", resultTransaction.getReasonCode());
+        }
     }
     
     @Test
     public void testPreAuthFinal_wrongPin(){
-        transaction.setRequestType(RequestType.FINAL_AUTH);
+        Transaction preAuthResponse = sVSGateway.processMessage(transaction);
+        if(preAuthResponse.getReasonCode().equals("01")){
         transaction.setGcpin("wrong_Pin");
-        sVSGateway = new SVSGateway();
-        SVSGatewayProcessor gatewayProcessor = new SVSGatewayProcessor();
-        sVSGateway.setSvsgp(gatewayProcessor);
+        transaction.setRequestType(RequestType.FINAL_AUTH);
         Transaction resultTransaction = sVSGateway.processMessage(transaction);
-        //assert for invalid pin
         Assert.assertEquals("20", resultTransaction.getReasonCode());
+        }
     }
+    
+    @Test
+    public void testPreAuthFinal_NullGCpin(){
+        Transaction preAuthResponse = sVSGateway.processMessage(transaction);
+        if(preAuthResponse.getReasonCode().equals("01")){
+        transaction.setGcpin("");
+        transaction.setRequestType(RequestType.FINAL_AUTH);
+        Transaction resultTransaction = sVSGateway.processMessage(transaction);
+        Assert.assertTrue(resultTransaction.getReasonCode().isEmpty());
+        }
+    }
+    
+    @Test
+    public void testPreAuthFinal_NullAccountNumber(){
+        transaction.setRequestType(RequestType.PREAUTH);
+        Transaction preAuthResponse = sVSGateway.processMessage(transaction);
+        if(preAuthResponse.getReasonCode().equals("01")){
+        transaction.setAccount("");
+        transaction.setRequestType(RequestType.FINAL_AUTH);
+        Transaction resultTransaction = sVSGateway.processMessage(transaction);
+        Assert.assertTrue(resultTransaction.getReasonCode().isEmpty());
+        }
+    }
+    
+     @Test
+    public void testPreAuthFinal_NullTransacionID(){
+        transaction.setRequestType(RequestType.PREAUTH);
+        Transaction preAuthResponse = sVSGateway.processMessage(transaction);
+        if(preAuthResponse.getReasonCode().equals("01")){
+        transaction.setTransactionId(null);
+        transaction.setRequestType(RequestType.FINAL_AUTH);
+        Transaction resultTransaction = sVSGateway.processMessage(transaction);
+        Assert.assertTrue(resultTransaction.getReasonCode().isEmpty());
+        }
+    }
+    
 }

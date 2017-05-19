@@ -63,11 +63,14 @@ public class SVSGateway extends Gateway {
             } else if(t.getGcpin() == null || t.getGcpin().trim().isEmpty()){
                 buildErrorResponse(t, "", "PIN NUMBER IS NULL");
                 return false;
-            } else if(t.getTransactionId() == null || t.getTransactionId().trim().isEmpty()){
+            } 
+        }
+        
+        if(t.getTransactionId() == null || t.getTransactionId().trim().isEmpty()){
                 buildErrorResponse(t, "", "TRANSACTION ID IS NULL");
                 return false;
-            } 
-        }   
+         }
+        
         LOG.info("Method validateTransaction ended. Class Name SVSGateway");
         return true;
     }

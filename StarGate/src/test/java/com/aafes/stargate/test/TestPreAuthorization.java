@@ -72,7 +72,7 @@ public class TestPreAuthorization {
         Assert.assertEquals(t.getReasonCode(), "01");
     }
     
-    @Ignore
+    //@Ignore
     @Test
     public void testPreAuthorizationFailInvalidPIN() throws MalformedURLException {
         sMethodName = "testPreAuthorizationFailInvalidPIN";
@@ -87,7 +87,7 @@ public class TestPreAuthorization {
         Assert.assertEquals(t.getReasonCode(), "20");
     }
     
-    @Ignore
+    //@Ignore
     @Test
     public void testPreAuthorizationFailPINLocked() throws MalformedURLException {
         sMethodName = "testPreAuthorizationFailPINLocked";
@@ -102,7 +102,7 @@ public class TestPreAuthorization {
         Assert.assertEquals(t.getReasonCode(), "29");
     }
 
-    @Ignore
+   // @Ignore
     @Test
     public void testNullAccount() throws MalformedURLException {
         sMethodName = "testNullAccount";
@@ -117,7 +117,7 @@ public class TestPreAuthorization {
         Assert.assertEquals(t.getResponseType(), ResponseType.DECLINED);
     }
     
-    @Ignore
+   // @Ignore
     @Test
     public void testNullGCPin() throws MalformedURLException {
         sMethodName = "testNullGCPin";
@@ -132,7 +132,7 @@ public class TestPreAuthorization {
         Assert.assertEquals(t.getResponseType(), ResponseType.DECLINED);
     }
     
-    @Ignore
+    //@Ignore
     @Test
     public void testNullTransactionId() throws MalformedURLException {
         sMethodName = "testNullTransactionId";

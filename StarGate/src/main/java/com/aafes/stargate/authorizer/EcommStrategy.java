@@ -118,8 +118,8 @@ public class EcommStrategy extends BaseStrategy {
                 buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
                 return false;
             }
-            if (t.getBillingAddress() == null
-                    || t.getBillingAddress().trim().isEmpty()) {
+            if (t.getBillingAddress1() == null
+                    || t.getBillingAddress1().trim().isEmpty()) {
                 buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
                 return false;
             }

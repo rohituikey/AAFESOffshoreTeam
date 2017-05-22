@@ -8,6 +8,22 @@ import com.datastax.driver.mapping.annotations.Transient;
 @Table(keyspace = "stargate", name = "transactions")
 final public class Transaction {
 
+    public String getBillingAddress1() {
+        return billingAddress1;
+    }
+
+    public void setBillingAddress1(String billingAddress1) {
+        this.billingAddress1 = billingAddress1;
+    }
+
+    public String getBillingAddress2() {
+        return billingAddress2;
+    }
+
+    public void setBillingAddress2(String billingAddress2) {
+        this.billingAddress2 = billingAddress2;
+    }
+
 //    public String getCardPresence() {
 //        return cardPresence;
 //    }
@@ -34,7 +50,7 @@ final public class Transaction {
     
     private String orderNumber = "";
     private String transactionId = "";
-    private long termId = 0L;
+    private String termId = "";
     private String comment = "";
     private String customerId = "";
     
@@ -90,7 +106,8 @@ final public class Transaction {
     private String userId = "";
     private String contact = "";
     private String cardHolderName = "";
-    private String billingAddress = "";
+    private String billingAddress1 = "";
+    private String billingAddress2 = "";
     private String billingCountryCode = "";
     private String shippingCountryCode = "";
     private String shippingAddress = "";
@@ -125,7 +142,7 @@ final public class Transaction {
     private String origAcctType = "";
     private String modifiedAcctValue = "";
     private String originalRequestType = "";
-    
+       
     //General Fields
     private String requestXmlDateTime = "";
     private String responseXmlDateTime = "";
@@ -216,14 +233,6 @@ final public class Transaction {
 
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
-    }
-
-    public long getTermId() {
-        return termId;
-    }
-
-    public void setTermId(long termId) {
-        this.termId = termId;
     }
 
     public String getComment() {
@@ -570,14 +579,6 @@ final public class Transaction {
 
     public void setCardHolderName(String cardHolderName) {
         this.cardHolderName = cardHolderName;
-    }
-
-    public String getBillingAddress() {
-        return billingAddress;
-    }
-
-    public void setBillingAddress(String billingAddress) {
-        this.billingAddress = billingAddress;
     }
 
     public String getBillingCountryCode() {
@@ -1097,7 +1098,21 @@ final public class Transaction {
     public void setGcpin(String gcpin) {
         this.gcpin = gcpin;
     }
-    
-    
+
+    /**
+     * @return the termId
+     */
+    public String getTermId() {
+        return termId;
+    }
+
+    /**
+     * @param termId the termId to set
+     */
+    public void setTermId(String termId) {
+        this.termId = termId;
+    }
+
+        
 
 }

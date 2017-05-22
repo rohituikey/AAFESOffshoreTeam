@@ -47,6 +47,7 @@ package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.GatewayException;
+import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StarGateConstants;
 import com.aafes.stargate.util.SvsUtil;
 import com.svs.svsxml.beans.Amount;
@@ -55,6 +56,8 @@ import com.svs.svsxml.beans.Merchant;
 import com.svs.svsxml.beans.PreAuthRequest;
 import com.svs.svsxml.beans.PreAuthResponse;
 import com.svs.svsxml.service.SVSXMLWay;
+import java.math.BigDecimal;
+import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -62,13 +65,16 @@ import org.slf4j.LoggerFactory;
  * Used to place a reserve on funds on a card for a fixed period of time or until a Pre-Authorization Completion message is approved.
  * This message type should always be followed by a Pre-Authorization Completion transaction.
  */
-public class PreAuthorizationProcessor {
+@Stateless
+public class PreAuthorizationProcessor extends Processor{
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PreAuthorizationProcessor.class.getSimpleName());
     String sMethodName = "";
     final String CLASS_NAME = PreAuthorizationProcessor.this.getClass().getSimpleName();
 
-    public void preAuth(Transaction t) {
-        PreAuthResponse preAuthResponseObj;
+
+    @Override
+    public void processRequest(Transaction t) {
+       PreAuthResponse preAuthResponseObj;
         PreAuthRequest preAuthRequest;
         SVSXMLWay sVSXMLWay;
         double approvedAmount;
@@ -79,8 +85,11 @@ public class PreAuthorizationProcessor {
             sVSXMLWay = SvsUtil.setUserNamePassword();
             preAuthRequest = new PreAuthRequest();
 
+            double amt = t.getAmount();
+            amt = amt/100;
+                    
             Amount amountObj = new Amount();
-            amountObj.setAmount(t.getAmount());
+            amountObj.setAmount(amt);
             amountObj.setCurrency(t.getCurrencycode());
             preAuthRequest.setRequestedAmount(amountObj);
             
@@ -94,8 +103,8 @@ public class PreAuthorizationProcessor {
             }
             
             card.setPinNumber(t.getGcpin());
-            card.setCardTrackOne(t.getTrack1());
-            card.setCardTrackTwo(t.getTrack2());
+           // card.setCardTrackOne(t.getTrack1());
+           // card.setCardTrackTwo(t.getTrack2());
             preAuthRequest.setCard(card);
             
             preAuthRequest.setDate(SvsUtil.formatLocalDateTime());
@@ -113,7 +122,7 @@ public class PreAuthorizationProcessor {
             preAuthRequest.setRoutingID(StarGateConstants.ROUTING_ID);
             // utilized when checkForDuplicate is FALSE. checkForDuplicate defauly is TRUE (SVSXMLSpecReviewV1.2.docx)
             //preAuthRequest.setStan(t.getSTAN()); 
-            preAuthRequest.setTransactionID(t.getTransactionId());
+            preAuthRequest.setTransactionID(t.getRrn() + "0000");
             preAuthRequest.setCheckForDuplicate(StarGateConstants.TRUE);
 
            preAuthResponseObj = sVSXMLWay.preAuth(preAuthRequest);
@@ -124,23 +133,29 @@ public class PreAuthorizationProcessor {
                     
                     t.setReasonCode(preAuthResponseObj.getReturnCode().getReturnCode());
                     t.setDescriptionField(preAuthResponseObj.getReturnCode().getReturnDescription());
-                    t.setResponseType(preAuthResponseObj.getReturnCode().getReturnDescription());
+                   // t.setResponseType(preAuthResponseObj.getReturnCode().getReturnDescription());
+                    if(t.getReasonCode().equalsIgnoreCase("01"))
+                    {
+                        t.setResponseType(ResponseType.APPROVED);
+                    } else {
+                        t.setResponseType(ResponseType.DECLINED);
+                    }
                 }
                 
                 if(preAuthResponseObj.getApprovedAmount() != null){
                     approvedAmount = preAuthResponseObj.getApprovedAmount().getAmount();
-                    t.setAmount((long) approvedAmount);
+                  //  t.setAmount((long) approvedAmount);
                     t.setCurrencycode(preAuthResponseObj.getApprovedAmount().getCurrency());
-                    t.setAmtPreAuthorized((long) approvedAmount);
+                    t.setAmtPreAuthorized((long) (approvedAmount*100));
                 }
                 
                 if(preAuthResponseObj.getBalanceAmount() != null)
-                    t.setBalanceAmount((long) preAuthResponseObj.getBalanceAmount().getAmount());
+                    t.setBalanceAmount((long) (preAuthResponseObj.getBalanceAmount().getAmount()*100));
                
                 LOGGER.info("AuthorizationCode : " + preAuthResponseObj.getAuthorizationCode());
 
                 if(preAuthResponseObj.getCard() != null) t.setCardSequenceNumber(preAuthResponseObj.getCard().getCardNumber());
-                t.setAuthoriztionCode(preAuthResponseObj.getAuthorizationCode());
+                t.setAuthNumber(preAuthResponseObj.getAuthorizationCode());
                 t.setSTAN(preAuthResponseObj.getStan());
                 t.setTransactionId(preAuthResponseObj.getTransactionID());
             }else LOGGER.error("Response Object is NULL " + sMethodName + " " + CLASS_NAME);

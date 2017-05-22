@@ -23,11 +23,12 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class SVSGatewayProcessor {
 
-    private SVSFinalAuth finalAuth;
-
+   
     private static final org.slf4j.Logger log
             = LoggerFactory.getLogger(SVSGatewayProcessor.class.getSimpleName());
 
+    @EJB
+    private ProcessorFactory processorFactory;
     @EJB
     private SVSDAO svsdao;
 
@@ -35,33 +36,9 @@ public class SVSGatewayProcessor {
 
         try {
             log.info("Gift Card Request Type : " + t.getRequestType());
-
-            switch (t.getRequestType()) {
-                case RequestType.INQUIRY:
-                    //BI
-                    BalanceInquiryProcessor balanceInquiryProcessor = new BalanceInquiryProcessor();
-                    balanceInquiryProcessor.processBalanceInquiry(t);
-                    break;
-                case RequestType.PREAUTH:
-                    //preAuth(t);
-                    PreAuthorizationProcessor preAuthorizationProcessorObj = new PreAuthorizationProcessor();
-                    preAuthorizationProcessorObj.preAuth(t);
-                    break;
-                case RequestType.FINAL_AUTH:
-                    //preAuthComplete(t);
-                    finalAuth = new SVSFinalAuth();
-                    finalAuth.completePreAuth(t);
-                    break;
-                case RequestType.REVERSAL:
-                    reverseTran(t);
-                    break;
-                case RequestType.ISSUE:
-                    SVSIssue sVSIssue = new SVSIssue();
-                    sVSIssue.issueGiftCard(t);
-                    break;
-                default:
-                    log.info("No Matching request type found.");
-            }
+            Processor processor = processorFactory.pickProcessor(t);
+            processor.processRequest(t);
+            
         } catch (Exception e) {
             log.error("SVSGatewayProcessor#execute#Exception : " + e.toString());
             t.setDescriptionField("SVS_GATEWAY_ERROR");
@@ -191,11 +168,4 @@ public class SVSGatewayProcessor {
 
     }
 
-    public SVSFinalAuth getFinalAuth() {
-        return finalAuth;
-    }
-
-    public void setFinalAuth(SVSFinalAuth finalAuth) {
-        this.finalAuth = finalAuth;
-    }
 }

@@ -6,6 +6,7 @@
 package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.Gateway;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.util.RequestType;
@@ -26,13 +27,15 @@ public class SVSGateway extends Gateway {
 
     @EJB
     private SVSGatewayProcessor svsgp;
-
+    @EJB
+    private Configurator configurator;
+    
     @Override
     public Transaction processMessage(Transaction t) {
 
         try {
             boolean validateTransactionFlg = this.validateTransaction(t);
-            if(validateTransactionFlg){
+            if (validateTransactionFlg) {
                 if (svsgp != null) {
                     t = svsgp.execute(t);
                 } else {
@@ -40,7 +43,7 @@ public class SVSGateway extends Gateway {
                     t.setDescriptionField("INTERNAL SERVER ERROR");
                     return t;
                 }
-            }else{
+            } else {
                 LOG.error("Data Validation Failed! " + t.getReasonCode() + ". " + t.getDescriptionField() + ". " + t.getResponseType());
                 return t;
             }
@@ -53,24 +56,21 @@ public class SVSGateway extends Gateway {
     }
 
     private boolean validateTransaction(Transaction t) throws GatewayException {
-         LOG.info("Method validateTransaction started. Class Name SVSGateway");
-        if(RequestType.INQUIRY.equals(t.getRequestType()) ||
-               RequestType.PREAUTH.equals(t.getRequestType()) ||
-                    RequestType.FINAL_AUTH.equals(t.getRequestType())){
-            if(t.getAccount() == null || t.getAccount().trim().isEmpty()){
-                buildErrorResponse(t, "", "CARD NUMBER IS NULL");
-                return false;
-            } else if(t.getGcpin() == null || t.getGcpin().trim().isEmpty()){
-                buildErrorResponse(t, "", "PIN NUMBER IS NULL");
+        LOG.info("Method validateTransaction started. Class Name SVSGateway");
+        if (RequestType.INQUIRY.equalsIgnoreCase(t.getRequestType())
+                || RequestType.PREAUTH.equalsIgnoreCase(t.getRequestType())
+                || RequestType.FINAL_AUTH.equalsIgnoreCase(t.getRequestType())) {
+            if (t.getAccount() == null || t.getAccount().trim().isEmpty()) {
+                buildErrorResponse(t, configurator.get("INVALID_ACCOUNT_NUMBER"), "INVALID_ACCOUNT_NUMBER");
                 return false;
             } 
-        }   
-        
-        if(t.getTransactionId() == null || t.getTransactionId().trim().isEmpty()){
-            buildErrorResponse(t, "", "TRANSACTION ID IS NULL");
-            return false;
-        } 
-        
+//            else if (t.getGcpin() == null || t.getGcpin().trim().isEmpty()) {
+//                buildErrorResponse(t, "", "PIN NUMBER IS NULL");
+//                return false;
+//            }
+        }
+
+
         LOG.info("Method validateTransaction ended. Class Name SVSGateway");
         return true;
     }
@@ -80,7 +80,7 @@ public class SVSGateway extends Gateway {
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
     }
-    
+
     public void setSvsgp(SVSGatewayProcessor svsgp) {
         this.svsgp = svsgp;
     }

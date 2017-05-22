@@ -7,6 +7,7 @@ package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.GatewayException;
+import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StarGateConstants;
 import com.aafes.stargate.util.SvsUtil;
 import com.svs.svsxml.beans.Amount;
@@ -15,18 +16,23 @@ import com.svs.svsxml.beans.BalanceInquiryResponse;
 import com.svs.svsxml.beans.Card;
 import com.svs.svsxml.beans.Merchant;
 import com.svs.svsxml.service.SVSXMLWay;
+import javax.ejb.Stateless;
+import javax.enterprise.inject.Stereotype;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author alugumetlas
  */
-public class BalanceInquiryProcessor {
+@Stateless
+public class BalanceInquiryProcessor extends Processor {
 
     private static final org.slf4j.Logger log
             = LoggerFactory.getLogger(BalanceInquiryProcessor.class.getSimpleName());
 
-    public void processBalanceInquiry(Transaction t) {
+
+    @Override
+    public void processRequest(Transaction t) {
         log.info("Method...... " + "processBalanceInquiry.......");
 
         SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
@@ -41,7 +47,7 @@ public class BalanceInquiryProcessor {
         Card card = new Card();
         card.setCardCurrency(StarGateConstants.CURRENCY);
         card.setCardNumber(t.getAccount());
-        card.setPinNumber("0000"+t.getGcpin());
+        card.setPinNumber(t.getGcpin());
         balanceInquiryRequest.setCard(card);
 
         Merchant merchant = new Merchant();
@@ -52,7 +58,7 @@ public class BalanceInquiryProcessor {
         balanceInquiryRequest.setMerchant(merchant);
 
         balanceInquiryRequest.setCheckForDuplicate(StarGateConstants.TRUE);
-        balanceInquiryRequest.setTransactionID(t.getTransactionId());
+        balanceInquiryRequest.setTransactionID(t.getRrn() + "0000");
         balanceInquiryRequest.setDate(SvsUtil.formatLocalDateTime());
         balanceInquiryRequest.setInvoiceNumber(t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
 
@@ -66,10 +72,10 @@ public class BalanceInquiryProcessor {
 
             if (balanceInquiryResponse != null) {
 
-                t.setAuthoriztionCode(balanceInquiryResponse.getAuthorizationCode());
+                t.setAuthNumber(balanceInquiryResponse.getAuthorizationCode());
 
                 if (balanceInquiryResponse.getBalanceAmount() != null) {
-                    t.setAmount((long) balanceInquiryResponse.getBalanceAmount().getAmount());
+                    t.setBalanceAmount((long) (balanceInquiryResponse.getBalanceAmount().getAmount()*100));
                     t.setCurrencycode(StarGateConstants.CURRENCY);
 
                     t.setCardSequenceNumber(balanceInquiryResponse.getCard().getCardNumber());
@@ -77,6 +83,12 @@ public class BalanceInquiryProcessor {
 
                     t.setReasonCode(balanceInquiryResponse.getReturnCode().getReturnCode());
                     t.setDescriptionField(balanceInquiryResponse.getReturnCode().getReturnDescription());
+                    if(t.getReasonCode().equalsIgnoreCase("01"))
+                    {
+                        t.setResponseType(ResponseType.APPROVED);
+                    } else {
+                        t.setResponseType(ResponseType.DECLINED);
+                    }
                 }
             }
         } catch (GatewayException e) {

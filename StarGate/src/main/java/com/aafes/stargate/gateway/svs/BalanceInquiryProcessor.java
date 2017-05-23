@@ -78,7 +78,7 @@ public class BalanceInquiryProcessor extends Processor {
                     t.setBalanceAmount((long) (balanceInquiryResponse.getBalanceAmount().getAmount()*100));
                     t.setCurrencycode(StarGateConstants.CURRENCY);
 
-                    t.setCardSequenceNumber(balanceInquiryResponse.getCard().getCardNumber());
+                    t.setAccount(balanceInquiryResponse.getCard().getCardNumber());
                     t.setExpiration(balanceInquiryResponse.getCard().getCardExpiration());
 
                     t.setReasonCode(balanceInquiryResponse.getReturnCode().getReturnCode());

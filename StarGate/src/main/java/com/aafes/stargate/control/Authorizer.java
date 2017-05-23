@@ -66,10 +66,10 @@ public class Authorizer {
             /**
              * Remove if condition after Junit test case modified for Authorizer
              */
-            if (tokenBusinessService != null
-                    && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
-                bTokenCall = tokenBusinessService.modifyTran(t);
-            }
+//            if (tokenBusinessService != null
+//                    && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
+//                bTokenCall = tokenBusinessService.modifyTran(t);
+//            }
             findFacility(t);
             if (t.getFacility() == null || t.getFacility().isEmpty()
                     || t.getStrategy() == null || t.getStrategy().isEmpty()) {
@@ -175,10 +175,10 @@ public class Authorizer {
             LOG.error("Exception caught" + e.toString());
             t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
             t.setDescriptionField("INTERNAL_SERVER_ERROR");
-            if (!bTokenCall && bDoneMApreq) {
-                t.setReasonCode(configurator.get("TOKENIZER_CONNECTION_ERROR"));
-                t.setDescriptionField("TOKENIZER_CONNECTION_ERROR");
-            }
+//            if (!bTokenCall && bDoneMApreq) {
+//                t.setReasonCode(configurator.get("TOKENIZER_CONNECTION_ERROR"));
+//                t.setDescriptionField("TOKENIZER_CONNECTION_ERROR");
+//            }
             t.setResponseType(ResponseType.DECLINED);
             if(cm.getResponse() != null)
             {

@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+    <xs:simpleType name="AccountTypeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Pan" />
+            <xs:enumeration value="Token" />
+        </xs:restriction>                                                  
+    </xs:simpleType>
+    <xs:simpleType name="RequestTypeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Issue" />
+            <xs:enumeration value="Lookup" />
+            <xs:enumeration value="Delete" />
+        </xs:restriction>                                                  
+    </xs:simpleType> 
+    <xs:element name="TokenMessage">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Request" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>                          
+                        <xs:sequence>
+                            <xs:element name="RequestType" type="RequestTypeType" minOccurs="1" maxOccurs="1" /> 
+                            <xs:element name="Media" minOccurs="1" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="Mastercard" />
+                                        <xs:enumeration value="Visa" />
+                                        <xs:enumeration value="Discover" />
+                                        <xs:enumeration value="Amex" />
+                                        <xs:enumeration value="Milstar" />
+                                        <xs:enumeration value="GiftCard" />
+                                    </xs:restriction>                                                  
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="AccountType" type="AccountTypeType" minOccurs="1" maxOccurs="1" /> 
+                            <xs:element name="Account" minOccurs="1" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="12"/>
+                                        <xs:maxLength value="200"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="TokenBankName" minOccurs="1" maxOccurs="1">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="1"/>
+                                        <xs:maxLength value="20"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>                
+                <xs:element name="Response" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>                          
+                        <xs:sequence>                          
+                             <xs:element name="ResponseType" minOccurs="1" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="SUCCESS" />
+                                        <xs:enumeration value="FAILED" />
+                                        <xs:enumeration value="TIMEOUT" />
+                                    </xs:restriction>                                                  
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="ReasonCode" minOccurs="0" maxOccurs="1">              
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:length value="3"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                           <xs:element name="DescriptionField" minOccurs="0" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="0"/>
+                                        <xs:maxLength value="16"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element> 
+                            <xs:element name="AccountType" type="AccountTypeType" minOccurs="1" maxOccurs="1" /> 
+                            <xs:element name="Account" minOccurs="1" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="12"/>
+                                        <xs:maxLength value="200"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>  
+                            <xs:element name="Expiration" minOccurs="0" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:length value="8"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>         
+                            <xs:element name="Status" minOccurs="0" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:length value="20"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>                      
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>  
+</xs:schema>

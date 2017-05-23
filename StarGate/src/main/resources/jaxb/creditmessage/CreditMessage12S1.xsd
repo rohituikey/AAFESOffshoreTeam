@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
-This version is the most up to date for a full on spec.  As of 15 December 2016.
-Shortened versions of Response and more intelligent Settle messages.
+This version contains the KeepAlive messaging required by IBM/Deca. Also includes new RequestTypeType of TrnCancel, Virtual GC Issue, VrtResponse, GCPin (expanded to length=8). 
+Increased the length of termId to max 8 digits a/n. Made Reason Code a variable length 1-3. Cleaned up extra spaces after some elements and refactored the AVS section. 12-May-2017
 -->
 
 <xs:schema
@@ -13,34 +13,37 @@ Shortened versions of Response and more intelligent Settle messages.
     
     <xs:simpleType name="AccountTypeType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="Pan" />
-            <xs:enumeration value="Token" />
-            <xs:enumeration value="EncryptedPayload" />
+            <xs:enumeration value="Pan"/>
+            <xs:enumeration value="Token"/>
+            <xs:enumeration value="EncryptedPayload"/>
+            <xs:enumeration value="Msg"/>
         </xs:restriction>                                                  
     </xs:simpleType>
     <xs:simpleType name="RequestTypeType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="Sale" />
-            <xs:enumeration value="Activate" />
-            <xs:enumeration value="Payment" />
-            <xs:enumeration value="Inquiry" />
-            <xs:enumeration value="Refund" />
-            <xs:enumeration value="Load" />
-            <xs:enumeration value="Recurr" />
-            <xs:enumeration value="PreAuth" />
+            <xs:enumeration value="Sale"/>
+            <xs:enumeration value="Activate"/>
             <xs:enumeration value="Issue"/>
-            <xs:enumeration value="FinalAuth" />
-            <xs:enumeration value="Acknowledgment" />
-            <xs:enumeration value="Settle" />
+            <xs:enumeration value="Payment"/>
+            <xs:enumeration value="Inquiry"/>
+            <xs:enumeration value="Refund"/>
+            <xs:enumeration value="Load"/>
+            <xs:enumeration value="Recurr"/>
+            <xs:enumeration value="PreAuth"/>
+            <xs:enumeration value="FinalAuth"/>
+            <xs:enumeration value="Acknowledgment"/>
+            <xs:enumeration value="Settle"/>
+            <xs:enumeration value="KeepAlive"/>
+            <xs:enumeration value="TrnCancel"/>
         </xs:restriction>                                                  
     </xs:simpleType>
     <xs:simpleType name="AddressVerificationResponseType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="Matched" />
-            <xs:enumeration value="UnMatched" />
-            <xs:enumeration value="Unavailable" />
-            <xs:enumeration value="NotVerified" />
-            <xs:enumeration value="Retry" />
+            <xs:enumeration value="Matched"/>
+            <xs:enumeration value="UnMatched"/>
+            <xs:enumeration value="Unavailable"/>
+            <xs:enumeration value="NotVerified"/>
+            <xs:enumeration value="Retry"/>
         </xs:restriction>                                                  
     </xs:simpleType>
     <xs:element name="Message">
@@ -58,6 +61,7 @@ Shortened versions of Response and more intelligent Settle messages.
                             </xs:element>
                             <xs:element name="LocalDateTime" type="xs:dateTime" minOccurs="1" maxOccurs="1"/>
                             <xs:element name="SettleIndicator" type="xs:boolean" minOccurs="1" maxOccurs="1"/>
+                            <!--For a KeepAlive message the Order number can be KeepAlive -->
                             <xs:element name="OrderNumber" minOccurs="1" maxOccurs="1">                
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
@@ -76,8 +80,9 @@ Shortened versions of Response and more intelligent Settle messages.
                             </xs:element>
                             <xs:element name="termId" minOccurs='1' maxOccurs='1'>
                                 <xs:simpleType>
-                                    <xs:restriction base="xs:integer">
-                                        <xs:totalDigits value="2"/>      
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="2"/>
+                                        <xs:maxLength value="8"/>
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
@@ -106,16 +111,20 @@ Shortened versions of Response and more intelligent Settle messages.
                             <xs:element name="Media" minOccurs="1" maxOccurs="1">                
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
-                                        <xs:enumeration value="Mastercard" />
-                                        <xs:enumeration value="Visa" />
-                                        <xs:enumeration value="Discover" />
-                                        <xs:enumeration value="Amex" />
-                                        <xs:enumeration value="Milstar" />
-                                        <xs:enumeration value="GiftCard" />
-                                        <xs:enumeration value="InComm" />
-                                        <xs:enumeration value="ATT" />
-                                        <xs:enumeration value="Esso" />
-                                        <xs:enumeration value="WEX" />
+                                        <xs:enumeration value="Mastercard"/>
+                                        <xs:enumeration value="Visa"/>
+                                        <xs:enumeration value="Discover"/>
+                                        <xs:enumeration value="Amex"/>
+                                        <xs:enumeration value="Milstar"/>
+                                        <xs:enumeration value="GiftCard"/>
+                                        <xs:enumeration value="InComm"/>
+                                        <xs:enumeration value="ATT"/>
+                                        <xs:enumeration value="Esso"/>
+                                        <xs:enumeration value="WEX"/>
+                                        <xs:enumeration value="Status"/>
+                                        <!-- Use Status for Store Status messages like Store Open or Store Close messages --> 
+                                        <xs:enumeration value="Info"/>
+                                        <!-- Use Info for non-financial Heartbeat or KeepAlive messages -->
                                     </xs:restriction>                                                  
                                 </xs:simpleType>
                             </xs:element>
@@ -127,10 +136,12 @@ Shortened versions of Response and more intelligent Settle messages.
                             <xs:element name="InputType" minOccurs="1" maxOccurs="1">                
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
-                                        <xs:enumeration value="Swiped" />
-                                        <xs:enumeration value="Keyed" />
-                                        <xs:enumeration value="Scanned" />
-                                        <xs:enumeration value="ICC" />
+                                        <xs:enumeration value="Swiped"/>
+                                        <xs:enumeration value="Keyed"/>
+                                        <xs:enumeration value="Scanned"/>
+                                        <xs:enumeration value="Contactless"/>
+                                        <xs:enumeration value="ICC"/>
+                                        <xs:enumeration value="Network"/>
                                     </xs:restriction>                                                  
                                 </xs:simpleType>
                             </xs:element>
@@ -145,7 +156,8 @@ Shortened versions of Response and more intelligent Settle messages.
                             <xs:choice>
                                 <xs:element name="Pan" type="AccountTypeType"/>                
                                 <xs:element name="Token" type="AccountTypeType"/>
-                                <xs:element name="EncryptedPayload" type="AccountTypeType"/>                                                
+                                <xs:element name="EncryptedPayload" type="AccountTypeType"/>
+                                <xs:element name="Msg" type="AccountTypeType"/>                                                
                             </xs:choice>
                             <xs:element name="Account" minOccurs="0" maxOccurs="1">                
                                 <xs:simpleType>
@@ -206,7 +218,7 @@ Shortened versions of Response and more intelligent Settle messages.
                             <xs:element name="GCpin" minOccurs="0" maxOccurs="1">
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
-                                        <xs:length value="4"/>
+                                        <xs:length value="8"/>
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
@@ -246,9 +258,9 @@ Shortened versions of Response and more intelligent Settle messages.
                                         <xs:element name="ServiceCode" minOccurs="0" maxOccurs="1">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
-                                                    <xs:enumeration value="S" />
-                                                    <xs:enumeration value="F" />
-                                                    <xs:enumeration value="O" />
+                                                    <xs:enumeration value="S"/>
+                                                    <xs:enumeration value="F"/>
+                                                    <xs:enumeration value="O"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element> 
@@ -358,13 +370,13 @@ Shortened versions of Response and more intelligent Settle messages.
                                 <!-- This is used when you make a Payment to MilSTar or ESSO Load to indicate HOW that load or payment was made. -->
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
-                                        <xs:enumeration value="Cash" />
-                                        <xs:enumeration value="GiftCard" />
-                                        <xs:enumeration value="Check" />
-                                        <xs:enumeration value="Amex" />                                                    
-                                        <xs:enumeration value="Discover" />
-                                        <xs:enumeration value="Mastercard" />
-                                        <xs:enumeration value="Visa" />
+                                        <xs:enumeration value="Cash"/>
+                                        <xs:enumeration value="GiftCard"/>
+                                        <xs:enumeration value="Check"/>
+                                        <xs:enumeration value="Amex"/>                                                    
+                                        <xs:enumeration value="Discover"/>
+                                        <xs:enumeration value="Mastercard"/>
+                                        <xs:enumeration value="Visa"/>
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
@@ -429,7 +441,7 @@ Shortened versions of Response and more intelligent Settle messages.
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
                                         <xs:minLength value="0"/>
-                                        <xs:maxLength value="5"/>
+                                        <xs:maxLength value="10"/>
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
@@ -450,7 +462,7 @@ Shortened versions of Response and more intelligent Settle messages.
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
-                            <!-- This is the Original Autorization Code from the PreAuth Response plced in the Final Auth Request -->
+                            <!-- This is the Original Autorization Code from the PreAuth Response placed in the Final Auth Request -->
                             <xs:element name="origAuthCode" minOccurs="0" maxOccurs="1">
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
@@ -459,7 +471,6 @@ Shortened versions of Response and more intelligent Settle messages.
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
-                            <!-- Used in the FinalAuth Request -->
                             <xs:element name="AmtPreAuthorized" minOccurs='0' maxOccurs='1'> 
                                 <xs:simpleType>
                                     <xs:restriction base="xs:decimal">
@@ -470,17 +481,17 @@ Shortened versions of Response and more intelligent Settle messages.
                             <xs:element name="EncryptMgmt" minOccurs="0" maxOccurs="1">
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
-                                        <xs:enumeration value="DUKPT" />
+                                        <xs:enumeration value="DUKPT"/>
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
                             <xs:element name="EncryptAlgorithm" minOccurs="0" maxOccurs="1">
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
-                                        <xs:enumeration value="3DES" />
-                                        <xs:enumeration value="RSA" />
-                                        <xs:enumeration value="ECC" />
-                                        <xs:enumeration value="AES" />
+                                        <xs:enumeration value="3DES"/>
+                                        <xs:enumeration value="RSA"/>
+                                        <xs:enumeration value="ECC"/>
+                                        <xs:enumeration value="AES"/>
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
@@ -518,7 +529,7 @@ Shortened versions of Response and more intelligent Settle messages.
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
-                                        <xs:element name="BillingAddress" minOccurs="0" maxOccurs="1">
+                                        <xs:element name="BillingAddress1" minOccurs="0" maxOccurs="1">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
                                                     <xs:minLength value="1"/>
@@ -526,6 +537,30 @@ Shortened versions of Response and more intelligent Settle messages.
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
+                                        <xs:element name="BillingAddress2" minOccurs="0" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:minLength value="1"/>
+                                                    <xs:maxLength value="40"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="BillingCity" minOccurs="0" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:minLength value="1"/>
+                                                    <xs:maxLength value="40"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="BillingState" minOccurs="0" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:minLength value="1"/>
+                                                    <xs:maxLength value="40"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>  
                                         <xs:element name="BillingCountryCode" minOccurs="0" maxOccurs="1">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
@@ -538,7 +573,7 @@ Shortened versions of Response and more intelligent Settle messages.
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
                                                     <xs:minLength value="0"/>
-                                                    <xs:maxLength value="5"/>
+                                                    <xs:maxLength value="10"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
@@ -557,7 +592,31 @@ Shortened versions of Response and more intelligent Settle messages.
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
-                                        <xs:element name="ShippingAddress" minOccurs="0" maxOccurs="1">
+                                        <xs:element name="ShippingAddress1" minOccurs="0" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:minLength value="1"/>
+                                                    <xs:maxLength value="40"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="ShippingAddress2" minOccurs="0" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:minLength value="1"/>
+                                                    <xs:maxLength value="40"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="ShippingCity" minOccurs="0" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:minLength value="1"/>
+                                                    <xs:maxLength value="40"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="ShippingState" minOccurs="0" maxOccurs="1">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
                                                     <xs:minLength value="1"/>
@@ -577,7 +636,7 @@ Shortened versions of Response and more intelligent Settle messages.
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
                                                     <xs:minLength value="0"/>
-                                                    <xs:maxLength value="5"/>
+                                                    <xs:maxLength value="10"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
@@ -592,7 +651,6 @@ Shortened versions of Response and more intelligent Settle messages.
                                 </xs:complexType>
                             </xs:element>
                         </xs:sequence>
-                        
                         <xs:attribute name="RRN" use="required">
                             <xs:simpleType>
                                 <xs:restriction base="xs:string">
@@ -608,26 +666,29 @@ Shortened versions of Response and more intelligent Settle messages.
                             <xs:element name="Media" minOccurs="1" maxOccurs="1">                
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
-                                        <xs:enumeration value="Mastercard" />
-                                        <xs:enumeration value="Visa" />
-                                        <xs:enumeration value="Discover" />
-                                        <xs:enumeration value="Amex" />
-                                        <xs:enumeration value="Milstar" />
-                                        <xs:enumeration value="GiftCard" />
-                                        <xs:enumeration value="InComm" />
-                                        <xs:enumeration value="ATT" />
-                                        <xs:enumeration value="Esso" />
-                                        <xs:enumeration value="WEX" />
+                                        <xs:enumeration value="Mastercard"/>
+                                        <xs:enumeration value="Visa"/>
+                                        <xs:enumeration value="Discover"/>
+                                        <xs:enumeration value="Amex"/>
+                                        <xs:enumeration value="Milstar"/>
+                                        <xs:enumeration value="GiftCard"/>
+                                        <xs:enumeration value="InComm"/>
+                                        <xs:enumeration value="ATT"/>
+                                        <xs:enumeration value="Esso"/>
+                                        <xs:enumeration value="WEX"/>
+                                        <xs:enumeration value="Status"/>
+                                        <xs:enumeration value="Info"/>
                                     </xs:restriction>                                                  
                                 </xs:simpleType>
                             </xs:element>
                             <xs:element name="ResponseType" minOccurs="1" maxOccurs="1">                
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
-                                        <xs:enumeration value="Approved" />
-                                        <xs:enumeration value="Decline" />
-                                        <xs:enumeration value="TIMEOUT" />
-                                        <xs:enumeration value="Referral" />
+                                        <xs:enumeration value="Approved"/>
+                                        <xs:enumeration value="Decline"/>
+                                        <xs:enumeration value="TIMEOUT"/>
+                                        <xs:enumeration value="Referral"/>
+                                        <xs:enumeration value="OK"/>
                                     </xs:restriction>                                                  
                                 </xs:simpleType>
                             </xs:element>
@@ -644,7 +705,8 @@ Shortened versions of Response and more intelligent Settle messages.
                                 therefore it is optional for Settle only but every other Response should have this element. -->                
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
-                                        <xs:length value="3"/>
+                                        <xs:minLength value="1"/>
+                                        <xs:maxLength value="3"/>
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
@@ -684,7 +746,8 @@ Shortened versions of Response and more intelligent Settle messages.
                                 </xs:complexType>                                    
                             </xs:element>
                             <xs:element name="PlanNumber" minOccurs="0" maxOccurs="1">
-                                <!-- No need to reply with plan number unless it was unknown or multiple were sent at the Request --> 
+                                <!-- No need to reply with plan number unless it was unknown, not sent in the request or multiple plan numbers
+                                were sent in the Request. --> 
                                 <xs:simpleType>
                                     <xs:restriction base="xs:integer">
                                         <xs:totalDigits value="5"/>
@@ -698,7 +761,7 @@ Shortened versions of Response and more intelligent Settle messages.
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
-                            <!-- Activation of INCOMM and AT&T and Milstar or Inquiry of GiftCards -->
+                            <!-- Activation of INCOMM and AT&T also after Milstar or Inquiry of GiftCards -->
                             <xs:element name="BalanceAmount" minOccurs="0" maxOccurs="1">                
                                 <xs:simpleType>
                                     <xs:restriction base="xs:decimal">
@@ -720,6 +783,27 @@ Shortened versions of Response and more intelligent Settle messages.
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
+                            <!-- Used for eComm Virtual Giftcard Issue Response -->
+                            <xs:element name="VrtGcAcctInfo" minOccurs="0" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence minOccurs="1" maxOccurs="1">
+                                        <xs:element name="VrtGcAcctNbr"> 
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:integer">
+                                                    <xs:totalDigits value="19"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="VrtGCPin"> 
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:integer">
+                                                    <xs:totalDigits value="8"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
                             <xs:element name="DescriptionField" minOccurs="0" maxOccurs="1">                
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
@@ -729,22 +813,24 @@ Shortened versions of Response and more intelligent Settle messages.
                                 </xs:simpleType>
                             </xs:element>
                             <xs:element name="origReqType" minOccurs="0" maxOccurs="1">
-                                <!-- This should be used for everything except Settlement Response messages -->
+                                <!-- This is optional but should be used for everything except Settlement Response messages -->
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
-                                        <xs:enumeration value="Sale" />
-                                        <xs:enumeration value="Payment" />
-                                        <xs:enumeration value="Inquiry" />
-                                        <xs:enumeration value="Refund" />
-                                        <xs:enumeration value="Load" />
-                                        <xs:enumeration value="Recurr" />
-                                        <xs:enumeration value="PreAuth" />
+                                        <xs:enumeration value="Sale"/>
+                                        <xs:enumeration value="Payment"/>
+                                        <xs:enumeration value="Inquiry"/>
+                                        <xs:enumeration value="Refund"/>
+                                        <xs:enumeration value="Load"/>
+                                        <xs:enumeration value="Recurr"/>
+                                        <xs:enumeration value="PreAuth"/>
+                                        <xs:enumeration value="FinalAuth"/>
+                                        <xs:enumeration value="Acknowledgment"/>
+                                        <xs:enumeration value="Settle"/>
+                                        <xs:enumeration value="Activate"/>
                                         <xs:enumeration value="Issue"/>
-                                        <xs:enumeration value="FinalAuth" />
-                                        <xs:enumeration value="Acknowledgment" />
-                                        <xs:enumeration value="Settle" />
-                                        <xs:enumeration value="Activate" />
-                                        <xs:enumeration value="Reversal" />
+                                        <xs:enumeration value="Reversal"/>
+                                        <xs:enumeration value="KeepAlive"/>
+                                        <xs:enumeration value="TrnCancel"/>
                                     </xs:restriction>                                                  
                                 </xs:simpleType>
                             </xs:element>
@@ -752,9 +838,10 @@ Shortened versions of Response and more intelligent Settle messages.
                                 <!-- This should be used when an Account was a PAN and a response was with a Token or Encryption -->
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
-                                        <xs:enumeration value="Pan" />
-                                        <xs:enumeration value="Token" />
-                                        <xs:enumeration value="Encryption" />
+                                        <xs:enumeration value="Pan"/>
+                                        <xs:enumeration value="Token"/>
+                                        <xs:enumeration value="Encryption"/>
+                                        <xs:enumeration value="Msg"/>
                                     </xs:restriction>                                                  
                                 </xs:simpleType>
                             </xs:element>
@@ -794,24 +881,37 @@ Shortened versions of Response and more intelligent Settle messages.
                             <xs:element name="AddressVerificationResponse" minOccurs="0" maxOccurs="1">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element name="CardHolderName" type="AddressVerificationResponseType"/>
-                                        <xs:element name="BillingAddress" type="AddressVerificationResponseType">
+                                        <xs:element name="CardHolderName" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
                                         </xs:element>
-                                        <xs:element name="BillingCountryCode" type="AddressVerificationResponseType">
+                                        <xs:element name="BillingAddress1" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
                                         </xs:element>
-                                        <xs:element name="BillingZipCode" type="AddressVerificationResponseType"> 
+                                        <xs:element name="BillingAddress2" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
                                         </xs:element>
-                                        <xs:element name="Email" type="AddressVerificationResponseType">
+                                        <xs:element name="BillingCity" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
                                         </xs:element>
-                                        <xs:element name="BillingPhone" type="AddressVerificationResponseType">
+                                        <xs:element name="BillingState" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
                                         </xs:element>
-                                        <xs:element name="ShippingAddress" type="AddressVerificationResponseType">
+                                        <xs:element name="BillingCountryCode" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
                                         </xs:element>
-                                        <xs:element name="ShippingCountryCode" type="AddressVerificationResponseType">
+                                        <xs:element name="BillingZipCode" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1"> 
                                         </xs:element>
-                                        <xs:element name="ShippingZipCode" type="AddressVerificationResponseType"> 
+                                        <xs:element name="Email" minOccurs="0" type="AddressVerificationResponseType" maxOccurs="1">
                                         </xs:element>
-                                        <xs:element name="ShippingPhone" type="AddressVerificationResponseType">
+                                        <xs:element name="BillingPhone" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
+                                        </xs:element>
+                                        <xs:element name="ShippingAddress1" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
+                                        </xs:element>
+                                        <xs:element name="ShippingAddress2" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
+                                        </xs:element>
+                                        <xs:element name="ShippingCity" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
+                                        </xs:element>
+                                        <xs:element name="ShippingState" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
+                                        </xs:element>
+                                        <xs:element name="ShippingCountryCode" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
+                                        </xs:element>
+                                        <xs:element name="ShippingZipCode" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
+                                        </xs:element>
+                                        <xs:element name="ShippingPhone" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
                                         </xs:element>                        
                                     </xs:sequence>                                    
                                 </xs:complexType>
@@ -844,16 +944,15 @@ Shortened versions of Response and more intelligent Settle messages.
             <xs:attribute name="TypeCode" use="required">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:enumeration value="Request" />
-                        <xs:enumeration value="Response" />
-                        <xs:enumeration value="Settle" />
+                        <xs:enumeration value="Request"/>
+                        <xs:enumeration value="Response"/>
+                        <xs:enumeration value="Settle"/>
                     </xs:restriction>
                 </xs:simpleType> 
             </xs:attribute>
             <xs:attribute name="MajorVersion" fixed="3" use="required" type="xs:integer"/>
-            <xs:attribute name="MinorVersion" fixed="0" use="required" type="xs:integer"/>
-            <xs:attribute name="FixVersion" fixed="0" use="required" type="xs:integer"/>
-            
+            <xs:attribute name="MinorVersion" fixed="1" use="required" type="xs:integer"/>
+            <xs:attribute name="FixVersion" fixed="0" use="required" type="xs:integer"/>            
         </xs:complexType>                       
     </xs:element>
 </xs:schema>

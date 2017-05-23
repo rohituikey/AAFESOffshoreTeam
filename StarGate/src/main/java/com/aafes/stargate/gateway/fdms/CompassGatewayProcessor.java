@@ -2,6 +2,7 @@ package com.aafes.stargate.gateway.fdms;
 
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.util.AVSResponseReasonCode;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
@@ -165,7 +166,7 @@ public class CompassGatewayProcessor {
               
             //<cmpmsg:AB> 
             ContactAddress ab = new ContactAddress();
-            ab.setNameText(t.getCardHolderName());
+            ab.setNameText(t.getCardHolderName().replace(",", "*").toUpperCase());
             if(t.getBillingPhone() != null 
                     && !t.getBillingPhone().equals("")){
                 String phoneNumber = String.format("%-14s", t.getBillingPhone());
@@ -174,7 +175,7 @@ public class CompassGatewayProcessor {
                 t.setTelephonetype(telePhoneType);
                 ab.setTelephoneType(telePhoneType);
             }
-            String address = t.getBillingAddress();
+            String address = t.getBillingAddress1();
             if(address!=null
                     && address.length()>30){
                 address = address.substring(0,30);
@@ -182,6 +183,14 @@ public class CompassGatewayProcessor {
             address = String.format("%-30s", address);
             ab.setAddress1(address);
 
+            String address2 = t.getBillingAddress2();
+            if(address2!=null
+                    && address2.length()>30){
+                address2 = address2.substring(0,30);
+            }
+            address2 = String.format("%-30s", address2);
+            ab.setAddress2(address2);
+            
             String zipCode = String.format("%-10s", t.getBillingZipCode());
             ab.setPostalCode(zipCode);
             ab.setCountryCode(t.getBillingCountryCode().toUpperCase());
@@ -255,7 +264,15 @@ public class CompassGatewayProcessor {
         t.setReasonCode(result.getResponseReasonCode());
         t.setResponseDate(result.getResponseDate());
         t.setAuthNumber(result.getAuthorizationCode());
-        t.setAvsResponseCode(result.getAVSResponseCode());
+        if(result.getAVSResponseCode().equalsIgnoreCase("i3"))
+        {
+         t.setAvsResponseCode(AVSResponseReasonCode.MATCHED);
+        }else if(result.getAVSResponseCode().equalsIgnoreCase("i8")){
+         t.setAvsResponseCode(AVSResponseReasonCode.UNMATCHED);
+        } else {
+            t.setAvsResponseCode(AVSResponseReasonCode.NOTVERIFIED);
+        }
+        
         t.setCsvResponseCode(result.getCSVResponseCode());
         
         if (t.getReasonCode().equalsIgnoreCase("100")) {

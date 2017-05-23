@@ -40,27 +40,30 @@ public class VisionGateway extends Gateway {
             t.setReasonCode(configurator.get(e.getMessage()));
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField(e.getMessage());
+        } catch (Exception e) {
+            t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
+            t.setResponseType(ResponseType.DECLINED);
+            t.setDescriptionField("INTERNAL_SERVER_ERROR");
         }
-
         return t;
     }
 
     private void validateTransaction(Transaction t) throws GatewayException {
-        
+
         // Add all validations here
         if (!t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)
                 && !t.getMedia().equalsIgnoreCase(MediaType.ESSO)) {
             throw new GatewayException("UNSUPPORTED_CARD_TYPE");
         }
 
-        if (! ( Validator.isCreditCard(t.getAccount())
-                && t.getAccount().length() <= 19 ) ) {
+        if (!(Validator.isCreditCard(t.getAccount())
+                && t.getAccount().length() <= 19)) {
             throw new GatewayException("INVALID_ACCOUNT_NUMBER");
         }
 
-        if (t.getRequestType() == null 
-                || t.getRequestType().length() == 0 
-                || t.getRequestType().equals("") ) {
+        if (t.getRequestType() == null
+                || t.getRequestType().length() == 0
+                || t.getRequestType().equals("")) {
             throw new GatewayException("INVALID_REQUEST_TYPE");
         }
 
@@ -70,43 +73,43 @@ public class VisionGateway extends Gateway {
                 && !t.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
             throw new GatewayException("INVALID_AMOUNT");
         }
-        
-         if (!Validator.isNumberOnly(t.getLocalDateTime())) {
-             throw new GatewayException("INVALID_LOCAL_DATETIME");
-         }
-         
-         if (!Validator.isExp(t.getExpiration())) {
-              throw new GatewayException("INVALID_EXPIRATION_DATE");
-         }
-         
-          if (t.getInputType() == null 
-                  || t.getInputType().length() < 0) {
-               throw new GatewayException("INVALID_INPUT_TYPE");
-          }
-          
-           if (t.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
+
+        if (!Validator.isNumberOnly(t.getLocalDateTime())) {
+            throw new GatewayException("INVALID_LOCAL_DATETIME");
+        }
+
+        if (!Validator.isExp(t.getExpiration())) {
+            throw new GatewayException("INVALID_EXPIRATION_DATE");
+        }
+
+        if (t.getInputType() == null
+                || t.getInputType().length() < 0) {
+            throw new GatewayException("INVALID_INPUT_TYPE");
+        }
+
+        if (t.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
             if ((t.getTrack2() == null || t.getTrack2().
                     length() == 0)
                     && (t.getTrack1() == null || t.
                     getTrack1().length() == 0)) {
                 throw new GatewayException("INVALID_TRACK_DATA");
             }
-           }
-           
-            if(!(t.getFacility() != null && t.getFacility().length() >= 8)) {
-                throw new GatewayException("INVALID_FACILITY");
-            }
-            
-            if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)
-                    && (t.getPlanNumber().equalsIgnoreCase("") || t.getPlanNumber().trim().length() == 0)) {
-               throw new GatewayException("INVALID_PLAN_NUMBER");
-           }
-            
-            if (t.getCvv() == null 
-                    || t.getCvv().equalsIgnoreCase("") 
-                    || t.getCvv().length() <= 2) {
-                throw new GatewayException("INVALID_CVV");
-            }
+        }
+
+        if (!(t.getFacility() != null && t.getFacility().length() >= 8)) {
+            throw new GatewayException("INVALID_FACILITY");
+        }
+
+        if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)
+                && (t.getPlanNumber().equalsIgnoreCase("") || t.getPlanNumber().trim().length() == 0)) {
+            throw new GatewayException("INVALID_PLAN_NUMBER");
+        }
+
+//            if (t.getCvv() == null 
+//                    || t.getCvv().equalsIgnoreCase("") 
+//                    || t.getCvv().length() <= 2) {
+//                throw new GatewayException("INVALID_CVV");
+//            }
     }
 
     public void setVpp(VisionPlusProcessor visionPlusProcessor) {
@@ -119,5 +122,5 @@ public class VisionGateway extends Gateway {
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
     }
-    
+
 }

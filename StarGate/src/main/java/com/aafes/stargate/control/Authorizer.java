@@ -1,5 +1,6 @@
 package com.aafes.stargate.control;
 
+import com.aafes.credit.AddressVerificationResponseType;
 import com.aafes.credit.Message;
 import com.aafes.credit.Message.Header;
 import com.aafes.credit.Message.Request;
@@ -11,6 +12,7 @@ import com.aafes.stargate.authorizer.entity.Facility;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.fdms.FDMSStub;
 import com.aafes.stargate.tokenizer.TokenBusinessService;
+import com.aafes.stargate.util.AVSResponseReasonCode;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
@@ -53,7 +55,7 @@ public class Authorizer {
     private String enableFDMSStub;
     @EJB
     private FDMSStub fDMSStub;
-    
+
     public Message authorize(Message cm) {
         Transaction t = new Transaction();
         boolean bTokenCall = false;
@@ -64,9 +66,10 @@ public class Authorizer {
             /**
              * Remove if condition after Junit test case modified for Authorizer
              */
-            if (tokenBusinessService != null) {
-                bTokenCall = tokenBusinessService.modifyTran(t);
-            }
+//            if (tokenBusinessService != null
+//                    && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
+//                bTokenCall = tokenBusinessService.modifyTran(t);
+//            }
             findFacility(t);
             if (t.getFacility() == null || t.getFacility().isEmpty()
                     || t.getStrategy() == null || t.getStrategy().isEmpty()) {
@@ -94,41 +97,37 @@ public class Authorizer {
                 storedTran = tranRepository.find(t.getIdentityUuid(),
                         t.getRrn(), t.getRequestType());
             }
-            
-            
-            
+
             if (storedTran == null) {
-                
+
                 /**
                  * FDMS Stub for specific UUIDs and credit cards.
                  */
-                LOG.info("enableFDMSStub : "+enableFDMSStub);
-                if(enableFDMSStub!=null
-                        && enableFDMSStub.equalsIgnoreCase("true")){
+                LOG.info("enableFDMSStub : " + enableFDMSStub);
+                if (enableFDMSStub != null
+                        && enableFDMSStub.equalsIgnoreCase("true")) {
                     boolean bFoundCard = fDMSStub.StoreAndReturnResponse(t);
-                    if(bFoundCard){
+                    if (bFoundCard) {
                         LOG.info("Found matched record.");
                         encryptValues(t);
                         tranRepository.save(t);
                         mapResponse(t, cm);
                         return cm;
-                    }else{
+                    } else {
                         LOG.info("No record found.");
                     }
                 }
-            
 
-            
                 LOG.info("Transaction not found. So processing...");
                 BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
                 if (baseStrategy != null) {
 
                     Transaction authTran = checkReversalTransaction(t);
 
-                    if ( (MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
-                            || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()) )
+                    if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
+                            || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
                             && (t.getReversal() != null
-                                && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) ) {
+                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL))) {
                         LOG.info("Don't call Vision / SVS for MilStar / GiftCard Reversals.");
                     } else {
                         t = baseStrategy.processRequest(t);
@@ -176,11 +175,15 @@ public class Authorizer {
             LOG.error("Exception caught" + e.toString());
             t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
             t.setDescriptionField("INTERNAL_SERVER_ERROR");
-            if (!bTokenCall && bDoneMApreq) {
-                t.setReasonCode(configurator.get("TOKENIZER_CONNECTION_ERROR"));
-                t.setDescriptionField("TOKENIZER_CONNECTION_ERROR");
-            }
+//            if (!bTokenCall && bDoneMApreq) {
+//                t.setReasonCode(configurator.get("TOKENIZER_CONNECTION_ERROR"));
+//                t.setDescriptionField("TOKENIZER_CONNECTION_ERROR");
+//            }
             t.setResponseType(ResponseType.DECLINED);
+            if(cm.getResponse() != null)
+            {
+                cm.getResponse().clear();
+            }
             mapResponse(t, cm);
             return cm;
         }
@@ -191,29 +194,24 @@ public class Authorizer {
     private Transaction checkReversalTransaction(Transaction t) {
 
         Transaction authTran = null;
-        
-        
 
         if (t.getReversal() != null
                 && t.getReversal().equalsIgnoreCase(RequestType.SALE)) {
 
             LOG.info("Reversal request.......");
-            
-            
-            if(MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia())){
-                
-                LOG.info("Gift Card Reversal request.......");
-                
-                authTran = tranRepository.find(t.getIdentityUuid(),
-                    t.getRrn(), RequestType.FINAL_AUTH);
-            }else{
-                LOG.info("FDMS / Vision Reversal request.......");
-                
-                authTran = tranRepository.find(t.getIdentityUuid(),
-                    t.getRrn(), RequestType.SALE);
-            }
 
-            
+            if (MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia())) {
+
+                LOG.info("Gift Card Reversal request.......");
+
+                authTran = tranRepository.find(t.getIdentityUuid(),
+                        t.getRrn(), RequestType.FINAL_AUTH);
+            } else {
+                LOG.info("FDMS / Vision Reversal request.......");
+
+                authTran = tranRepository.find(t.getIdentityUuid(),
+                        t.getRrn(), RequestType.SALE);
+            }
 
             if (authTran == null) {
                 throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_REVERSAL");
@@ -255,15 +253,14 @@ public class Authorizer {
 
                 t.setReasonCode("000");
                 t.setResponseType(ResponseType.APPROVED);
-            } 
-            
+            }
+
             if (MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia())) {
                 LOG.info("Gift Card Reversal Response.......");
 
                 t.setReasonCode("100");
                 t.setResponseType(ResponseType.APPROVED);
-            } 
-            
+            }
 
         } else {
 
@@ -275,7 +272,9 @@ public class Authorizer {
     }
 
     private void encryptValues(Transaction t) {
-        if ("true".equalsIgnoreCase(this.maskAccount)) {
+        if ("true".equalsIgnoreCase(this.maskAccount)
+                && t.getAccount() != null
+                && !t.getAccount().trim().isEmpty()) {
             String account = t.getAccount();
             account = account.replaceAll("\\w(?=\\w{4})", "");
             t.setAccount(account);
@@ -331,7 +330,7 @@ public class Authorizer {
         transaction.setOrderNumber(header.getOrderNumber());
         transaction.setTransactionId(header.getTransactionId());
         if (header.getTermId() != null) {
-            transaction.setTermId(header.getTermId().longValue());
+            transaction.setTermId(header.getTermId());
         }
 
         transaction.setComment(header.getComment());
@@ -515,10 +514,12 @@ public class Authorizer {
         Request.AddressVerificationService addressVerServc = request.getAddressVerificationService();
         if (addressVerServc != null) {
             transaction.setCardHolderName(addressVerServc.getCardHolderName());
-            transaction.setBillingAddress(addressVerServc.getBillingAddress());
+            transaction.setBillingAddress1(addressVerServc.getBillingAddress1());
+            transaction.setBillingAddress2(addressVerServc.getBillingAddress2());
             transaction.setBillingCountryCode(addressVerServc.getBillingCountryCode());
             transaction.setShippingCountryCode(addressVerServc.getShippingCountryCode());
-            transaction.setShippingAddress(addressVerServc.getShippingAddress());
+            transaction.setShippingAddress(addressVerServc.getShippingAddress1());
+            transaction.setShippingAddress(addressVerServc.getShippingAddress2());
             transaction.setBillingZipCode(addressVerServc.getBillingZipCode());
             transaction.setShippingZipCode(addressVerServc.getShippingZipCode());
             try {
@@ -589,7 +590,7 @@ public class Authorizer {
     private void mapResponse(Transaction t, Message cm) {
 
         Response response = new Response();
-//        cm.getRequest().clear();
+        cm.getRequest().clear();
         cm.getHeader().setComment(t.getComment());
         response.setReasonCode(t.getReasonCode());
         response.setResponseType(t.getResponseType());
@@ -601,40 +602,67 @@ public class Authorizer {
             response.setMedia(t.getMedia());
             response.setAuthNumber(t.getAuthNumber());
 
-            if (t.getPlanNumber() != null && !t.getPlanNumber().trim().isEmpty()) {
+            if (t.getPlanNumber() != null && !t.getPlanNumber().trim().isEmpty()
+                    && t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)) {
                 response.setPlanNumber(BigInteger.valueOf(Long.
                         valueOf(t.getPlanNumber())));
             }
             if (t.getMilstarNumber() != null && !t.getMilstarNumber().trim().isEmpty()) {
                 response.setMilstarNumber(t.getMilstarNumber());
             }
-            response.setBalanceAmount(BigDecimal.valueOf(t.getBalanceAmount()).movePointLeft(2));
+            if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)
+                    || t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD)) {
+                response.setBalanceAmount(BigDecimal.valueOf(t.getBalanceAmount()).movePointLeft(2));
+                if(t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH))
+                {
+                    response.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()).movePointLeft(2));
+                }
+            }
             if (response.getCardReferenceID() != null) {
                 response.setCardReferenceID(BigInteger.valueOf(Long.
                         valueOf(t.getCardReferenceID())));
             }
-            response.setPartialAmount(BigDecimal.valueOf(t.getPartialAmount()).movePointLeft(2));
+//            if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)) {
+//                response.setPartialAmount(BigDecimal.valueOf(t.getPartialAmount()).movePointLeft(2));
+//            }
             response.setOrigReqType(t.getRequestType());
+
             if ("Pan".equalsIgnoreCase(t.getPan())) {
-                response.setOrigAcctType(t.getOrigAcctType());
-                if (!t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD)) {
+                response.setOrigAcctType("Pan");
+                if(t.getTokenId() != null && !t.getTokenId().trim().isEmpty())
                     response.setModifiedAcctValue(t.getTokenId());
-                }
+                
+                //response.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()).movePointLeft(2));
+
             }
 
-            response.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()).movePointLeft(2));
+            if (t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD)
+                    && t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
+
+                Response.VrtGcAcctInfo GcInfo = new Response.VrtGcAcctInfo();
+                GcInfo.setVrtGcAcctNbr(new BigInteger(String.valueOf(t.getAccount())));
+                GcInfo.setVrtGCPin(new BigInteger(String.valueOf(t.getGcpin())));
+                response.setVrtGcAcctInfo(GcInfo);
+
+            }
             if (t.getSettleRs() != null && !t.getSettleRs().trim().isEmpty()) {
                 response.setSettleRs(t.getSettleRs());
                 response.setSettleAmt(BigDecimal.valueOf(t.getSettleAmt()));
+            }
+
+            if (t.getMedia().equalsIgnoreCase(MediaType.VISA)
+                    || t.getMedia().equalsIgnoreCase(MediaType.MASTER)
+                    || t.getMedia().equalsIgnoreCase(MediaType.DISCOVER)
+                    || t.getMedia().equalsIgnoreCase(MediaType.AMEX)) {
+                Response.AddressVerificationResponse avr = new Response.AddressVerificationResponse();
+                avr.setBillingZipCode(AddressVerificationResponseType.fromValue(t.getAvsResponseCode()));
+                response.setAddressVerificationResponse(avr);
             }
         }
 
         //TODO ::
 //        Response.WEXResponsePayAtPumpData wexRespData = new Response.WEXResponsePayAtPumpData();
 //        wexRespData.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()));
-//        Response.AddressVerificationResponse avr = new Response.AddressVerificationResponse();
-//        avr.setBillingAddress(t.getBillingAddress());
-//        response.setAddressVerificationResponse(t.getAddressVerificationResponse());
         cm.getResponse().add(response);
     }
 
@@ -668,12 +696,8 @@ public class Authorizer {
         this.enableFDMSStub = enableFDMSStub;
     }
 
-   
-   
     public void setfDMSStub(FDMSStub fDMSStub) {
         this.fDMSStub = fDMSStub;
     }
-    
-    
-    
+
 }

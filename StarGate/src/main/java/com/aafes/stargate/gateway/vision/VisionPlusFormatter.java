@@ -279,9 +279,9 @@ final public class VisionPlusFormatter {
                         getZipCode().trim());
             }
 
-            if (t.getBillingAddress() != null || t.
-                    getBillingAddress().length() != 0) {
-                AVS = zipCode + t.getBillingAddress();
+            if (t.getBillingAddress1() != null && t.
+                    getBillingAddress1().length() != 0) {
+                AVS = zipCode + t.getBillingAddress1();
             } else {
                 AVS = zipCode;
             }
@@ -302,9 +302,9 @@ final public class VisionPlusFormatter {
                             getBillingZipCode().trim());
             }
 
-            if (t.getBillingAddress() != null || t.
-                    getBillingAddress().length() != 0) {
-                AVS = zipCode + t.getBillingAddress();
+            if (t.getBillingAddress1() != null || t.
+                    getBillingAddress1().length() != 0) {
+                AVS = zipCode + t.getBillingAddress1() ;
             } else {
                 AVS = zipCode;
             }

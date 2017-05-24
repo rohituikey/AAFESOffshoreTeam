@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TokenMessage>
+	<Request>
+		<RequestType>Issue</RequestType>
+		<Media>Visa</Media>
+		<AccountType>Pan</AccountType>
+		<Account>6019440000000001234</Account>
+		<TokenBankName>ECOMM001</TokenBankName>
+	</Request>
+</TokenMessage>

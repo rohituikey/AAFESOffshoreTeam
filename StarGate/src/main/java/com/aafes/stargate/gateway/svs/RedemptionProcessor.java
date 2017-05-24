@@ -30,28 +30,7 @@ public class RedemptionProcessor {
 
         SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
        
-//<redemptionAmount>
-//amount-m
-//currency-m
-//</redemptionAmount>
-//<card>
-//cardNumber-m
-//pinNumber-m
-//cardTrackOne-n
-//cardTrackTwo-n
-//</card>
-//date-m
-//invoiceNumber-m
-//<merchant>
-//merchantName-m
-//merchantNumber-m
-//storeNumber
-//division
-//</merchant>
-//routingID-m
-//stan-m
-//transactionID-n
-//checkForDuplicate-,m
+
 
         
         RedemptionRequest redemptionRequest = new RedemptionRequest();
@@ -60,30 +39,45 @@ public class RedemptionProcessor {
         amount.setCurrency(StarGateConstants.CURRENCY);
         redemptionRequest.setRedemptionAmount(amount);
         
+        t.getTermId();
+        
+        
+        
         Card card = new Card();
         card.setCardCurrency(StarGateConstants.CURRENCY);
         card.setCardNumber(t.getAccount());
         card.setPinNumber("0000"+t.getGcpin());
+        card.setCardTrackOne(t.getTrack1());
         redemptionRequest.setCard(card);
         
-        redemptionRequest.setCheckForDuplicate(StarGateConstants.TRUE);
+        
+        
+//        redemptionRequest.setCheckForDuplicate(StarGateConstants.TRUE);
         redemptionRequest.setTransactionID(t.getTransactionId());
         redemptionRequest.setDate(SvsUtil.formatLocalDateTime());
         redemptionRequest.setInvoiceNumber(t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
 //        redemptionRequest.setStan(t.getSTAN());
-        redemptionRequest.setRoutingID(StarGateConstants.ROUTING_ID);
+//        redemptionRequest.setRoutingID(StarGateConstants.ROUTING_ID);
         
-        Merchant merchant = new Merchant();
-        merchant.setDivision(StarGateConstants.MERCHANT_DIVISION_NUMBER);
-        merchant.setMerchantName(StarGateConstants.MERCHANT_NAME);
-        merchant.setMerchantNumber(StarGateConstants.MERCHANT_NUMBER);
-        merchant.setStoreNumber(StarGateConstants.STORE_NUMBER);
-        redemptionRequest.setMerchant(merchant);
+//        Merchant merchant = new Merchant();
+//        merchant.setDivision(StarGateConstants.MERCHANT_DIVISION_NUMBER);
+//        merchant.setMerchantName(StarGateConstants.MERCHANT_NAME);
+//        merchant.setMerchantNumber(StarGateConstants.MERCHANT_NUMBER);
+//        merchant.setStoreNumber(StarGateConstants.STORE_NUMBER);
+//        redemptionRequest.setMerchant(merchant);
         
         log.info("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "||TransactionId " + t.getTransactionId() + "||Invoice Number " + t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
 
         
         RedemptionResponse redemptionResponse = sVSXMLWay.redemption(redemptionRequest);
+// <cm:Media>GiftCard</cm:Media>
+//<cm:ResponseType>Approved</cm:ResponseType>
+//<cm:AuthNumber>085249</cm:AuthNumber>
+//<cm:ReasonCode>001</cm:ReasonCode>
+//<cm:BalanceAmount>10.00</cm:BalanceAmount>
+//<cm:DescriptionField>APPROVED</cm:DescriptionField>
+//<cm:origReqType>Sale</cm:origReqType>
+
         
          try {
             log.info("RESPONSE---->AuthorizationCode " + redemptionResponse.getAuthorizationCode() + "||AMOUNT " + redemptionResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + redemptionResponse.getReturnCode().getReturnCode() + "||RETURN  CODE  DISCRIPTION " + redemptionResponse.getReturnCode().getReturnDescription());
@@ -92,8 +86,11 @@ public class RedemptionProcessor {
                  t.setAmount((long) redemptionResponse.getBalanceAmount().getAmount());
                     t.setCurrencycode(StarGateConstants.CURRENCY);
 
+                   // t.getMedia();
+                    t.setAuthNumber(redemptionResponse.getAuthorizationCode());
                     t.setCardSequenceNumber(redemptionResponse.getCard().getCardNumber());
                     t.setExpiration(redemptionResponse.getCard().getCardExpiration());
+                    //t.setOriginalRequestType(redemptionResponse.get);
 
                     t.setReasonCode(redemptionResponse.getReturnCode().getReturnCode());
                     t.setDescriptionField(redemptionResponse.getReturnCode().getReturnDescription());

@@ -17,10 +17,10 @@ import org.slf4j.LoggerFactory;
  */
 @Stateless
 public class ProcessorFactory {
-    
+
     private static final org.slf4j.Logger log
             = LoggerFactory.getLogger(ProcessorFactory.class.getSimpleName());
-    
+
     @EJB
     private BalanceInquiryProcessor balanceInquiryProcessor;
     @EJB
@@ -29,36 +29,40 @@ public class ProcessorFactory {
     private SVSFinalAuthProcessor sVSFinalAuthProcessor;
     @EJB
     private SVSIssueProcessor issueProcessor;
-    
-    
+    @EJB
+    private NetworkMessageProcessor networkMessageProcessor;
+
     public Processor pickProcessor(Transaction t) {
-  
+
         Processor processor = null;
         String requestType = t.getRequestType();
 
         if (requestType != null) {
-            
+
             switch (requestType) {
-                
+
                 case RequestType.INQUIRY:
-                   processor = balanceInquiryProcessor;
+                    processor = balanceInquiryProcessor;
                     break;
                 case RequestType.PREAUTH:
                     processor = preAuthorizationProcessor;
                     break;
                 case RequestType.FINAL_AUTH:
-                   processor = sVSFinalAuthProcessor;
+                    processor = sVSFinalAuthProcessor;
                     break;
                 case RequestType.REVERSAL:
-                   // Future
+                    // Future
                     break;
                 case RequestType.ISSUE:
-                   processor = issueProcessor;
+                    processor = issueProcessor;
                     break;
+                case RequestType.NETWORK:
+                    processor = networkMessageProcessor;
+                    break;
+
                 default:
                     log.info("No Matching request type found.");
-                    
-               
+
             }
         }
 

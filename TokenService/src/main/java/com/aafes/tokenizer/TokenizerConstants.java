@@ -17,7 +17,7 @@ public class TokenizerConstants {
     public static final String EXPIRED = "Expired";
     
     
-    //Media
+    //Card Type
     public static final String MILSTAR = "Milstar";
     public static final String AMEX = "Amex";
     public static final String VISA = "Visa";

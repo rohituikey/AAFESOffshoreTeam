@@ -15,10 +15,7 @@ import com.svs.svsxml.beans.IssueVirtualGiftCardRequest;
 import com.svs.svsxml.beans.IssueVirtualGiftCardResponse;
 import com.svs.svsxml.beans.Merchant;
 import com.svs.svsxml.service.SVSXMLWay;
-import com.svs.svsxml.service.SVSXMLWayService;
-import java.util.Map;
 import javax.ejb.Stateless;
-import javax.xml.ws.BindingProvider;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -26,12 +23,11 @@ import org.slf4j.LoggerFactory;
  * @author singha
  */
 @Stateless
-public class SVSIssueProcessor extends Processor{
+public class SVSIssueProcessor extends Processor {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PreAuthorizationProcessor.class.getSimpleName());
     String sMethodName = "";
     final String CLASS_NAME = SVSIssueProcessor.this.getClass().getSimpleName();
-
 
     @Override
     public void processRequest(Transaction t) {
@@ -51,11 +47,11 @@ public class SVSIssueProcessor extends Processor{
             merchant.setStoreNumber(StarGateConstants.STORE_NUMBER);
             request.setMerchant(merchant);
             request.setRoutingID(StarGateConstants.ROUTING_ID);
-            request.setTransactionID(t.getRrn()+"0000");
+            request.setTransactionID(t.getRrn() + "0000");
             request.setCheckForDuplicate(StarGateConstants.TRUE);
 
             double amt = t.getAmount();
-            amt = amt/100;
+            amt = amt / 100;
             Amount amount = new Amount();
             amount.setAmount(amt);
             amount.setCurrency(StarGateConstants.CURRENCY);
@@ -63,31 +59,39 @@ public class SVSIssueProcessor extends Processor{
 
             IssueVirtualGiftCardResponse response = sVSXMLWay.issueVirtualGiftCard(request);
 
-            t.setAmtPreAuthorized((long) (response.getApprovedAmount().getAmount()*100));
+            t.setAmtPreAuthorized((long) (response.getApprovedAmount().getAmount() * 100));
             t.setAuthNumber(response.getAuthorizationCode());
-            t.setBalanceAmount((long) (response.getBalanceAmount().getAmount()*100));
+            t.setBalanceAmount((long) (response.getBalanceAmount().getAmount() * 100));
             t.setReasonCode(response.getReturnCode().getReturnCode());
             t.setAccount(response.getCard().getCardNumber());
             t.setExpiration(response.getCard().getCardExpiration());
-            t.setGcpin(response.getCard().getPinNumber());
+            t.setGcpin(response.getCard().getPinNumber().length() < 4 ? appendZeroForFourDigitPin(response.getCard().getPinNumber()) : response.getCard().getPinNumber());
             t.setDescriptionField(response.getReturnCode().getReturnDescription());
             t.setReasonCode(response.getReturnCode().getReturnCode());
             t.setDescriptionField(response.getReturnCode().getReturnDescription());
 
-            if(t.getReasonCode().equalsIgnoreCase("01"))
-                    {
-                        t.setResponseType(ResponseType.APPROVED);
-                    } else {
-                        t.setResponseType(ResponseType.DECLINED);
-                    }
-            
+            if (t.getReasonCode().equalsIgnoreCase("01")) {
+                t.setResponseType(ResponseType.APPROVED);
+            } else {
+                t.setResponseType(ResponseType.DECLINED);
+            }
+
             LOGGER.info("ReturnDescription : " + String.valueOf(response.getReturnCode().getReturnDescription()));
 
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
             throw new GatewayException("INTERNAL_SERVER_ERROR");
         }
-        
+
     }
-     
+
+    private String appendZeroForFourDigitPin(String gcPin) {
+        int noOfZeroesToBeAppended = 4 - gcPin.length();
+        for (int i = 0; i < noOfZeroesToBeAppended; i++) {
+            gcPin = "0" + gcPin;
+        }
+        return gcPin;
+
+    }
+
 }

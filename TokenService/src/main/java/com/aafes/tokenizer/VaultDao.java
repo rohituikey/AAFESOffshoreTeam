@@ -5,9 +5,11 @@
  */
 package com.aafes.tokenizer;
 
+import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
+import com.datastax.driver.mapping.Result;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -33,9 +35,31 @@ public class VaultDao {
         mapper.save(tb);
     }
     
-    public Vault find(String tokenNumber)
+    public Vault findByToken(String tokenNumber)
     {
         return (Vault) mapper.get(tokenNumber);
+        
+    }
+    
+    public Vault findByAccount(String accountNumber)
+    {
+        Vault vault = null;
+        ResultSet resultSet = factory.getSession().execute("select * from tokenizer.vault where accountnumber = '"
+                +accountNumber +"' allow filtering;");
+        
+        Result<Vault> vaultSet = mapper.map(resultSet);
+        
+        if(vaultSet != null)
+        {
+            for(Vault v : vaultSet)
+            {
+                 vault = v;
+                 break;
+            }
+           
+        }
+        
+        return vault;
         
     }
     

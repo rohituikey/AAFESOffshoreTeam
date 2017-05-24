@@ -42,14 +42,15 @@ public class NetworkMessageProcessor extends Processor {
         networkRequest.setMerchant(merchant);
         
         networkRequest.setRoutingID(StarGateConstants.ROUTING_ID);
-        networkRequest.setStan(t.getSTAN());
+     
         networkRequest.setNetworkCode(StarGateConstants.NETWORK_CODE);
         
-        LOGGER.info("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "||Invoice Number " + t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
+        
+        LOGGER.info("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode()+"return code :" +t.getReasonCode() );
         
         NetworkResponse networkResponse = sVSXMLWay.network(networkRequest);
         t.setAuthoriztionCode(networkResponse.getAuthorizationCode());
-        LOGGER.info("return code : " + networkResponse.getReturnCode().getReturnCode()+"authorization code  :"+networkResponse.getAuthorizationCode());
+        LOGGER.info("return code : " + networkResponse.getReturnCode().getReturnCode());
         t.setReasonCode(networkResponse.getReturnCode().getReturnCode());
         t.setDescriptionField(networkResponse.getReturnCode().getReturnDescription());
         //t.setTransactionId(networkResponse.get);

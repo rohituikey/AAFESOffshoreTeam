@@ -15,101 +15,93 @@ import com.svs.svsxml.beans.Merchant;
 import com.svs.svsxml.beans.RedemptionRequest;
 import com.svs.svsxml.beans.RedemptionResponse;
 import com.svs.svsxml.service.SVSXMLWay;
-import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author alugumetlas
  */
-@Stateless
-public class RedemptionProcessor extends Processor {
-
-    private static final org.slf4j.Logger log
+public class RedemptionProcessor {
+     private static final org.slf4j.Logger log
             = LoggerFactory.getLogger(RedemptionProcessor.class.getSimpleName());
 
-    public void processRequest(Transaction t) {
+    public void processRedemptionRequest(Transaction t) {
         log.info("Method...... " + "processRedemptionRequest.......");
 
         SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
+       
+
+
         
- //       <ns1:RedemptionRequest>
-//         <request>
-//            <date>2016-10-21T10:10:56</date>
-//            <invoiceNumber>9999</invoiceNumber>
-//            <merchant>
-//               <merchantName>IT-D VP OFFICE</merchantName>
-//               <merchantNumber>061571</merchantNumber>
-//               <storeNumber>F00500</storeNumber>
-//               <division />
-//            </merchant>
-//            <routingID>6006491571000000000</routingID>
-//            <stan>112233</stan>
-//            <checkForDuplicate>false</checkForDuplicate>
-//            <card>
-//               <cardCurrency>USD</cardCurrency>
-//               <cardNumber>6006491572010001514</cardNumber>
-//               <pinNumber>5196</pinNumber>
-//               <cardExpiration />
-//            </card>
-//            <redemptionAmount>
-//               <amount>229.00</amount>
-//               <currency>USD</currency
-
-
         RedemptionRequest redemptionRequest = new RedemptionRequest();
         Amount amount = new Amount();
         amount.setAmount(t.getAmount());
         amount.setCurrency(StarGateConstants.CURRENCY);
         redemptionRequest.setRedemptionAmount(amount);
-
-        //t.getTermId();
+        
+        t.getTermId();
+        
+        
+        
         Card card = new Card();
         card.setCardCurrency(StarGateConstants.CURRENCY);
         card.setCardNumber(t.getAccount());
-        card.setPinNumber("0000" + t.getGcpin());
+        card.setPinNumber("0000"+t.getGcpin());
         card.setCardTrackOne(t.getTrack1());
         redemptionRequest.setCard(card);
         
-        redemptionRequest.setStan(t.getSTAN());
-        redemptionRequest.setCheckForDuplicate(StarGateConstants.TRUE);
-        //redemptionRequest.setTransactionID(t.getTransactionId());
+        
+        
+//        redemptionRequest.setCheckForDuplicate(StarGateConstants.TRUE);
+        redemptionRequest.setTransactionID(t.getTransactionId());
         redemptionRequest.setDate(SvsUtil.formatLocalDateTime());
-        if (t.getOrderNumber() != null && t.getOrderNumber().length() >= 8) {
-            redemptionRequest.setInvoiceNumber(t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
-        } else {
-            redemptionRequest.setInvoiceNumber(t.getOrderNumber());
-        }
-        redemptionRequest.setStan(t.getSTAN());
-        redemptionRequest.setRoutingID(StarGateConstants.ROUTING_ID);
+        redemptionRequest.setInvoiceNumber(t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
+//        redemptionRequest.setStan(t.getSTAN());
+//        redemptionRequest.setRoutingID(StarGateConstants.ROUTING_ID);
+        
+//        Merchant merchant = new Merchant();
+//        merchant.setDivision(StarGateConstants.MERCHANT_DIVISION_NUMBER);
+//        merchant.setMerchantName(StarGateConstants.MERCHANT_NAME);
+//        merchant.setMerchantNumber(StarGateConstants.MERCHANT_NUMBER);
+//        merchant.setStoreNumber(StarGateConstants.STORE_NUMBER);
+//        redemptionRequest.setMerchant(merchant);
+        
+        log.info("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "||TransactionId " + t.getTransactionId() + "||Invoice Number " + t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
 
-        Merchant merchant = new Merchant();
-        merchant.setMerchantName(StarGateConstants.MERCHANT_NAME);
-        merchant.setMerchantNumber(StarGateConstants.MERCHANT_NUMBER);
-        merchant.setStoreNumber(StarGateConstants.STORE_NUMBER);
-        redemptionRequest.setMerchant(merchant);
-
-        log.info("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "||TransactionId " + t.getTransactionId() + "||Invoice Number " + redemptionRequest.getInvoiceNumber());
-
+        
         RedemptionResponse redemptionResponse = sVSXMLWay.redemption(redemptionRequest);
+// <cm:Media>GiftCard</cm:Media>
+//<cm:ResponseType>Approved</cm:ResponseType>
+//<cm:AuthNumber>085249</cm:AuthNumber>
+//<cm:ReasonCode>001</cm:ReasonCode>
+//<cm:BalanceAmount>10.00</cm:BalanceAmount>
+//<cm:DescriptionField>APPROVED</cm:DescriptionField>
+//<cm:origReqType>Sale</cm:origReqType>
 
-        try {
+        
+         try {
             log.info("RESPONSE---->AuthorizationCode " + redemptionResponse.getAuthorizationCode() + "||AMOUNT " + redemptionResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + redemptionResponse.getReturnCode().getReturnCode() + "||RETURN  CODE  DISCRIPTION " + redemptionResponse.getReturnCode().getReturnDescription());
-            if (redemptionRequest != null) {
-                t.setAmount((long) redemptionResponse.getBalanceAmount().getAmount());
-                t.setCurrencycode(StarGateConstants.CURRENCY);
+            if(redemptionRequest != null)
+            {
+                 t.setAmount((long) redemptionResponse.getBalanceAmount().getAmount());
+                    t.setCurrencycode(StarGateConstants.CURRENCY);
 
-                t.setAuthNumber(redemptionResponse.getAuthorizationCode());
-                t.setCardSequenceNumber(redemptionResponse.getCard().getCardNumber());
-                t.setExpiration(redemptionResponse.getCard().getCardExpiration());
+                   // t.getMedia();
+                    t.setAuthNumber(redemptionResponse.getAuthorizationCode());
+                    t.setCardSequenceNumber(redemptionResponse.getCard().getCardNumber());
+                    t.setExpiration(redemptionResponse.getCard().getCardExpiration());
+                    //t.setOriginalRequestType(redemptionResponse.get);
 
-                t.setReasonCode(redemptionResponse.getReturnCode().getReturnCode());
-                t.setDescriptionField(redemptionResponse.getReturnCode().getReturnDescription());
+                    t.setReasonCode(redemptionResponse.getReturnCode().getReturnCode());
+                    t.setDescriptionField(redemptionResponse.getReturnCode().getReturnDescription());
             }
-        } catch (GatewayException e) {
-
-        }
-
+         }
+         catch(GatewayException e){
+             
+         }
+        
+        
+        
     }
 
 }

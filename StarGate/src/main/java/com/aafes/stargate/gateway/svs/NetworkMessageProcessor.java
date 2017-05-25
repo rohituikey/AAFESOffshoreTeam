@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class NetworkMessageProcessor extends Processor {
     
-    private static final Logger LOGGER=  LoggerFactory.getLogger(NetworkMessageProcessor.class.getSimpleName());
+    private static final Logger LOGGER=  LoggerFactory.getLogger(BalanceInquiryProcessor.class.getSimpleName());
     @Override
     public void processRequest(Transaction t) {
  
@@ -33,8 +33,7 @@ public class NetworkMessageProcessor extends Processor {
         SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
         NetworkRequest networkRequest = new NetworkRequest();
         networkRequest.setDate(SvsUtil.formatLocalDateTime());
-        
-        
+
         Merchant merchant = new Merchant();
         merchant.setDivision(StarGateConstants.MERCHANT_DIVISION_NUMBER);
         merchant.setMerchantName(StarGateConstants.MERCHANT_NAME);
@@ -43,6 +42,7 @@ public class NetworkMessageProcessor extends Processor {
         networkRequest.setMerchant(merchant);
         
         networkRequest.setRoutingID(StarGateConstants.ROUTING_ID);
+     
         networkRequest.setNetworkCode(StarGateConstants.NETWORK_CODE);
         
         

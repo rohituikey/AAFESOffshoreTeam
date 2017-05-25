@@ -31,6 +31,8 @@ public class ProcessorFactory {
     private SVSIssueProcessor issueProcessor;
     @EJB
     private NetworkMessageProcessor networkMessageProcessor;
+    @EJB
+    private RedemptionProcessor redemptionProcessor;
 
     public Processor pickProcessor(Transaction t) {
 
@@ -56,7 +58,11 @@ public class ProcessorFactory {
                 case RequestType.ISSUE:
                     processor = issueProcessor;
                     break;
+                    //added below two cases
                 case RequestType.NETWORK:
+                    processor = networkMessageProcessor;
+                    break;
+                case RequestType.REDEMPTION:
                     processor = networkMessageProcessor;
                     break;
 

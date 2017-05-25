@@ -35,20 +35,19 @@ public class SVSIssueGiftCardProcessor extends Processor {
         try {
             sMethodName = "sVSIssueGiftCard";
             LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-
+            
+            SVSXMLWay svsXMLWay = SvsUtil.setUserNamePassword();
             IssueGiftCardRequest request = new IssueGiftCardRequest();
 
             Amount amount = new Amount();
             amount.setAmount(transaction.getAmount());
-            amount.setCurrency(transaction.getCurrencycode());
+            amount.setCurrency(StarGateConstants.CURRENCY);
             request.setIssueAmount(amount);
 
-            Card card = new Card();
-            card.setPinNumber(transaction.getGcpin());
-            card.setCardNumber(transaction.getAccount());
-            card.setCardCurrency(transaction.getCurrencycode());
-            card.setCardTrackOne(transaction.getTrack1());
-            card.setCardTrackTwo(transaction.getTrack2());
+             Card card = new Card();
+             card.setCardCurrency(StarGateConstants.CURRENCY);
+             card.setCardNumber(transaction.getAccount());
+             card.setPinNumber(transaction.getGcpin());
             request.setCard(card);
 
             request.setDate(SvsUtil.formatLocalDateTime());
@@ -61,10 +60,14 @@ public class SVSIssueGiftCardProcessor extends Processor {
             request.setMerchant(merchant);
 
             request.setRoutingID(StarGateConstants.ROUTING_ID);
-            request.setStan(transaction.getSTAN());
-            request.setTransactionID(transaction.getTransactionId());
-            SVSXMLWay svsXMLWay = SvsUtil.setUserNamePassword();
+           // request.setStan(transaction.getSTAN());
+          //  request.setTransactionID(transaction.getTransactionId());
+            
+             request.setTransactionID(transaction.getRrn() + "0000");
+             request.setCheckForDuplicate(StarGateConstants.TRUE);  
+           
             IssueGiftCardResponse response = svsXMLWay.issueGiftCard(request);
+          
             transaction.setReasonCode(response.getReturnCode().getReturnCode());
             transaction.setDescriptionField(response.getReturnCode().getReturnDescription());
             if (transaction.getReasonCode().equalsIgnoreCase("01")) {
@@ -76,11 +79,12 @@ public class SVSIssueGiftCardProcessor extends Processor {
             transaction.setAmount((long) response.getApprovedAmount().getAmount());
             transaction.setCurrencycode(response.getApprovedAmount().getCurrency());
             transaction.setBalanceAmount((long) response.getBalanceAmount().getAmount());
-            //where to take the follwing fields
-            response.getCard().getCardExpiration();
-            response.getCard().getEovDate();
-            response.getConversionRate();
-            response.getIncentiveNumber();
+            transaction.setExpiration(response.getCard().getCardExpiration());
+            transaction.setTransactionId(response.getTransactionID());
+            
+            //response.getConversionRate();
+            //response.getIncentiveNumber();
+            
             
             LOGGER.info("ReturnDescription : " + String.valueOf(response.getReturnCode().getReturnDescription()));
         } catch (Exception e) {

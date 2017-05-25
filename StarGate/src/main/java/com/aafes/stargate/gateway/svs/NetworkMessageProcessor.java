@@ -1,11 +1,12 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
  */
 package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.gateway.svs.Processor;
 import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StarGateConstants;
@@ -24,11 +25,11 @@ import org.slf4j.LoggerFactory;
  */
 @Stateless
 public class NetworkMessageProcessor extends Processor {
-    
-    private static final Logger LOGGER=  LoggerFactory.getLogger(BalanceInquiryProcessor.class.getSimpleName());
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkMessageProcessor.class.getSimpleName());
+
     @Override
     public void processRequest(Transaction t) {
- 
 
         SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
         NetworkRequest networkRequest = new NetworkRequest();
@@ -40,25 +41,25 @@ public class NetworkMessageProcessor extends Processor {
         merchant.setMerchantNumber(StarGateConstants.MERCHANT_NUMBER);
         merchant.setStoreNumber(StarGateConstants.STORE_NUMBER);
         networkRequest.setMerchant(merchant);
-        
+
         networkRequest.setRoutingID(StarGateConstants.ROUTING_ID);
-     
         networkRequest.setNetworkCode(StarGateConstants.NETWORK_CODE);
-        
-        
-        LOGGER.info("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode()+"return code :" +t.getReasonCode() );
-        
+
+        LOGGER.info("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "return code :" + t.getReasonCode());
+
         NetworkResponse networkResponse = sVSXMLWay.network(networkRequest);
-        t.setAuthoriztionCode(networkResponse.getAuthorizationCode());
-        LOGGER.info("return code : " + networkResponse.getReturnCode().getReturnCode());
-        t.setReasonCode(networkResponse.getReturnCode().getReturnCode());
-        t.setDescriptionField(networkResponse.getReturnCode().getReturnDescription());
-        //t.setTransactionId(networkResponse.get);
-        if(networkResponse.getReturnCode().getReturnCode().equals("01")){
-            t.setResponseType(ResponseType.APPROVED);
-        }
-        else{
-            t.setResponseType(ResponseType.DECLINED);
+        try {
+            if (networkResponse != null) {
+                LOGGER.info("return code : " + networkResponse.getReturnCode().getReturnCode());
+
+                t.setAuthoriztionCode(networkResponse.getAuthorizationCode());
+                t.setReasonCode(networkResponse.getReturnCode().getReturnCode());
+                t.setDescriptionField(networkResponse.getReturnCode().getReturnDescription());
+
+            }
+        } catch (GatewayException e) {
+            LOGGER.error(("Error in Network Message method responce" + e));
+            throw new GatewayException("INTERNAL SERVER ERROR");
         }
     }
 }

@@ -28,14 +28,21 @@ public class TestNetworkMessage {
     
     Transaction transaction = new Transaction();
     
-    NetworkMessageProcessor messageProcessor = new NetworkMessageProcessor();
-    
+    @Before
+    public void getKeyedMILSTARSaleRequestatPOS() throws DatatypeConfigurationException {
+        transaction.setMedia(MediaType.GIFT_CARD);
+        transaction.setRequestType(RequestType.NETWORK);
+        transaction.setInputType(InputType.KEYED);
+    }
+
+
     @Test
     public void testNetworkMessageSuccess() throws MalformedURLException {
-       
-        messageProcessor.processRequest(transaction);
-        Assert.assertEquals("00", transaction.getReasonCode());
-        
+
+    NetworkMessageProcessor messageProcessor = new NetworkMessageProcessor();
+    messageProcessor.processRequest(transaction);
+    Assert.assertEquals("00", transaction.getReasonCode());
+
     }
-    
+
 }

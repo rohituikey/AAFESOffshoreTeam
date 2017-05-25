@@ -31,6 +31,10 @@ public class ProcessorFactory {
     private SVSIssueProcessor issueProcessor;
     @EJB
     private NetworkMessageProcessor networkMessageProcessor;
+    @EJB
+    private MerchandiseReturnMessageProcessor merchandiseReturnMessageProcessor;
+    @EJB
+    private SVSReversalProcessor sVSReversalProcessor;
 
     public Processor pickProcessor(Transaction t) {
 
@@ -51,7 +55,10 @@ public class ProcessorFactory {
                     processor = sVSFinalAuthProcessor;
                     break;
                 case RequestType.REVERSAL:
-                    // Future
+                    processor = sVSReversalProcessor;
+                    break;
+                case RequestType.REFUND:
+                    processor = merchandiseReturnMessageProcessor;
                     break;
                 case RequestType.ISSUE:
                     processor = issueProcessor;
@@ -67,6 +74,62 @@ public class ProcessorFactory {
         }
 
         return processor;
+    }
+
+    public BalanceInquiryProcessor getBalanceInquiryProcessor() {
+        return balanceInquiryProcessor;
+    }
+
+    public void setBalanceInquiryProcessor(BalanceInquiryProcessor balanceInquiryProcessor) {
+        this.balanceInquiryProcessor = balanceInquiryProcessor;
+    }
+
+    public PreAuthorizationProcessor getPreAuthorizationProcessor() {
+        return preAuthorizationProcessor;
+    }
+
+    public void setPreAuthorizationProcessor(PreAuthorizationProcessor preAuthorizationProcessor) {
+        this.preAuthorizationProcessor = preAuthorizationProcessor;
+    }
+
+    public SVSFinalAuthProcessor getsVSFinalAuthProcessor() {
+        return sVSFinalAuthProcessor;
+    }
+
+    public void setsVSFinalAuthProcessor(SVSFinalAuthProcessor sVSFinalAuthProcessor) {
+        this.sVSFinalAuthProcessor = sVSFinalAuthProcessor;
+    }
+
+    public SVSIssueProcessor getIssueProcessor() {
+        return issueProcessor;
+    }
+
+    public void setIssueProcessor(SVSIssueProcessor issueProcessor) {
+        this.issueProcessor = issueProcessor;
+    }
+
+    public NetworkMessageProcessor getNetworkMessageProcessor() {
+        return networkMessageProcessor;
+    }
+
+    public void setNetworkMessageProcessor(NetworkMessageProcessor networkMessageProcessor) {
+        this.networkMessageProcessor = networkMessageProcessor;
+    }
+
+    public MerchandiseReturnMessageProcessor getMerchandiseReturnMessageProcessor() {
+        return merchandiseReturnMessageProcessor;
+    }
+
+    public void setMerchandiseReturnMessageProcessor(MerchandiseReturnMessageProcessor merchandiseReturnMessageProcessor) {
+        this.merchandiseReturnMessageProcessor = merchandiseReturnMessageProcessor;
+    }
+
+    public SVSReversalProcessor getsVSReversalProcessor() {
+        return sVSReversalProcessor;
+    }
+
+    public void setsVSReversalProcessor(SVSReversalProcessor sVSReversalProcessor) {
+        this.sVSReversalProcessor = sVSReversalProcessor;
     }
 
 }

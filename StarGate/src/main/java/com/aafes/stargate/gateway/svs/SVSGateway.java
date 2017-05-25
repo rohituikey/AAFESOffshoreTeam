@@ -59,7 +59,9 @@ public class SVSGateway extends Gateway {
         LOG.info("Method validateTransaction started. Class Name SVSGateway");
         if (RequestType.INQUIRY.equalsIgnoreCase(t.getRequestType())
                 || RequestType.PREAUTH.equalsIgnoreCase(t.getRequestType())
-                || RequestType.FINAL_AUTH.equalsIgnoreCase(t.getRequestType())) {
+                || RequestType.FINAL_AUTH.equalsIgnoreCase(t.getRequestType())
+                || RequestType.REFUND.equals(t.getRequestType())
+                || RequestType.REVERSAL.equals(t.getRequestType())) {
             if (t.getAccount() == null || t.getAccount().trim().isEmpty()) {
                 buildErrorResponse(t, configurator.get("INVALID_ACCOUNT_NUMBER"), "INVALID_ACCOUNT_NUMBER");
                 return false;
@@ -83,5 +85,13 @@ public class SVSGateway extends Gateway {
 
     public void setSvsgp(SVSGatewayProcessor svsgp) {
         this.svsgp = svsgp;
+    }
+    
+    public Configurator getConfigurator() {
+        return configurator;
+    }
+
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
     }
 }

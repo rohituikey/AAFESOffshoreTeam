@@ -1,5 +1,6 @@
 package com.aafes.stargate.util;
 
+
 final public class RequestType {
 
     public static final String SALE = "Sale";
@@ -14,6 +15,10 @@ final public class RequestType {
     public static final String FINAL = "Final";
     public static final String FINAL_AUTH = "FinalAuth";
     public static final String ISSUE = "Issue";
+    //added below two lines
+    public static final String NETWORK = "KeepAlive";
+    public static final String REDEMPTION = "redemption";
+
 
     private RequestType() {
         // Never instantiate.

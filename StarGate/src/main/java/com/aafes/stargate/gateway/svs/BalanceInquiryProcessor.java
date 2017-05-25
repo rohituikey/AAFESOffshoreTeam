@@ -56,10 +56,12 @@ public class BalanceInquiryProcessor extends Processor {
         merchant.setMerchantNumber(StarGateConstants.MERCHANT_NUMBER);
         merchant.setStoreNumber(StarGateConstants.STORE_NUMBER);
         balanceInquiryRequest.setMerchant(merchant);
+//       log.info("$$$$$$$$$$-------"+t.getPinBlock());
 
         balanceInquiryRequest.setCheckForDuplicate(StarGateConstants.TRUE);
         balanceInquiryRequest.setTransactionID(t.getRrn() + "0000");
         balanceInquiryRequest.setDate(SvsUtil.formatLocalDateTime());
+        
         balanceInquiryRequest.setInvoiceNumber(t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
 
         balanceInquiryRequest.setRoutingID(StarGateConstants.ROUTING_ID);

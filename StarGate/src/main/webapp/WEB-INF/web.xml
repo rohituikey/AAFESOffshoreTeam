@@ -7,9 +7,9 @@
     </session-config>
     <security-constraint>
         <web-resource-collection>
-        <url-pattern>/*</url-pattern>
-        <http-method>GET</http-method>
-        <http-method>POST</http-method>
+            <url-pattern>/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
         </web-resource-collection>
         <!-- no auth-constraint tag here -->
     </security-constraint>
@@ -43,4 +43,14 @@
         <realm-name>ApplicationRealm</realm-name>
     </login-config>
             -->
+    <ejb-local-ref>
+        <ejb-ref-name>sVSGateway</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <ejb-link>#SVSGateway</ejb-link>
+    </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>sVSGatewayProcessor</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <ejb-link>#SVSGatewayProcessor</ejb-link>
+    </ejb-local-ref>
 </web-app>

@@ -125,14 +125,6 @@ public class ProcessorFactory {
         this.networkMessageProcessor = networkMessageProcessor;
     }
 
-    public RedemptionProcessor getRedemptionProcessor() {
-        return redemptionProcessor;
-    }
-
-    public void setRedemptionProcessor(RedemptionProcessor redemptionProcessor) {
-        this.redemptionProcessor = redemptionProcessor;
-    }
-
     public MerchandiseReturnMessageProcessor getMerchandiseReturnMessageProcessor() {
         return merchandiseReturnMessageProcessor;
     }

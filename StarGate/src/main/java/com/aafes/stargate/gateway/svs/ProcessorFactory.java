@@ -40,6 +40,8 @@ public class ProcessorFactory {
     @EJB
     private SVSReversalProcessor sVSReversalProcessor;
 
+    @EJB
+    private SVSIssueGiftCardProcessor issueGiftCard;
 
     public Processor pickProcessor(Transaction t) {
 
@@ -74,6 +76,9 @@ public class ProcessorFactory {
                     break;
                 case RequestType.REDEMPTION:
                     processor = networkMessageProcessor;
+                    break;
+                case RequestType.ISSUEGIFTCARD:
+                    processor = issueGiftCard;
                     break;
 
                 default:
@@ -141,4 +146,19 @@ public class ProcessorFactory {
         this.sVSReversalProcessor = sVSReversalProcessor;
     }
 
+    public RedemptionProcessor getRedemptionProcessor() {
+        return redemptionProcessor;
+    }
+
+    public void setRedemptionProcessor(RedemptionProcessor redemptionProcessor) {
+        this.redemptionProcessor = redemptionProcessor;
+    }
+
+    public SVSIssueGiftCardProcessor getIssueGiftCard() {
+        return issueGiftCard;
+    }
+
+    public void setIssueGiftCard(SVSIssueGiftCardProcessor issueGiftCard) {
+        this.issueGiftCard = issueGiftCard;
+    }
 }

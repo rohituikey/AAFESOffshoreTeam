@@ -48,7 +48,6 @@ public class TestNetworkMessage {
 
         transaction.setMedia(MediaType.GIFT_CARD);
         transaction.setRequestType(RequestType.NETWORK);
-        transaction.setInputType(InputType.KEYED);
     }
 
     @Test

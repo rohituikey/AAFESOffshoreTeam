@@ -54,12 +54,14 @@ public class TestRedemptionRequest {
 
         transaction.setMedia(MediaType.GIFT_CARD);
         transaction.setRequestType(RequestType.REDEMPTION);
-        transaction.setInputType(InputType.KEYED);
+       
         transaction.setAccount("6006491572010001514");
         transaction.setAmount((long) 29.00);
         transaction.setGcpin("5196");
         transaction.setOrderNumber("9999");
         transaction.setSTAN("112233");
+        transaction.setRrn("9RprkC1gEYoN");
+        //transaction.setTransactionId("6125");
     }
 
     @Test

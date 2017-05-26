@@ -44,7 +44,7 @@ public class RedemptionProcessor extends Processor {
             Card card = new Card();
             card.setCardCurrency(StarGateConstants.CURRENCY);
             card.setCardNumber(t.getAccount());
-            card.setPinNumber("0000" + t.getGcpin());
+            card.setPinNumber( t.getGcpin());
             redemptionRequest.setCard(card);
 
             redemptionRequest.setCheckForDuplicate(StarGateConstants.FALSE);
@@ -53,6 +53,8 @@ public class RedemptionProcessor extends Processor {
 
             redemptionRequest.setStan(t.getSTAN());
             redemptionRequest.setRoutingID(StarGateConstants.ROUTING_ID);
+            redemptionRequest.setTransactionID(t.getRrn()+"0000");
+           // redemptionRequest.setTransactionID(t.getTransactionId());
 
             Merchant merchant = new Merchant();
             merchant.setDivision(StarGateConstants.MERCHANT_DIVISION_NUMBER);
@@ -71,7 +73,7 @@ public class RedemptionProcessor extends Processor {
             RedemptionResponse redemptionResponse = sVSXMLWay.redemption(redemptionRequest);
 
             log.info("RESPONSE---->AuthorizationCode " + redemptionResponse.getAuthorizationCode() + "||AMOUNT " + redemptionResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + redemptionResponse.getReturnCode().getReturnCode() + "||RETURN  CODE  DISCRIPTION " + redemptionResponse.getReturnCode().getReturnDescription());
-            if (redemptionRequest != null) {
+            if (redemptionResponse != null) {
                 t.setAmount((long) redemptionResponse.getBalanceAmount().getAmount());
                 t.setCurrencycode(StarGateConstants.CURRENCY);
 
@@ -84,7 +86,7 @@ public class RedemptionProcessor extends Processor {
                 t.setAuthNumber(redemptionResponse.getAuthorizationCode());
                 t.setReasonCode(redemptionResponse.getReturnCode().getReturnCode());
                 t.setDescriptionField(redemptionResponse.getReturnCode().getReturnDescription());
-                t.setTransactionId(redemptionRequest.getTransactionID());
+                t.setTransactionId(redemptionResponse.getTransactionID());
                 if (t.getReasonCode().equalsIgnoreCase("01")) {
                     t.setResponseType(ResponseType.APPROVED);
                 } else {

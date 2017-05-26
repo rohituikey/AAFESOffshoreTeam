@@ -5,9 +5,13 @@
  */
 package com.aafes.stargate.test;
 
-
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.gateway.svs.NetworkMessageProcessor;
+import com.aafes.stargate.gateway.svs.ProcessorFactory;
 import com.aafes.stargate.gateway.svs.RedemptionProcessor;
+import com.aafes.stargate.gateway.svs.SVSGateway;
+import com.aafes.stargate.gateway.svs.SVSGatewayProcessor;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
@@ -17,20 +21,41 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author alugumetlas
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TestRedemptionRequest {
 
-    Transaction transaction = new Transaction();
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TestRedemptionRequest.class.getSimpleName());
 
-    @Before
-    public void getKeyedMILSTARSaleRequestatPOS() throws DatatypeConfigurationException {
+    private RedemptionProcessor redemptionProcessor = new RedemptionProcessor();
+    private ProcessorFactory processorFactory = new ProcessorFactory();
+    private SVSGatewayProcessor svsgp = new SVSGatewayProcessor();
+    private Transaction transaction = new Transaction();
 
+    @Mock
+    private Configurator configurator;
+
+    @InjectMocks
+    private SVSGateway sVSGateway = new SVSGateway();
+
+    @Before
+    public void setUp() {
+        processorFactory.setRedemptionProcessor(redemptionProcessor);
+        svsgp.setProcessorFactory(processorFactory);
+        sVSGateway.setSvsgp(svsgp);
+
+        transaction.setMedia(MediaType.GIFT_CARD);
+        transaction.setRequestType(RequestType.NETWORK);
+        transaction.setInputType(InputType.KEYED);
         transaction.setMedia(MediaType.GIFT_CARD);
         transaction.setRequestType(RequestType.REDEMPTION);
         transaction.setInputType(InputType.KEYED);
@@ -39,59 +64,60 @@ public class TestRedemptionRequest {
         transaction.setGcpin("7020");
         transaction.setOrderNumber("9999");
         transaction.setSTAN("112233");
-
     }
 
     @Test
     public void testRedemptionRequestSuccessOrFailedIncaseOFPinGetLocked() throws MalformedURLException {
 
         LOGGER.info("method...." + "testRedemptionRequestSuccessOrFailedIncaseOFPinGetLocked");
-        RedemptionProcessor redemptionProcessor = new RedemptionProcessor();
-        redemptionProcessor.processRequest(transaction);
+
+        Transaction t = sVSGateway.processMessage(transaction);;
         if (transaction.getReasonCode() == "29") {
-            Assert.assertEquals(transaction.getReasonCode(), "29");
+            Assert.assertEquals(t.getReasonCode(), "29");
         }
-        Assert.assertEquals(transaction.getReasonCode(), "01");
+        Assert.assertEquals(t.getReasonCode(), "01");
     }
 
     @Test
     public void testForTransactionFailedDueToInvalidGcPin() throws MalformedURLException {
         LOGGER.info("method...." + "testForTransactionFailedDueToInvalidGcPin");
-        RedemptionProcessor redemptionProcessor = new RedemptionProcessor();
-        redemptionProcessor.processRequest(transaction);
+
         transaction.setGcpin("ss");
-        Assert.assertEquals(transaction.getReasonCode(), "20");
+        Transaction t = sVSGateway.processMessage(transaction);
+
+        Assert.assertEquals(t.getReasonCode(), "20");
 
     }
 
     @Test
     public void testForTransactionFailedDueToInvalidCardNumber() throws MalformedURLException {
         LOGGER.info("method...." + "testForTransactionFailedDueToInvalidCardNumber");
-        RedemptionProcessor redemptionProcessor = new RedemptionProcessor();
-        redemptionProcessor.processRequest(transaction);
+
         transaction.setAccount("62666485547567458");
-        System.out.println(transaction.getReasonCode());
-        Assert.assertEquals(transaction.getReasonCode(), "04");
+        Transaction t = sVSGateway.processMessage(transaction);
+
+        Assert.assertEquals(t.getReasonCode(), "04");
 
     }
 
     @Test
     public void testForNullTranscationId() {
         LOGGER.info("method...." + "testForNullTranscationId");
-        RedemptionProcessor redemptionProcessor = new RedemptionProcessor();
-        redemptionProcessor.processRequest(transaction);
+
         transaction.setTransactionId("");
-        System.out.println(transaction.getReasonCode());
-        Assert.assertEquals(transaction.getDescriptionField(), "TRANSACTION ID IS NULL");
+        Transaction t = sVSGateway.processMessage(transaction);;
+
+        Assert.assertEquals(t.getDescriptionField(), "TRANSACTION ID IS NULL");
     }
 
     @Test
     public void testForAmount() throws MalformedURLException {
         LOGGER.info("method...." + "testForWrongRoutingId");
-        RedemptionProcessor redemptionProcessor = new RedemptionProcessor();
-        redemptionProcessor.processRequest(transaction);
+
         transaction.setAmount(250);
-        Assert.assertEquals(transaction.getAmount(), 250);
+        Transaction t = sVSGateway.processMessage(transaction);
+
+        Assert.assertEquals(t.getAmount(), 250);
 
     }
 

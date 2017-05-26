@@ -13,4 +13,6 @@ public class ResponseCodes {
     public static final String INVALID_ACCOUNT = "001";
     public static final String INVALID_CREDIT_PLAN = "006";
     public static final String INVALID_ADDRESS = "074";
+    
+    public static final String DUP_CHECK_REASON_CODE = "15";
 }

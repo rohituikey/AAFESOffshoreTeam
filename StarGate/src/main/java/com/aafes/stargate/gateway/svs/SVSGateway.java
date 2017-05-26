@@ -61,7 +61,8 @@ public class SVSGateway extends Gateway {
                 || RequestType.PREAUTH.equalsIgnoreCase(t.getRequestType())
                 || RequestType.FINAL_AUTH.equalsIgnoreCase(t.getRequestType())
                 || RequestType.REFUND.equals(t.getRequestType())
-                || RequestType.REVERSAL.equals(t.getRequestType())) {
+                || RequestType.REVERSAL.equals(t.getRequestType())
+                || RequestType.ISSUEGIFTCARD.equals(t.getRequestType())) {
             if (t.getAccount() == null || t.getAccount().trim().isEmpty()) {
                 buildErrorResponse(t, configurator.get("INVALID_ACCOUNT_NUMBER"), "INVALID_ACCOUNT_NUMBER");
                 return false;

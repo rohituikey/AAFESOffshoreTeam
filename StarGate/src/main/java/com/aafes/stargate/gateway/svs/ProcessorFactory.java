@@ -33,6 +33,7 @@ public class ProcessorFactory {
     private NetworkMessageProcessor networkMessageProcessor;
     @EJB
     private RedemptionProcessor redemptionProcessor;
+
     
     @EJB
     private MerchandiseReturnMessageProcessor merchandiseReturnMessageProcessor;
@@ -139,6 +140,14 @@ public class ProcessorFactory {
 
     public void setsVSReversalProcessor(SVSReversalProcessor sVSReversalProcessor) {
         this.sVSReversalProcessor = sVSReversalProcessor;
+    }
+    
+    public RedemptionProcessor getRedemptionProcessor() {
+        return redemptionProcessor;
+    }
+
+    public void setRedemptionProcessor(RedemptionProcessor redemptionProcessor) {
+        this.redemptionProcessor = redemptionProcessor;
     }
 
 }

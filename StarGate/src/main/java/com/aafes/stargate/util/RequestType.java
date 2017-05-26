@@ -16,7 +16,7 @@ final public class RequestType {
     public static final String FINAL_AUTH = "FinalAuth";
     public static final String ISSUE = "Issue";
     //added below two lines
-    public static final String NETWORK = "KeepAlive";
+    public static final String NETWORK = "Network";
     public static final String REDEMPTION = "redemption";
 
 

@@ -33,8 +33,8 @@ public class RedemptionProcessor extends Processor {
     public void processRequest(Transaction t) {
         try {
             log.info("Method...... " + "processRedemptionRequest.......");
-            SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
-
+            
+           
             RedemptionRequest redemptionRequest = new RedemptionRequest();
             Amount amount = new Amount();
             amount.setAmount(t.getAmount());
@@ -47,12 +47,10 @@ public class RedemptionProcessor extends Processor {
             card.setPinNumber( t.getGcpin());
             redemptionRequest.setCard(card);
 
-            redemptionRequest.setCheckForDuplicate(StarGateConstants.TRUE);
+          
             redemptionRequest.setDate(SvsUtil.formatLocalDateTime());
-
-           
             redemptionRequest.setRoutingID(StarGateConstants.ROUTING_ID);
-            redemptionRequest.setTransactionID(t.getRrn()+"0000");
+            //  redemptionRequest.setTransactionID(t.getRrn()+"0000");
 
             Merchant merchant = new Merchant();
             merchant.setDivision(StarGateConstants.MERCHANT_DIVISION_NUMBER);
@@ -65,19 +63,20 @@ public class RedemptionProcessor extends Processor {
             } else {
                 redemptionRequest.setInvoiceNumber(t.getOrderNumber());
             }
-
+              redemptionRequest.setCheckForDuplicate(StarGateConstants.TRUE);
+              
             log.info("REQUEST----> Invoice Number " + redemptionRequest.getInvoiceNumber());
-
+            
+            SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
             RedemptionResponse redemptionResponse = sVSXMLWay.redemption(redemptionRequest);
 
             log.info("RESPONSE---->AuthorizationCode " + redemptionResponse.getAuthorizationCode() + "||AMOUNT " + redemptionResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + redemptionResponse.getReturnCode().getReturnCode() + "||RETURN  CODE  DISCRIPTION " + redemptionResponse.getReturnCode().getReturnDescription());
             if (redemptionResponse != null) {
+               
                 t.setBalanceAmount((long) redemptionResponse.getApprovedAmount().getAmount());
                 t.setCurrencycode(StarGateConstants.CURRENCY);
 
-                t.setCardSequenceNumber(redemptionResponse.getCard().getCardNumber());
-                t.setTrack1(redemptionResponse.getCard().getCardTrackOne());
-                t.setTrack2(redemptionResponse.getCard().getCardTrackTwo());
+                t.setAccount(redemptionResponse.getCard().getCardNumber());
                 t.setExpiration(redemptionResponse.getCard().getEovDate());
 
                 t.setAuthNumber(redemptionResponse.getAuthorizationCode());
@@ -90,7 +89,7 @@ public class RedemptionProcessor extends Processor {
                     t.setResponseType(ResponseType.DECLINED);
                 }
             }
-        } catch (GatewayException e) {
+        } catch (Exception e) {
             log.error(("Error in processBalanceInquiry method responce" + e));
             throw new GatewayException("INTERNAL SERVER ERROR");
         }

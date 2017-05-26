@@ -31,6 +31,7 @@ public class SVSReversalProcessor extends Processor {
             sMethodName = "SVSreversal Method ";
             LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
             ReversalRequest request = new ReversalRequest();
+           
             Amount amount = new Amount();
             amount.setAmount(transaction.getAmount());
             amount.setCurrency(transaction.getCurrencycode());
@@ -39,8 +40,6 @@ public class SVSReversalProcessor extends Processor {
             Card card = new Card();
             card.setPinNumber(transaction.getGcpin());
             card.setCardNumber(transaction.getAccount());
-            card.setCardTrackOne(transaction.getTrack1());
-            card.setCardTrackTwo(transaction.getTrack2());
             request.setCard(card);
 
             request.setDate(SvsUtil.formatLocalDateTime());
@@ -53,7 +52,10 @@ public class SVSReversalProcessor extends Processor {
             request.setMerchant(merchant);
 
             request.setRoutingID(StarGateConstants.ROUTING_ID);
-            request.setStan(transaction.getSTAN());
+             
+           request.setStan(SvsUtil.generateStan());
+         //request.setStan(transaction.getSTAN());
+           
             SVSXMLWay svsXMLWay = SvsUtil.setUserNamePassword();
             ReversalResponse response = svsXMLWay.reversal(request);
 
@@ -66,10 +68,9 @@ public class SVSReversalProcessor extends Processor {
             }
             transaction.setAuthoriztionCode(response.getAuthorizationCode());
             //where to take the follwing fields
-            response.getCard().getCardExpiration();
-            response.getCard().getEovDate();
-            response.getConversionRate();
-            LOGGER.info("ReturnDescription : " + String.valueOf(response.getReturnCode().getReturnDescription()));
+             transaction.setBalanceAmount((long) (response.getBalanceAmount().getAmount()));
+            
+             LOGGER.info("ReturnDescription : " + String.valueOf(response.getReturnCode().getReturnDescription()));
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
             throw new GatewayException("INTERNAL_SERVER_ERROR");

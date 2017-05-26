@@ -47,14 +47,12 @@ public class RedemptionProcessor extends Processor {
             card.setPinNumber( t.getGcpin());
             redemptionRequest.setCard(card);
 
-            redemptionRequest.setCheckForDuplicate(StarGateConstants.FALSE);
-            redemptionRequest.setStan(t.getSTAN());
+            redemptionRequest.setCheckForDuplicate(StarGateConstants.TRUE);
             redemptionRequest.setDate(SvsUtil.formatLocalDateTime());
 
-            redemptionRequest.setStan(t.getSTAN());
+           
             redemptionRequest.setRoutingID(StarGateConstants.ROUTING_ID);
             redemptionRequest.setTransactionID(t.getRrn()+"0000");
-           // redemptionRequest.setTransactionID(t.getTransactionId());
 
             Merchant merchant = new Merchant();
             merchant.setDivision(StarGateConstants.MERCHANT_DIVISION_NUMBER);
@@ -74,7 +72,7 @@ public class RedemptionProcessor extends Processor {
 
             log.info("RESPONSE---->AuthorizationCode " + redemptionResponse.getAuthorizationCode() + "||AMOUNT " + redemptionResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + redemptionResponse.getReturnCode().getReturnCode() + "||RETURN  CODE  DISCRIPTION " + redemptionResponse.getReturnCode().getReturnDescription());
             if (redemptionResponse != null) {
-                t.setAmount((long) redemptionResponse.getBalanceAmount().getAmount());
+                t.setBalanceAmount((long) redemptionResponse.getApprovedAmount().getAmount());
                 t.setCurrencycode(StarGateConstants.CURRENCY);
 
                 t.setCardSequenceNumber(redemptionResponse.getCard().getCardNumber());
@@ -82,7 +80,6 @@ public class RedemptionProcessor extends Processor {
                 t.setTrack2(redemptionResponse.getCard().getCardTrackTwo());
                 t.setExpiration(redemptionResponse.getCard().getEovDate());
 
-                t.setSTAN(redemptionResponse.getStan());
                 t.setAuthNumber(redemptionResponse.getAuthorizationCode());
                 t.setReasonCode(redemptionResponse.getReturnCode().getReturnCode());
                 t.setDescriptionField(redemptionResponse.getReturnCode().getReturnDescription());

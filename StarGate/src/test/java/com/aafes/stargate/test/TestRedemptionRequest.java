@@ -54,14 +54,14 @@ public class TestRedemptionRequest {
 
         transaction.setMedia(MediaType.GIFT_CARD);
         transaction.setRequestType(RequestType.REDEMPTION);
+
        
         transaction.setAccount("6006491572010001514");
         transaction.setAmount((long) 29.00);
         transaction.setGcpin("5196");
         transaction.setOrderNumber("9999");
-        transaction.setSTAN("112233");
         transaction.setRrn("9RprkC1gEYoN");
-        //transaction.setTransactionId("6125");
+      
     }
 
     @Test
@@ -77,16 +77,7 @@ public class TestRedemptionRequest {
          LOGGER.info("RETURN DISCRIPTION--"+t.getDescriptionField());
     }
 
-    @Test
-    public void testForTransactionFailedDueToInvalidGcPin() throws MalformedURLException {
-        LOGGER.info("method...." + "testForTransactionFailedDueToInvalidGcPin");
-
-        transaction.setGcpin("ss");
-        Transaction t = sVSGateway.processMessage(transaction);
-
-        Assert.assertEquals(t.getReasonCode(), "20");
-
-    }
+  
 
     @Test
     public void testForTransactionFailedDueToInvalidCardNumber() throws MalformedURLException {
@@ -99,15 +90,22 @@ public class TestRedemptionRequest {
         Assert.assertEquals(t.getReasonCode(), "911");
 
     }
+      @Test
+    public void testForTransactionFailedDueToInvalidGcPin() throws MalformedURLException {
+        LOGGER.info("method...." + "testForTransactionFailedDueToInvalidGcPin");
+
+        transaction.setGcpin("s");
+        Transaction t = sVSGateway.processMessage(transaction);
+
+        Assert.assertEquals(t.getReasonCode(), "200");
+
+    }
 
     @Test
     public void testForAmount() throws MalformedURLException {
         LOGGER.info("method...." + "testForWrongRoutingId");
-
-        transaction.setAmount(250);
         Transaction t = sVSGateway.processMessage(transaction);
-
-        Assert.assertEquals(t.getAmount(), 250);
+        Assert.assertEquals(t.getBalanceAmount(), 29);
 
     }
 

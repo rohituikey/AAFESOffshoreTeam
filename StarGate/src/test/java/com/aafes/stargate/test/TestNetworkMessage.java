@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author alugumetlas
  */
-@RunWith(MockitoJUnitRunner.class)
 public class TestNetworkMessage {
     
    
@@ -39,11 +38,6 @@ public class TestNetworkMessage {
     private ProcessorFactory processorFactory = new ProcessorFactory();
     private SVSGatewayProcessor svsgp = new SVSGatewayProcessor();
     private Transaction transaction = new Transaction();
-
-    @Mock
-    private Configurator configurator;
-    
-    @InjectMocks
     private SVSGateway sVSGateway = new SVSGateway();
     
     @Before
@@ -57,14 +51,17 @@ public class TestNetworkMessage {
         transaction.setInputType(InputType.KEYED);
     }
 
-
     @Test
     public void testNetworkMessageSuccess() throws MalformedURLException {
-
-    NetworkMessageProcessor messageProcessor = new NetworkMessageProcessor();
-      Transaction t = sVSGateway.processMessage(transaction);
+    Transaction t = sVSGateway.processMessage(transaction);
     Assert.assertEquals("00", t.getReasonCode());
 
+    }
+    @Test
+    public void testAuthorizationNullOrNot()
+    {
+        Transaction t = sVSGateway.processMessage(transaction);
+        Assert.assertNotNull(t.getAuthoriztionCode());
     }
 
 }

@@ -76,7 +76,7 @@ public class ProcessorFactory {
                     processor = networkMessageProcessor;
                     break;
                 case RequestType.REDEMPTION:
-                    processor = networkMessageProcessor;
+                    processor = redemptionProcessor;
                     break;
                 case RequestType.ISSUEGIFTCARD:
                     processor = issueGiftCard;

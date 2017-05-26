@@ -7,7 +7,6 @@ package com.aafes.stargate.test;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Configurator;
-import com.aafes.stargate.gateway.svs.NetworkMessageProcessor;
 import com.aafes.stargate.gateway.svs.ProcessorFactory;
 import com.aafes.stargate.gateway.svs.RedemptionProcessor;
 import com.aafes.stargate.gateway.svs.SVSGateway;
@@ -16,15 +15,15 @@ import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.SvsUtil;
+import com.google.common.collect.ComparisonChain;
 import java.net.MalformedURLException;
-import javax.xml.datatype.DatatypeConfigurationException;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +43,6 @@ public class TestRedemptionRequest {
 
     @Mock
     private Configurator configurator;
-
     @InjectMocks
     private SVSGateway sVSGateway = new SVSGateway();
 
@@ -55,31 +53,28 @@ public class TestRedemptionRequest {
         sVSGateway.setSvsgp(svsgp);
 
         transaction.setMedia(MediaType.GIFT_CARD);
-        transaction.setRequestType(RequestType.NETWORK);
-        transaction.setInputType(InputType.KEYED);
-        transaction.setMedia(MediaType.GIFT_CARD);
         transaction.setRequestType(RequestType.REDEMPTION);
         transaction.setInputType(InputType.KEYED);
-        transaction.setAccount("6006491572010002439");
-        transaction.setAmount((long) 229.00);
-        transaction.setGcpin("7020");
+        transaction.setAccount("6006491572010001514");
+        transaction.setAmount((long) 29.00);
+        transaction.setGcpin("5196");
         transaction.setOrderNumber("9999");
         transaction.setSTAN("112233");
     }
-@Ignore
+
     @Test
     public void testRedemptionRequestSuccessOrFailedIncaseOFPinGetLocked() throws MalformedURLException {
 
-        LOGGER.info("method...." + "testRedemptionRequestSuccessOrFailedIncaseOFPinGetLocked");
+        LOGGER.info("method...." + "testRedemptionRequestSuccessOrFailedIncaseOFPinGetLocked-");
 
         Transaction t = sVSGateway.processMessage(transaction);;
         if (transaction.getReasonCode() == "29") {
             Assert.assertEquals(t.getReasonCode(), "29");
         }
         Assert.assertEquals(t.getReasonCode(), "01");
+         LOGGER.info("RETURN DISCRIPTION--"+t.getDescriptionField());
     }
 
-    @Ignore
     @Test
     public void testForTransactionFailedDueToInvalidGcPin() throws MalformedURLException {
         LOGGER.info("method...." + "testForTransactionFailedDueToInvalidGcPin");
@@ -91,28 +86,18 @@ public class TestRedemptionRequest {
 
     }
 
-    @Ignore
     @Test
     public void testForTransactionFailedDueToInvalidCardNumber() throws MalformedURLException {
         LOGGER.info("method...." + "testForTransactionFailedDueToInvalidCardNumber");
 
-        transaction.setAccount("62666485547567458");
+        transaction.setAccount("");
+        Mockito.when(configurator.get("INVALID_ACCOUNT_NUMBER")).thenReturn("911");
         Transaction t = sVSGateway.processMessage(transaction);
 
-        Assert.assertEquals(t.getReasonCode(), "04");
+        Assert.assertEquals(t.getReasonCode(), "911");
 
     }
-    @Ignore
-    @Test
-    public void testForNullTranscationId() {
-        LOGGER.info("method...." + "testForNullTranscationId");
 
-        transaction.setTransactionId("");
-        Transaction t = sVSGateway.processMessage(transaction);;
-
-        Assert.assertEquals(t.getDescriptionField(), "TRANSACTION ID IS NULL");
-    }
-    @Ignore
     @Test
     public void testForAmount() throws MalformedURLException {
         LOGGER.info("method...." + "testForWrongRoutingId");
@@ -122,6 +107,12 @@ public class TestRedemptionRequest {
 
         Assert.assertEquals(t.getAmount(), 250);
 
+    }
+
+    @Test
+    public void testAuthorizationNullOrNot() {
+        Transaction t = sVSGateway.processMessage(transaction);
+        Assert.assertNotNull(t.getAuthoriztionCode());
     }
 
 }

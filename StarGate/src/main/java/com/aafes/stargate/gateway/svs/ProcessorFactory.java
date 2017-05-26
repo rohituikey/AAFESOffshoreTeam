@@ -155,14 +155,6 @@ public class ProcessorFactory {
         this.redemptionProcessor = redemptionProcessor;
     }
 
-    public RedemptionProcessor getRedemptionProcessor() {
-        return redemptionProcessor;
-    }
-
-    public void setRedemptionProcessor(RedemptionProcessor redemptionProcessor) {
-        this.redemptionProcessor = redemptionProcessor;
-    }
-
     public SVSIssueGiftCardProcessor getIssueGiftCard() {
         return issueGiftCard;
     }

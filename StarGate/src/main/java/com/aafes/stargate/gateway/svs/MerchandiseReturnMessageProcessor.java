@@ -32,18 +32,17 @@ public class MerchandiseReturnMessageProcessor extends Processor {
             LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
 
             MerchandiseReturnRequest request = new MerchandiseReturnRequest();
-
+           
             Amount amount = new Amount();
             amount.setAmount(transaction.getAmount());
             amount.setCurrency(transaction.getCurrencycode());
             request.setReturnAmount(amount);
 
             Card card = new Card();
-            card.setPinNumber(transaction.getGcpin());
             card.setCardNumber(transaction.getAccount());
-            card.setCardCurrency(transaction.getCurrencycode());
-            card.setCardTrackOne(transaction.getTrack1());
-            card.setCardTrackTwo(transaction.getTrack2());
+            card.setPinNumber(transaction.getGcpin());
+            //card.setCardTrackOne(transaction.getTrack1());
+            //card.setCardTrackTwo(transaction.getTrack2());
             request.setCard(card);
 
             request.setDate(SvsUtil.formatLocalDateTime());
@@ -56,9 +55,11 @@ public class MerchandiseReturnMessageProcessor extends Processor {
             request.setMerchant(merchant);
 
             request.setRoutingID(StarGateConstants.ROUTING_ID);
-            request.setStan(transaction.getSTAN());
+            request.setCheckForDuplicate(StarGateConstants.TRUE);
+           // request.setStan(transaction.getSTAN());
             SVSXMLWay svsXMLWay = SvsUtil.setUserNamePassword();
             MerchandiseReturnResponse response = svsXMLWay.merchandiseReturn(request);
+            
             transaction.setReasonCode(response.getReturnCode().getReturnCode());
             transaction.setDescriptionField(response.getReturnCode().getReturnDescription());
             if (transaction.getReasonCode().equalsIgnoreCase("01")) {
@@ -67,10 +68,8 @@ public class MerchandiseReturnMessageProcessor extends Processor {
                 transaction.setResponseType(ResponseType.DECLINED);
             }
             transaction.setAuthoriztionCode(response.getAuthorizationCode());
-            //where to take the follwing fields
-            response.getCard().getCardExpiration();
-            response.getCard().getEovDate();
-            response.getConversionRate();
+            transaction.setBalanceAmount((long) (response.getBalanceAmount().getAmount() ));
+            
             
             LOGGER.info("ReturnDescription : " + String.valueOf(response.getReturnCode().getReturnDescription()));
         } catch (Exception e) {

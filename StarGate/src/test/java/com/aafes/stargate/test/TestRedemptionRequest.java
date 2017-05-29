@@ -11,11 +11,8 @@ import com.aafes.stargate.gateway.svs.ProcessorFactory;
 import com.aafes.stargate.gateway.svs.RedemptionProcessor;
 import com.aafes.stargate.gateway.svs.SVSGateway;
 import com.aafes.stargate.gateway.svs.SVSGatewayProcessor;
-import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
-import com.aafes.stargate.util.SvsUtil;
-import com.google.common.collect.ComparisonChain;
 import java.net.MalformedURLException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,13 +52,12 @@ public class TestRedemptionRequest {
         transaction.setMedia(MediaType.GIFT_CARD);
         transaction.setRequestType(RequestType.REDEMPTION);
 
-       
-        transaction.setAccount("6006491572010001514");
+        transaction.setAccount("6006496628299904508");
         transaction.setAmount((long) 29.00);
-        transaction.setGcpin("5196");
+        transaction.setGcpin("2496");
         transaction.setOrderNumber("9999");
         transaction.setRrn("9RprkC1gEYoN");
-      
+
     }
 
     @Test
@@ -74,10 +70,8 @@ public class TestRedemptionRequest {
             Assert.assertEquals(t.getReasonCode(), "29");
         }
         Assert.assertEquals(t.getReasonCode(), "01");
-         LOGGER.info("RETURN DISCRIPTION--"+t.getDescriptionField());
+        LOGGER.info("RETURN DISCRIPTION--" + t.getDescriptionField());
     }
-
-  
 
     @Test
     public void testForTransactionFailedDueToInvalidCardNumber() throws MalformedURLException {
@@ -88,9 +82,9 @@ public class TestRedemptionRequest {
         Transaction t = sVSGateway.processMessage(transaction);
 
         Assert.assertEquals(t.getReasonCode(), "911");
-
     }
-      @Test
+
+    @Test
     public void testForTransactionFailedDueToInvalidGcPin() throws MalformedURLException {
         LOGGER.info("method...." + "testForTransactionFailedDueToInvalidGcPin");
 
@@ -98,7 +92,6 @@ public class TestRedemptionRequest {
         Transaction t = sVSGateway.processMessage(transaction);
 
         Assert.assertEquals(t.getReasonCode(), "200");
-
     }
 
     @Test
@@ -106,7 +99,6 @@ public class TestRedemptionRequest {
         LOGGER.info("method...." + "testForWrongRoutingId");
         Transaction t = sVSGateway.processMessage(transaction);
         Assert.assertEquals(t.getBalanceAmount(), 29);
-
     }
 
     @Test

@@ -82,10 +82,6 @@ public class SVSIssueGiftCardProcessor extends Processor {
             transaction.setExpiration(response.getCard().getCardExpiration());
             transaction.setTransactionId(response.getTransactionID());
             
-            //response.getConversionRate();
-            //response.getIncentiveNumber();
-            
-            
             LOGGER.info("ReturnDescription : " + String.valueOf(response.getReturnCode().getReturnDescription()));
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());

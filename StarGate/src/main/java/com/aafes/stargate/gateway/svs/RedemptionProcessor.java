@@ -75,7 +75,7 @@ public class RedemptionProcessor extends Processor {
                 t.setBalanceAmount((long) redemptionResponse.getApprovedAmount().getAmount());
                 t.setCurrencycode(StarGateConstants.CURRENCY);
 
-                t.setCardSequenceNumber(redemptionResponse.getCard().getCardNumber());
+                t.setCardReferenceID(redemptionResponse.getCard().getCardNumber());
                 t.setTrack1(redemptionResponse.getCard().getCardTrackOne());
                 t.setTrack2(redemptionResponse.getCard().getCardTrackTwo());
                 t.setExpiration(redemptionResponse.getCard().getEovDate());

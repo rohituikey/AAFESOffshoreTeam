@@ -111,64 +111,78 @@ public class CompassGatewayProcessor {
         String orderNumber = String.format("%-22s", t.getOrderNumber());
         soapTran.setOrderNumber(orderNumber);
         soapTran.setMop(mapRequestTypeToMop(t.getMedia()));
-        
+
         String account = String.format("%-19s", t.getAccount());
         soapTran.setAccountNumber(account);
         soapTran.setExpirationDate(t.getExpiration());
-        
+
         String divisionNumber = String.format("%010d", 805602);
         t.setDivisionnumber(divisionNumber);
         soapTran.setDivisionNumber(divisionNumber);
-        
+
         long amount = t.getAmount();
-        if(amount < 0){
+        if (amount < 0) {
             amount = amount * -1;
         }
         String amountTr = String.format("%012d", amount);
         soapTran.setAmount(amountTr);
-        
+
         String currencyCode = "840";
         t.setCurrencycode(currencyCode);
         soapTran.setCurrencyCode(currencyCode);
-        
+
         String transactionType = "7";
         t.setTransactiontype(transactionType);
         soapTran.setTransactionType(transactionType);
-       
-              
+
         OnlineAF oaf = new OnlineAF();
         String actionCode = "";
-        
-        log.info("Reversal flag : "+t.getReversal());
-        
-          if(t.getReversal()!=null
-                && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)){
-              
+
+        log.info("Reversal flag : " + t.getReversal());
+
+        if (t.getReversal() != null
+                && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
+
             log.info("FDMS Reversal request.......");
-            
+
             actionCode = "AR";
             t.setActioncode(actionCode);
             soapTran.setActionCode(actionCode);
-            
-            
+
             //<cmpmsg:PA> 
             PA pa = new PA();
             pa.setResponseDate(t.getResponseDate());
             pa.setAuthorizationCode(t.getAuthNumber());
             oaf.setPA(pa);
-        }else{
-              
-            log.info("FDMS Auth request......."); 
-              
+        } else {
+
+            log.info("FDMS Auth request.......");
+
             actionCode = "AU";
             t.setActioncode(actionCode);
             soapTran.setActionCode(actionCode);
-              
+
             //<cmpmsg:AB> 
             ContactAddress ab = new ContactAddress();
-            ab.setNameText(t.getCardHolderName().replace(",", "*").toUpperCase());
-            if(t.getBillingPhone() != null 
-                    && !t.getBillingPhone().equals("")){
+            String cardHolderName = t.getCardHolderName();
+            if (cardHolderName != null) {
+                String[] k = cardHolderName.split(",");
+
+                try {
+                    if (k.length > 1) {
+                        cardHolderName = k[1].trim() + "*" + k[0].trim();
+                    } else {
+                        cardHolderName = "*" + k[0].trim();
+                    }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    log.info("FDMS Auth request Array Index Outr of bounds exception.......");
+
+                }
+               
+                ab.setNameText(cardHolderName.toUpperCase());
+            }
+            if (t.getBillingPhone() != null
+                    && !t.getBillingPhone().equals("")) {
                 String phoneNumber = String.format("%-14s", t.getBillingPhone());
                 ab.setTelephoneNumber(phoneNumber);
                 String telePhoneType = "H";
@@ -176,42 +190,44 @@ public class CompassGatewayProcessor {
                 ab.setTelephoneType(telePhoneType);
             }
             String address = t.getBillingAddress1();
-            if(address!=null
-                    && address.length()>30){
-                address = address.substring(0,30);
+            if (address == null) {
+                address = "";
+            }
+            if (address != null
+                    && address.length() > 30) {
+                address = address.substring(0, 30);
             }
             address = String.format("%-30s", address);
             ab.setAddress1(address);
 
             String address2 = t.getBillingAddress2();
-            if(address2!=null
-                    && address2.length()>30){
-                address2 = address2.substring(0,30);
+            if (address2 == null) {
+                address2 = "";
+            }
+            if (address2 != null
+                    && address2.length() > 30) {
+                address2 = address2.substring(0, 30);
             }
             address2 = String.format("%-30s", address2);
             ab.setAddress2(address2);
-            
+
             String zipCode = String.format("%-10s", t.getBillingZipCode());
             ab.setPostalCode(zipCode);
             ab.setCountryCode(t.getBillingCountryCode().toUpperCase());
             oaf.setAB(ab);
 
-
             //<cmpmsg:FR> 
-            if(t.getCvv() !=null 
-                    && (!t.getCvv().equals("")) ){
+            if (t.getCvv() != null
+                    && (!t.getCvv().equals(""))) {
                 FR fr = new FR();
                 fr.setCardSecurityValue(t.getCvv());
-                String cardSecurityPresence = getCardSecurityPresence(t.getMedia(),t.getCvv());
+                String cardSecurityPresence = getCardSecurityPresence(t.getMedia(), t.getCvv());
                 t.setBillpaymentindicator(cardSecurityPresence);
                 fr.setCardSecurityPresence(cardSecurityPresence);
                 oaf.setFR(fr);
             }
-            
-              
-        }
 
-        
+        }
 
         otr.setAdditionalFormats(oaf);
 
@@ -233,19 +249,19 @@ public class CompassGatewayProcessor {
         }
         return "";
     }
-    
+
     private String getCardSecurityPresence(String mediaType,
             String cvv) {
-        
-        if(MediaType.AMEX.equalsIgnoreCase(mediaType)){
-             return " ";
+
+        if (MediaType.AMEX.equalsIgnoreCase(mediaType)) {
+            return " ";
         }
-        
-       if(MediaType.MASTER.equalsIgnoreCase(mediaType)
-               && "999".equals(cvv)){
-          return " ";
-       }
-        
+
+        if (MediaType.MASTER.equalsIgnoreCase(mediaType)
+                && "999".equals(cvv)) {
+            return " ";
+        }
+
         return "1";
     }
 
@@ -260,21 +276,20 @@ public class CompassGatewayProcessor {
     private void mapResponse(OnlineTransResponse result,
             com.aafes.stargate.authorizer.entity.Transaction t) {
         log.info("result.getResponseReasonCode() : " + result.getResponseReasonCode());
-     
+
         t.setReasonCode(result.getResponseReasonCode());
         t.setResponseDate(result.getResponseDate());
         t.setAuthNumber(result.getAuthorizationCode());
-        if(result.getAVSResponseCode().equalsIgnoreCase("i3"))
-        {
-         t.setAvsResponseCode(AVSResponseReasonCode.MATCHED);
-        }else if(result.getAVSResponseCode().equalsIgnoreCase("i8")){
-         t.setAvsResponseCode(AVSResponseReasonCode.UNMATCHED);
+        if (result.getAVSResponseCode().equalsIgnoreCase("i3")) {
+            t.setAvsResponseCode(AVSResponseReasonCode.MATCHED);
+        } else if (result.getAVSResponseCode().equalsIgnoreCase("i8")) {
+            t.setAvsResponseCode(AVSResponseReasonCode.UNMATCHED);
         } else {
             t.setAvsResponseCode(AVSResponseReasonCode.NOTVERIFIED);
         }
-        
+
         t.setCsvResponseCode(result.getCSVResponseCode());
-        
+
         if (t.getReasonCode().equalsIgnoreCase("100")) {
             t.setResponseType(ResponseType.APPROVED);
             t.setDescriptionField(ResponseType.APPROVED);

@@ -13,6 +13,7 @@ final public class Facility implements Serializable {
     private String facility;
     private String strategy;
     private String deviceType;
+    private String tokenBankName;
 
     public String getFacility() {
         return facility;
@@ -55,5 +56,13 @@ final public class Facility implements Serializable {
      */
     public void setDeviceType(String deviceType) {
         this.deviceType = deviceType;
+    }
+
+    public String getTokenBankName() {
+        return tokenBankName;
+    }
+
+    public void setTokenBankName(String tokenBankName) {
+        this.tokenBankName = tokenBankName;
     }
 }

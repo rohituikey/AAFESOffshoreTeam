@@ -151,6 +151,8 @@ final public class Transaction {
     private String facility = "";
     @Transient
     private String strategy = "";
+    @Transient
+    private String tokenBankName = "";
     
     // MilStar Gateway Fields
     @Transient
@@ -1111,6 +1113,14 @@ final public class Transaction {
      */
     public void setTermId(String termId) {
         this.termId = termId;
+    }
+
+    public String getTokenBankName() {
+        return tokenBankName;
+    }
+
+    public void setTokenBankName(String tokenBankName) {
+        this.tokenBankName = tokenBankName;
     }
 
         

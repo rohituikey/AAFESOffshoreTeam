@@ -1,5 +1,6 @@
 package com.aafes.stargate.control;
 
+import com.aafes.credit.AccountTypeType;
 import com.aafes.credit.AddressVerificationResponseType;
 import com.aafes.credit.Message;
 import com.aafes.credit.Message.Header;
@@ -55,6 +56,8 @@ public class Authorizer {
     private String enableFDMSStub;
     @EJB
     private FDMSStub fDMSStub;
+    
+    private boolean isDuplicateTransaction = false;
 
     public Message authorize(Message cm) {
         Transaction t = new Transaction();
@@ -63,13 +66,7 @@ public class Authorizer {
         try {
             mapRequest(t, cm);
             bDoneMApreq = true;
-            /**
-             * Remove if condition after Junit test case modified for Authorizer
-             */
-//            if (tokenBusinessService != null
-//                    && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
-//                bTokenCall = tokenBusinessService.modifyTran(t);
-//            }
+            
             findFacility(t);
             if (t.getFacility() == null || t.getFacility().isEmpty()
                     || t.getStrategy() == null || t.getStrategy().isEmpty()) {
@@ -81,6 +78,26 @@ public class Authorizer {
                 return cm;
             }
 
+            
+            /**
+             * Remove if condition after Junit test case modified for Authorizer
+             */
+            if (tokenBusinessService != null
+                    && t.getAccountTypeType() != null
+                    && t.getAccountTypeType().equalsIgnoreCase(AccountTypeType.TOKEN.value())
+                    && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
+                bTokenCall = tokenBusinessService.lookUpAccount(t);
+                if (!bTokenCall) {
+                    LOG.info("Token Not found");
+                    t.setReasonCode(configurator.get("TOKEN_NOTFOUND"));
+                    t.setResponseType(ResponseType.DECLINED);
+                    t.setDescriptionField("TOKEN_NOTFOUND");
+                    mapResponse(t, cm);
+                    return cm;
+                }
+            }
+
+            
             Transaction storedTran = null;
             if (t.getReversal() != null
                     && t.getReversal().equalsIgnoreCase(RequestType.SALE)) {
@@ -100,6 +117,7 @@ public class Authorizer {
 
             if (storedTran == null) {
 
+                isDuplicateTransaction = false;
                 /**
                  * FDMS Stub for specific UUIDs and credit cards.
                  */
@@ -155,6 +173,7 @@ public class Authorizer {
 
             } else {
                 LOG.info("Transaction found. So replying from the cache...");
+                isDuplicateTransaction = true;
                 mapResponse(storedTran, cm);
             }
         } catch (AuthorizerException e) {
@@ -175,13 +194,12 @@ public class Authorizer {
             LOG.error("Exception caught" + e.toString());
             t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
             t.setDescriptionField("INTERNAL_SERVER_ERROR");
-//            if (!bTokenCall && bDoneMApreq) {
-//                t.setReasonCode(configurator.get("TOKENIZER_CONNECTION_ERROR"));
-//                t.setDescriptionField("TOKENIZER_CONNECTION_ERROR");
-//            }
+            if (!bTokenCall && bDoneMApreq) {
+                t.setReasonCode(configurator.get("TOKENIZER_CONNECTION_ERROR"));
+                t.setDescriptionField("TOKENIZER_CONNECTION_ERROR");
+            }
             t.setResponseType(ResponseType.DECLINED);
-            if(cm.getResponse() != null)
-            {
+            if (cm.getResponse() != null) {
                 cm.getResponse().clear();
             }
             mapResponse(t, cm);
@@ -304,6 +322,7 @@ public class Authorizer {
             t.setFacility(facility.getFacility());
             t.setStrategy(facility.getStrategy());
             t.setDeviceType(facility.getDeviceType());
+            t.setTokenBankName(facility.getTokenBankName());
         }
 
     }
@@ -432,85 +451,85 @@ public class Authorizer {
                 && request.getPlanNumbers().getPlanNumber().get(0) != null) {
             transaction.setPlanNumber(request.getPlanNumbers().getPlanNumber().get(0).toString());
         }
-        if (request.getEssoRequestData() != null) {
-            BigDecimal pumpAmt;
-            pumpAmt = request.getEssoRequestData().getPumpPrice();
-            if (pumpAmt != null) {
-                pumpAmt = pumpAmt.movePointRight(2);
-                long n = pumpAmt.longValueExact();
-                transaction.setPumpPrice(n);
-            }
-            if (request.getEssoRequestData().getProductCode() != null) {
-                transaction.setProductCode(request.getEssoRequestData().getProductCode().toString());
-            }
-            if (request.getEssoRequestData().getOdometer() != null) {
-                transaction.setOdoMeter(request.getEssoRequestData().getOdometer().toString());
-            }
-            if (request.getEssoRequestData().getRationAmt() != null) {
-                transaction.setRationAmt(request.getEssoRequestData().getRationAmt().toString());
-            }
-            if (request.getEssoRequestData().getUnitMeas() != null) {
-                transaction.setUnitMeas(request.getEssoRequestData().getUnitMeas().toString());
-            }
-        }
+//        if (request.getEssoRequestData() != null) {
+//            BigDecimal pumpAmt;
+//            pumpAmt = request.getEssoRequestData().getPumpPrice();
+//            if (pumpAmt != null) {
+//                pumpAmt = pumpAmt.movePointRight(2);
+//                long n = pumpAmt.longValueExact();
+//                transaction.setPumpPrice(n);
+//            }
+//            if (request.getEssoRequestData().getProductCode() != null) {
+//                transaction.setProductCode(request.getEssoRequestData().getProductCode().toString());
+//            }
+//            if (request.getEssoRequestData().getOdometer() != null) {
+//                transaction.setOdoMeter(request.getEssoRequestData().getOdometer().toString());
+//            }
+//            if (request.getEssoRequestData().getRationAmt() != null) {
+//                transaction.setRationAmt(request.getEssoRequestData().getRationAmt().toString());
+//            }
+//            if (request.getEssoRequestData().getUnitMeas() != null) {
+//                transaction.setUnitMeas(request.getEssoRequestData().getUnitMeas().toString());
+//            }
+//        }
 
-        BigDecimal essoAmt;
-        essoAmt = request.getEssoLoadAmt();
-        if (essoAmt != null) {
-            essoAmt = essoAmt.movePointRight(2);
-            long n = essoAmt.longValueExact();
-            transaction.setEssoLoadAmount(n);
-        }
-        if (request.getPumpNmbr() != null) {
-            transaction.setPumpNmbr(request.getPumpNmbr().toString());
-        }
-        if (request.getWEXRequestPayAtPumpData() != null) {
-            Request.WEXRequestPayAtPumpData wexReqPayAtPump = request.getWEXRequestPayAtPumpData();
-            if (wexReqPayAtPump.getDriverId() != null) {
-                transaction.setDriverId(wexReqPayAtPump.getDriverId().toString());
-            }
-            if (wexReqPayAtPump.getRestrictCode() != null) {
-                transaction.setRestrictCode(wexReqPayAtPump.getRestrictCode().toString());
-            }
-            if (wexReqPayAtPump.getQtyPumped() != null) {
-                BigDecimal qtyPumped;
-                qtyPumped = wexReqPayAtPump.getQtyPumped();
-                qtyPumped = qtyPumped.movePointRight(2);
-                long n = qtyPumped.longValueExact();
-                transaction.setQtyPumped(n);
-            }
-            if (wexReqPayAtPump.getFuelPrice() != null) {
-                BigDecimal fuelPrice;
-                fuelPrice = wexReqPayAtPump.getFuelPrice();
-                fuelPrice = fuelPrice.movePointRight(2);
-                long n = fuelPrice.longValueExact();
-                transaction.setFuelPrice(n);
-            }
-            if (wexReqPayAtPump.getFuelProdCode() != null) {
-                transaction.setFuelProdCode(wexReqPayAtPump.getFuelProdCode().toString());
-            }
-            if (wexReqPayAtPump.getUnitOfMeas() != null) {
-                transaction.setUnitOfMeas(wexReqPayAtPump.getUnitOfMeas().toString());
-            }
-            if (wexReqPayAtPump.getVehicleId() != null) {
-                transaction.setVehicleId(wexReqPayAtPump.getVehicleId().toString());
-            }
-            if (wexReqPayAtPump.getLicenseNumber() != null) {
-                transaction.setLicenceNumber(wexReqPayAtPump.getLicenseNumber());
-            }
-            if (wexReqPayAtPump.getDeptNumber() != null) {
-                transaction.setDeptNumber(wexReqPayAtPump.getDeptNumber().toString());
-            }
-            transaction.setJobValueNumber(wexReqPayAtPump.getJobValueNumber());
-            transaction.setDataNumber(wexReqPayAtPump.getDataNumber());
-            transaction.setUserId(wexReqPayAtPump.getUserId());
-//          TODO:  transaction.setContact(request);
-            if (wexReqPayAtPump.getProdDetailCount() != null) {
-                transaction.setProdDetailCount(wexReqPayAtPump.getProdDetailCount().toString());
-            }
-            transaction.setServiceCode(wexReqPayAtPump.getServiceCode());
-
-        }
+//        BigDecimal essoAmt;
+//        essoAmt = request.getEssoLoadAmt();
+//        if (essoAmt != null) {
+//            essoAmt = essoAmt.movePointRight(2);
+//            long n = essoAmt.longValueExact();
+//            transaction.setEssoLoadAmount(n);
+//        }
+//        if (request.getPumpNmbr() != null) {
+//            transaction.setPumpNmbr(request.getPumpNmbr().toString());
+//        }
+//        if (request.getWEXRequestPayAtPumpData() != null) {
+//            Request.WEXRequestPayAtPumpData wexReqPayAtPump = request.getWEXRequestPayAtPumpData();
+//            if (wexReqPayAtPump.getDriverId() != null) {
+//                transaction.setDriverId(wexReqPayAtPump.getDriverId().toString());
+//            }
+//            if (wexReqPayAtPump.getRestrictCode() != null) {
+//                transaction.setRestrictCode(wexReqPayAtPump.getRestrictCode().toString());
+//            }
+//            if (wexReqPayAtPump.getQtyPumped() != null) {
+//                BigDecimal qtyPumped;
+//                qtyPumped = wexReqPayAtPump.getQtyPumped();
+//                qtyPumped = qtyPumped.movePointRight(2);
+//                long n = qtyPumped.longValueExact();
+//                transaction.setQtyPumped(n);
+//            }
+//            if (wexReqPayAtPump.getFuelPrice() != null) {
+//                BigDecimal fuelPrice;
+//                fuelPrice = wexReqPayAtPump.getFuelPrice();
+//                fuelPrice = fuelPrice.movePointRight(2);
+//                long n = fuelPrice.longValueExact();
+//                transaction.setFuelPrice(n);
+//            }
+//            if (wexReqPayAtPump.getFuelProdCode() != null) {
+//                transaction.setFuelProdCode(wexReqPayAtPump.getFuelProdCode().toString());
+//            }
+//            if (wexReqPayAtPump.getUnitOfMeas() != null) {
+//                transaction.setUnitOfMeas(wexReqPayAtPump.getUnitOfMeas().toString());
+//            }
+//            if (wexReqPayAtPump.getVehicleId() != null) {
+//                transaction.setVehicleId(wexReqPayAtPump.getVehicleId().toString());
+//            }
+//            if (wexReqPayAtPump.getLicenseNumber() != null) {
+//                transaction.setLicenceNumber(wexReqPayAtPump.getLicenseNumber());
+//            }
+//            if (wexReqPayAtPump.getDeptNumber() != null) {
+//                transaction.setDeptNumber(wexReqPayAtPump.getDeptNumber().toString());
+//            }
+//            transaction.setJobValueNumber(wexReqPayAtPump.getJobValueNumber());
+//            transaction.setDataNumber(wexReqPayAtPump.getDataNumber());
+//            transaction.setUserId(wexReqPayAtPump.getUserId());
+////          TODO:  transaction.setContact(request);
+//            if (wexReqPayAtPump.getProdDetailCount() != null) {
+//                transaction.setProdDetailCount(wexReqPayAtPump.getProdDetailCount().toString());
+//            }
+//            transaction.setServiceCode(wexReqPayAtPump.getServiceCode());
+//
+//        }
         Request.AddressVerificationService addressVerServc = request.getAddressVerificationService();
         if (addressVerServc != null) {
             transaction.setCardHolderName(addressVerServc.getCardHolderName());
@@ -613,8 +632,7 @@ public class Authorizer {
             if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)
                     || t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD)) {
                 response.setBalanceAmount(BigDecimal.valueOf(t.getBalanceAmount()).movePointLeft(2));
-                if(t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH))
-                {
+                if (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) {
                     response.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()).movePointLeft(2));
                 }
             }
@@ -629,11 +647,21 @@ public class Authorizer {
 
             if ("Pan".equalsIgnoreCase(t.getPan())) {
                 response.setOrigAcctType("Pan");
-                if(t.getTokenId() != null && !t.getTokenId().trim().isEmpty())
-                    response.setModifiedAcctValue(t.getTokenId());
-                
-                //response.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()).movePointLeft(2));
+                if (tokenBusinessService != null
+                        && !isDuplicateTransaction
+                        && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
+                    try {
+                        tokenBusinessService.issueToken(t);
+                    } catch (ProcessingException e) {
+                        LOG.error("Cannot generate token. Token Service Error");
+                    }
 
+                }
+                if (t.getTokenId() != null && !t.getTokenId().trim().isEmpty()) {
+                    response.setModifiedAcctValue(t.getTokenId());
+                }
+
+                //response.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()).movePointLeft(2));
             }
 
             if (t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD)

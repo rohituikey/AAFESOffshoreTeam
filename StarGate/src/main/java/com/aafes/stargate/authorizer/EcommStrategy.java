@@ -14,6 +14,7 @@ import com.aafes.stargate.gateway.Gateway;
 import static com.aafes.stargate.gateway.vision.Common.convertStackTraceToString;
 import com.aafes.stargate.util.GetMediaTypeByAccountNbr;
 import com.aafes.stargate.util.MediaType;
+import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseCodes;
 import com.aafes.stargate.util.ResponseType;
 import javax.ejb.Stateless;
@@ -112,27 +113,29 @@ public class EcommStrategy extends BaseStrategy {
         }
 
         // AVS Verification
-        if (t.getZipCode() == null || t.getZipCode().trim().isEmpty()) {
-            if (t.getBillingZipCode() == null
-                    || t.getBillingZipCode().trim().isEmpty()) {
-                buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
-                return false;
-            }
-            if (t.getBillingAddress1() == null
-                    || t.getBillingAddress1().trim().isEmpty()) {
-                buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
-                return false;
-            }
-            if (t.getBillingCountryCode() == null
-                    || t.getBillingCountryCode().trim().isEmpty()) {
-                buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
-                return false;
-            }
+        if (!t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD)) {
+            if (t.getZipCode() == null || t.getZipCode().trim().isEmpty()) {
+                if (t.getBillingZipCode() == null
+                        || t.getBillingZipCode().trim().isEmpty()) {
+                    buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
+                    return false;
+                }
+                if (t.getBillingAddress1() == null
+                        || t.getBillingAddress1().trim().isEmpty()) {
+                    buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
+                    return false;
+                }
+                if (t.getBillingCountryCode() == null
+                        || t.getBillingCountryCode().trim().isEmpty()) {
+                    buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
+                    return false;
+                }
 
-            if (t.getCardHolderName() == null
-                    || t.getCardHolderName().trim().isEmpty()) {
-                buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
-                return false;
+                if (t.getCardHolderName() == null
+                        || t.getCardHolderName().trim().isEmpty()) {
+                    buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
+                    return false;
+                }
             }
         }
 

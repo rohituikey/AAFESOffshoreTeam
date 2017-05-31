@@ -20,4 +20,7 @@ public class StarGateConstants {
     public static final boolean TRUE = true;
     public static final boolean FALSE = false;
     public static final String NETWORK_CODE ="301";
+    //FOLLOWING PROPERTIES ARE SET TO MAKE TIMEOUT OF READ RESPONSE OF 10 SECONDS I.E. 10000 MILLISECONDS
+    public static final Integer LONG_REQUEST_TIMEOUT = 10000;
+    public static final Integer LONG_CONNECT_TIMEOUT = 100000;
 }

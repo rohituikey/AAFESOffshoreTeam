@@ -5,6 +5,9 @@
             30
         </session-timeout>
     </session-config>
+    <Listner>
+        <Listener-class>com.aafes.stargate.web.SchedulerServlet</Listener-class>
+    </Listner>
     <security-constraint>
         <web-resource-collection>
             <url-pattern>/*</url-pattern>
@@ -43,7 +46,7 @@
         <realm-name>ApplicationRealm</realm-name>
     </login-config>
             -->
-    <ejb-local-ref>
+<!--    <ejb-local-ref>
         <ejb-ref-name>sVSGateway</ejb-ref-name>
         <ejb-ref-type>Session</ejb-ref-type>
         <ejb-link>#SVSGateway</ejb-link>
@@ -52,5 +55,5 @@
         <ejb-ref-name>sVSGatewayProcessor</ejb-ref-name>
         <ejb-ref-type>Session</ejb-ref-type>
         <ejb-link>#SVSGatewayProcessor</ejb-link>
-    </ejb-local-ref>
+    </ejb-local-ref>-->
 </web-app>

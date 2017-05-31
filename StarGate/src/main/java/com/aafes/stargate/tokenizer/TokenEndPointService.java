@@ -6,6 +6,10 @@
 package com.aafes.stargate.tokenizer;
 
 
+import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.token.AccountTypeType;
+import com.aafes.token.RequestTypeType;
+import com.aafes.token.TokenMessage;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.ProcessingException;
@@ -33,52 +37,61 @@ public class TokenEndPointService {
             = LoggerFactory.getLogger(TokenEndPointService.class.getSimpleName());
     
     
-    public String lookupAccount(String token) throws ProcessingException{
+    public String lookupAccount(Transaction t) throws ProcessingException{
        log.info("TokenServicer#lookupAccount#Start.......");
         
-        //http://haqapsgate03:7070/tokenizer/lookup
-        String lookupEndpoint = tokenEndpoint + "/lookup";
-        log.info("TokenServicer#lookupAccount#lookupEndpoint : "+lookupEndpoint);
-                
         Client client = ClientBuilder.newBuilder().build();
-        WebTarget target = client.target(lookupEndpoint);
+        WebTarget target = client.target(tokenEndpoint);
         log.info("TokenServicer#lookupAccount#Done WebTarget.........");
                 
-        TokenRequest tR = new TokenRequest();
-        tR.setClient("gso");
-        tR.setToken(token);
-        Entity entity = Entity.entity(tR, MediaType.APPLICATION_JSON);
+        TokenMessage tm = new TokenMessage();
+        TokenMessage.Request request = new TokenMessage.Request();
+        request.setAccount(t.getAccount());
+        request.setAccountType(AccountTypeType.TOKEN);
+        request.setMedia(t.getMedia());
+        request.setRequestType(RequestTypeType.LOOKUP);
+        request.setTokenBankName(t.getTokenBankName());
+        tm.setRequest(request);
+      //  request.set
+        Entity entity = Entity.entity(tm, MediaType.APPLICATION_XML);
          
-        Response response = target.request(MediaType.APPLICATION_JSON).post(entity);
+        Response response = target.request(MediaType.APPLICATION_XML).post(entity);
          
-        LookupResponse entityFromResponse = response.readEntity(LookupResponse.class);    
+        tm = response.readEntity(TokenMessage.class);    
         log.info("TokenServicer#lookupAccount#Got response.........");
-        return entityFromResponse.getAccount();
+        if(tm.getResponse() != null) {
+            return tm.getResponse().getAccount();
+        }
+        return "";
        
     }
     
     
-    public String issueToken(String account) throws ProcessingException{
+    public String issueToken(Transaction t) throws ProcessingException{
         log.info("TokenServicer#issueToken#Start.......");
         
-        //http://haqapsgate03:7070/tokenizer/issue
-        String issueEndpoint = tokenEndpoint + "/issue";
-        log.info("TokenServicer#issueToken#lookupEndpoint : "+issueEndpoint);
                 
         Client client = ClientBuilder.newBuilder().build();
-        WebTarget target = client.target(issueEndpoint);
+        WebTarget target = client.target(tokenEndpoint);
         log.info("TokenServicer#issueToken#Done WebTarget.........");
                 
-        TokenRequest tR = new TokenRequest();
-        tR.setClient("gso");
-        tR.setAccountNumber(account);
-        Entity entity = Entity.entity(tR, MediaType.APPLICATION_JSON);
+        TokenMessage tm = new TokenMessage();
+        TokenMessage.Request request = new TokenMessage.Request();
+        request.setAccount(t.getAccount());
+        request.setAccountType(AccountTypeType.PAN);
+        request.setMedia(t.getMedia());
+        request.setRequestType(RequestTypeType.ISSUE);
+        request.setTokenBankName(t.getTokenBankName());
+        tm.setRequest(request);
+        Entity entity = Entity.entity(tm, MediaType.APPLICATION_XML);
          
-        Response response = target.request(MediaType.APPLICATION_JSON).post(entity);
+        Response response = target.request(MediaType.APPLICATION_XML).post(entity);
          
-        IssueResponse entityFromResponse = response.readEntity(IssueResponse.class);    
-        log.info("TokenServicer#issueToken#Got response.........");
-        return entityFromResponse.getToken();
+        tm = response.readEntity(TokenMessage.class);       
+        if(tm.getResponse() != null) {
+            return tm.getResponse().getAccount();
+        }
+        return "";
        
     }
 

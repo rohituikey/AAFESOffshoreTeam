@@ -5,9 +5,12 @@ To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
 
-<xs:schema version="1.0"
-           xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           elementFormDefault="qualified">
+<xs:schema xmlns="http://www.aafes.com/token"
+    targetNamespace="http://www.aafes.com/token"
+    xmlns:credit="http://www.aafes.com/token"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified" 
+>
     <xs:simpleType name="AccountTypeType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="Pan" />
@@ -28,7 +31,7 @@ and open the template in the editor.
                     <xs:complexType>                          
                         <xs:sequence>
                             <xs:element name="RequestType" type="RequestTypeType" minOccurs="1" maxOccurs="1" /> 
-                            <xs:element name="Media" minOccurs="1" maxOccurs="1">                
+                            <xs:element name="Media" minOccurs="0" maxOccurs="1">                
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
                                         <xs:enumeration value="Mastercard" />

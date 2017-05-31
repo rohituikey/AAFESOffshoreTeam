@@ -5,15 +5,23 @@
  */
 package com.aafes.stargate.authorizer;
 
+import com.aafes.starsettler.imported.SettleEntity;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Authorizer;
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.gateway.Gateway;
-import com.aafes.stargate.util.GetMediaTypeByAccountNbr;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import com.aafes.starsettler.imported.SettleMessageDAO;
+import com.aafes.starsettler.imported.SettleStatus;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +31,9 @@ import org.slf4j.LoggerFactory;
  */
 @Stateless
 public class RetailStrategy extends BaseStrategy {
+
+    @EJB
+    private SettleMessageDAO settleMessageDAO;
 
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(Authorizer.class.getSimpleName());
@@ -43,6 +54,12 @@ public class RetailStrategy extends BaseStrategy {
             if (gateway != null) {
                 t = gateway.processMessage(t);
             }
+            
+            //if Authorized, save in settle message repository to settle
+            if ((t.getReasonCode().equalsIgnoreCase("000")) && (t.getSettleIndicator().equalsIgnoreCase("true"))){
+                saveToSettle(t);
+            }
+            
         } catch (AuthorizerException e) {
             buildErrorResponse(t, "", e.getMessage());
             return t;
@@ -51,6 +68,34 @@ public class RetailStrategy extends BaseStrategy {
             return t;
         }
         return t;
+    }
+    
+    private void saveToSettle(Transaction t){
+    List<SettleEntity> settleEntityList = new ArrayList<SettleEntity>();
+    SettleEntity settleEntity = new SettleEntity();
+    
+    settleEntity.setTransactionId(t.getTransactionId());
+    settleEntity.setReceiveddate(this.getSystemDate());
+    settleEntity.setOrderNumber(t.getOrderNumber());
+    settleEntity.setSettleDate(this.getSystemDate());
+    //Card Type not available    
+    settleEntity.setTransactionType(t.getTransactiontype());
+    //ClientLineId not available  
+    settleEntity.setClientLineId(t.getTransactionId());
+    settleEntity.setIdentityUUID(t.getIdentityUuid());
+    //LineId not available 
+    //ShipId not available 
+    settleEntity.setRrn(t.getRrn());
+    settleEntity.setPaymentAmount(Long.toString(t.getAmount()));
+    
+    
+    //where to map t.getLocalDateTime()
+    
+    settleEntity.setSettlestatus(SettleStatus.Ready_to_settle);
+     
+    
+    settleEntityList.add(settleEntity);
+    settleMessageDAO.save(settleEntityList);
     }
 
     private boolean validateRetailFields(Transaction t) {
@@ -119,5 +164,14 @@ public class RetailStrategy extends BaseStrategy {
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
     }
+    
+    private String getSystemDate() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        String ts = dateFormat.format(date);
+        return ts;
+    }
+    
+    
 
 }

@@ -7,8 +7,9 @@ package com.aafes.stargate.web;
 
 import com.aafes.stargate.gateway.svs.Scheduler;
 import java.util.Timer;
-import javax.servlet.ServletRequestEvent;
-import javax.servlet.ServletRequestListener;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebServlet;
 
 /**
@@ -16,14 +17,18 @@ import javax.servlet.annotation.WebServlet;
  * @author alugumetlas
  */
 @WebServlet(name = "SchedulerServlet", urlPatterns = {"/SchedulerServlet"})
-public class SchedulerServlet implements ServletRequestListener {
+public class SchedulerServlet implements ServletContextListener {
 
-    public void requestInitialized(ServletRequestEvent servletRequestEvent) {
+    ServletContext servletContext;
+
+    public void contextInitialized(ServletContextEvent sce) {
+        servletContext = sce.getServletContext();
         Timer time = new Timer();
         Scheduler scheduler = new Scheduler();
-        time.schedule(scheduler, 0, 10000);  
+        time.schedule(scheduler, 0, 10000);
+
     }
 
-    public void requestDestroyed(ServletRequestEvent servletRequestEvent) {
+    public void contextDestroyed(ServletContextEvent sce) {
     }
 }

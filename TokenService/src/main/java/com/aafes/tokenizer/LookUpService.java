@@ -6,8 +6,8 @@
 package com.aafes.tokenizer;
 
 import com.aafes.tokenservice.util.AccountType;
-import generated.AccountTypeType;
-import generated.TokenMessage;
+import com.aafes.token.AccountTypeType;
+import com.aafes.token.TokenMessage;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;

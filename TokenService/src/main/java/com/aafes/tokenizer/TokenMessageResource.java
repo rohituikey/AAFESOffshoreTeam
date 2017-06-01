@@ -5,7 +5,7 @@
  */
 package com.aafes.tokenizer;
 
-import generated.TokenMessage;
+import com.aafes.token.TokenMessage;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;

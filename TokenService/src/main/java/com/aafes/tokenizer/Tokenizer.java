@@ -7,8 +7,8 @@ package com.aafes.tokenizer;
 
 import com.aafes.tokenservice.util.AccountType;
 import com.aafes.tokenservice.util.ResponseType;
-import generated.AccountTypeType;
-import generated.TokenMessage;
+import com.aafes.token.AccountTypeType;
+import com.aafes.token.TokenMessage;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 

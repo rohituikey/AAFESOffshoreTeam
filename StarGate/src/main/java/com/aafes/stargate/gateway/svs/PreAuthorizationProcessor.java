@@ -51,8 +51,6 @@ import com.aafes.stargate.util.ResponseCodes;
 import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StarGateConstants;
 import com.aafes.stargate.util.SvsUtil;
-import com.sun.xml.internal.ws.client.ClientTransportException;
-import com.sun.xml.internal.ws.developer.JAXWSProperties;
 import com.svs.svsxml.beans.Amount;
 import com.svs.svsxml.beans.Card;
 import com.svs.svsxml.beans.Merchant;
@@ -61,17 +59,8 @@ import com.svs.svsxml.beans.PreAuthResponse;
 import com.svs.svsxml.service.SVSXMLWay;
 import java.net.SocketTimeoutException;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.xml.ws.BindingProvider;
+import javax.xml.ws.WebServiceException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -145,7 +134,7 @@ public class PreAuthorizationProcessor extends Processor{
             if(dupCheckFlag) handleDupCheckCondition(t, dupCheckFlag);
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
-            if(e instanceof SocketTimeoutException || e instanceof ClientTransportException){
+            if(e instanceof SocketTimeoutException || e instanceof WebServiceException){
                 retryReason = "Exception : " + e.getMessage();
                 handleDupCheckCondition(t, dupCheckFlag);
             } else throw new GatewayException("INTERNAL SYSTEM ERROR");
@@ -231,7 +220,7 @@ public class PreAuthorizationProcessor extends Processor{
             }
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
-            if(e instanceof SocketTimeoutException || e instanceof ClientTransportException){
+            if(e instanceof SocketTimeoutException || e instanceof WebServiceException) {
                 retryReason = "Exception : " + e.getMessage();
                 handleDupCheckCondition(t, dupCheckFlag);
                 dupCheckCounter++;

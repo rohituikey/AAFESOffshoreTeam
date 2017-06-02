@@ -10,18 +10,27 @@ import java.util.Timer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebServlet;
+import javax.servlet.annotation.WebListener;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
  * @author alugumetlas
  */
-@WebServlet(name = "SchedulerServlet", urlPatterns = {"/SchedulerServlet"})
+@WebListener
 public class SchedulerServlet implements ServletContextListener {
-
+   private static final org.slf4j.Logger log
+            = LoggerFactory.getLogger(SchedulerServlet.class.getSimpleName());
     ServletContext servletContext;
 
+    /**
+     *
+     * @param sce
+     */
+    @Override
     public void contextInitialized(ServletContextEvent sce) {
+        log.info("$$$$$$$$****** started context intilized method");
         servletContext = sce.getServletContext();
         Timer time = new Timer();
         Scheduler scheduler = new Scheduler();

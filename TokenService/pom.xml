@@ -121,9 +121,15 @@
                 <version>0.7.1.201405082137</version>
                 <configuration>
                     <excludes>
-                        
-                     </excludes><!--
-	   -->
+                        <exclude>com/aafes/token/**/*</exclude>
+                        <exclude>com/aafes/tokenservice/util/**/*</exclude>
+                        <exclude>com/aafes/tokenizer/ApplicationConfig.*</exclude>
+                        <exclude>com/aafes/tokenizer/CassandraSessionFactory.*</exclude>
+                        <exclude>com/aafes/tokenizer/Configurator.*</exclude>
+                        <exclude>com/aafes/tokenizer/TokenizerConstants.*</exclude>
+                        <exclude>com/aafes/tokenizer/VaultDao.*</exclude>
+                        <exclude>com/aafes/tokenizer/TokenizerDao.*</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>

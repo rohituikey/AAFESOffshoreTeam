@@ -6,6 +6,8 @@
 package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.util.MediaType;
+import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
 import java.util.TimerTask;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,9 @@ public class Scheduler extends TimerTask {
         svsgp.setProcessorFactory(processorFactory);
         sVSGateway.setSvsgp(svsgp);
 
+        transaction.setMedia(MediaType.GIFT_CARD);
+        transaction.setRequestType(RequestType.NETWORK);
+
     }
 
     public void run() {
@@ -46,16 +51,6 @@ public class Scheduler extends TimerTask {
 
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 //    public static void main(String[] args) {
 ////        log.info("its main scheduler    ..");
 //        System.out.println("its main scheduler    ..");

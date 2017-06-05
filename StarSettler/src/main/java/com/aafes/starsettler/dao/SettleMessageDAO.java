@@ -303,6 +303,7 @@ public class SettleMessageDAO {
                     + "' and transactiontype = '" + settleData.getTransactionType()
                     + "' and clientlineid='" + settleData.getClientLineId()
                     + "' and transactionid='" + settleData.getTransactionId() + "';";
+            if(factory == null) factory = new CassandraSessionFactory();
             factory.getSession().execute(query);
         }
         );
@@ -460,5 +461,101 @@ public class SettleMessageDAO {
           
         }
          return recordDuplicate;
+    }
+    
+    public List<SettleEntity> getRetailData(String processDate, String settleStatus, String uuid) {
+        List<SettleEntity> retailData = new ArrayList<SettleEntity>();
+
+        if (processDate == null || processDate.isEmpty()) {
+            processDate = this.getProcessDate();
+        }
+        // Get vision data from Cassandra
+        String query = "SELECT " + buildCoulumns() + " FROM starsettler.settlemessages where receiveddate = '" + processDate + "' and "
+                + "settlestatus = '" + settleStatus + "' and identityuuid = '" + uuid + "' transactiontype != 'TrnCancel' " + " ALLOW FILTERING";
+        if(factory == null) factory = new CassandraSessionFactory();
+        ResultSet result = factory.getSession().execute(query);
+
+        String cardType = "";
+        for (Row row : result) {
+            cardType = row.getString("cardtype");
+            if (cardType != null && !cardType.trim().isEmpty()
+                    && (cardType.equalsIgnoreCase(CardType.GIFT_CARD))) {
+                SettleEntity settleEntity = new SettleEntity();
+                settleEntity.setIdentityUUID(row.getString("identityuuid"));
+                settleEntity.setLineId(row.getString("lineId"));
+                settleEntity.setClientLineId(row.getString("clientLineId"));
+                settleEntity.setShipId(row.getString("shipId"));
+                settleEntity.setCrc(row.getString("crc"));
+                settleEntity.setQuantity(row.getString("quantity"));
+                settleEntity.setUnitCost(row.getString("unitCost"));
+                settleEntity.setUnitDiscount(row.getString("unitDiscount"));
+                settleEntity.setUnit(row.getString("unit"));
+                settleEntity.setUnitTotal(row.getString("unitTotal"));
+                settleEntity.setCouponCode(row.getString("couponCode"));
+                settleEntity.setCardType(row.getString("cardType"));
+                settleEntity.setPaymentAmount(row.getString("paymentAmount"));
+                settleEntity.setTransactionType(row.getString("transactionType"));
+                settleEntity.setTransactionId(row.getString("transactionId"));
+                settleEntity.setOrderNumber(row.getString("orderNumber"));
+                settleEntity.setOrderDate(row.getString("orderDate"));
+                settleEntity.setShipDate(row.getString("shipDate"));
+                settleEntity.setSettleDate(row.getString("settleDate"));
+                settleEntity.setCardReferene(row.getString("cardReferene"));
+                settleEntity.setCardToken(row.getString("cardToken"));
+                settleEntity.setExpirationDate(row.getString("expirationDate"));
+                settleEntity.setAuthNum(row.getString("authNum"));
+                settleEntity.setRequestPlan(row.getString("requestPlan"));
+                settleEntity.setResponsePlan(row.getString("responsePlan"));
+                settleEntity.setQualifiedPlan(row.getString("qualifiedPlan"));
+                settleEntity.setSettlePlan(row.getString("settleplan"));
+                settleEntity.setRrn(row.getString("rrn"));
+                settleEntity.setFirstName(row.getString("firstName"));
+                settleEntity.setLastName(row.getString("lastName"));
+                settleEntity.setHomePhone(row.getString("homePhone"));
+                settleEntity.setEmail(row.getString("email"));
+                settleEntity.setAddressLine1(row.getString("addressLine1"));
+                settleEntity.setAddressLine2(row.getString("addressLine2"));
+//                settleEntity.setAddressLine3(row.getString("addressLine3"));
+                settleEntity.setCity(row.getString("city"));
+                settleEntity.setProvinceCode(row.getString("provinceCode"));
+                settleEntity.setPostalCode(row.getString("postalCode"));
+                settleEntity.setCountryCode(row.getString("countryCode"));
+                settleEntity.setShippingAmount(row.getString("shippingAmount"));
+                settleEntity.setAppeasementCode(row.getString("appeasementCode"));
+                settleEntity.setAppeasementDate(row.getString("appeasementDate"));
+                settleEntity.setAppeasementDescription(row.getString("appeasementDescription"));
+                settleEntity.setAppeasementReference(row.getString("appeasementReference"));
+                settleEntity.setResponseType(row.getString("responseType"));
+                settleEntity.setReasonCode(row.getString("reasonCode"));
+                settleEntity.setDescriptionField(row.getString("descriptionField"));
+                settleEntity.setBatchId(row.getString("batchId"));
+                settleEntity.setSettleId(row.getString("settleId"));
+                settleEntity.setReceiveddate(row.getString("receivedDate"));
+                settleEntity.setSettlestatus(row.getString("settlestatus"));
+                retailData.add(settleEntity);
+            }
+        }
+        return retailData;
+    }
+    
+    public List<String> getDecaIdentityUuid(String processDate, String settleStatus, String uuid) {
+        List<String> decaUuIdList = new ArrayList<String>();
+        
+        try{
+            if (processDate == null || processDate.isEmpty()) {
+                processDate = this.getProcessDate();
+            }
+
+            String query = "SELECT * FROM stargate.facmapper where strategy = 'Deca' ALLOW FILTERING";
+            if(factory == null) factory = new CassandraSessionFactory();
+            ResultSet result = factory.getSession().execute(query);
+
+            for (Row row : result) {
+                decaUuIdList.add(row.getString("uuid"));
+            }
+        }catch(Exception e){
+            LOG.error("Exception " + e.getMessage());
+        }
+        return decaUuIdList;
     }
 }

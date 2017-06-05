@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Example of an Exchange GiftCard (SVS) Balance Inquiry Request  --> 
+<cm:Message
+xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+xmlns:cm='http://www.aafes.com/credit'
+xsi:schemaLocation='http://www.aafes.com/credit file:/home/simulator/CreditMessage12S1.xsd'
+TypeCode="Request" MajorVersion="3" MinorVersion="1" FixVersion="0">
+<cm:Header>
+<cm:IdentityUUID>c47e4366-fe72-473b-b114-523e8de5641f</cm:IdentityUUID>
+<cm:LocalDateTime>2016-03-06T11:20:05</cm:LocalDateTime>
+<cm:SettleIndicator>false</cm:SettleIndicator>
+<cm:OrderNumber>754896533</cm:OrderNumber>
+<cm:transactionId>6357</cm:transactionId>
+<cm:termId>05</cm:termId>
+</cm:Header>
+<cm:Request RRN="5MN5NDx18-nq">
+<cm:Media>GiftCard</cm:Media>
+<cm:RequestType>Issue</cm:RequestType>
+<cm:InputType>Keyed</cm:InputType>
+<cm:Pan>Pan</cm:Pan>
+<cm:AmountField>10.00</cm:AmountField>
+<cm:DescriptionField>INQUIRY</cm:DescriptionField>
+<cm:AddressVerificationService>
+  <cm:CardHolderName>123</cm:CardHolderName>
+  <cm:BillingAddress1>1222</cm:BillingAddress1>
+  <cm:BillingCountryCode>US</cm:BillingCountryCode>
+  <cm:BillingZipCode>12345</cm:BillingZipCode>
+  <cm:Email>@</cm:Email>
+  <cm:BillingPhone>9999999999</cm:BillingPhone>
+</cm:AddressVerificationService>
+</cm:Request> 
+</cm:Message>

@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
  */
 
 @Stateless
-public class RetailsSFTP {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RetailsSFTP.class.getName());
+public class RetailSFTP {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RetailSFTP.class.getName());
     private Session session = null;
     private Channel channel = null;
     private ChannelSftp channelSftp = null;
@@ -46,7 +46,7 @@ public class RetailsSFTP {
     private String password;
     private String SFTPErrorMsg;
 
-    public RetailsSFTP() {
+    public RetailSFTP() {
         LOGGER.info("Starting SFTP session.");
     }
 

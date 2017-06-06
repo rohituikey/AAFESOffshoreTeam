@@ -22,12 +22,12 @@ import org.slf4j.LoggerFactory;
  * 
  */
 @Stateless
-public class RetailsService {
+public class RetailService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RetailsService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(RetailService.class.getName());
 
     @EJB
-    private RetailsSFTP sftp = new RetailsSFTP();
+    private RetailSFTP sftp = new RetailSFTP();
 
     @EJB
     private RetailFile retailFile = new RetailFile();
@@ -61,7 +61,7 @@ public class RetailsService {
    
     int facilityCount = 0;
 
-    public RetailsService() {
+    public RetailService() {
         this.dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     }
 
@@ -132,7 +132,7 @@ public class RetailsService {
         this.password = password;
     }
 
-    public void setSftp(RetailsSFTP sftp) {
+    public void setSftp(RetailSFTP sftp) {
         this.sftp = sftp;
     }
 

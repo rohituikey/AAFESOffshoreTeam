@@ -22,11 +22,8 @@ import javax.ejb.Stateless;
 
 @Stateless
 public class RetailSettler extends BaseSettler{
-    
-
-    
     @EJB
-    private RetailsService retailServiceObj;
+    private RetailService retailServiceObj;
 
     // Schedular will call this method 
     @Override
@@ -44,14 +41,14 @@ public class RetailSettler extends BaseSettler{
                 tmpStr = decaUuidList.get(i);
                 retailDataListTmp = repository.getRetailData(processDate, SettleStatus.Ready_to_settle, tmpStr);
             }
-            retailDataList.addAll(retailDataListTmp);
+            if(retailDataListTmp.size() > 0) retailDataList.addAll(retailDataListTmp);
         }
         
        //  Format milstar data
         HashMap<String, SettleEntity> retailDataMap = consolidateRetailData(retailDataList);
         
         //Create Vision File and SFTP to vision
-        if(retailServiceObj == null) retailServiceObj = new RetailsService();
+        if(retailServiceObj == null) retailServiceObj = new RetailService();
         retailServiceObj.generateAndSendToRetail(retailDataMap);
         
         super.updateStatus(retailDataList, SettleStatus.In_Progress);
@@ -59,7 +56,7 @@ public class RetailSettler extends BaseSettler{
 
    
 
-    public void setVisionService(RetailsService retailsServiceObj) {
+    public void setRetailService(RetailService retailsServiceObj) {
         this.retailServiceObj = retailsServiceObj;
     }
     

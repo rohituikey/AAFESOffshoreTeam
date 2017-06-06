@@ -9,6 +9,10 @@ import com.aafes.starsettler.control.CassandraSessionFactory;
 import com.aafes.starsettler.control.Configurator;
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.util.CardType;
+import com.aafes.starsettler.util.QueryConstants;
+import com.aafes.starsettler.util.TransactionType;
+import com.datastax.driver.core.BoundStatement;
+import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
@@ -465,90 +469,106 @@ public class SettleMessageDAO {
     
     public List<SettleEntity> getRetailData(String processDate, String settleStatus, String uuid) {
         List<SettleEntity> retailData = new ArrayList<SettleEntity>();
+        String[] bindVaribleArray = new String[3];
+        PreparedStatement preparedStatementObj = null;
+        ResultSet result = null;
+        BoundStatement boundStatement = null;
+        String cardType = "", txnType = "";
 
-        if (processDate == null || processDate.isEmpty()) {
-            processDate = this.getProcessDate();
-        }
-        // Get vision data from Cassandra
-        String query = "SELECT " + buildCoulumns() + " FROM starsettler.settlemessages where receiveddate = '" + processDate + "' and "
-                + "settlestatus = '" + settleStatus + "' and identityuuid = '" + uuid + "' transactiontype != 'TrnCancel' " + " ALLOW FILTERING";
-        if(factory == null) factory = new CassandraSessionFactory();
-        ResultSet result = factory.getSession().execute(query);
+        try{
+            if (processDate == null || processDate.isEmpty()) processDate = this.getProcessDate();
+            String query = "SELECT " + buildCoulumns();
+            if(factory == null) factory = new CassandraSessionFactory();
 
-        String cardType = "";
-        for (Row row : result) {
-            cardType = row.getString("cardtype");
-            if (cardType != null && !cardType.trim().isEmpty()
-                    && (cardType.equalsIgnoreCase(CardType.GIFT_CARD))) {
-                SettleEntity settleEntity = new SettleEntity();
-                settleEntity.setIdentityUUID(row.getString("identityuuid"));
-                settleEntity.setLineId(row.getString("lineId"));
-                settleEntity.setClientLineId(row.getString("clientLineId"));
-                settleEntity.setShipId(row.getString("shipId"));
-                settleEntity.setCrc(row.getString("crc"));
-                settleEntity.setQuantity(row.getString("quantity"));
-                settleEntity.setUnitCost(row.getString("unitCost"));
-                settleEntity.setUnitDiscount(row.getString("unitDiscount"));
-                settleEntity.setUnit(row.getString("unit"));
-                settleEntity.setUnitTotal(row.getString("unitTotal"));
-                settleEntity.setCouponCode(row.getString("couponCode"));
-                settleEntity.setCardType(row.getString("cardType"));
-                settleEntity.setPaymentAmount(row.getString("paymentAmount"));
-                settleEntity.setTransactionType(row.getString("transactionType"));
-                settleEntity.setTransactionId(row.getString("transactionId"));
-                settleEntity.setOrderNumber(row.getString("orderNumber"));
-                settleEntity.setOrderDate(row.getString("orderDate"));
-                settleEntity.setShipDate(row.getString("shipDate"));
-                settleEntity.setSettleDate(row.getString("settleDate"));
-                settleEntity.setCardReferene(row.getString("cardReferene"));
-                settleEntity.setCardToken(row.getString("cardToken"));
-                settleEntity.setExpirationDate(row.getString("expirationDate"));
-                settleEntity.setAuthNum(row.getString("authNum"));
-                settleEntity.setRequestPlan(row.getString("requestPlan"));
-                settleEntity.setResponsePlan(row.getString("responsePlan"));
-                settleEntity.setQualifiedPlan(row.getString("qualifiedPlan"));
-                settleEntity.setSettlePlan(row.getString("settleplan"));
-                settleEntity.setRrn(row.getString("rrn"));
-                settleEntity.setFirstName(row.getString("firstName"));
-                settleEntity.setLastName(row.getString("lastName"));
-                settleEntity.setHomePhone(row.getString("homePhone"));
-                settleEntity.setEmail(row.getString("email"));
-                settleEntity.setAddressLine1(row.getString("addressLine1"));
-                settleEntity.setAddressLine2(row.getString("addressLine2"));
-//                settleEntity.setAddressLine3(row.getString("addressLine3"));
-                settleEntity.setCity(row.getString("city"));
-                settleEntity.setProvinceCode(row.getString("provinceCode"));
-                settleEntity.setPostalCode(row.getString("postalCode"));
-                settleEntity.setCountryCode(row.getString("countryCode"));
-                settleEntity.setShippingAmount(row.getString("shippingAmount"));
-                settleEntity.setAppeasementCode(row.getString("appeasementCode"));
-                settleEntity.setAppeasementDate(row.getString("appeasementDate"));
-                settleEntity.setAppeasementDescription(row.getString("appeasementDescription"));
-                settleEntity.setAppeasementReference(row.getString("appeasementReference"));
-                settleEntity.setResponseType(row.getString("responseType"));
-                settleEntity.setReasonCode(row.getString("reasonCode"));
-                settleEntity.setDescriptionField(row.getString("descriptionField"));
-                settleEntity.setBatchId(row.getString("batchId"));
-                settleEntity.setSettleId(row.getString("settleId"));
-                settleEntity.setReceiveddate(row.getString("receivedDate"));
-                settleEntity.setSettlestatus(row.getString("settlestatus"));
-                retailData.add(settleEntity);
+            bindVaribleArray[0] = processDate;
+            bindVaribleArray[1] = settleStatus;
+            bindVaribleArray[2] = uuid;
+            preparedStatementObj = factory.getSession().prepare(query + QueryConstants.FETCH_DATA_FOR_RETAIL_REPORT);
+            boundStatement = new BoundStatement(preparedStatementObj);
+            result = factory.getSession().execute(boundStatement.bind(bindVaribleArray));
+
+            for (Row row : result) {
+                cardType = row.getString("cardtype");
+                txnType = row.getString("transactiontype");
+                if (cardType != null && !cardType.trim().isEmpty()
+                        && (CardType.GIFT_CARD.equalsIgnoreCase(cardType))
+                        && (!TransactionType.REVERSAL.equalsIgnoreCase(txnType))) {
+                    SettleEntity settleEntity = new SettleEntity();
+                    settleEntity.setIdentityUUID(row.getString("identityuuid"));
+                    settleEntity.setLineId(row.getString("lineId"));
+                    settleEntity.setClientLineId(row.getString("clientLineId"));
+                    settleEntity.setShipId(row.getString("shipId"));
+                    settleEntity.setCrc(row.getString("crc"));
+                    settleEntity.setQuantity(row.getString("quantity"));
+                    settleEntity.setUnitCost(row.getString("unitCost"));
+                    settleEntity.setUnitDiscount(row.getString("unitDiscount"));
+                    settleEntity.setUnit(row.getString("unit"));
+                    settleEntity.setUnitTotal(row.getString("unitTotal"));
+                    settleEntity.setCouponCode(row.getString("couponCode"));
+                    settleEntity.setCardType(row.getString("cardType"));
+                    settleEntity.setPaymentAmount(row.getString("paymentAmount"));
+                    settleEntity.setTransactionType(row.getString("transactionType"));
+                    settleEntity.setTransactionId(row.getString("transactionId"));
+                    settleEntity.setOrderNumber(row.getString("orderNumber"));
+                    settleEntity.setOrderDate(row.getString("orderDate"));
+                    settleEntity.setShipDate(row.getString("shipDate"));
+                    settleEntity.setSettleDate(row.getString("settleDate"));
+                    settleEntity.setCardReferene(row.getString("cardReferene"));
+                    settleEntity.setCardToken(row.getString("cardToken"));
+                    settleEntity.setExpirationDate(row.getString("expirationDate"));
+                    settleEntity.setAuthNum(row.getString("authNum"));
+                    settleEntity.setRequestPlan(row.getString("requestPlan"));
+                    settleEntity.setResponsePlan(row.getString("responsePlan"));
+                    settleEntity.setQualifiedPlan(row.getString("qualifiedPlan"));
+                    settleEntity.setSettlePlan(row.getString("settleplan"));
+                    settleEntity.setRrn(row.getString("rrn"));
+                    settleEntity.setFirstName(row.getString("firstName"));
+                    settleEntity.setLastName(row.getString("lastName"));
+                    settleEntity.setHomePhone(row.getString("homePhone"));
+                    settleEntity.setEmail(row.getString("email"));
+                    settleEntity.setAddressLine1(row.getString("addressLine1"));
+                    settleEntity.setAddressLine2(row.getString("addressLine2"));
+    //                settleEntity.setAddressLine3(row.getString("addressLine3"));
+                    settleEntity.setCity(row.getString("city"));
+                    settleEntity.setProvinceCode(row.getString("provinceCode"));
+                    settleEntity.setPostalCode(row.getString("postalCode"));
+                    settleEntity.setCountryCode(row.getString("countryCode"));
+                    settleEntity.setShippingAmount(row.getString("shippingAmount"));
+                    settleEntity.setAppeasementCode(row.getString("appeasementCode"));
+                    settleEntity.setAppeasementDate(row.getString("appeasementDate"));
+                    settleEntity.setAppeasementDescription(row.getString("appeasementDescription"));
+                    settleEntity.setAppeasementReference(row.getString("appeasementReference"));
+                    settleEntity.setResponseType(row.getString("responseType"));
+                    settleEntity.setReasonCode(row.getString("reasonCode"));
+                    settleEntity.setDescriptionField(row.getString("descriptionField"));
+                    settleEntity.setBatchId(row.getString("batchId"));
+                    settleEntity.setSettleId(row.getString("settleId"));
+                    settleEntity.setReceiveddate(row.getString("receivedDate"));
+                    settleEntity.setSettlestatus(row.getString("settlestatus"));
+                    retailData.add(settleEntity);
+                }
             }
+        }catch(Exception ex){
+            LOG.error("Exception " + ex.getMessage());
         }
         return retailData;
     }
     
     public List<String> getDecaIdentityUuid(String processDate, String settleStatus, String uuid) {
         List<String> decaUuIdList = new ArrayList<String>();
+        PreparedStatement preparedStatementObj = null;
+        ResultSet result = null;
+        String[] bindVaribleArray = new String[1];
+        BoundStatement boundStatement = null;
         
         try{
-            if (processDate == null || processDate.isEmpty()) {
-                processDate = this.getProcessDate();
-            }
-
-            String query = "SELECT * FROM stargate.facmapper where strategy = 'Deca' ALLOW FILTERING";
+            if (processDate == null || processDate.isEmpty()) processDate = this.getProcessDate();
             if(factory == null) factory = new CassandraSessionFactory();
-            ResultSet result = factory.getSession().execute(query);
+            
+            bindVaribleArray[0] = "Deca";
+            preparedStatementObj = factory.getSession().prepare(QueryConstants.FETCH_UUID);
+            boundStatement = new BoundStatement(preparedStatementObj);
+            result = factory.getSession().execute(boundStatement.bind(bindVaribleArray));
 
             for (Row row : result) {
                 decaUuIdList.add(row.getString("uuid"));

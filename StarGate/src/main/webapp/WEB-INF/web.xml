@@ -5,17 +5,16 @@
             30
         </session-timeout>
     </session-config>
-    <Listner>
-        <Listener-class>com.aafes.stargate.web.SchedulerServlet</Listener-class>
-    </Listner>
-    <security-constraint>
+    <listener>
+        <listener-class>com.aafes.stargate.web.SchedulerServlet</listener-class>
+    </listener>
+    <!--security-constraint>
         <web-resource-collection>
             <url-pattern>/*</url-pattern>
             <http-method>GET</http-method>
             <http-method>POST</http-method>
         </web-resource-collection>
-        <!-- no auth-constraint tag here -->
-    </security-constraint>
+    </security-constraint-->
     <!--      
     <security-constraint>
               <web-resource-collection>

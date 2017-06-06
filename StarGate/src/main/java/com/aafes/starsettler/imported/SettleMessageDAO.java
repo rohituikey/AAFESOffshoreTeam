@@ -6,6 +6,8 @@
 package com.aafes.starsettler.imported;
 
 import com.aafes.stargate.control.CassandraSessionFactory;
+import com.datastax.driver.core.BoundStatement;
+import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
@@ -31,15 +33,51 @@ public class SettleMessageDAO {
     public void postConstruct() {
         Session session = factory.getSession();
         mapper = new MappingManager(session).mapper(SettleEntity.class);
+
     }
 
     public void save(List<SettleEntity> settleEntityList) {
         for (SettleEntity settleEntity : settleEntityList) {
             mapper.save(settleEntity);
+            
         }
+    }
+    
+    /**
+     * 
+     * @param settleEntity 
+     */
+    public void update(SettleEntity settleEntity) {
+        //Write a update query
+        // mapper.delete(settleEntity);
+        try {
+            PreparedStatement preparedStatementObj = null;
+            String[] bindVaribleArray = new String[7];
+            BoundStatement boundStatement = null;
+            bindVaribleArray[0] = settleEntity.getSettlestatus();
+            bindVaribleArray[1] = settleEntity.getReceiveddate();
+            bindVaribleArray[2] = settleEntity.getOrderNumber();
+            bindVaribleArray[3] = settleEntity.getSettleDate();
+            bindVaribleArray[4] = settleEntity.getCardType();
+            bindVaribleArray[5] = settleEntity.getTransactionType();
+            bindVaribleArray[6] = settleEntity.getClientLineId();
+            bindVaribleArray[6] = settleEntity.getTransactionId();
+
+            preparedStatementObj = factory.getSession().prepare("UPDATE STARSETTLER.SETTLEENTITY SET SETTLESTATUS=? WHERE  receiveddate = ? AND ordernumber = ? AND settledate = ? AND cardtype = ? AND transactiontype = ? AND clientlineid = ? AND transactionid=?");
+            boundStatement = new BoundStatement(preparedStatementObj);
+            factory.getSession().execute(boundStatement.bind((Object[]) bindVaribleArray));
+        } catch (Exception e) {
+            LOG.error("Exception " + e.getMessage());
+        }
+       
     }
 
     
+    public SettleEntity find(String receiveddate, String ordernumber, String settledate,String cardtype, String transactiontype, String clientlineid,String transactionid)
+    {
+        return (SettleEntity) mapper.get(receiveddate, ordernumber, settledate,cardtype,transactiontype,clientlineid,transactionid);
+        
+    }
 
     @EJB
     public void setCassandraSessionFactory(CassandraSessionFactory factory) {

@@ -13,4 +13,5 @@ public final class SettlerType {
     
     public static final String FDMS = "fdms";
     public static final String MILSTAR = "milstar";
+    public static final String RETAIL = "retail";
 }

@@ -5,7 +5,6 @@
  */
 package com.aafes.starsettler.retailer;
 
-import com.aafes.starsettler.gateway.vision.*;
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.tokenizer.TokenEndPointService;
 import com.aafes.starsettler.util.TransactionType;
@@ -64,6 +63,7 @@ public class RetailFile {
         long debitAmount = 0;
         long creditAmount = 0;
         int iSequence = 0;
+        String transactionId, terminalId;
         
         List<SettleEntity> errorList = new ArrayList<SettleEntity>();
         
@@ -132,6 +132,8 @@ public class RetailFile {
             } catch (IndexOutOfBoundsException e) {
                 orderDate = "error";
             }
+            
+            transactionId = entry.getValue().getTransactionId();
 
             String sRetailDetails = recordType
                     + batchSource
@@ -146,6 +148,7 @@ public class RetailFile {
                     + String.format("%-12s", salesClerk)
                     + String.format("%-10s", orderNbr)
                     + String.format("%-8s", orderDate)
+                    + String.format("%-8s", transactionId)
                     + String.format("%-35s", "")+"\n";
 
             bw.write(sRetailDetails);

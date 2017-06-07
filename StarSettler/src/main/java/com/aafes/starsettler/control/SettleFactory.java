@@ -10,6 +10,7 @@ import com.aafes.starsettler.gateway.vision.VisionSettler;
 import com.aafes.starsettler.util.SettlerType;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import com.aafes.starsettler.retailer.RetailSettler;
 
 /**
  *
@@ -22,6 +23,8 @@ public class SettleFactory {
     private FirstDataSettler firstDataSettler;
     @EJB
     private VisionSettler visionSettler;
+    @EJB
+    private RetailSettler retailSettlerObj = new RetailSettler();
    
     
     public BaseSettler findSettler(String settlerType) {
@@ -32,7 +35,9 @@ public class SettleFactory {
 
             case SettlerType.MILSTAR:
                 return visionSettler;
-                
+            
+            case SettlerType.RETAIL:
+                return retailSettlerObj;
             // Add more settlers
             default:
                 return null;

@@ -17,7 +17,7 @@ import javax.ejb.EJB;
 public abstract class BaseSettler {
 
     @EJB
-    private SettleMessageRepository repository;
+    private SettleMessageRepository repository = new SettleMessageRepository();
    
     public abstract void run(String processDate);
 
@@ -34,6 +34,10 @@ public abstract class BaseSettler {
                 settleData = repository.getVisionData(processDate,settleStatus);
                 break;
             
+            case SettlerType.RETAIL:
+                settleData = repository.getRetailData(processDate, settleStatus, "");
+                break;    
+                
             default:
                 settleData = repository.getAll(processDate,settleStatus);
                 break;

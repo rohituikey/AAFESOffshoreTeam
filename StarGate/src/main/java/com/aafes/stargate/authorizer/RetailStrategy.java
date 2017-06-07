@@ -61,31 +61,31 @@ public class RetailStrategy extends BaseStrategy {
             }
             
 
-    if (t.getReversal().equalsIgnoreCase(SettleConstant.TRUE) && t.getSettleIndicator().equalsIgnoreCase(SettleConstant.TRUE)) {
-            settleEntity = findSettleEntity( t);
-                if (settleEntity!=null && settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Ready_to_settle)) {
-                       updateSettel(settleEntity);
-                }else if(settleEntity!=null && settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Done)){
-                        t.setTransactiontype(StarGateConstants.REFUND); //Update the transactio type 
-                        t.setRequestType(StarGateConstants.REFUND);
-                        if (gateway != null) {
-                                t = gateway.processMessage(t);  //calling refund 
-                            }
-                        
-                 } else {
-                   t.setReasonCode(StarGateConstants.NO_PRIOR_AUTHORIZATION_ERROR);
-                   t.setResponseType(ResponseType.DECLINED);
-                   t.setDescriptionField(StarGateConstants.DESC);
-                   
+            if (t.getReversal().equalsIgnoreCase(SettleConstant.TRUE) && t.getSettleIndicator().equalsIgnoreCase(SettleConstant.TRUE)) {
+                settleEntity = findSettleEntity(t);
+                if (settleEntity != null && settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Ready_to_settle)) {
+                    updateSettel(settleEntity);
+                } else if (settleEntity != null && settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Done)) {
+                    t.setTransactiontype(StarGateConstants.REFUND); //Update the transactio type 
+                    t.setRequestType(StarGateConstants.REFUND);
+                    if (gateway != null) {
+                        t = gateway.processMessage(t);  //calling refund 
+                    }
+
+                } else {
+                    t.setReasonCode(StarGateConstants.NO_PRIOR_AUTHORIZATION_ERROR);
+                    t.setResponseType(ResponseType.DECLINED);
+                    t.setDescriptionField(StarGateConstants.DESC);
+
                 }
 
-            }            
+            }
 
             //if Authorized, save in settle message repository to settle
-            if ((t.getReasonCode().equalsIgnoreCase("000")) && (t.getSettleIndicator().equalsIgnoreCase("true"))){
+            if ((t.getReasonCode().equalsIgnoreCase("000")) && (t.getSettleIndicator().equalsIgnoreCase("true"))) {
                 saveToSettle(t);
             }
-            
+
              
             
             
@@ -100,8 +100,8 @@ public class RetailStrategy extends BaseStrategy {
     }
     
     private SettleEntity findSettleEntity(Transaction t){
-        SettleEntity settleEntity =  settleMessageDAO.find( t.getLocalDateTime(),t.getOrderNumber(),t.getLocalDateTime(),t.getCardHolderName(),t.getTransactiontype(),t.getCustomerId(),t.getTransactionId());
-       return settleEntity; 
+            return settleMessageDAO.find( t.getLocalDateTime(),t.getOrderNumber(),t.getLocalDateTime(),t.getMedia(),t.getTransactiontype(),t.getCustomerId(),t.getTransactionId());
+       
     }
     /**
      * 

@@ -23,4 +23,9 @@ public class StarGateConstants {
     //FOLLOWING PROPERTIES ARE SET TO MAKE TIMEOUT OF READ RESPONSE OF 10 SECONDS I.E. 10000 MILLISECONDS
     public static final Integer LONG_REQUEST_TIMEOUT = 10000;
     public static final Integer LONG_CONNECT_TIMEOUT = 100000;
+    public static final String SETTLEMEMT="settlement";
+    public static final String NO_PRIOR_AUTHORIZATION_ERROR = "901";
+     public static final String REFUND = "refund";
+     public static final String DESC= "There was no prior authorization ";
+     
 }

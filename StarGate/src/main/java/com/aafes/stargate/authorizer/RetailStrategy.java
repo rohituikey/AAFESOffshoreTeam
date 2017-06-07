@@ -10,10 +10,14 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Authorizer;
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.gateway.Gateway;
+import com.aafes.stargate.gateway.GatewayFactory;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import com.aafes.stargate.util.StarGateConstants;
+import com.aafes.stargate.util.StrategyType;
+import com.aafes.starsettler.imported.SettleConstant;
 import com.aafes.starsettler.imported.SettleMessageDAO;
 import com.aafes.starsettler.imported.SettleStatus;
 import java.text.DateFormat;
@@ -34,7 +38,8 @@ public class RetailStrategy extends BaseStrategy {
 
     @EJB
     private SettleMessageDAO settleMessageDAO;
-
+    
+    SettleEntity settleEntity;
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(Authorizer.class.getSimpleName());
 
@@ -55,10 +60,34 @@ public class RetailStrategy extends BaseStrategy {
                 t = gateway.processMessage(t);
             }
             
+
+    if (t.getReversal().equalsIgnoreCase(SettleConstant.TRUE) && t.getSettleIndicator().equalsIgnoreCase(SettleConstant.TRUE)) {
+            settleEntity = findSettleEntity( t);
+                if (settleEntity!=null && settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Ready_to_settle)) {
+                       updateSettel(settleEntity);
+                }else if(settleEntity!=null && settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Done)){
+                        t.setTransactiontype(StarGateConstants.REFUND); //Update the transactio type 
+                        t.setRequestType(StarGateConstants.REFUND);
+                        if (gateway != null) {
+                                t = gateway.processMessage(t);  //calling refund 
+                            }
+                        
+                 } else {
+                   t.setReasonCode(StarGateConstants.NO_PRIOR_AUTHORIZATION_ERROR);
+                   t.setResponseType(ResponseType.DECLINED);
+                   t.setDescriptionField(StarGateConstants.DESC);
+                   
+                }
+
+            }            
+
             //if Authorized, save in settle message repository to settle
             if ((t.getReasonCode().equalsIgnoreCase("000")) && (t.getSettleIndicator().equalsIgnoreCase("true"))){
                 saveToSettle(t);
             }
+            
+             
+            
             
         } catch (AuthorizerException e) {
             buildErrorResponse(t, "", e.getMessage());
@@ -70,9 +99,17 @@ public class RetailStrategy extends BaseStrategy {
         return t;
     }
     
+    private SettleEntity findSettleEntity(Transaction t){
+        SettleEntity settleEntity =  settleMessageDAO.find( t.getLocalDateTime(),t.getOrderNumber(),t.getLocalDateTime(),t.getCardHolderName(),t.getTransactiontype(),t.getCustomerId(),t.getTransactionId());
+       return settleEntity; 
+    }
+    /**
+     * 
+     * @param t 
+     */
     private void saveToSettle(Transaction t){
     List<SettleEntity> settleEntityList = new ArrayList<SettleEntity>();
-    SettleEntity settleEntity = new SettleEntity();
+    settleEntity = new SettleEntity();
     
     settleEntity.setTransactionId(t.getTransactionId());
     settleEntity.setReceiveddate(this.getSystemDate());
@@ -98,6 +135,13 @@ public class RetailStrategy extends BaseStrategy {
     settleMessageDAO.save(settleEntityList);
     }
 
+    
+    private void updateSettel(SettleEntity settleEntity){
+        settleEntity.setSettlestatus(SettleConstant.Not_to_settle);
+        settleMessageDAO.update(settleEntity);
+    }
+
+    
     private boolean validateRetailFields(Transaction t) {
 
          LOG.info("Validating fields");
@@ -173,5 +217,25 @@ public class RetailStrategy extends BaseStrategy {
     }
     
     
-
+//public static void main(String str[]){
+//    BaseStrategy RetailStrategy = new RetailStrategy();
+//    Transaction t = new Transaction();
+//    t.setStrategy(StrategyType.MPG);
+//    t.setTransactionId("1258");
+//    t.setOrderNumber("3641258");
+//    t.setTransactiontype("Sale");
+//    t.setIdentityUuid("302aa1e2-22f0-4a3d-a41c-2c4339d847c4");
+//    t.setRrn("hbXQUJ6pGth7");
+//    t.setAmount((long)1.00);
+//    t.setSettleIndicator("true");
+//    t.setReversal("true");
+//    t.setLocalDateTime("2017-02-05T09:10:01");
+//    t.setCustomerId("01");
+//    t.setAccount("6019440000000321");
+//    RetailStrategy.setGatewayFactory(new GatewayFactory());
+//    RetailStrategy.processRequest(t);
+//    
+//
+//}
+    
 }

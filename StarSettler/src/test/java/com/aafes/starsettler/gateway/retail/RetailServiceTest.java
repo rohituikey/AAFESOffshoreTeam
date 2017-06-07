@@ -6,10 +6,10 @@ package com.aafes.starsettler.gateway.retail;
  * and open the template in the editor.
  */
 import com.aafes.starsettler.entity.SettleEntity;
-import com.aafes.starsettler.retailer.RetailFile;
-import com.aafes.starsettler.retailer.RetailSFTP;
-import com.aafes.starsettler.retailer.RetailService;
-import com.aafes.starsettler.retailer.RetailSettler;
+import com.aafes.starsettler.gateway.retailer.RetailFile;
+import com.aafes.starsettler.gateway.retailer.RetailSFTP;
+import com.aafes.starsettler.gateway.retailer.RetailService;
+import com.aafes.starsettler.gateway.retailer.RetailSettler;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

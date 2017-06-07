@@ -5,7 +5,7 @@ package com.aafes.starsettler.gateway.retail;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-import com.aafes.starsettler.retailer.RetailSFTP;
+import com.aafes.starsettler.gateway.retailer.RetailSFTP;
 import java.io.IOException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;

@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.aafes.starsettler.retailer;
+package com.aafes.starsettler.gateway.retailer;
 
+import com.aafes.starsettler.control.Configurator;
 import com.aafes.starsettler.entity.SettleEntity;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -27,10 +28,13 @@ public class RetailService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RetailService.class.getName());
 
     @EJB
-    private RetailSFTP sftp = new RetailSFTP();
+    private RetailSFTP sftp;
 
     @EJB
-    private RetailFile retailFile = new RetailFile();
+    private RetailFile retailFile;
+    
+    @EJB
+    private Configurator configurator;
 
     private final DateFormat dateFormat;
     
@@ -67,14 +71,20 @@ public class RetailService {
 
     public void generateAndSendToRetail(HashMap<String, SettleEntity> visionHashMap) {
         LOGGER.info("Triggered.");
-
         try {
-
             Date date = new Date();
             String createdDate = dateFormat.format(date);
-           // remove
-            if(null == sourcePath)
-                sourcePath = "D:\\Users\\burangir\\";
+            
+            if(configurator == null ) configurator = new Configurator();
+            
+            if(null == sourcePath){
+                if(System.getProperty("RETAIL_STRATEGY_REPORT_PATH") != null)
+                    sourcePath = configurator.get("RETAIL_STRATEGY_REPORT_PATH");
+                else {
+                    configurator.postConstruct();
+                    sourcePath = configurator.get("RETAIL_STRATEGY_REPORT_PATH");
+                }
+            }
             retailFile.createFile(createdDate, sourcePath, visionHashMap);
 
             sftp.setSFTPUSER(this.user);

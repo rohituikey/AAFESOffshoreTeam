@@ -11,7 +11,6 @@ import com.aafes.starsettler.dao.TransactionDAO;
 import com.aafes.starsettler.entity.AuthorizationCodes;
 import com.aafes.starsettler.entity.Facility;
 import com.aafes.starsettler.entity.SettleEntity;
-import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -24,11 +23,11 @@ import javax.ejb.Stateless;
 public class SettleMessageRepository {
 
     @EJB
-    private SettleMessageDAO settleMessageDAO =  new SettleMessageDAO();
+    private SettleMessageDAO settleMessageDAO;
     @EJB
-    private FacilityDAO facilityDAO = new FacilityDAO();
+    private FacilityDAO facilityDAO;
     @EJB
-    private TransactionDAO transactionDAO = new TransactionDAO();        
+    private TransactionDAO transactionDAO;        
       
      
 
@@ -98,12 +97,10 @@ public class SettleMessageRepository {
     }
 
     public List<SettleEntity> getRetailData(String processDate, String settleStatus, String uuid) {
-         if(settleMessageDAO == null) settleMessageDAO = new SettleMessageDAO();
         return settleMessageDAO.getRetailData(processDate, settleStatus, uuid);
     }
     
-    public List<String> getDecaIdentityUuid(String processDate, String settleStatus, String uuid) {
-        if(settleMessageDAO == null) settleMessageDAO = new SettleMessageDAO();
-        return settleMessageDAO.getDecaIdentityUuid(processDate, settleStatus, uuid);
+    public List<String> getUuidList(String strategyStr) {
+        return settleMessageDAO.getIdentityUuidList(strategyStr);
     } 
 }

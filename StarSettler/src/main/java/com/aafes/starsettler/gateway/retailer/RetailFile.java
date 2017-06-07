@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.aafes.starsettler.retailer;
+package com.aafes.starsettler.gateway.retailer;
 
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.tokenizer.TokenEndPointService;
@@ -15,12 +15,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -60,22 +58,19 @@ public class RetailFile {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile())));
         // BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile())));
 
-        long debitAmount = 0;
-        long creditAmount = 0;
-        int iSequence = 0;
-        String transactionId, terminalId;
+        long debitAmount = 0, creditAmount = 0, tranAmount;
+        int iSequence = 0, effectiveDate, storeNumber = 385800000;
+        String transactionId, terminalId, accountNbr, token,  recordType = "D", batchSource = "0005", tranCode = "0000", tranAmountStr,
+        creditPlan, authCode, rRn, seqNumber, ticketNumber, salesClerk = "0005", orderNbr, orderDate, sRetailDetails, sRetailTrailer,
+        localDate, localTime;
+        Date dateObj = new Date();
         
-        List<SettleEntity> errorList = new ArrayList<SettleEntity>();
+        //List<SettleEntity> errorList = new ArrayList<SettleEntity>();
         
         for (Map.Entry<String, SettleEntity> entry : retailDataMap.entrySet()) {
-
             iSequence++;
-
-            String recordType = "D";
-            String batchSource = "0005";
-            
-            String token = entry.getValue().getCardToken();
-            String accountNbr = "NoMatchingAccount";
+            token = entry.getValue().getCardToken();
+            accountNbr = "NoMatchingAccount";
             try{        
                  accountNbr = tokenEndPointService.lookupAccount(entry.getValue());
             }catch(Exception e){
@@ -89,44 +84,28 @@ public class RetailFile {
                 accountNbr = String.format("%19s", accountNbr);
             }
             
-            long tranAmount = Long.parseLong(entry.getValue().getPaymentAmount());
+            tranAmount = Long.parseLong(entry.getValue().getPaymentAmount());
 
-            String tranCode = "0000";
             if (TransactionType.Deposit.equalsIgnoreCase(entry.getValue().getTransactionType())) {
                 tranCode = "0150"; 
                 debitAmount = debitAmount + tranAmount;
             } else if(TransactionType.Refund.equalsIgnoreCase(entry.getValue().getTransactionType())) {
-                
-                if(tranAmount < 0) {
-                    tranAmount = -1*tranAmount;
-                }
+                if(tranAmount < 0)  tranAmount = -1 * tranAmount;
                 tranCode = "0400";
                 creditAmount = creditAmount + tranAmount;
             }
 
-
-            String tranAmountStr = String.format("%015d",tranAmount);
-
-            int effectiveDate = getDayOfTheYear(entry.getValue().getSettleDate());
-            String creditPlan = entry.getValue().getSettlePlan();
-//            if(entry.getValue().getQualifiedPlan()!=null
-//                    && (!entry.getValue().getQualifiedPlan().equals("")) ){
-//                creditPlan = entry.getValue().getQualifiedPlan();
-//            }else if(entry.getValue().getResponsePlan()!=null
-//                    && (!entry.getValue().getResponsePlan().equals("")) ){
-//                creditPlan = entry.getValue().getResponsePlan();
-//            }else{
-//                creditPlan = entry.getValue().getRequestPlan();
-//            }
-                    
-            String authCode = entry.getValue().getAuthNum();
-            String rRn = entry.getValue().getRrn();
-            String seqNumber = String.format("%03d", iSequence);
-            String ticketNumber = rRn + seqNumber;
-            String salesClerk = "0005";
-            int storeNumber = 385800000;
-            String orderNbr = entry.getValue().getOrderNumber();
-            String orderDate = entry.getValue().getOrderDate();
+            tranAmountStr = String.format("%015d",tranAmount);
+            effectiveDate = getDayOfTheYear(entry.getValue().getSettleDate());
+            creditPlan = entry.getValue().getSettlePlan();
+            authCode = entry.getValue().getAuthNum();
+            rRn = entry.getValue().getRrn();
+            seqNumber = String.format("%03d", iSequence);
+            ticketNumber = rRn + seqNumber;
+            salesClerk = "0005";
+            storeNumber = 385800000;
+            orderNbr = entry.getValue().getOrderNumber();
+            orderDate = entry.getValue().getOrderDate();
             try {
                 orderDate = orderDate.substring(6, 8) + orderDate.substring(4, 6) + orderDate.substring(0, 4);
             } catch (IndexOutOfBoundsException e) {
@@ -135,45 +114,27 @@ public class RetailFile {
             
             transactionId = entry.getValue().getTransactionId();
 
-            String sRetailDetails = recordType
-                    + batchSource
-                    + accountNbr
-                    + tranAmountStr
-                    + tranCode
-                    + String.format("%07d", effectiveDate)
-                    + String.format("%-5s", creditPlan)
-                    + String.format("%-6s", authCode)
-                    + String.format("%-15s", ticketNumber)
-                    + String.format("%09d", storeNumber)
-                    + String.format("%-12s", salesClerk)
-                    + String.format("%-10s", orderNbr)
-                    + String.format("%-8s", orderDate)
-                    + String.format("%-8s", transactionId)
-                    + String.format("%-35s", "")+"\n";
+            localDate = getLocalDate(dateObj);
+            localTime = getLocalTime(dateObj);
+            
+            sRetailDetails = recordType + batchSource + accountNbr + tranAmountStr + tranCode + String.format("%07d", effectiveDate)
+                    + String.format("%-5s", creditPlan) + String.format("%-6s", authCode) + String.format("%-15s", ticketNumber)
+                    + String.format("%09d", storeNumber) + String.format("%-12s", salesClerk) + String.format("%-10s", orderNbr)
+                    + String.format("%-8s", orderDate) + String.format("%-8s", transactionId) + String.format("%-8s", localDate) 
+                    + String.format("%-8s", localTime) + String.format("%-35s", "")+"\n";
 
             bw.write(sRetailDetails);
 
             LOGGER.info("file length " + sRetailDetails.length());
-
         }
-        
-       
-            String sRetailTrailer = "T"
-                    + "0005"
-                    + String.format("%07d", getDayOfTheCurrentYear())
-                    + String.format("%015d", debitAmount)
-                    + String.format("%015d", creditAmount)
-                    + String.format("%-108s", "");
-
-            bw.write(sRetailTrailer);
-            bw.close();
-        
+        sRetailTrailer = "T" + "0005" + String.format("%07d", getDayOfTheCurrentYear()) + String.format("%015d", debitAmount)
+                + String.format("%015d", creditAmount) + String.format("%-108s", "");
+        bw.write(sRetailTrailer);
+        bw.close();
        }    
-
     }
 
     private int getDayOfTheYear(String settleDate) {
-
         try {
             int day = Integer.parseInt(settleDate.substring(6, 8));
             int month = Integer.parseInt(settleDate.substring(4, 6));
@@ -196,5 +157,24 @@ public class RetailFile {
         String currentDayOfyear = new SimpleDateFormat("YYYY").format(dCurrent) + "" + cal.get(Calendar.DAY_OF_YEAR);
         return Integer.parseInt(currentDayOfyear);
     }
-
+    
+    private String getLocalDate(Date dateObj){
+        try{
+            SimpleDateFormat smpLocalDate = new SimpleDateFormat("yyyymmdd");
+            return smpLocalDate.format(dateObj);
+        }catch(Exception dateExc){
+            LOGGER.error(dateExc.getMessage());
+        }
+        return "";
+    }
+    
+    private String getLocalTime(Date dateObj){
+         try{
+            SimpleDateFormat smpLocalDate = new SimpleDateFormat("HHmmSS");
+            return smpLocalDate.format(dateObj);
+         }catch(Exception dateExc){
+            LOGGER.error(dateExc.getMessage());
+        }
+        return "";
+    }
 }

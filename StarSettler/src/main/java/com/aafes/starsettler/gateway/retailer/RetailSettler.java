@@ -3,17 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.aafes.starsettler.retailer;
+package com.aafes.starsettler.gateway.retailer;
 
 import com.aafes.starsettler.control.BaseSettler;
 import com.aafes.starsettler.control.SettleMessageRepository;
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.util.SettleStatus;
+import com.aafes.starsettler.util.StrategyType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author burangir
@@ -23,41 +26,35 @@ import javax.ejb.Stateless;
 @Stateless
 public class RetailSettler extends BaseSettler{
     @EJB
-    private RetailService retailServiceObj;
+    private RetailService retailService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RetailSettler.class.getSimpleName());
+    String sMethodName = "";
+    final String CLASS_NAME = RetailSettler.this.getClass().getSimpleName();
 
     // Schedular will call this method 
     @Override
     public void run(String processDate) {
+        sMethodName = "run";
+        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         List<SettleEntity> retailDataList = new ArrayList<>();
         List<SettleEntity> retailDataListTmp = new ArrayList<>();
-        List<String> decaUuidList = new ArrayList<>();
+        List<String> uuidList = new ArrayList<>();
         SettleMessageRepository repository = new SettleMessageRepository();
 
-        String tmpStr = null;
-        decaUuidList = repository.getDecaIdentityUuid(processDate, tmpStr, tmpStr);
-        System.out.println("Total UUID's with strategy = DECA " + decaUuidList.size());
-        for(int i = 0; i < decaUuidList.size(); i++){
-            if(null != decaUuidList.get(i)){
-                tmpStr = decaUuidList.get(i);
+        uuidList = repository.getUuidList(StrategyType.DECA);
+        LOGGER.info("Total UUID's with strategy = DECA " + uuidList.size());
+        for(String tmpStr : uuidList){
                 retailDataListTmp = repository.getRetailData(processDate, SettleStatus.Ready_to_settle, tmpStr);
-            }
-            if(retailDataListTmp.size() > 0) retailDataList.addAll(retailDataListTmp);
+                if(!retailDataListTmp.isEmpty()) retailDataList.addAll(retailDataListTmp);
         }
-        
-       //  Format milstar data
         HashMap<String, SettleEntity> retailDataMap = consolidateRetailData(retailDataList);
-        
-        //Create Vision File and SFTP to vision
-        if(retailServiceObj == null) retailServiceObj = new RetailService();
-        retailServiceObj.generateAndSendToRetail(retailDataMap);
-        
+        retailService.generateAndSendToRetail(retailDataMap);
         super.updateStatus(retailDataList, SettleStatus.In_Progress);
+        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
     }
 
-   
-
     public void setRetailService(RetailService retailsServiceObj) {
-        this.retailServiceObj = retailsServiceObj;
+        this.retailService = retailsServiceObj;
     }
     
     /**
@@ -67,7 +64,8 @@ public class RetailSettler extends BaseSettler{
      * @return 
      */
     private HashMap<String, SettleEntity> consolidateRetailData(List<SettleEntity> settleEntityList) {
-
+        sMethodName = "consolidateRetailData";
+        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         HashMap<String,SettleEntity> retailDataMapLocal = new HashMap<>();
         
         settleEntityList.forEach((settleEntity) -> {
@@ -86,6 +84,7 @@ public class RetailSettler extends BaseSettler{
             }
         });
         retailDataMapLocal.forEach((k, v) -> System.out.println("Key : " + k + " Value : " + v.getCardToken() + ", amount :" + v.getPaymentAmount()));
+        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         return retailDataMapLocal;
     }
 }

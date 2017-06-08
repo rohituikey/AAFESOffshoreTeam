@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 public class RetailSettler extends BaseSettler{
     @EJB
     private RetailService retailService;
+    @EJB
+    private SettleMessageRepository repository;
     private static final Logger LOGGER = LoggerFactory.getLogger(RetailSettler.class.getSimpleName());
     String sMethodName = "";
     final String CLASS_NAME = RetailSettler.this.getClass().getSimpleName();
@@ -39,17 +41,24 @@ public class RetailSettler extends BaseSettler{
         List<SettleEntity> retailDataList = new ArrayList<>();
         List<SettleEntity> retailDataListTmp = new ArrayList<>();
         List<String> uuidList = new ArrayList<>();
-        SettleMessageRepository repository = new SettleMessageRepository();
+        HashMap<String,SettleEntity> retailDataMap = new HashMap<>();
+        SettleMessageRepository repository = new SettleMessageRepository();// remove it
 
         uuidList = repository.getUuidList(StrategyType.DECA);
         LOGGER.info("Total UUID's with strategy = DECA " + uuidList.size());
-        for(String tmpStr : uuidList){
-                retailDataListTmp = repository.getRetailData(processDate, SettleStatus.Ready_to_settle, tmpStr);
+        for(String localUuIdStr : uuidList){
+                retailDataListTmp = repository.getRetailData(processDate, SettleStatus.Ready_to_settle, localUuIdStr);
                 if(!retailDataListTmp.isEmpty()) retailDataList.addAll(retailDataListTmp);
         }
-        HashMap<String, SettleEntity> retailDataMap = consolidateRetailData(retailDataList);
+        //HashMap<String, SettleEntity> retailDataMap = consolidateRetailData(retailDataList);
+        
+        retailDataList.forEach((settleEntity) -> {
+            String key = settleEntity.getCardToken() + settleEntity.getOrderNumber() + settleEntity.getSettlePlan();
+            retailDataMap.put(key, settleEntity);
+        });
+        //retailService = new RetailService();
         retailService.generateAndSendToRetail(retailDataMap);
-        super.updateStatus(retailDataList, SettleStatus.In_Progress);
+        //super.updateStatus(retailDataList, SettleStatus.In_Progress); // remove it
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
     }
 
@@ -63,28 +72,28 @@ public class RetailSettler extends BaseSettler{
      * @param settleEntityList
      * @return 
      */
-    private HashMap<String, SettleEntity> consolidateRetailData(List<SettleEntity> settleEntityList) {
-        sMethodName = "consolidateRetailData";
-        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        HashMap<String,SettleEntity> retailDataMapLocal = new HashMap<>();
-        
-        settleEntityList.forEach((settleEntity) -> {
-            String key = settleEntity.getCardToken()+settleEntity.getOrderNumber()+settleEntity.getSettlePlan();
-            if(retailDataMapLocal.containsKey(key)){
-                SettleEntity settleEntityDup = retailDataMapLocal.get(key);
-                if(settleEntityDup.getPaymentAmount()!=null &&
-                        settleEntity.getPaymentAmount()!=null){
-                     long lAmt = Long.parseLong(settleEntityDup.getPaymentAmount()) 
-                             + Long.parseLong(settleEntity.getPaymentAmount());
-                    settleEntityDup.setPaymentAmount(Long.toString(lAmt));
-                }
-                retailDataMapLocal.put(key, settleEntityDup);
-            }else{
-                retailDataMapLocal.put(key, settleEntity);
-            }
-        });
-        retailDataMapLocal.forEach((k, v) -> System.out.println("Key : " + k + " Value : " + v.getCardToken() + ", amount :" + v.getPaymentAmount()));
-        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        return retailDataMapLocal;
-    }
+//    private HashMap<String, SettleEntity> consolidateRetailData(List<SettleEntity> settleEntityList) {
+//        sMethodName = "consolidateRetailData";
+//        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+//        HashMap<String,SettleEntity> retailDataMapLocal = new HashMap<>();
+//        
+//        settleEntityList.forEach((settleEntity) -> {
+//            String key = settleEntity.getCardToken()+settleEntity.getOrderNumber()+settleEntity.getSettlePlan();
+//            if(retailDataMapLocal.containsKey(key)){
+//                SettleEntity settleEntityDup = retailDataMapLocal.get(key);
+//                if(settleEntityDup.getPaymentAmount()!=null &&
+//                        settleEntity.getPaymentAmount()!=null){
+//                     long lAmt = Long.parseLong(settleEntityDup.getPaymentAmount()) 
+//                             + Long.parseLong(settleEntity.getPaymentAmount());
+//                    settleEntityDup.setPaymentAmount(Long.toString(lAmt));
+//                }
+//                retailDataMapLocal.put(key, settleEntityDup);
+//            }else{
+//                retailDataMapLocal.put(key, settleEntity);
+//            }
+//        });
+//        retailDataMapLocal.forEach((k, v) -> System.out.println("Key : " + k + " Value : " + v.getCardToken() + ", amount :" + v.getPaymentAmount()));
+//        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+//        return retailDataMapLocal;
+//    }
 }

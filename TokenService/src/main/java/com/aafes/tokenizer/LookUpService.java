@@ -28,25 +28,25 @@ public class LookUpService {
         String accountNumber = "";
         Vault vault = null;
         
-        if(tm.getRequest().getAccountType().value().equalsIgnoreCase(AccountType.TOKEN))
-        {
-           TokenBank tokenBank = tokenizerDao.find(tm.getRequest().getAccount(), tm.getRequest().getTokenBankName());
-           if(tokenBank != null)
-           {
-               SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-               Date expDate = df.parse(tokenBank.getExpirydate());;
-               String date = df.format(new Date());
-               Date currentDate = df.parse(date);
-               
-               if(currentDate.after(expDate))
-               {
-                   tokenBank.setStatus(TokenizerConstants.EXPIRED);
-                   tokenizerDao.save(tokenBank);
-                   return accountNumber;
-               }
-               
-           }
-        } 
+//        if(tm.getRequest().getAccountType().value().equalsIgnoreCase(AccountType.TOKEN))
+//        {
+//           TokenBank tokenBank = tokenizerDao.find(tm.getRequest().getAccount(), tm.getRequest().getTokenBankName());
+//           if(tokenBank != null)
+//           {
+//               SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+//               Date expDate = df.parse(tokenBank.getExpirydate());;
+//               String date = df.format(new Date());
+//               Date currentDate = df.parse(date);
+//        
+//               if(currentDate.after(expDate))
+//               {
+//                   tokenBank.setStatus(TokenizerConstants.EXPIRED);
+//                   tokenizerDao.save(tokenBank);
+//                   return accountNumber;
+//               }
+//               
+//           }
+//        } 
         
         if(tm.getRequest().getAccountType().value().equalsIgnoreCase(AccountType.PAN))
         {
@@ -56,14 +56,23 @@ public class LookUpService {
         }
         
         
-        if(vault != null)
+        if(vault != null && vault.getAccountnumber().contains(tm.getRequest().getTokenBankName()))
         {
             accountNumber = vault.getAccountnumber();
+            accountNumber = accountNumber.replaceAll(tm.getRequest().getTokenBankName(), "");
         }
         
         return accountNumber;
                 
         
+    }
+
+    protected void setVaultDao(VaultDao vaultDao) {
+        this.vaultDao = vaultDao;
+    }
+
+    protected void setTokenizerDao(TokenizerDao tokenizerDao) {
+        this.tokenizerDao = tokenizerDao;
     }
     
 }

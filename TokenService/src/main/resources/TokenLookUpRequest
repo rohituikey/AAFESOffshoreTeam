@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<TokenMessage xmlns='http://www.aafes.com/token' >
+<TokenMessage xmlns='http://www.aafes.com/token'  >
 	<Request>
 		<RequestType>Lookup</RequestType>
 		<Media>Visa</Media>

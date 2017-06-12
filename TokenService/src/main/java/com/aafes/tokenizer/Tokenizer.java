@@ -11,6 +11,7 @@ import com.aafes.token.AccountTypeType;
 import com.aafes.token.TokenMessage;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.xml.bind.JAXBException;
 
 @Stateless
 public class Tokenizer {
@@ -22,8 +23,10 @@ public class Tokenizer {
     @EJB
     private Configurator configurator;
 
-    public TokenMessage handle(TokenMessage tm) {
+    public TokenMessage handle(TokenMessage tm) throws JAXBException {
 
+        this.validate(tm);
+        
         TokenMessage.Response response = new TokenMessage.Response();
         try {
 
@@ -33,7 +36,7 @@ public class Tokenizer {
                 if (request.getRequestType().value().equalsIgnoreCase(TokenizerConstants.LOOKUP)
                         && request.getAccountType().value().equalsIgnoreCase(AccountType.TOKEN)) {
                     String account = lookUpService.process(tm);
-
+                    
                     if (account != null && !account.trim().isEmpty()) {
                         response.setAccountType(AccountTypeType.PAN);
                         response.setAccount(account);
@@ -41,7 +44,7 @@ public class Tokenizer {
                         response.setResponseType(ResponseType.SUCCESS);
                         response.setReasonCode(configurator.get("SUCCESS"));
                     } else {
-
+                        
                         response.setDescriptionField("INVALID_TOKEN");
                         response.setResponseType(ResponseType.FAILED);
                         response.setReasonCode(configurator.get("INVALID_TOKEN"));
@@ -50,7 +53,7 @@ public class Tokenizer {
                 } else if (request.getRequestType().value().equalsIgnoreCase(TokenizerConstants.ISSUE)
                         && request.getAccountType().value().equalsIgnoreCase(AccountType.PAN)) {
                     String token = issueService.process(tm);
-
+                   
                     if (token != null && !token.trim().isEmpty()) {
                         response.setAccountType(AccountTypeType.TOKEN);
                         response.setAccount(token);
@@ -58,7 +61,7 @@ public class Tokenizer {
                         response.setResponseType(ResponseType.SUCCESS);
                         response.setReasonCode(configurator.get("SUCCESS"));
                     } else {
-
+                        
                         response.setDescriptionField("INVALID_CARD_NUMBER");
                         response.setResponseType(ResponseType.FAILED);
                         response.setReasonCode(configurator.get("INVALID_CARD_NUMBER"));
@@ -68,7 +71,7 @@ public class Tokenizer {
                     response.setResponseType(ResponseType.FAILED);
                     response.setReasonCode(configurator.get("BAD_REQUEST"));
                 }
-
+                
             }
 
         } catch (Exception e) {
@@ -79,5 +82,29 @@ public class Tokenizer {
 
         tm.setResponse(response);
         return tm;
+    }
+    
+    
+    private void validate(TokenMessage tm) throws JAXBException
+    {
+        if(tm.getRequest().getRequestType().value().equalsIgnoreCase(TokenizerConstants.ISSUE))
+        {
+            if(tm.getRequest().getMedia() == null || tm.getRequest().getMedia().trim().isEmpty())
+            {
+                throw new JAXBException("Media required for Issue");
+            }
+        }
+    }
+
+    protected void setLookUpService(LookUpService lookUpService) {
+        this.lookUpService = lookUpService;
+    }
+
+    protected void setIssueService(IssueService issueService) {
+        this.issueService = issueService;
+    }
+
+    protected void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
     }
 }

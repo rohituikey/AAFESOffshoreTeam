@@ -73,10 +73,9 @@ public class SettleMessageDAO {
     }
 
     
-    public SettleEntity find(String receiveddate, String ordernumber, String settledate,String cardtype, String transactiontype, String clientlineid,String transactionid)
+    public SettleEntity find(String uuid, String ordernumber, String rrn, String transactionid)
     {
-        return (SettleEntity) mapper.get(receiveddate, ordernumber, settledate,cardtype,transactiontype,clientlineid,transactionid);
-        
+        return (SettleEntity) mapper.get(uuid,ordernumber,rrn,transactionid);
     }
 
     @EJB

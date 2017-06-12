@@ -100,7 +100,7 @@ public class RetailStrategy extends BaseStrategy {
     }
     
     private SettleEntity findSettleEntity(Transaction t){
-            return settleMessageDAO.find( t.getLocalDateTime(),t.getOrderNumber(),t.getLocalDateTime(),t.getMedia(),t.getTransactiontype(),t.getCustomerId(),t.getTransactionId());
+            return settleMessageDAO.find(t.getIdentityUuid() ,t.getOrderNumber(), t.getRrn(),t.getTransactionId());
        
     }
     /**

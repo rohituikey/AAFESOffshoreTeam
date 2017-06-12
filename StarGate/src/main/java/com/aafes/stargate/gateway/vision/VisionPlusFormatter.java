@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Arrays;
+import javax.ejb.Stateless;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,7 +31,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author nguyentul
  */
-final public class VisionPlusFormatter {
+@Stateless
+public class VisionPlusFormatter {
 
     private static final Logger LOG
             = LoggerFactory.getLogger(VisionPlusFormatter.class.getSimpleName());
@@ -118,7 +120,7 @@ final public class VisionPlusFormatter {
             } else if (additional_rsp.length() >= 83
                     && (t.getRequestType().equalsIgnoreCase(
                             RequestType.SALE))) {
-                rspBalance = additional_rsp.substring(68, 83);
+                rspBalance = additional_rsp.substring(71, 83);
                 try {
                     t.setBalanceAmount(Long.parseLong(rspBalance));
                 } catch (NumberFormatException e) {

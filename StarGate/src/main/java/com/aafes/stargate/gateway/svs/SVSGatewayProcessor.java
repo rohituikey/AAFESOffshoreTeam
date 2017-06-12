@@ -8,6 +8,7 @@ package com.aafes.stargate.gateway.svs;
 import com.aafes.stargate.authorizer.entity.GiftCard;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.dao.SVSDAO;
+import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class SVSGatewayProcessor {
 
+   
     private static final org.slf4j.Logger log
             = LoggerFactory.getLogger(SVSGatewayProcessor.class.getSimpleName());
 
@@ -36,7 +38,7 @@ public class SVSGatewayProcessor {
             log.info("Gift Card Request Type : " + t.getRequestType());
             Processor processor = processorFactory.pickProcessor(t);
             processor.processRequest(t);
-
+            
         } catch (Exception e) {
             log.error("SVSGatewayProcessor#execute#Exception : " + e.toString());
             t.setDescriptionField("SVS_GATEWAY_ERROR");
@@ -166,10 +168,9 @@ public class SVSGatewayProcessor {
 
     }
 
-    public ProcessorFactory getProcessorFactory() {
-        return processorFactory;
-    }
-
+    /**
+     * @param processorFactory the processorFactory to set
+     */
     public void setProcessorFactory(ProcessorFactory processorFactory) {
         this.processorFactory = processorFactory;
     }

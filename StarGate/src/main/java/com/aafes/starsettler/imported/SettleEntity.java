@@ -8,6 +8,7 @@ package com.aafes.starsettler.imported;
 import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
+import com.datastax.driver.mapping.annotations.Transient;
 
 /**
  *
@@ -39,6 +40,7 @@ public class SettleEntity {
     
     
     private String identityUUID = "";
+    private String tokenBankName = "";
     
     // Line Item Fields
     private String lineId = "";
@@ -559,6 +561,14 @@ public class SettleEntity {
 
     public void setSettlePlan(String settlePlan) {
         this.settlePlan = settlePlan;
+    }
+
+    public String getTokenBankName() {
+        return tokenBankName;
+    }
+
+    public void setTokenBankName(String tokenBankName) {
+        this.tokenBankName = tokenBankName;
     }
     
     

@@ -32,10 +32,13 @@ public class MerchandiseReturnMessageProcessor extends Processor {
             LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
 
             MerchandiseReturnRequest request = new MerchandiseReturnRequest();
-           
+
+            double amt = transaction.getAmount();
+            amt = amt/100;
+            
             Amount amount = new Amount();
-            amount.setAmount(transaction.getAmount());
-            amount.setCurrency(transaction.getCurrencycode());
+            amount.setAmount(amt);
+            amount.setCurrency(StarGateConstants.CURRENCY);
             request.setReturnAmount(amount);
 
             Card card = new Card();
@@ -56,22 +59,27 @@ public class MerchandiseReturnMessageProcessor extends Processor {
 
             request.setRoutingID(StarGateConstants.ROUTING_ID);
             request.setCheckForDuplicate(StarGateConstants.TRUE);
-           // request.setStan(transaction.getSTAN());
+            request.setTransactionID(transaction.getRrn() + "0000");
+            // request.setStan(transaction.getSTAN());
             SVSXMLWay svsXMLWay = SvsUtil.setUserNamePassword();
             MerchandiseReturnResponse response = svsXMLWay.merchandiseReturn(request);
-            
-            transaction.setReasonCode(response.getReturnCode().getReturnCode());
-            transaction.setDescriptionField(response.getReturnCode().getReturnDescription());
-            if (transaction.getReasonCode().equalsIgnoreCase("01")) {
-                transaction.setResponseType(ResponseType.APPROVED);
+
+            if (response != null) {
+                transaction.setReasonCode(response.getReturnCode().getReturnCode());
+                transaction.setDescriptionField(response.getReturnCode().getReturnDescription());
+                if (transaction.getReasonCode().equalsIgnoreCase("01")) {
+                    transaction.setResponseType(ResponseType.APPROVED);
+                } else {
+                    transaction.setResponseType(ResponseType.DECLINED);
+                }
+                transaction.setAuthNumber(response.getAuthorizationCode());
+                transaction.setBalanceAmount((long) (response.getBalanceAmount().getAmount()*100));
+
+                LOGGER.info("ReturnDescription : " + String.valueOf(response.getReturnCode().getReturnDescription()));
             } else {
                 transaction.setResponseType(ResponseType.DECLINED);
             }
-            transaction.setAuthoriztionCode(response.getAuthorizationCode());
-            transaction.setBalanceAmount((long) (response.getBalanceAmount().getAmount() ));
-            
-            
-            LOGGER.info("ReturnDescription : " + String.valueOf(response.getReturnCode().getReturnDescription()));
+
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
             throw new GatewayException("INTERNAL_SERVER_ERROR");

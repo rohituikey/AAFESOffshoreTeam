@@ -2,7 +2,9 @@ package com.aafes.stargate.gateway.fdms;
 
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.util.AVSResponseReasonCode;
+import com.aafes.stargate.util.Encryptor;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
@@ -15,12 +17,17 @@ import com.firstdata.cmpwsapi.schemas.cmpmsg.FR;
 import com.firstdata.cmpwsapi.schemas.cmpmsg.OnlineAF;
 import com.firstdata.cmpwsapi.schemas.cmpmsg.PA;
 import com.firstdata.cmpwsapi.schemas.cmpmsg.Transaction;
+import com.ibm.mq.jms.MQQueueConnection;
+import com.ibm.mq.jms.MQQueueConnectionFactory;
+import com.ibm.msg.client.wmq.WMQConstants;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.JMSException;
 import javax.ws.rs.ProcessingException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -54,6 +61,17 @@ public class CompassGatewayProcessor {
 
     public CompassGatewayProcessor() {
 
+    }
+
+    @PostConstruct
+    public void PostContruct() {
+        try {
+            log.info("Decrypting passwords");
+            decryptValues();
+
+        } catch (Exception ex) {
+            log.error("Unable to Decrypt values" + ex.getMessage());
+        }
     }
 
     @SuppressWarnings("UnusedAssignment")
@@ -91,6 +109,13 @@ public class CompassGatewayProcessor {
 
             mapResponse(result, t);
 
+        } catch (GatewayException e) {
+            log.error("CompassGatewayProcessor#execute#Exception : " + e.toString());
+            t.setDescriptionField(e.getMessage());
+            t.setResponseType(ResponseType.DECLINED);
+            t.setReasonCode(configurator.get(e.getMessage()));
+//            mapResponse(result, t);
+            return t;
         } catch (Exception e) {
             log.error("CompassGatewayProcessor#execute#Exception : " + e.toString());
             t.setDescriptionField("INVALID_COMPASS_ENDPOINT");
@@ -114,7 +139,13 @@ public class CompassGatewayProcessor {
 
         String account = String.format("%-19s", t.getAccount());
         soapTran.setAccountNumber(account);
-        soapTran.setExpirationDate(t.getExpiration());
+        
+        if(t.getExpiration() != null)
+        {
+             String[] dates = {t.getExpiration().substring(0, 2),t.getExpiration().substring(2)};
+             soapTran.setExpirationDate(dates[1] + dates[0]);
+        }
+        
 
         String divisionNumber = String.format("%010d", 805602);
         t.setDivisionnumber(divisionNumber);
@@ -154,7 +185,7 @@ public class CompassGatewayProcessor {
             pa.setResponseDate(t.getResponseDate());
             pa.setAuthorizationCode(t.getAuthNumber());
             oaf.setPA(pa);
-        } else {
+        } else  {
 
             log.info("FDMS Auth request.......");
 
@@ -178,7 +209,7 @@ public class CompassGatewayProcessor {
                     log.info("FDMS Auth request Array Index Outr of bounds exception.......");
 
                 }
-               
+
                 ab.setNameText(cardHolderName.toUpperCase());
             }
             if (t.getBillingPhone() != null
@@ -227,7 +258,7 @@ public class CompassGatewayProcessor {
                 oaf.setFR(fr);
             }
 
-        }
+        } 
 
         otr.setAdditionalFormats(oaf);
 
@@ -265,11 +296,22 @@ public class CompassGatewayProcessor {
         return "1";
     }
 
+    private void decryptValues() {
+        String baseDir = System.getProperty("jboss.server.config.dir");
+        String keysPath = baseDir + "/crypto/keys";
+        String logPath = baseDir + "/crypto.log4j.properties";
+
+        Encryptor encryptor = new Encryptor(keysPath, logPath);
+
+        compassPassword = encryptor.decrypt(compassPassword);
+    }
+
     public void setCompassUser(String compassUser) {
         this.compassUser = compassUser;
     }
 
     public void setCompassPassword(String compassPassword) {
+
         this.compassPassword = compassPassword;
     }
 

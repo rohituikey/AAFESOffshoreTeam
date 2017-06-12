@@ -5,9 +5,9 @@
  */
 package com.aafes.stargate.gateway.vision.entity;
 
-
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.GatewayException;
+import com.aafes.stargate.gateway.MQGatewayException;
 import com.aafes.stargate.util.Encryptor;
 import static com.ibm.mq.constants.CMQC.MQAT_JAVA;
 import static com.ibm.mq.constants.CMQC.MQCIH_PASS_EXPIRATION;
@@ -38,6 +38,7 @@ import java.util.Calendar;
 import java.util.UUID;
 import java.util.logging.Level;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.jms.BytesMessage;
@@ -130,7 +131,8 @@ public class CICSHandlerBean {
             LOG.info("MQ Connection Started." + cf.getChannel() + cf.
                     getHostName() + cf.getQueueManager());
         } catch (JMSException ex) {
-            LOG.error("Unable to contrct MQ startup" + ex.getMessage());
+            LOG.error("Unable contact  MQ startup" + ex.getMessage());
+             throw new MQGatewayException("Unable to contact MQ startup.");
         }
     }
 
@@ -138,9 +140,11 @@ public class CICSHandlerBean {
         String correlationId = new String(getCorrelationIDWithCalendar());
         LOG.debug("Sending with traceid: " + correlationId);
         logASCII("To Vision: ", payload);
+        MQQueueSession session = null;
+        MQQueueSender sender = null;
         try {
 
-            MQQueueSession session = (MQQueueSession) connection.
+            session = (MQQueueSession) connection.
                     createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
             ConnectionMetaData connInfo = connection.getMetaData();
 
@@ -158,71 +162,91 @@ public class CICSHandlerBean {
                     WMQConstants.WMQ_MDCTX_SET_IDENTITY_CONTEXT);
             //WMQ_MDCTX_SET_IDENTITY_CONTEXT
             //WMQ_MDCTX_SET_ALL_CONTEXT
-            System.out.println("At MQQue Sender ::::");
-            try (MQQueueSender sender = (MQQueueSender) session.createSender(
-                    requestQueue)) {
-                BytesMessage bm = session.createBytesMessage();
-                System.out.println("1 ::::");
-                MQCIH cih = new MQCIH();
-                System.out.println("2 ::::");
-                cih.setVersion(2);
-                cih.setFunction(cicsMQFunc);
-                cih.setAuthenticator(cicsPassword);
-                cih.setTransactionId(transId);
-                cih.setUOWControl(MQCUOWC_ONLY);
-                cih.setFlags(MQCIH_REPLY_WITHOUT_NULLS | MQCIH_PASS_EXPIRATION
-                        | MQCIH_SYNC_ON_RETURN);
-                cih.setReplyToFormat(MQFMT_NONE);
-                cih.setFormat(MQFMT_NONE);
-                cih.setLinkType(1);
-                cih.setOutputDataLength(1600);
-                MQHeader header = cih;
+            LOG.info("At MQQue Sender ::::");
+            sender = (MQQueueSender) session.createSender(requestQueue);
 
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                header.write(new DataOutputStream(out));
-                byte[] hd = out.toByteArray();
-                bm.setStringProperty("JMS_IBM_Format", MQFMT_CICS);	//Struc Length v1=164 v2=180
-                bm.
-                        setStringProperty("JMS_IBM_MQMD_UserIdentifier",
-                                cicsUserName);
-                bm.setStringProperty("JMS_IBM_MQMD_ReplyToQ", responseQ);
-                bm.setStringProperty("JMS_IBM_MQMD_ReplyToQMgr",
-                        cicsMQManagerName);
-                System.out.println("3 ::::");
-                bm.setIntProperty("JMS_IBM_Character_Set", 1208);
-                bm.setIntProperty("JMS_IBM_MQMD_Priority", 0);
-                bm.setIntProperty("JMS_IBM_MQMD_Expiry", cicsMQExpiry);
-                bm.setIntProperty("JMS_IBM_MQMD_Persistence",
-                        MQPER_NOT_PERSISTENT);
-                bm.setObjectProperty("JMS_IBM_MQMD_CorrelId",
-                        MQC.MQCI_NEW_SESSION);
-                bm.setIntProperty("JMS_IBM_MsgType", MQC.MQMT_REQUEST);
+            BytesMessage bm = session.createBytesMessage();
+            LOG.info("1 ::::");
+            MQCIH cih = new MQCIH();
+            LOG.info("2 ::::");
+            cih.setVersion(2);
+            cih.setFunction(cicsMQFunc);
+            cih.setAuthenticator(cicsPassword);
+            cih.setTransactionId(transId);
+            cih.setUOWControl(MQCUOWC_ONLY);
+            cih.setFlags(MQCIH_REPLY_WITHOUT_NULLS | MQCIH_PASS_EXPIRATION
+                    | MQCIH_SYNC_ON_RETURN);
+            cih.setReplyToFormat(MQFMT_NONE);
+            cih.setFormat(MQFMT_NONE);
+            cih.setLinkType(1);
+            cih.setOutputDataLength(1600);
+            MQHeader header = cih;
 
-                bm.setObjectProperty("JMS_IBM_MQMD_MsgId", correlationId.
-                        getBytes());
-                bm.setIntProperty("JMS_IBM_MQMD_Report",
-                        MQRO_COPY_MSG_ID_TO_CORREL_ID);
-                bm.setIntProperty("JMS_IBM_MQMD_PutApplType", MQAT_JAVA);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            header.write(new DataOutputStream(out));
+            byte[] hd = out.toByteArray();
+            bm.setStringProperty("JMS_IBM_Format", MQFMT_CICS);	//Struc Length v1=164 v2=180
+            bm.
+                    setStringProperty("JMS_IBM_MQMD_UserIdentifier",
+                            cicsUserName);
+            bm.setStringProperty("JMS_IBM_MQMD_ReplyToQ", responseQ);
+            bm.setStringProperty("JMS_IBM_MQMD_ReplyToQMgr",
+                    cicsMQManagerName);
+            LOG.info("3 ::::");
+            bm.setIntProperty("JMS_IBM_Character_Set", 1208);
+            bm.setIntProperty("JMS_IBM_MQMD_Priority", 0);
+            bm.setIntProperty("JMS_IBM_MQMD_Expiry", cicsMQExpiry);
+            bm.setIntProperty("JMS_IBM_MQMD_Persistence",
+                    MQPER_NOT_PERSISTENT);
+            bm.setObjectProperty("JMS_IBM_MQMD_CorrelId",
+                    MQC.MQCI_NEW_SESSION);
+            bm.setIntProperty("JMS_IBM_MsgType", MQC.MQMT_REQUEST);
 
-                bm.writeBytes(hd);
+            bm.setObjectProperty("JMS_IBM_MQMD_MsgId", correlationId.
+                    getBytes());
+            bm.setIntProperty("JMS_IBM_MQMD_Report",
+                    MQRO_COPY_MSG_ID_TO_CORREL_ID);
+            bm.setIntProperty("JMS_IBM_MQMD_PutApplType", MQAT_JAVA);
 
-                bm.writeBytes(cicsMQProgName.getBytes("CP500"));
-                bm.writeBytes("    1208".getBytes());
+            bm.writeBytes(hd);
 
-                bm.writeBytes(payload);
-                // Start the connection
-                sender.send(bm);
-                System.out.println("Sent ::::");
-                LOG.debug("Sent message to Queue: " + requestQueue.
-                        getQueueName());
-            }
+            bm.writeBytes(cicsMQProgName.getBytes("CP500"));
+            bm.writeBytes("    1208".getBytes());
+
+            bm.writeBytes(payload);
+            // Start the connection
+            sender.send(bm);
+            LOG.info("Sent ::::");
+            LOG.debug("Sent message to Queue: " + requestQueue.
+                    getQueueName());
+
             LOG.debug("Message Sent OK.\n");
 
         } catch (JMSException | IOException jmsex) {
             LOG.error("Unable to send MQ Message." + jmsex.getMessage());
-            throw new GatewayException("Unable to send MQ Message.");
+            throw new MQGatewayException("Unable to send MQ Message.");
+        } finally {
+            if (sender != null) {
+                try {
+                    sender.close();
+                } catch (JMSException ex) {
+                    LOG.error("Failed to close the message sender: "
+                            + ex.toString());
+                   throw new MQGatewayException("Failed to close the message sender:");
+                }
+            }
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (JMSException ex) {
+                    LOG.error("Failed to close the session: "
+                            + ex.toString());
+                     throw new MQGatewayException("Failed to close the session:");
+                }
+            }
         }
-        System.out.println("Success ::::");
+
+        LOG.info("Success ::::");
         return correlationId;
     }
 
@@ -273,6 +297,7 @@ public class CICSHandlerBean {
                 } catch (JMSException ex) {
                     LOG.error("Failed to close the message receiver: "
                             + ex.toString());
+                        throw new MQGatewayException("Failed to close the message receiver:");
                 }
             }
             if (session != null) {
@@ -281,12 +306,14 @@ public class CICSHandlerBean {
                 } catch (JMSException ex) {
                     LOG.error("Failed to close the session: "
                             + ex.toString());
+                    throw new MQGatewayException("Failed to close the session:");
                 }
             }
         }
         return responsePayload;
     }
 
+    @PreDestroy
     public void closeConnection() {
         if (connection != null) {
             try {
@@ -294,7 +321,9 @@ public class CICSHandlerBean {
             } catch (JMSException ex) {
                 java.util.logging.Logger.getLogger(CICSHandlerBean.class.
                         getName()).log(Level.SEVERE, null, ex);
+                 throw new MQGatewayException("Failed to close the connection:");
             }
+
         }
     }
 
@@ -306,20 +335,19 @@ public class CICSHandlerBean {
         return val.substring(0, 24).getBytes();
     }
 
-    
     private void decryptValues() {
-      
-            String baseDir = System.getProperty("jboss.server.config.dir");
-            String keysPath = baseDir + "/crypto/keys";
-            String logPath = baseDir + "/crypto.log4j.properties";
 
-            Encryptor encryptor = new Encryptor(keysPath, logPath);
+        String baseDir = System.getProperty("jboss.server.config.dir");
+        String keysPath = baseDir + "/crypto/keys";
+        String logPath = baseDir + "/crypto.log4j.properties";
 
-            cicsPassword = encryptor.decrypt(cicsPassword);
-            qPassword = encryptor.decrypt(qPassword);
-        
+        Encryptor encryptor = new Encryptor(keysPath, logPath);
+
+        cicsPassword = encryptor.decrypt(cicsPassword);
+        qPassword = encryptor.decrypt(qPassword);
+
     }
-    
+
     public String getTransId() {
         return transId;
     }

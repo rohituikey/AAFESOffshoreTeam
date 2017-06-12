@@ -8,6 +8,7 @@ package com.aafes.stargate.gateway.vision;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.gateway.MQGatewayException;
 import com.aafes.stargate.gateway.vision.entity.CICSTranId;
 import com.aafes.stargate.gateway.vision.entity.CICSHandlerBean;
 import com.aafes.stargate.util.DeviceType;
@@ -37,7 +38,10 @@ public class VisionPlusProcessor {
             VisionPlusProcessor.class.getSimpleName());
     @EJB
     private CICSHandlerBean mqhandler;
-    
+
+    @EJB
+    private VisionPlusFormatter vpFormatter;
+
     @EJB
     private Configurator configurator;
 
@@ -47,7 +51,7 @@ public class VisionPlusProcessor {
         String correlationId = null;
         // Sending MQ Message.
         try {
-            VisionPlusFormatter vpFormatter = new VisionPlusFormatter();
+            // VisionPlusFormatter vpFormatter = new VisionPlusFormatter();
             IsoMessage isoMsg = vpFormatter.toISO8583(t);
             LOG.debug("Request to Vision: " + isoMsg.debugString());
             switch (t.getDeviceType()) {
@@ -87,9 +91,9 @@ public class VisionPlusProcessor {
              * comment below line for actual vision call
              */
             //correlationId = "123dummy";
-            
-             // Reading MQ Message.ii
-        getResponse(correlationId, t);
+
+            // Reading MQ Message.ii
+            getResponse(correlationId, t);
         } catch (IOException ioex) {
             correlationId = null;
 
@@ -106,13 +110,28 @@ public class VisionPlusProcessor {
             t.setDescriptionField("ERR");
             LOG.error(com.aafes.stargate.gateway.vision.Common.
                     convertStackTraceToString(cex));
-        } catch(Exception e) {
-            t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
+        } catch (MQGatewayException cex) {
+            correlationId = null;
+            t.setResponseType(ResponseType.DECLINED);
+            t.setReasonCode(configurator.get("MQ_SERVICE_ERROR"));
+            t.setDescriptionField("MQ_SERVICE_ERROR");
+            LOG.error(com.aafes.stargate.gateway.vision.Common.
+                    convertStackTraceToString(cex));
+        } catch (Exception e) {
+
+            if (e.getMessage().equalsIgnoreCase("unable to contact mq startup.")
+                    || e.getMessage().equalsIgnoreCase("WFLyeE0042: failed to construct component instance")) {
+                t.setResponseType(ResponseType.DECLINED);
+                t.setReasonCode(configurator.get("MQ_SERVICE_ERROR"));
+                t.setDescriptionField("MQ_SERVICE_ERROR");
+                LOG.error(com.aafes.stargate.gateway.vision.Common.
+                        convertStackTraceToString(e));
+            } else {
+                t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
                 t.setResponseType(ResponseType.DECLINED);
                 t.setDescriptionField("INTERNAL_SERVER_ERROR");
+            }
         }
-
-       
 
         return t;
     }
@@ -127,7 +146,7 @@ public class VisionPlusProcessor {
                  */
                 rsp = mqhandler.getMessage(correlationId);
                 t.setResponseAuthDateTime(this.getSystemDateTime());
-                VisionPlusFormatter.parseISO8583(rsp, t);
+                vpFormatter.parseISO8583(rsp, t);
                 /**
                  * comment below line for actual vision call
                  */
@@ -174,5 +193,19 @@ public class VisionPlusProcessor {
         Date date = new Date();
         String ts = dateFormat.format(date);
         return ts;
+    }
+
+    /**
+     * @param configurator the configurator to set
+     */
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
+
+    /**
+     * @param vpFormatter the vpFormatter to set
+     */
+    public void setVpFormatter(VisionPlusFormatter vpFormatter) {
+        this.vpFormatter = vpFormatter;
     }
 }

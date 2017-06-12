@@ -9,8 +9,7 @@ and open the template in the editor.
     targetNamespace="http://www.aafes.com/token"
     xmlns:credit="http://www.aafes.com/token"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    elementFormDefault="qualified" 
->
+    elementFormDefault="qualified" >
     <xs:simpleType name="AccountTypeType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="Pan" />

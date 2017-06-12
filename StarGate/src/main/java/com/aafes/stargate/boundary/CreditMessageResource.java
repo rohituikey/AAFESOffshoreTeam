@@ -65,7 +65,13 @@ public class CreditMessageResource {
         try {
             LOG.info("From Client: " + requestXML);
             String ValidatedXML = FilterRequestXML(requestXML);
-            if (ValidatedXML != null) {
+            if(requestXML.contains("DOCTYPE")
+                    ||requestXML.contains("CDATA")){
+                LOG.error("Invalid Request");
+                responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
+                        + "</ErrorInformation>";
+            }
+            else if (ValidatedXML != null) {
                 Message requestMessage = unmarshalWithValidation(requestXML);
                 //Message requestMessage = unmarshalWithValidation(requestXML);
                 Message responseMessage = authorizer.authorize(requestMessage);

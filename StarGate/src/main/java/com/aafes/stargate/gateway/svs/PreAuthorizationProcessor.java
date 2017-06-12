@@ -47,7 +47,6 @@ package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.GatewayException;
-import com.aafes.stargate.util.ResponseCodes;
 import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StarGateConstants;
 import com.aafes.stargate.util.SvsUtil;
@@ -57,10 +56,8 @@ import com.svs.svsxml.beans.Merchant;
 import com.svs.svsxml.beans.PreAuthRequest;
 import com.svs.svsxml.beans.PreAuthResponse;
 import com.svs.svsxml.service.SVSXMLWay;
-import java.net.SocketTimeoutException;
-import java.util.Date;
+import java.math.BigDecimal;
 import javax.ejb.Stateless;
-import javax.xml.ws.WebServiceException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -71,16 +68,16 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class PreAuthorizationProcessor extends Processor{
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PreAuthorizationProcessor.class.getSimpleName());
-    String sMethodName = "", retryReason = "";;
+    String sMethodName = "";
     final String CLASS_NAME = PreAuthorizationProcessor.this.getClass().getSimpleName();
-    SVSXMLWay sVSXMLWay;
-    PreAuthResponse preAuthResponseObj = null;
-    PreAuthRequest preAuthRequest;
-    int dupCheckCounter = 0;
-    
+
+
     @Override
     public void processRequest(Transaction t) {
-        boolean dupCheckFlag = false;
+       PreAuthResponse preAuthResponseObj;
+        PreAuthRequest preAuthRequest;
+        SVSXMLWay sVSXMLWay;
+        double approvedAmount;
         
         sMethodName = "preAuth";
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
@@ -93,7 +90,7 @@ public class PreAuthorizationProcessor extends Processor{
                     
             Amount amountObj = new Amount();
             amountObj.setAmount(amt);
-            amountObj.setCurrency(t.getCurrencycode());
+            amountObj.setCurrency(StarGateConstants.CURRENCY);
             preAuthRequest.setRequestedAmount(amountObj);
             
             Card card = new Card();
@@ -127,104 +124,44 @@ public class PreAuthorizationProcessor extends Processor{
             //preAuthRequest.setStan(t.getSTAN()); 
             preAuthRequest.setTransactionID(t.getRrn() + "0000");
             preAuthRequest.setCheckForDuplicate(StarGateConstants.TRUE);
-            LOGGER.info("Request Sent Time " + new Date().toString());
-            preAuthResponseObj = sVSXMLWay.preAuth(preAuthRequest);
-            LOGGER.info("Response received Time " + new Date().toString());
-            dupCheckFlag = handlePreAuthResponse(t, preAuthResponseObj);
-            if(dupCheckFlag) handleDupCheckCondition(t, dupCheckFlag);
-        } catch (Exception e) {
-            LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
-            if(e instanceof SocketTimeoutException || e instanceof WebServiceException){
-                retryReason = "Exception : " + e.getMessage();
-                handleDupCheckCondition(t, dupCheckFlag);
-            } else throw new GatewayException("INTERNAL SYSTEM ERROR");
-        }
-        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-    }
-    
-    public boolean handlePreAuthResponse(Transaction t, PreAuthResponse preAuthResponseObj){
-        sMethodName = "handlePreAuthResponse";
-        boolean dupCheckFlag = false;
-        double approvedAmount;
-        String reasonCode = "", reasonDescription = "";
-        
-        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        try{
-            if(preAuthResponseObj != null){
+
+           preAuthResponseObj = sVSXMLWay.preAuth(preAuthRequest);
+           if(preAuthResponseObj != null){
                 if(preAuthResponseObj.getReturnCode() != null){
-                    reasonCode = String.valueOf(preAuthResponseObj.getReturnCode().getReturnCode());
-                    reasonDescription = String.valueOf(preAuthResponseObj.getReturnCode().getReturnDescription());
+                    LOGGER.info("ReturnCode : " + String.valueOf(preAuthResponseObj.getReturnCode().getReturnCode()));
+                    LOGGER.info("ReturnDescription : " + String.valueOf(preAuthResponseObj.getReturnCode().getReturnDescription()));
                     
-                    LOGGER.info("ReturnCode : " + reasonCode);
-                    LOGGER.info("ReturnDescription : " + reasonDescription);
-                    
-                    if(ResponseCodes.DUP_CHECK_REASON_CODE.equals(reasonCode)){
-                        dupCheckFlag = true;
-                        retryReason = "ReturnCode : " + reasonCode;
-                    }
-                   // else if(ResponseType.TIMEOUT.equalsIgnoreCase(sMethodName))
-                    
-                    if(!dupCheckFlag){
-                        t.setReasonCode(reasonCode);
-                        t.setDescriptionField(reasonDescription);
-                        if("01".equalsIgnoreCase(reasonCode)) t.setResponseType(ResponseType.APPROVED);
-                        else t.setResponseType(ResponseType.DECLINED);
+                    t.setReasonCode(preAuthResponseObj.getReturnCode().getReturnCode());
+                    t.setDescriptionField(preAuthResponseObj.getReturnCode().getReturnDescription());
+                   // t.setResponseType(preAuthResponseObj.getReturnCode().getReturnDescription());
+                    if(t.getReasonCode().equalsIgnoreCase("01"))
+                    {
+                        t.setResponseType(ResponseType.APPROVED);
+                    } else {
+                        t.setResponseType(ResponseType.DECLINED);
                     }
                 }
                 
-                if(!dupCheckFlag){
-                    if(preAuthResponseObj.getApprovedAmount() != null){
-                        approvedAmount = preAuthResponseObj.getApprovedAmount().getAmount();
-                        t.setCurrencycode(preAuthResponseObj.getApprovedAmount().getCurrency());
-                        t.setAmtPreAuthorized((long) (approvedAmount*100));
-                    }
-
-                    if(preAuthResponseObj.getBalanceAmount() != null)
-                        t.setBalanceAmount((long) (preAuthResponseObj.getBalanceAmount().getAmount()*100));
-
-                    LOGGER.info("AuthorizationCode : " + preAuthResponseObj.getAuthorizationCode());
-
-                    if(preAuthResponseObj.getCard() != null) t.setCardSequenceNumber(preAuthResponseObj.getCard().getCardNumber());
-                    t.setAuthNumber(preAuthResponseObj.getAuthorizationCode());
-                    t.setSTAN(preAuthResponseObj.getStan());
-                    t.setTransactionId(preAuthResponseObj.getTransactionID());
+                if(preAuthResponseObj.getApprovedAmount() != null){
+                    approvedAmount = preAuthResponseObj.getApprovedAmount().getAmount();
+                  //  t.setAmount((long) approvedAmount);
+                    t.setCurrencycode(preAuthResponseObj.getApprovedAmount().getCurrency());
+                    t.setAmtPreAuthorized((long) (approvedAmount*100));
                 }
+                
+                if(preAuthResponseObj.getBalanceAmount() != null)
+                    t.setBalanceAmount((long) (preAuthResponseObj.getBalanceAmount().getAmount()*100));
+               
+                LOGGER.info("AuthorizationCode : " + preAuthResponseObj.getAuthorizationCode());
+
+                if(preAuthResponseObj.getCard() != null) t.setCardSequenceNumber(preAuthResponseObj.getCard().getCardNumber());
+                t.setAuthNumber(preAuthResponseObj.getAuthorizationCode());
+                t.setSTAN(preAuthResponseObj.getStan());
+                t.setTransactionId(preAuthResponseObj.getTransactionID());
             }else LOGGER.error("Response Object is NULL " + sMethodName + " " + CLASS_NAME);
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
-        }
-        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        return dupCheckFlag;
-    }
-    
-    private void handleDupCheckCondition(Transaction t, boolean dupCheckFlag){
-        sMethodName = "handleDupCheckCondition";
-        
-        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        try{
-            dupCheckCounter++;
-            if(dupCheckCounter < 4){
-                LOGGER.info("Retrying to send request. Retry Reason " + retryReason + ". Retry Number : "+ dupCheckCounter 
-                        + ". Method " + sMethodName + ". Class Name " + CLASS_NAME);
-                preAuthResponseObj = sVSXMLWay.preAuth(preAuthRequest);
-                dupCheckFlag = handlePreAuthResponse(t, preAuthResponseObj);
-                if(dupCheckFlag){
-                    handleDupCheckCondition(t, dupCheckFlag);
-                    dupCheckCounter++;
-                }
-            } else if(dupCheckCounter > 3){
-                LOGGER.info("Retry count exausted. Please continue with manual follow-up!! " + "Method " + sMethodName + 
-                        ". Class Name " + CLASS_NAME);
-                dupCheckCounter = 0;
-            }
-        } catch (Exception e) {
-            LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
-            if(e instanceof SocketTimeoutException || e instanceof WebServiceException) {
-                retryReason = "Exception : " + e.getMessage();
-                handleDupCheckCondition(t, dupCheckFlag);
-                dupCheckCounter++;
-            } else throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
     }

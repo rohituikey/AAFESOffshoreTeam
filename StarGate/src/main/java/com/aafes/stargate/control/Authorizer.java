@@ -669,7 +669,7 @@ public class Authorizer {
 
                 Response.VrtGcAcctInfo GcInfo = new Response.VrtGcAcctInfo();
                 GcInfo.setVrtGcAcctNbr(new BigInteger(String.valueOf(t.getAccount())));
-                GcInfo.setVrtGCPin(new BigInteger(String.valueOf(t.getGcpin())));
+                GcInfo.setVrtGCPin(t.getGcpin());
                 response.setVrtGcAcctInfo(GcInfo);
 
             }
@@ -726,6 +726,13 @@ public class Authorizer {
 
     public void setfDMSStub(FDMSStub fDMSStub) {
         this.fDMSStub = fDMSStub;
+    }
+
+    /**
+     * @param baseStrategyFactory the baseStrategyFactory to set
+     */
+    public void setBaseStrategyFactory(BaseStrategyFactory baseStrategyFactory) {
+        this.baseStrategyFactory = baseStrategyFactory;
     }
 
 }

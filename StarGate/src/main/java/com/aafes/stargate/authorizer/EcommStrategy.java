@@ -8,15 +8,15 @@ package com.aafes.stargate.authorizer;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Authorizer;
 import com.aafes.stargate.control.AuthorizerException;
+import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.control.CustInfo;
 import com.aafes.stargate.control.MQServ;
 import com.aafes.stargate.gateway.Gateway;
 import static com.aafes.stargate.gateway.vision.Common.convertStackTraceToString;
-import com.aafes.stargate.util.GetMediaTypeByAccountNbr;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
-import com.aafes.stargate.util.ResponseCodes;
 import com.aafes.stargate.util.ResponseType;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +29,9 @@ public class EcommStrategy extends BaseStrategy {
 
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(Authorizer.class.getSimpleName());
+
+    @EJB
+    private Configurator configurator;
 
     @Override
     public Transaction processRequest(Transaction t) {
@@ -74,25 +77,20 @@ public class EcommStrategy extends BaseStrategy {
         // Validate only fields which are required for ECOMM 
         // Settle Indicator is always false
         if ("true".equalsIgnoreCase(t.getSettleIndicator())) {
-            buildErrorResponse(t, "", "INVALID SETTLE INDICATOR");
+            buildErrorResponse(t, configurator.get("INVALID_SETTLE_INDICATOR"), "INVALID_SETTLE_INDICATOR");
             return false;
         }
 
-//        if (t.getReversal() != null && !t.getReversal().isEmpty()) {
-//            //TODO : Remove below line when handling reversals
-//            buildErrorResponse(t, "", "REVERSAL IS NOT SUPPORTED");
-//            return false;
-//        }
         if (t.getVoidFlag() != null && !t.getVoidFlag().isEmpty()) {
             //TODO : Remove below line when handling voids
-            buildErrorResponse(t, "", "VOID IS NOT SUPPORTED");
+            buildErrorResponse(t, configurator.get("VOID_IS_NOT_SUPPORTED"), "VOID_IS_NOT_SUPPORTED");
             return false;
         }
 
         if (t.getOrderNumber() != null && !t.getOrderNumber().isEmpty()
                 && t.getOrderNumber().length() > 22) {
             //TODO : Remove below line when handling voids
-            buildErrorResponse(t, "", "INVALID ORDER NUMBER");
+            buildErrorResponse(t, configurator.get("INVALID_ORDER_NUMBER"), "INVALID_ORDER_NUMBER");
             return false;
         }
 
@@ -107,8 +105,34 @@ public class EcommStrategy extends BaseStrategy {
         // For Milstar, Plan Number should be there
         if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)) {
             if (PlanNbr.equalsIgnoreCase("") || PlanNbr.trim().isEmpty()) {
-                buildErrorResponse(t, ResponseCodes.INVALID_CREDIT_PLAN, "INVALID CREDIT PLAN");
+                buildErrorResponse(t, configurator.get("INVALID_CREDIT_PLAN"), "INVALID_CREDIT_PLAN");
                 return false;
+            }
+
+            if (!RequestType.SALE.equalsIgnoreCase(t.getRequestType())) {
+                if (t.getReversal() == null || t.getReversal().trim().isEmpty()) {
+                    buildErrorResponse(t, configurator.get("INVALID_REQUEST_TYPE"), "INVALID_REQUEST_TYPE");
+                    return false;
+                }
+            }
+        } else if (t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD)) {
+            if (!t.getRequestType().matches("(?i)" + RequestType.ISSUE
+                    + "|" + RequestType.PREAUTH + "|"
+                    + "|" + RequestType.FINAL_AUTH + "|"
+                    + "|" + RequestType.INQUIRY + "|"
+                    + "|" + RequestType.REFUND)) {
+                buildErrorResponse(t, configurator.get("INVALID_REQUEST_TYPE"), "INVALID_REQUEST_TYPE");
+                return false;
+            }
+        } else if (t.getMedia().equalsIgnoreCase(MediaType.VISA)
+                || t.getMedia().equalsIgnoreCase(MediaType.AMEX)
+                || t.getMedia().equalsIgnoreCase(MediaType.DISCOVER)
+                || t.getMedia().equalsIgnoreCase(MediaType.MASTER)) {
+            if (!RequestType.SALE.equalsIgnoreCase(t.getRequestType())) {
+                if (t.getReversal() == null || t.getReversal().trim().isEmpty()) {
+                    buildErrorResponse(t, configurator.get("INVALID_REQUEST_TYPE"), "INVALID_REQUEST_TYPE");
+                    return false;
+                }
             }
         }
 
@@ -117,23 +141,23 @@ public class EcommStrategy extends BaseStrategy {
             if (t.getZipCode() == null || t.getZipCode().trim().isEmpty()) {
                 if (t.getBillingZipCode() == null
                         || t.getBillingZipCode().trim().isEmpty()) {
-                    buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
+                    buildErrorResponse(t, configurator.get("INVALID_ADDRESS"), "INVALID_ADDRESS");
                     return false;
                 }
                 if (t.getBillingAddress1() == null
                         || t.getBillingAddress1().trim().isEmpty()) {
-                    buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
+                    buildErrorResponse(t, configurator.get("INVALID_ADDRESS"), "INVALID_ADDRESS");
                     return false;
                 }
                 if (t.getBillingCountryCode() == null
                         || t.getBillingCountryCode().trim().isEmpty()) {
-                    buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
+                    buildErrorResponse(t, configurator.get("INVALID_ADDRESS"), "INVALID_ADDRESS");
                     return false;
                 }
 
                 if (t.getCardHolderName() == null
                         || t.getCardHolderName().trim().isEmpty()) {
-                    buildErrorResponse(t, ResponseCodes.INVALID_ADDRESS, "INVALID ADDRESS");
+                    buildErrorResponse(t, configurator.get("INVALID_ADDRESS"), "INVALID_ADDRESS");
                     return false;
                 }
             }
@@ -175,5 +199,12 @@ public class EcommStrategy extends BaseStrategy {
             throw new AuthorizerException("Customer ID is not authorized to use the milstar card"); //buildResponseMessage(message, rrn, 'D', "995", "NOT ALLOWD", "Customer ID is not authorized to use the milstar card");                                 
         }
 
+    }
+
+    /**
+     * @param configurator the configurator to set
+     */
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
     }
 }

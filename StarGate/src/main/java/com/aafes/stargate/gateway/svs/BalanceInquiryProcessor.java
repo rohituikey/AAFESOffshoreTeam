@@ -30,6 +30,7 @@ public class BalanceInquiryProcessor extends Processor {
     private static final org.slf4j.Logger log
             = LoggerFactory.getLogger(BalanceInquiryProcessor.class.getSimpleName());
 
+
     @Override
     public void processRequest(Transaction t) {
         log.info("Method...... " + "processBalanceInquiry.......");
@@ -55,16 +56,11 @@ public class BalanceInquiryProcessor extends Processor {
         merchant.setMerchantNumber(StarGateConstants.MERCHANT_NUMBER);
         merchant.setStoreNumber(StarGateConstants.STORE_NUMBER);
         balanceInquiryRequest.setMerchant(merchant);
-//       log.info("$$$$$$$$$$-------"+t.getPinBlock());
 
         balanceInquiryRequest.setCheckForDuplicate(StarGateConstants.TRUE);
         balanceInquiryRequest.setTransactionID(t.getRrn() + "0000");
         balanceInquiryRequest.setDate(SvsUtil.formatLocalDateTime());
-        if (t.getOrderNumber().length() >= 8 && t.getOrderNumber() != null) {
-            balanceInquiryRequest.setInvoiceNumber(t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
-        } else {
-            balanceInquiryRequest.setInvoiceNumber(t.getOrderNumber());
-        }
+        balanceInquiryRequest.setInvoiceNumber(t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
 
         balanceInquiryRequest.setRoutingID(StarGateConstants.ROUTING_ID);
 //        balanceInquiryRequest.setStan(t.getSTAN());
@@ -72,22 +68,23 @@ public class BalanceInquiryProcessor extends Processor {
 
         BalanceInquiryResponse balanceInquiryResponse = sVSXMLWay.balanceInquiry(balanceInquiryRequest);
         try {
-            log.info("RESPONSE---->AuthorizationCode " + balanceInquiryResponse.getAuthorizationCode() + "||AMOUNT " + balanceInquiryResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + balanceInquiryResponse.getReturnCode().getReturnCode() + "||RETURN CODE DISCRIPTION" + balanceInquiryResponse.getReturnCode().getReturnDescription());
+            log.info("RESPONSE---->AuthorizationCode " + balanceInquiryResponse.getAuthorizationCode() + "||AMOUNT " + balanceInquiryResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + balanceInquiryResponse.getReturnCode().getReturnCode() + "||RETURN CODE DISCRIPTION" + balanceInquiryResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + balanceInquiryResponse.getReturnCode().getReturnDescription());
 
             if (balanceInquiryResponse != null) {
 
                 t.setAuthNumber(balanceInquiryResponse.getAuthorizationCode());
 
                 if (balanceInquiryResponse.getBalanceAmount() != null) {
-                    t.setBalanceAmount((long) (balanceInquiryResponse.getBalanceAmount().getAmount() * 100));
+                    t.setBalanceAmount((long) (balanceInquiryResponse.getBalanceAmount().getAmount()*100));
                     t.setCurrencycode(StarGateConstants.CURRENCY);
 
-                    t.setAccount(balanceInquiryResponse.getCard().getCardNumber());
+                    t.setCardSequenceNumber(balanceInquiryResponse.getCard().getCardNumber());
                     t.setExpiration(balanceInquiryResponse.getCard().getCardExpiration());
 
                     t.setReasonCode(balanceInquiryResponse.getReturnCode().getReturnCode());
                     t.setDescriptionField(balanceInquiryResponse.getReturnCode().getReturnDescription());
-                    if (t.getReasonCode().equalsIgnoreCase("01")) {
+                    if(t.getReasonCode().equalsIgnoreCase("01"))
+                    {
                         t.setResponseType(ResponseType.APPROVED);
                     } else {
                         t.setResponseType(ResponseType.DECLINED);

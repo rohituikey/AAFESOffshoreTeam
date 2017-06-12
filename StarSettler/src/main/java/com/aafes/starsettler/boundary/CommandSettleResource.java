@@ -40,7 +40,7 @@ public class CommandSettleResource {
         try {
             LOG.info("Calling ondemand...");
 
-            LOG.info("ProcessDate : " + commandMessage.getProcessDate() + ", SettlerType :" + commandMessage.getSettlerType());
+            LOG.info("identityUUID : " + commandMessage.getIdentityuuid()+  "ProcessDate : " + commandMessage.getProcessDate() + ", SettlerType :" + commandMessage.getSettlerType());
 
             String response = settler.commandSettle(commandMessage);
 

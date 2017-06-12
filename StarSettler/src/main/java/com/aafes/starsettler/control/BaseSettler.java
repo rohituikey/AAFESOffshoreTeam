@@ -17,29 +17,25 @@ import javax.ejb.EJB;
 public abstract class BaseSettler {
 
     @EJB
-    private SettleMessageRepository repository = new SettleMessageRepository();
+    private SettleMessageRepository repository;
    
-    public abstract void run(String processDate);
+    public abstract void run(String identityUUID, String processDate);
 
-    public List<SettleEntity> getSettleData(String settlerType, String processDate, String settleStatus) {
+    public List<SettleEntity> getSettleData(String identityUUID,String settlerType, String processDate, String settleStatus) {
 
         List<SettleEntity> settleData = null;
 
         switch (settlerType) {
             case SettlerType.FDMS:
-                settleData = repository.getFDMSData(processDate,settleStatus);
+                settleData = repository.getFDMSData(identityUUID,processDate,settleStatus);
                 break;
 
             case SettlerType.MILSTAR:
-                settleData = repository.getVisionData(processDate,settleStatus);
+                settleData = repository.getVisionData(identityUUID,processDate,settleStatus);
                 break;
             
-            case SettlerType.RETAIL:
-                settleData = repository.getRetailData(processDate, settleStatus, "");
-                break;    
-                
             default:
-                settleData = repository.getAll(processDate,settleStatus);
+                settleData = repository.getAll(identityUUID,processDate,settleStatus);
                 break;
         }
 

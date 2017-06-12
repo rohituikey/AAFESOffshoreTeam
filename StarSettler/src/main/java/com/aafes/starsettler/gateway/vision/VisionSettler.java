@@ -30,11 +30,11 @@ public class VisionSettler extends BaseSettler{
 
     // Schedular will call this method 
     @Override
-    public void run(String processDate) {
+    public void run(String identityUUID, String processDate) {
          // TODO
         // Get Milstar Data records from Base Settler
         // And process them
-        List<SettleEntity> milstarData = super.getSettleData(SettlerType.MILSTAR,processDate,SettleStatus.Ready_to_settle);
+        List<SettleEntity> milstarData = super.getSettleData(identityUUID, SettlerType.MILSTAR,processDate,SettleStatus.Ready_to_settle);
          //super.getSettleData(SettlerType.MILSTAR);
         
        //  Format milstar data

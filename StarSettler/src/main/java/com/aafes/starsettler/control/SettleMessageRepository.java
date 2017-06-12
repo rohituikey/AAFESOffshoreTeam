@@ -43,16 +43,24 @@ public class SettleMessageRepository {
         return transactionDAO.find(settleEntity);
     }
 
-    public List<SettleEntity> getFDMSData(String processDate, String settleStatus) {
-       return settleMessageDAO.getFDMSData(processDate, settleStatus);
+    public List<SettleEntity> getFDMSData(String identityUUID, String processDate, String settleStatus) {
+       return settleMessageDAO.getFDMSData(identityUUID, processDate, settleStatus);
     }
 
-    public List<SettleEntity> getVisionData(String processDate, String settleStatus) {
-        return settleMessageDAO.getVisionData(processDate, settleStatus);
+    public List<SettleEntity> getVisionData(String identityUUID, String processDate, String settleStatus) {
+        return settleMessageDAO.getVisionData(identityUUID, processDate, settleStatus);
     }
 
-    public List<SettleEntity> getAll(String processDate, String settleStatus) {
-        return settleMessageDAO.getAll(processDate, settleStatus);
+    public List<SettleEntity> getRetailData(String processDate, String settleStatus, String uuid) {
+        return settleMessageDAO.getRetailData(processDate, settleStatus, uuid);
+    }
+    
+    public List<String> getUuidList(String strategyStr) {
+        return settleMessageDAO.getIdentityUuidList(strategyStr);
+    } 
+    
+    public List<SettleEntity> getAll(String identityUUID, String processDate, String settleStatus) {
+        return settleMessageDAO.getAll(identityUUID, processDate, settleStatus);
     }
 
     public void updateStatus(List<SettleEntity> settleData, String status) {
@@ -96,11 +104,5 @@ public class SettleMessageRepository {
         this.transactionDAO = transactionDAO;
     }
 
-    public List<SettleEntity> getRetailData(String processDate, String settleStatus, String uuid) {
-        return settleMessageDAO.getRetailData(processDate, settleStatus, uuid);
-    }
     
-    public List<String> getUuidList(String strategyStr) {
-        return settleMessageDAO.getIdentityUuidList(strategyStr);
-    } 
 }

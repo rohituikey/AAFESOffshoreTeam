@@ -36,12 +36,12 @@ public class FirstDataSettler extends BaseSettler{
     
     // Schedular will call this method 
     @Override
-    public void run(String processDate) {
+    public void run(String identityUUID, String processDate) {
 
         // Get First Data records from Base Settler
         // And process them
         log.info(" FDMS Settlement process started ");
-        List<SettleEntity> fdmsData = getSettleData(SettlerType.FDMS,processDate,SettleStatus.Ready_to_settle);
+        List<SettleEntity> fdmsData = getSettleData(identityUUID, SettlerType.FDMS,processDate,SettleStatus.Ready_to_settle);
 
         // Format fdms data and send it to FDMS to settle
         if (fdmsData == null || fdmsData.isEmpty()) {

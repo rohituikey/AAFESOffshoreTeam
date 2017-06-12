@@ -17,9 +17,17 @@ import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -57,12 +65,25 @@ public class SettleMessageResource {
 
             // Unmarshal against XSD
             // Send the settle message to Setler
+             String ValidatedXML = FilterRequestXML(requestXML);
+              if(requestXML.contains("DOCTYPE")
+                    ||requestXML.contains("CDATA")){
+                LOG.error("Invalid Request");
+                responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
+                        + "</ErrorInformation>";
+            }
+            else if (ValidatedXML != null) {
             Settlement requestMessage = unmarshalWithValidation(requestXML);
 
             Settlement responseMessage = settler.saveForSettle(requestMessage);
 
             responseXML = marshal(responseMessage);
             LOG.info("To Client: " + responseXML);
+            } else {
+                LOG.error("Invalid Request");
+                responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
+                        + "</ErrorInformation>";
+            }
         } catch (JAXBException | SAXException e) {
 
             responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
@@ -114,6 +135,45 @@ public class SettleMessageResource {
      */
     public void setSettler(Settler settler) {
         this.settler = settler;
+    }
+    
+    private static String FilterRequestXML(String xmlString) {
+        LOG.info("In filter request method.");
+
+        String retString = null;
+        try {
+            StringReader reader = new StringReader(xmlString);
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            Document document = dbf.newDocumentBuilder().parse(new InputSource(reader));
+            retString = getStringFromDocument(document);
+            LOG.info("Validated XML");
+        } catch (Exception ex) {
+            LOG.error(ex.toString());
+            retString = null;
+        }
+        return retString;
+    }
+
+    public static String getStringFromDocument(Document doc) throws TransformerException {
+
+        StringWriter writer = null;
+
+        try {
+            DOMSource domSource = new DOMSource(doc);
+            writer = new StringWriter();
+            StreamResult result = new StreamResult(writer);
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.transform(domSource, result);
+
+        } catch (Exception ex) {
+            LOG.error(ex.toString());
+        }
+
+        return writer.toString();
     }
 
 }

@@ -3,6 +3,7 @@ package com.aafes.starsettler.control;
 import com.aafes.starsettler.dao.FacilityDAO;
 import com.aafes.starsettler.entity.CommandMessage;
 import com.aafes.starsettler.entity.*;
+import com.aafes.starsettler.tokenizer.TokenEndPointService;
 import com.aafes.starsettler.util.CardType;
 import com.aafes.starsettler.util.ResponseType;
 import com.aafes.starsettler.util.SettleStatus;
@@ -41,8 +42,8 @@ public class Settler {
     private Configurator configurator;
     @EJB
     private SettleMessageRepository settleRepository;
-
-    private CassandraSessionFactory factory;
+    @EJB
+    private TokenEndPointService tokenEndPointService;
 
     @EJB
     private SettleFactory settleFactory;
@@ -69,8 +70,7 @@ public class Settler {
                 settleMessage.getResponse().add(response);
             } else {
                 String tokenBankName = findFacility(settleMessage.getIdentityUUID());
-//                findToken(settleMessage.get)
-                findAuthorizationCodes(settleEntityList,tokenBankName);
+                findAuthorizationCodes(settleEntityList, tokenBankName);
                 // Pass the entity to Setlle Repository to save
                 settleRepository.save(settleEntityList);
 
@@ -109,7 +109,8 @@ public class Settler {
             String settleType = commandMessage.getSettlerType();
             String processDate = commandMessage.getProcessDate();
             BaseSettler baseSettler = settleFactory.findSettler(settleType);
-            baseSettler.run(processDate);
+            String identityUUID = commandMessage.getIdentityuuid();
+            baseSettler.run(identityUUID, processDate);
 
         } catch (Exception e) {
             response = e.getMessage();
@@ -135,8 +136,15 @@ public class Settler {
         }
     }
 
-    private void findAuthorizationCodes(List<SettleEntity> settleEntityList, String tokenBankname) {
+    private void findAuthorizationCodes(List<SettleEntity> settleEntityList, String tokenBankname) throws SettlerException {
+
+        boolean isTokenPresent = false;
         for (SettleEntity settleEntity : settleEntityList) {
+            settleEntity.setTokenBankName(tokenBankname);
+            isTokenPresent = findToken(settleEntity);
+            if (!isTokenPresent) {
+                throw new SettlerException("TOKEN_NOTFOUND");
+            }
             String cardType = settleEntity.getCardType();
             if (cardType.equalsIgnoreCase(CardType.AMEX)
                     || cardType.equalsIgnoreCase(CardType.VISA)
@@ -149,10 +157,27 @@ public class Settler {
                 settleEntity.setAvsResponseCode(ac.getAvsResponseCode());
                 settleEntity.setCsvResponseCode(ac.getCsvResponseCode());
             }
-            settleEntity.setTokenBankName(tokenBankname);
+            
         }
     }
 
+    private boolean findToken(SettleEntity se) {
+
+        try {
+            if (tokenEndPointService != null) {
+                String accountNbr = tokenEndPointService.lookupAccount(se);
+                if (accountNbr == null || accountNbr.trim().isEmpty()) {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            LOG.info("Error while calling tokenizer for token : " + se.getCardToken());
+            LOG.error(e.toString());
+            return false;
+        }
+
+        return true;
+    }
 //         private void validateDuplicateRecords(List<SettleEntity> settleEntityList) {
 //         
 //       for (SettleEntity settleEntity : settleEntityList) {
@@ -177,6 +202,7 @@ public class Settler {
 //            settleMessage.getResponse().add(response);
 //            }
 //     }
+
     private void mapRequest(Settlement settleMessage, List<SettleEntity> settleEntityList) throws JAXBException, SettlerException {
 
         // TODO
@@ -374,7 +400,7 @@ public class Settler {
         settleEntity.setCardReferene(payment.getCardReference());
         settleEntity.setCardToken(payment.getCardToken());
 
-        if (payment.getExpirationDate() != null) {
+        if (payment.getExpirationDate() != null && !payment.getType().equalsIgnoreCase(CardType.GIFT_CARD)) {
             //check for valid expiration date
             String exp = payment.getExpirationDate().toString();
             if (exp != null && exp.length() == 4) {
@@ -511,7 +537,7 @@ public class Settler {
         settleEntity.setCardReferene(payment.getCardReference());
         settleEntity.setCardToken(payment.getCardToken());
 
-        if (payment.getExpirationDate() != null) {
+        if (payment.getExpirationDate() != null && !payment.getType().equalsIgnoreCase(CardType.GIFT_CARD)) {
             //check for valid expiration date
             String exp = payment.getExpirationDate().toString();
             if (exp != null && exp.length() == 4) {
@@ -649,7 +675,7 @@ public class Settler {
         settleEntity.setCardReferene(payment.getCardReference());
         settleEntity.setCardToken(payment.getCardToken());
 
-        if (payment.getExpirationDate() != null) {
+        if (payment.getExpirationDate() != null && !payment.getType().equalsIgnoreCase(CardType.GIFT_CARD) ) {
             //check for valid expiration date
             String exp = payment.getExpirationDate().toString();
             if (exp != null && exp.length() == 4) {

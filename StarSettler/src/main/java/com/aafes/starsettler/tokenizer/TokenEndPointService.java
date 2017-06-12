@@ -50,6 +50,7 @@ public class TokenEndPointService {
         request.setAccountType(AccountTypeType.TOKEN);
         request.setMedia(t.getCardType());
         request.setRequestType(RequestTypeType.LOOKUP);
+         request.setTokenBankName(t.getTokenBankName());
         tm.setRequest(request);
       //  request.set
         Entity entity = Entity.entity(tm, MediaType.APPLICATION_XML);

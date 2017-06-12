@@ -17,6 +17,7 @@ public class CommandMessage {
     
     private String settlerType ="";
     private String processDate="";
+    private String identityuuid ="";
 
     public CommandMessage() {
     }
@@ -37,7 +38,20 @@ public class CommandMessage {
     public void setProcessDate(String processDate) {
         this.processDate = processDate;
     }
-    
-    
+
+    /**
+     * @return the identityuuid
+     */
+    public String getIdentityuuid() {
+        return identityuuid;
+    }
+
+    /**
+     * @param identityuuid the identityuuid to set
+     */
+    public void setIdentityuuid(String identityuuid) {
+        this.identityuuid = identityuuid;
+    }
+  
     
 }

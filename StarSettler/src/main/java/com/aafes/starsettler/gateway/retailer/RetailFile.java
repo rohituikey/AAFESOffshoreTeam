@@ -95,7 +95,7 @@ public class RetailFile {
                 creditAmount = creditAmount + tranAmount;
             }
 
-            tranAmountStr = String.format("%015d",tranAmount);
+            tranAmountStr = String.format("%017d",tranAmount);
             effectiveDate = getDayOfTheYear(entry.getValue().getSettleDate());
             creditPlan = entry.getValue().getSettlePlan();
             authCode = entry.getValue().getAuthNum();
@@ -119,7 +119,7 @@ public class RetailFile {
             
             sRetailDetails = recordType + batchSource + accountNbr + tranAmountStr + tranCode + String.format("%07d", effectiveDate)
                     + String.format("%-5s", creditPlan) + String.format("%-6s", authCode) + String.format("%-15s", ticketNumber)
-                    + String.format("%09d", storeNumber) + String.format("%-12s", salesClerk) + String.format("%-10s", orderNbr)
+                    + String.format("%09d", storeNumber) + String.format("%-12s", salesClerk) + String.format("%-16s", orderNbr)
                     + String.format("%-8s", orderDate) + String.format("%-8s", transactionId) + String.format("%-8s", localDate) 
                     + String.format("%-8s", localTime) + String.format("%-35s", "")+"\n";
 

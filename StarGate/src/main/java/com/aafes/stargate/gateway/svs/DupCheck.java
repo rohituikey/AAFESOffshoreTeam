@@ -7,7 +7,6 @@ package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.GatewayException;
-import com.aafes.stargate.util.ResponseCodes;
 import com.aafes.stargate.util.ResponseType;
 import com.svs.svsxml.beans.PreAuthResponse;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,7 @@ public class DupCheck {
                     LOGGER.info("ReturnCode : " + reasonCode);
                     LOGGER.info("ReturnDescription : " + reasonDescription);
 
-                    if (ResponseCodes.DUP_CHECK_REASON_CODE.equals(reasonCode)) {
+                    if ("".equals(reasonCode)) {
                         dupCheckFlag = true;
                     }
 

@@ -18,25 +18,25 @@ public class CompassGateway extends Gateway {
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(CompassGateway.class.getSimpleName());
 
-    @EJB
-    private CompassGatewayProcessor cgp;
+//    @EJB
+//    private CompassGatewayProcessor cgp;
 
     @Override
     public Transaction processMessage(Transaction t) {
 
-        try {
-            this.validateTransaction(t);
-            if (cgp != null) {
-                t = cgp.execute(t);
-            } else {
-                t.setResponseType(ResponseType.DECLINED);
-                t.setDescriptionField("INTERNAL SERVER ERROR");
-                return t;
-            }
-        } catch (GatewayException e) {
-            t.setResponseType(ResponseType.DECLINED);
-            t.setDescriptionField(e.getMessage());
-        }
+//        try {
+//            this.validateTransaction(t);
+//            if (cgp != null) {
+//                t = cgp.execute(t);
+//            } else {
+//                t.setResponseType(ResponseType.DECLINED);
+//                t.setDescriptionField("INTERNAL SERVER ERROR");
+//                return t;
+//            }
+//        } catch (GatewayException e) {
+//            t.setResponseType(ResponseType.DECLINED);
+//            t.setDescriptionField(e.getMessage());
+//        }
 
         return t;
     }
@@ -46,9 +46,9 @@ public class CompassGateway extends Gateway {
        
     }
 
-    public void setCgp(CompassGatewayProcessor cgp) {
-        this.cgp = cgp;
-    }
+//    public void setCgp(CompassGatewayProcessor cgp) {
+//        this.cgp = cgp;
+//    }
 
     
 }

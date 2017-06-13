@@ -43,7 +43,7 @@ public class EcommStrategy extends BaseStrategy {
                 return t;
             }
             if (t.getMedia().equals(MediaType.MIL_STAR)) {
-                CIDValidation(t);
+//                CIDValidation(t);
             }
 
             //Send transaction to Gateway

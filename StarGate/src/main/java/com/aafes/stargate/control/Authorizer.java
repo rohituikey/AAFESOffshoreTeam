@@ -649,7 +649,8 @@ public class Authorizer {
                 response.setOrigAcctType("Pan");
                 if (tokenBusinessService != null
                         && !isDuplicateTransaction
-                        && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
+                        && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)
+                        &&  (t.getTokenId() == null || t.getTokenId().trim().isEmpty())) {
                     try {
                         tokenBusinessService.issueToken(t);
                     } catch (ProcessingException e) {

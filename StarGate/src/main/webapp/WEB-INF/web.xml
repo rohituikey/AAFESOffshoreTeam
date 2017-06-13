@@ -5,9 +5,9 @@
             30
         </session-timeout>
     </session-config>
-    <listener>
+<!--    <listener>
         <listener-class>com.aafes.stargate.web.SchedulerServlet</listener-class>
-    </listener>
+    </listener>-->
     <!--security-constraint>
         <web-resource-collection>
             <url-pattern>/*</url-pattern>

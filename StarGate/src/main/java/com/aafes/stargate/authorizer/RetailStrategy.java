@@ -224,6 +224,7 @@ public class RetailStrategy extends BaseStrategy {
 
         if (t.getSettleIndicator() == null || !t.getSettleIndicator().equalsIgnoreCase(SettleConstant.TRUE)) {
             this.buildErrorResponse(t, "INVALID_SETTLE_INDICATOR", "INVALID_SETTLE_INDICATOR");
+            return false;
         }
         return true;
     }

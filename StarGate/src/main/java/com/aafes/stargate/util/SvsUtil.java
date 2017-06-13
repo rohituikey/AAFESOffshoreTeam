@@ -5,7 +5,6 @@
  */
 package com.aafes.stargate.util;
 
-import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import com.svs.svsxml.service.SVSXMLWay;
 import com.svs.svsxml.service.SVSXMLWayService;
 import java.text.SimpleDateFormat;

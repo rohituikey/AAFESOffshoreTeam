@@ -18,33 +18,36 @@ public class VisionGateway extends Gateway {
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(VisionGateway.class.getSimpleName());
 
-    @EJB
-    private VisionPlusProcessor vpp;
+//    @EJB
+//    private VisionPlusProcessor vpp;
     @EJB
     private Configurator configurator;
 
     @Override
     public Transaction processMessage(Transaction t) {
 
-        try {
-            this.validateTransaction(t);
-            if (vpp != null) {
-                t = vpp.authorize(t);
-            } else {
-                t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
-                t.setResponseType(ResponseType.DECLINED);
-                t.setDescriptionField("INTERNAL_SERVER_ERROR");
-                return t;
-            }
-        } catch (GatewayException e) {
-            t.setReasonCode(configurator.get(e.getMessage()));
-            t.setResponseType(ResponseType.DECLINED);
-            t.setDescriptionField(e.getMessage());
-        } catch (Exception e) {
-            t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
-            t.setResponseType(ResponseType.DECLINED);
-            t.setDescriptionField("INTERNAL_SERVER_ERROR");
-        }
+//        try {
+//            this.validateTransaction(t);
+//            if (vpp != null) {
+//                t = vpp.authorize(t);
+//            } else {
+//                t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
+//                t.setResponseType(ResponseType.DECLINED);
+//                t.setDescriptionField("INTERNAL_SERVER_ERROR");
+//                return t;
+//            }
+//        } catch (GatewayException e) {
+//            t.setReasonCode(configurator.get(e.getMessage()));
+//            t.setResponseType(ResponseType.DECLINED);
+//            t.setDescriptionField(e.getMessage());
+//        } catch (Exception e) {
+//            t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
+//            t.setResponseType(ResponseType.DECLINED);
+//            t.setDescriptionField("INTERNAL_SERVER_ERROR");
+//        }
+        t.setResponseType(ResponseType.APPROVED);
+        t.setAuthNumber("123456");
+
         return t;
     }
 
@@ -112,10 +115,9 @@ public class VisionGateway extends Gateway {
 //            }
     }
 
-    public void setVpp(VisionPlusProcessor visionPlusProcessor) {
-        this.vpp = visionPlusProcessor;
-    }
-
+//    public void setVpp(VisionPlusProcessor visionPlusProcessor) {
+//        this.vpp = visionPlusProcessor;
+//    }
     /**
      * @param configurator the configurator to set
      */

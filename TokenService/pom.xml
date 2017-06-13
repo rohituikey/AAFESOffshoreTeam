@@ -12,6 +12,7 @@
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
     
     <dependencies>
@@ -87,6 +88,11 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jackson-provider</artifactId>
             <version>2.3.4.Final</version>
+        </dependency>
+         <dependency>
+            <groupId>com.offbytwo.keyczar</groupId>
+            <artifactId>keyczar</artifactId>
+            <version>0.71g</version>
         </dependency>
     </dependencies>
 

@@ -14,6 +14,7 @@ import java.util.Date;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import java.security.SecureRandom;
+import java.util.List;
 import javax.inject.Inject;
 
 @Stateless
@@ -29,11 +30,11 @@ public class IssueService {
     public String process(TokenMessage tm) throws ParseException {
         String token = "";
         Vault vault = null;
-        vault = vaultDao.findByAccount(tm.getRequest().getAccount() + tm.getRequest().getTokenBankName());
+        vault = getExistingToken(tm);
 
         if (vault == null) {
 
-           token =  this.generarte(tm);
+            token = this.generarte(tm);
         } else {
             token = vault.getTokennumber();
 //            TokenBank tokenBank = tokenizerDao.find(token, tm.getRequest().getTokenBankName());
@@ -43,7 +44,7 @@ public class IssueService {
 //               Date expDate = df.parse(tokenBank.getExpirydate());;
 //               String date = df.format(new Date());
 //               Date currentDate = df.parse(date);
-               
+
 //               if(currentDate.after(expDate))
 //               {
 //                   tokenBank.setStatus(TokenizerConstants.EXPIRED);
@@ -63,36 +64,63 @@ public class IssueService {
 
     }
 
-    private String generarte(TokenMessage tm)
-    {
-         String token = "";
-            int attempts = 1;
+    private Vault getExistingToken(TokenMessage tm) {
+        Vault vault = null;
+        List<String> tokensList = tokenizerDao.getAllTokensByName(tm.getRequest().getTokenBankName());
+        if (tokensList == null) {
+            return vault;
+        }
 
-            while (attempts < 4) {
-                token = generateToken(tm.getRequest().getAccount(), tm.getRequest().getMedia());
-                TokenBank tokenBank = tokenizerDao.find(token, tm.getRequest().getTokenBankName());
-                if (tokenBank != null) {
-                    // generate again
-                    attempts++;
-                } else {
-
-                    Vault newVault = new Vault();
-                    newVault.setAccountnumber(tm.getRequest().getAccount() + tm.getRequest().getTokenBankName());
-                    newVault.setTokennumber(token);
-                    vaultDao.save(newVault);
-
-                    TokenBank newTokenBank = new TokenBank();
-                    newTokenBank.setTokenbankname(tm.getRequest().getTokenBankName());
-                    newTokenBank.setTokennumber(token);
-                    newTokenBank.setExpirydate(getExpirationDate());
-                    newTokenBank.setStatus(TokenizerConstants.ACTIVE);
-                    tokenizerDao.save(newTokenBank);
-                    break;
+        Vault existingVault;
+        String accountNumber = "";
+        for (String token : tokensList) {
+            existingVault = vaultDao.findByToken(token);
+            if (existingVault != null) {
+                if ( existingVault.getAccountnumber().contains(tm.getRequest().getTokenBankName())) {
+                    accountNumber = existingVault.getAccountnumber();
+                    accountNumber = accountNumber.replaceAll(tm.getRequest().getTokenBankName(), "");
+                    
+                }
+                if (tm.getRequest().getAccount().equalsIgnoreCase(accountNumber)) {
+                    existingVault.setAccountnumber(accountNumber);
+                    vault = existingVault;
                 }
             }
+        }
+
+        return vault;
+    }
+
+    private String generarte(TokenMessage tm) {
+        String token = "";
+        int attempts = 1;
+
+        while (attempts < 4) {
+            token = generateToken(tm.getRequest().getAccount(), tm.getRequest().getMedia());
+            TokenBank tokenBank = tokenizerDao.find(token, tm.getRequest().getTokenBankName());
+            if (tokenBank != null) {
+                // generate again
+                attempts++;
+            } else {
+
+                Vault newVault = new Vault();
+                newVault.setAccountnumber(tm.getRequest().getAccount() + tm.getRequest().getTokenBankName());
+                newVault.setTokennumber(token);
+                vaultDao.save(newVault);
+
+                TokenBank newTokenBank = new TokenBank();
+                newTokenBank.setTokenbankname(tm.getRequest().getTokenBankName());
+                newTokenBank.setTokennumber(token);
+                newTokenBank.setExpirydate(getExpirationDate());
+                newTokenBank.setStatus(TokenizerConstants.ACTIVE);
+                tokenizerDao.save(newTokenBank);
+                break;
+            }
+        }
 
         return token;
     }
+
     private String generateToken(String accountNumber, String cardType) {
         String token = "";
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -106,11 +134,11 @@ public class IssueService {
 
         String last4 = accountNumber.substring(accountNumber.length() - 4);
         String mediaValue = findMediaValue(cardType);
-        
+
         token = "9" + mediaValue + token + last4;
         return token;
     }
-    
+
     private String findMediaValue(String cardType) {
         switch (cardType) {
             case TokenizerConstants.MILSTAR:
@@ -127,9 +155,9 @@ public class IssueService {
                 return "5";
             case TokenizerConstants.GIFTCARD:
                 return "8";
-                
+
         }
-        
+
         return "9";
     }
 
@@ -144,7 +172,7 @@ public class IssueService {
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
         expDate = df.format(newDate);
         return expDate;
-}
+    }
 
     protected void setVaultDao(VaultDao vaultDao) {
         this.vaultDao = vaultDao;

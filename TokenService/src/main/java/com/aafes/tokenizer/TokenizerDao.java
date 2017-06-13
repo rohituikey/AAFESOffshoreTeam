@@ -6,9 +6,13 @@
 package com.aafes.tokenizer;
 
 import com.aafes.tokenservice.util.Encryptor;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -56,6 +60,21 @@ public class TokenizerDao {
         return (TokenBank) mapper.get(tokenNumber, tokenBankName);
 
     }
+    
+    public List<String> getAllTokensByName(String tokenBankName) {
+         
+        List<String> tokensList = new ArrayList<>();
+        String query = "select * from tokenizer.tokenbank where tokenbankname = '" + tokenBankName +"' ALLOW FILTERING";
+        
+
+        ResultSet result = factory.getSession().execute(query);
+
+        for (Row row : result) {
+            tokensList.add(row.getString("tokennumber"));
+        }
+        
+        return tokensList;
+    }
 
     @EJB
     public void setCassandraSessionFactory(CassandraSessionFactory factory) {
@@ -69,4 +88,6 @@ public class TokenizerDao {
     protected void setLogPath(String logPath) {
         this.logPath = logPath;
     }
+
+    
 }

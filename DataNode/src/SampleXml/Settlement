@@ -74,3 +74,17 @@
 
 
 </Settlement>
+
+
+
+
+
+
+// Command Settle
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<commandMessage>
+	<processdate>2017-06-13</processdate>
+	<identityuuid>0ee1c509-2c70-4bcd-b261-f94f1fe6c43b</identityuuid>
+	<settlerType>deca</settlerType>
+</commandMessage>

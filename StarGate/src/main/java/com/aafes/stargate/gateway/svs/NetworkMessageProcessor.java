@@ -42,7 +42,7 @@ public class NetworkMessageProcessor extends Processor {
         networkRequest.setMerchant(merchant);
 
         networkRequest.setRoutingID(StarGateConstants.ROUTING_ID);
-        networkRequest.setNetworkCode("");
+        networkRequest.setNetworkCode(StarGateConstants.NETWOK_CODE);
 
         LOGGER.info("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "return code :" + t.getReasonCode());
 

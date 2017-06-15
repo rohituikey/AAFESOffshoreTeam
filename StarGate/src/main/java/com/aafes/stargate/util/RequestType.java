@@ -14,6 +14,9 @@ final public class RequestType {
     public static final String FINAL = "Final";
     public static final String FINAL_AUTH = "FinalAuth";
     public static final String ISSUE = "Issue";
+    public static final String NETWORK = "Network";
+    public static final String REDEMPTION = "Redemption";
+   
 
     private RequestType() {
         // Never instantiate.

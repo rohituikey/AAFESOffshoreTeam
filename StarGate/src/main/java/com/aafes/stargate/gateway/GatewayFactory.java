@@ -9,10 +9,12 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.fdms.CompassGateway;
 import com.aafes.stargate.gateway.svs.SVSGateway;
 import com.aafes.stargate.gateway.vision.VisionGateway;
+import com.aafes.stargate.gateway.vision.simulator.VisionGatewayStub;
 import com.aafes.stargate.util.GetMediaTypeByAccountNbr;
 import com.aafes.stargate.util.MediaType;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 
 /**
  *
@@ -20,42 +22,52 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class GatewayFactory {
-    
+
     @EJB
     private VisionGateway visionGateway;
-    
+
     @EJB
     private CompassGateway compassGateway;
-    
+
     @EJB
     private SVSGateway sVSGateway;
-     
-     
-     
-      public Gateway pickGateway(Transaction t) {
+
+    @Inject
+    private String enableStub;
+
+    @EJB
+    private VisionGatewayStub visionGatewaySimulator;
+
+    public Gateway pickGateway(Transaction t) {
         System.out.println("Inside Base");
         Gateway gateway = null;
         String mediaType = t.getMedia();
 
         if (mediaType == null || mediaType.isEmpty()) {
             mediaType = GetMediaTypeByAccountNbr.getCardType(t.getAccount());
-
         }
-        
-         System.out.println(mediaType);
+
+        System.out.println(mediaType);
         if (mediaType != null) {
             t.setMedia(mediaType);
             switch (mediaType) {
                 case MediaType.MIL_STAR:
-                    gateway = visionGateway;
+                    if (enableStub != null && enableStub.equalsIgnoreCase("true")) {
+                        gateway = visionGatewaySimulator;
+                    } else {
+                        gateway = visionGateway;
+                    }
                     return gateway;
-                 case MediaType.VISA : case MediaType.MASTER : case MediaType.DISCOVER : case MediaType.AMEX :
+                case MediaType.VISA:
+                case MediaType.MASTER:
+                case MediaType.DISCOVER:
+                case MediaType.AMEX:
                     gateway = compassGateway;
                     return gateway;
-                 
-                 case MediaType.GIFT_CARD:
-                     gateway = sVSGateway;
-                     return  gateway;
+
+                case MediaType.GIFT_CARD:
+                    gateway = sVSGateway;
+                    return gateway;
                 // Add more gateways
             }
         }
@@ -70,7 +82,9 @@ public class GatewayFactory {
     public void setCompassGateway(CompassGateway compassGateway) {
         this.compassGateway = compassGateway;
     }
-    
-    
-    
+
+    public void setEnableStub(String enableStub) {
+        this.enableStub = enableStub;
+    }
+
 }

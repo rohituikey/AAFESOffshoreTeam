@@ -7,7 +7,6 @@ package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.GatewayException;
-import com.aafes.stargate.gateway.svs.Processor;
 import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StarGateConstants;
 import com.aafes.stargate.util.SvsUtil;
@@ -43,7 +42,7 @@ public class NetworkMessageProcessor extends Processor {
         networkRequest.setMerchant(merchant);
 
         networkRequest.setRoutingID(StarGateConstants.ROUTING_ID);
-        networkRequest.setNetworkCode("");
+        networkRequest.setNetworkCode(StarGateConstants.NETWOK_CODE);
 
         LOGGER.info("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "return code :" + t.getReasonCode());
 
@@ -55,8 +54,13 @@ public class NetworkMessageProcessor extends Processor {
                 t.setAuthoriztionCode(networkResponse.getAuthorizationCode());
                 t.setReasonCode(networkResponse.getReturnCode().getReturnCode());
                 t.setDescriptionField(networkResponse.getReturnCode().getReturnDescription());
-
+                if (t.getReasonCode().equalsIgnoreCase("00")) {
+                    t.setResponseType(ResponseType.APPROVED);
+                } else {
+                    t.setResponseType(ResponseType.DECLINED);
+                }
             }
+
         } catch (GatewayException e) {
             LOGGER.error(("Error in Network Message method responce" + e));
             throw new GatewayException("INTERNAL SERVER ERROR");

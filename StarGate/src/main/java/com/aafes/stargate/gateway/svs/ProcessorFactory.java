@@ -31,7 +31,11 @@ public class ProcessorFactory {
     private SVSIssueProcessor issueProcessor;
     @EJB
     private MerchandiseReturnMessageProcessor merchandiseReturnMessageProcessor;
-
+    @EJB
+    private NetworkMessageProcessor networkMessageProcessor;
+    @EJB
+    private RedemptionProcessor redemptionProcessor;  
+    
     public Processor pickProcessor(Transaction t) {
 
         Processor processor = null;
@@ -59,6 +63,14 @@ public class ProcessorFactory {
                 case RequestType.ISSUE:
                     processor = issueProcessor;
                     break;
+                //added
+                case RequestType.NETWORK:
+                    processor = networkMessageProcessor;
+                    break;
+                case RequestType.REDEMPTION:
+                    processor = redemptionProcessor;
+                    break;
+ 
                 default:
                     log.info("No Matching request type found.");
 
@@ -96,4 +108,15 @@ public class ProcessorFactory {
         this.issueProcessor = issueProcessor;
     }
 
+    public void setNetworkMessageProcessor(NetworkMessageProcessor networkMessageProcessor) {
+        this.networkMessageProcessor = networkMessageProcessor;
+    }
+
+    public void setRedemptionProcessor(RedemptionProcessor redemptionProcessor) {
+        this.redemptionProcessor = redemptionProcessor;
+    }
+
+//    public void setSplitShipmentProcessor(SplitShipmentProcessor splitShipmentProcessor) {
+//        this.splitShipmentProcessor = splitShipmentProcessor;
+//    }
 }

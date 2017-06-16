@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<!--
+This version contains the KeepAlive messaging required by IBM/Deca. Also includes new RequestTypeType of TrnCancel, Virtual GC Issue, VrtResponse, GCPin (expanded to length=8). 
+Increased the length of termId to max 8 digits a/n. Made Reason Code a variable length 1-3. Cleaned up extra spaces after some elements and refactored the AVS section. 12-May-2017
+-->
+
+<xs:schema xmlns="http://www.aafes.com/tokenvalidator" 
+           targetNamespace="http://www.aafes.com/tokenvalidator" 
+           xmlns:tokenvalidator="http://www.aafes.com/tokenvalidator" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault="qualified" >
+    <xs:simpleType name="AccountTypeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Pan"/>
+            <xs:enumeration value="Token"/>
+            <xs:enumeration value="EncryptedPayload"/>
+            <xs:enumeration value="Msg"/>
+        </xs:restriction>                                                  
+    </xs:simpleType>
+    <xs:simpleType name="RequestTypeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Token"/>
+        </xs:restriction>                                                  
+    </xs:simpleType>
+    <xs:element name="Message">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Header" minOccurs="1" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="IdentityUUID" minOccurs="1" maxOccurs="1">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:length value="36"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="LocalDateTime" type="xs:dateTime" minOccurs="1" maxOccurs="1"/>
+                            <xs:element name="termId" minOccurs='1' maxOccurs='1'>
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="2"/>
+                                        <xs:maxLength value="8"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="Comment" minOccurs="0" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="0"/>
+                                        <xs:maxLength value="255"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="CustomerID" minOccurs="0" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:length value="11"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                        </xs:sequence>                    
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="Request" minOccurs="0" maxOccurs="5">
+                    <xs:complexType>                          
+                        <xs:sequence>
+                            <xs:element name="Media" minOccurs="1" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="Mastercard"/>
+                                        <xs:enumeration value="Visa"/>
+                                        <xs:enumeration value="Discover"/>
+                                        <xs:enumeration value="Amex"/>
+                                        <xs:enumeration value="Milstar"/>
+                                        <xs:enumeration value="GiftCard"/>
+                                        <xs:enumeration value="InComm"/>
+                                        <xs:enumeration value="ATT"/>
+                                        <xs:enumeration value="Esso"/>
+                                        <xs:enumeration value="WEX"/>
+                                        <xs:enumeration value="Status"/>
+                                        <xs:enumeration value="Info"/>
+                                    </xs:restriction>                                                  
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:choice>
+                                <xs:element name="RequestType" type="RequestTypeType"/>                
+                            </xs:choice>
+                            <xs:choice>
+                                <xs:element name="Pan" type="AccountTypeType"/>                
+                                <xs:element name="Token" type="AccountTypeType"/>
+                                <xs:element name="EncryptedPayload" type="AccountTypeType"/>
+                                <xs:element name="Msg" type="AccountTypeType"/>                                                
+                            </xs:choice>
+                            <xs:element name="Account" minOccurs="0" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="12"/>
+                                        <xs:maxLength value="200"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Response" minOccurs="0" maxOccurs="5">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="TokenId" minOccurs="1" maxOccurs="1"> 
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="6"/>
+                                        <xs:maxLength value="6"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="Media" minOccurs="1" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="Mastercard"/>
+                                        <xs:enumeration value="Visa"/>
+                                        <xs:enumeration value="Discover"/>
+                                        <xs:enumeration value="Amex"/>
+                                        <xs:enumeration value="Milstar"/>
+                                        <xs:enumeration value="GiftCard"/>
+                                        <xs:enumeration value="InComm"/>
+                                        <xs:enumeration value="ATT"/>
+                                        <xs:enumeration value="Esso"/>
+                                        <xs:enumeration value="WEX"/>
+                                        <xs:enumeration value="Status"/>
+                                        <xs:enumeration value="Info"/>
+                                    </xs:restriction>                                                  
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="ResponseType" minOccurs="1" maxOccurs="1">                
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="Approved"/>
+                                        <xs:enumeration value="Decline"/>
+                                        <xs:enumeration value="TIMEOUT"/>
+                                        <xs:enumeration value="Referral"/>
+                                        <xs:enumeration value="OK"/>
+                                    </xs:restriction>                                                  
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="ReasonCode" minOccurs="0" maxOccurs="1">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="1"/>
+                                        <xs:maxLength value="3"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                        </xs:sequence>  
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="MajorVersion" fixed="3" use="required" type="xs:integer"/>
+            <xs:attribute name="MinorVersion" fixed="1" use="required" type="xs:integer"/>
+            <xs:attribute name="FixVersion" fixed="0" use="required" type="xs:integer"/>            
+        </xs:complexType>                       
+    </xs:element>
+</xs:schema>

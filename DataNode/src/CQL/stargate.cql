@@ -200,3 +200,14 @@ insert into stargate.gcbank(cardNumber,pin,balanceAmount) values('60064915720100
 insert into stargate.gcbank(cardNumber,pin,balanceAmount) values('6006491572010002496','0118','40000');
 
 
+create table stargate.crosssiterequesttokentable(
+tokenid text,
+tokenstatus text,
+tokencredatetime text,
+identityuuid text,
+termid text,
+customerid text,
+media text,
+account text,
+primary key (tokenid, identityuuid)
+) with default_time_to_live = 300;

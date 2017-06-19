@@ -2,6 +2,8 @@ package com.aafes.stargate.boundary;
 
 import com.aafes.credit.Message;
 import com.aafes.stargate.control.Authorizer;
+import com.aafes.stargate.util.CreditMessageTokenConstants;
+import com.aafes.stargate.validatetoken.TokenValidatorService;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -12,6 +14,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
@@ -53,38 +56,56 @@ public class CreditMessageResource {
      * Process a new credit authorization request.
      *
      * @param requestXML
+     * @param tokenId
      * @return the request XML document with added response data
      */
     @POST
     @Consumes("application/xml")
     @Produces("application/xml")
-    public String postXml(String requestXML) {
 
+    public String postXml(String requestXML, @QueryParam("tokenId") String tokenId) {
         String responseXML = "";
-
+        boolean tokenValidateFlg = false;
+        TokenValidatorService tokenValidatorService = null;
+        String uuid = "";
         try {
-            LOG.info("From Client: " + requestXML);
-            String ValidatedXML = FilterRequestXML(requestXML);
-            if(requestXML.contains("DOCTYPE")
-                    ||requestXML.contains("CDATA")){
-                LOG.error("Invalid Request");
-                responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
-                        + "</ErrorInformation>";
-            }
-            else if (ValidatedXML != null) {
-                Message requestMessage = unmarshalWithValidation(requestXML);
-                //Message requestMessage = unmarshalWithValidation(requestXML);
-                Message responseMessage = authorizer.authorize(requestMessage);
-                //putInfoOnHealthChecker(responseMessage);
+            if (null != tokenId && !tokenId.isEmpty()) {
+                LOG.info("From Client CreditMessageResource: " + requestXML);
+                String ValidatedXML = FilterRequestXML(requestXML);
+                if (requestXML.contains("DOCTYPE")
+                        || requestXML.contains("CDATA")) {
+                    LOG.error("Invalid Request CreditMessageResource");
+                    responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
+                            + "</ErrorInformation>";
+                } else if (ValidatedXML != null) {
+                    Message requestMessage = unmarshalWithValidation(requestXML);
+                    if (tokenValidatorService == null) {
+                        tokenValidatorService = new TokenValidatorService();
+                    }
+                    uuid = requestMessage.getHeader().getIdentityUUID();
+                    tokenValidateFlg = tokenValidatorService.validateToken(tokenId, uuid);
+                    if (tokenValidateFlg) {
+                        //Message requestMessage = unmarshalWithValidation(requestXML);
+                        Message responseMessage = authorizer.authorize(requestMessage);
+                        //putInfoOnHealthChecker(responseMessage);
 
-                responseXML = marshal(responseMessage);
-                LOG.info("To Client: " + responseXML);
+                        responseXML = marshal(responseMessage);
+                        LOG.info("To Client CreditMessageResource: " + responseXML);
+                    } else {
+                        LOG.error("Invalid Request");
+                        responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Unauthorized Transactions</Error>"
+                                + "</ErrorInformation>";
+                    }
+                } else {
+                    LOG.error("Invalid Request");
+                    responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
+                            + "</ErrorInformation>";
+                }
             } else {
                 LOG.error("Invalid Request");
                 responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
                         + "</ErrorInformation>";
             }
-
         } catch (JAXBException | SAXException e) {
 
             responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
@@ -94,8 +115,11 @@ public class CreditMessageResource {
             Logger.getLogger(CreditMessageResource.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        if (tokenValidatorService == null) {
+            tokenValidatorService = new TokenValidatorService();
+        }
+        tokenValidateFlg = tokenValidatorService.udpateTokenStatus(CreditMessageTokenConstants.STATUS_INACTIVE, tokenId, uuid);
         return responseXML;
-
     }
 
 //    private void putInfoOnHealthChecker(Message responseMessage) {
@@ -142,7 +166,7 @@ public class CreditMessageResource {
 
     private Message unmarshalWithValidation(String xml) throws SAXException, JAXBException {
         Message request = new Message();
-
+        LOG.info("In unmarshalWithValidation - start ");
         StringReader reader = new StringReader(xml);
         JAXBContext jc = JAXBContext.newInstance(Message.class);
         Unmarshaller unmarshaller = jc.createUnmarshaller();
@@ -161,7 +185,7 @@ public class CreditMessageResource {
 
         jaxbUnmarshaller.setSchema(schema);
         request = (Message) jaxbUnmarshaller.unmarshal(reader);
-
+        LOG.info("In unmarshalWithValidation - end ");
         return request;
     }
 

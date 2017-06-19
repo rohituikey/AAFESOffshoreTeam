@@ -15,14 +15,14 @@ import com.aafes.stargate.util.StarGateConstants;
 public class CIDValidationStub {
     
      public  static boolean validateStub(Transaction t) {
-        if (t.getComment().equalsIgnoreCase(StarGateConstants.VALID_I_FOR_APPROVED)) 
+        if (t.getComment().equalsIgnoreCase(StarGateConstants.VALID_APPROVED)) 
             return true;
-        else if(t.getComment().equalsIgnoreCase(StarGateConstants.INVALID_I_FOR_DECLINE))
+        else if(t.getComment().equalsIgnoreCase(StarGateConstants.INVALID_DECLINE))
              return false;
-        else if(t.getComment().equalsIgnoreCase(StarGateConstants.INVALID_I_FOR_APPROVE))
-            return true;
-        else if(t.getComment().equalsIgnoreCase(StarGateConstants.VALID_I_FOR_DECLINE))
-         return false;
+        else if(t.getComment().equalsIgnoreCase(StarGateConstants.INVALID_APPROVED))
+            return false;
+        else if(t.getComment().equalsIgnoreCase(StarGateConstants.VALID_DECLINE))
+         return true;
         else 
             return true; 
     }

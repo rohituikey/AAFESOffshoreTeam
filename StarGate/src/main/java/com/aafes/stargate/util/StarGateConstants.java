@@ -20,8 +20,8 @@ public class StarGateConstants {
     public static final boolean TRUE = true;
     public static final boolean FALSE = false;
     public static final String NETWOK_CODE = "301";
-    public static final String VALID_I_FOR_APPROVED="Vaild I for Approved";
-    public static final String INVALID_I_FOR_DECLINE= "Invalid I for Decilne";
-    public static final String INVALID_I_FOR_APPROVE= "Invalid I for Approve";
-    public static final String VALID_I_FOR_DECLINE= "Valid I for Decline";
+    public static final String VALID_APPROVED="VALID_APPROVED";
+    public static final String INVALID_DECLINE= "INVALID_DECLINE";
+    public static final String INVALID_APPROVED= "INVALID_APPROVE";
+    public static final String VALID_DECLINE = "VALID_DECLINE";
 }

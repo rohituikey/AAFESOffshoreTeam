@@ -30,29 +30,29 @@ public class CIDValidationStubTest {
     @Test
     public void testCidValodationApproved()
     {
-       transaction.setComment("Vaild I for Approved");
+       transaction.setComment("VALID_APPROVED");
         Assert.assertEquals(true,  CIDValidationStub.validateStub(transaction));
     }
     
     @Test
     public void testCidValodationInvalidApprove()
     {
-       transaction.setComment("Invalid I for Approve");
-        Assert.assertEquals(true,  CIDValidationStub.validateStub(transaction));
+       transaction.setComment("INVALID_DECLINE");
+        Assert.assertEquals(false,  CIDValidationStub.validateStub(transaction));
     }
     
      @Test
     public void testCidValodationValidDecilne()
     {
-       transaction.setComment("valid I for Decline");
+       transaction.setComment("INVALID_APPROVED");
         Assert.assertEquals(false,  CIDValidationStub.validateStub(transaction));
     }
     
     @Test
     public void testCidValodationDecilne()
     {
-       transaction.setComment("Invalid I for Decilne");
-        Assert.assertEquals(false,  CIDValidationStub.validateStub(transaction));
+       transaction.setComment("VALID_DECLINE");
+        Assert.assertEquals(true,  CIDValidationStub.validateStub(transaction));
     }
     
    

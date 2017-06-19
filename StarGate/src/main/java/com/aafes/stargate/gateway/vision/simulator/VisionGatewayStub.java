@@ -20,15 +20,10 @@ public class VisionGatewayStub extends Gateway {
     
     @Override
     public Transaction processMessage(Transaction t) {
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(VisionGatewayStub.class.getName()).info("Interupted Exception occured");
-        }
-        if (t.getComment().equalsIgnoreCase("Approve")) {
+        if (t.getComment().equalsIgnoreCase(ResponseType.APPROVED)) {
             
             t.setResponseType(ResponseType.APPROVED);
-            t.setReasonCode("01");
+            t.setReasonCode("100");
         } else {
             t.setResponseType(ResponseType.DECLINED);
             t.setReasonCode("200");

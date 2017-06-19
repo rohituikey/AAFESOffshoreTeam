@@ -22,6 +22,6 @@ public class StarGateConstants {
     public static final String NETWOK_CODE = "301";
     public static final String VALID_APPROVED="VALID_APPROVED";
     public static final String INVALID_DECLINE= "INVALID_DECLINE";
-    public static final String INVALID_APPROVED= "INVALID_APPROVE";
+    public static final String INVALID_APPROVED= "INVALID_APPROVED";
     public static final String VALID_DECLINE = "VALID_DECLINE";
 }

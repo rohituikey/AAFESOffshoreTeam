@@ -9,6 +9,7 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.stub.CIDValidationStub;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -19,13 +20,6 @@ import org.junit.Test;
 public class CIDValidationStubTest {
     
     private  Transaction transaction = new Transaction();
-    
-    @Before
-    public void setup()
-    {
-        transaction.setComment("Vaild I for Approved");
-    }
-    
     
     @Test
     public void testCidValodationApproved()
@@ -41,6 +35,7 @@ public class CIDValidationStubTest {
         Assert.assertEquals(false,  CIDValidationStub.validateStub(transaction));
     }
     
+    
      @Test
     public void testCidValodationValidDecilne()
     {
@@ -55,6 +50,6 @@ public class CIDValidationStubTest {
         Assert.assertEquals(true,  CIDValidationStub.validateStub(transaction));
     }
     
-   
+    
     
 }

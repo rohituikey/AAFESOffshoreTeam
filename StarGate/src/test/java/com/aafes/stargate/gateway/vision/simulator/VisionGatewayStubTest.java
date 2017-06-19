@@ -11,6 +11,7 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
@@ -49,6 +50,7 @@ public class VisionGatewayStubTest {
      * @throws Exception
      */
     @Test
+    @Ignore("Functionality removed")
     public void testProcessMessage_requestHoldForThreeSeconds() throws Exception {
         transaction.setComment("Approve");
         Date startTime = new Date();

@@ -13,11 +13,14 @@ import com.aafes.stargate.control.CustInfo;
 import com.aafes.stargate.control.MQServ;
 import com.aafes.stargate.gateway.Gateway;
 import static com.aafes.stargate.gateway.vision.Common.convertStackTraceToString;
+import com.aafes.stargate.stub.CIDValidationStub;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import com.aafes.stargate.util.StarGateConstants;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -32,7 +35,11 @@ public class EcommStrategy extends BaseStrategy {
 
     @EJB
     private Configurator configurator;
-
+    
+    @Inject
+    private String enableStub;
+    
+    
     @Override
     public Transaction processRequest(Transaction t) {
 
@@ -43,7 +50,7 @@ public class EcommStrategy extends BaseStrategy {
                 return t;
             }
             if (t.getMedia().equals(MediaType.MIL_STAR)) {
-//                CIDValidation(t);
+                CIDValidation(t);
             }
 
             //Send transaction to Gateway
@@ -175,26 +182,30 @@ public class EcommStrategy extends BaseStrategy {
     private void CIDValidation(Transaction t) {
 
         boolean authorizedForMilstar = true;
-        //If we fail to perform this check let the authorization go through. 
-        try {
-            LOG.debug("Calling custInfo ");
-
-            CustInfo custInfo = new CustInfo();
-            String ssn = custInfo.callCustomerLookup(t.getCustomerId());
-            if (ssn != null && !ssn.equals("")) {
-                MQServ mqServ = new MQServ();
-                authorizedForMilstar = mqServ.callMatch(ssn, t.getAccount());
-            } else {
-                throw new AuthorizerException("Unable to lookup the ssn for cid " + t.getCustomerId());
-            }
-        } catch (Exception ce) {
-            String longDescription = "Unable to perform the milstar cid lookup " + ce.getMessage() + ".";
-            LOG.warn(longDescription);
-            LOG.error(convertStackTraceToString(ce));
-            t.setComment("Unable to perform the milstar cid lookup");
-
-        }
-
+       if(enableStub != null && enableStub.trim().equalsIgnoreCase("true")) //
+       {
+           authorizedForMilstar= CIDValidationStub.validateStub(t);
+       }else{
+           //If we fail to perform this check let the authorization go through.
+           try {
+               LOG.debug("Calling custInfo ");
+               
+               CustInfo custInfo = new CustInfo();
+               String ssn = custInfo.callCustomerLookup(t.getCustomerId());
+               if (ssn != null && !ssn.equals("")) {
+                   MQServ mqServ = new MQServ();
+                   authorizedForMilstar = mqServ.callMatch(ssn, t.getAccount());
+               } else {
+                   throw new AuthorizerException("Unable to lookup the ssn for cid " + t.getCustomerId());
+               }
+           } catch (Exception ce) {
+               String longDescription = "Unable to perform the milstar cid lookup " + ce.getMessage() + ".";
+               LOG.warn(longDescription);
+               LOG.error(convertStackTraceToString(ce));
+               t.setComment("Unable to perform the milstar cid lookup");
+               
+           }
+       }
         if (!authorizedForMilstar) {
             throw new AuthorizerException("Customer ID is not authorized to use the milstar card"); //buildResponseMessage(message, rrn, 'D', "995", "NOT ALLOWD", "Customer ID is not authorized to use the milstar card");                                 
         }
@@ -207,4 +218,10 @@ public class EcommStrategy extends BaseStrategy {
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
     }
+
+    public void setEnableStub(String enableStub) {
+        this.enableStub = enableStub;
+    }
+    
+    
 }

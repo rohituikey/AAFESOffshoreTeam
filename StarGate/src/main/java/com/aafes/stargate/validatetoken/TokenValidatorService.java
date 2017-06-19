@@ -5,10 +5,10 @@
  */
 package com.aafes.stargate.validatetoken;
 
+import com.aafes.stargate.dao.TokenServiceDAO;
 import com.aafes.stargate.gateway.GatewayException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.aafes.stargate.util.CreditMessageTokenConstants;
+import com.datastax.driver.core.ResultSet;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -16,45 +16,47 @@ import org.slf4j.LoggerFactory;
  * @author burangir
  */
 public class TokenValidatorService {
-
+    private TokenServiceDAO tokenServiceDAO;
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TokenValidatorService.class.getSimpleName());
     String sMethodName = "";
     final String CLASS_NAME = TokenValidatorService.this.getClass().getSimpleName();
-    DateFormat dateFormat = new SimpleDateFormat("HHmmss");
-    long seconds = 0L, configuredTimeOut = 0L;
-    
-    public boolean validateToken(String tokenStr) {
-        sMethodName = "preAuth";
-        Date inputTime = null, currentTime = null;
-        
+
+    public boolean validateToken(String tokenStr, String identityUuid) {
+        sMethodName = "validateToken";
+        boolean tokenValidateFlg = false;
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         try {
             if (null != tokenStr) {
-                inputTime = dateFormat.parse(tokenStr);
-                currentTime = dateFormat.parse(getLocalTime(new Date()));
-                
-                if(inputTime.after(currentTime))
-                    seconds = (inputTime.getTime() - currentTime.getTime())/1000;
-                else if(currentTime.after(inputTime))
-                    seconds = (currentTime.getTime() - inputTime.getTime())/1000;
-            }
+                if (tokenServiceDAO == null) {
+                    tokenServiceDAO = new TokenServiceDAO();
+                }
+                ResultSet tokenObj = null;
+                tokenObj = tokenServiceDAO.validateToken(tokenStr, identityUuid, CreditMessageTokenConstants.STATUS_ACTIVE);
 
+                if (tokenObj != null) tokenValidateFlg = true;
+            }
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
-
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        return false;
+        return tokenValidateFlg;
     }
-
-    private String getLocalTime(Date dateObj) {
+    
+    public boolean udpateTokenStatus(String tokenStatus, String tokenId, String identityUuid) {
+        sMethodName = "udpateTokenStatus";
+        boolean tokenValidateFlg = false;
+        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         try {
-            SimpleDateFormat smpLocalDate = new SimpleDateFormat("HHmmss");
-            return smpLocalDate.format(dateObj);
-        } catch (Exception dateExc) {
-            LOGGER.error(dateExc.getMessage());
+            if (null != tokenId) {
+                if (tokenServiceDAO == null)  tokenServiceDAO = new TokenServiceDAO();
+                tokenValidateFlg = tokenServiceDAO.updateTokenStatus(tokenStatus, tokenId, identityUuid);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
+            throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
-        return "";
+        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+        return tokenValidateFlg;
     }
 }

@@ -9,14 +9,14 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
            xmlns:tokenvalidator="http://www.aafes.com/tokenvalidator" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            elementFormDefault="qualified" >
-    <xs:simpleType name="AccountTypeType">
+    <!--xs:simpleType name="AccountTypeType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="Pan"/>
             <xs:enumeration value="Token"/>
             <xs:enumeration value="EncryptedPayload"/>
             <xs:enumeration value="Msg"/>
         </xs:restriction>                                                  
-    </xs:simpleType>
+    </xs:simpleType-->
     <xs:simpleType name="RequestTypeType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="Token"/>
@@ -35,7 +35,7 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
-                            <xs:element name="LocalDateTime" type="xs:dateTime" minOccurs="1" maxOccurs="1"/>
+                            <!--xs:element name="LocalDateTime" type="xs:dateTime" minOccurs="1" maxOccurs="1"/>
                             <xs:element name="termId" minOccurs='1' maxOccurs='1'>
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
@@ -58,7 +58,7 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                         <xs:length value="11"/>
                                     </xs:restriction>
                                 </xs:simpleType>
-                            </xs:element>
+                            </xs:element-->
                         </xs:sequence>                    
                     </xs:complexType>
                 </xs:element>
@@ -66,7 +66,7 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                 <xs:element name="Request" minOccurs="0" maxOccurs="5">
                     <xs:complexType>                          
                         <xs:sequence>
-                            <xs:element name="Media" minOccurs="1" maxOccurs="1">                
+                            <!--xs:element name="Media" minOccurs="1" maxOccurs="1">                
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
                                         <xs:enumeration value="Mastercard"/>
@@ -83,11 +83,11 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                         <xs:enumeration value="Info"/>
                                     </xs:restriction>                                                  
                                 </xs:simpleType>
-                            </xs:element>
+                            </xs:element-->
                             <xs:choice>
                                 <xs:element name="RequestType" type="RequestTypeType"/>                
                             </xs:choice>
-                            <xs:choice>
+                            <!--xs:choice>
                                 <xs:element name="Pan" type="AccountTypeType"/>                
                                 <xs:element name="Token" type="AccountTypeType"/>
                                 <xs:element name="EncryptedPayload" type="AccountTypeType"/>
@@ -100,8 +100,7 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                         <xs:maxLength value="200"/>
                                     </xs:restriction>
                                 </xs:simpleType>
-                            </xs:element>
-
+                            </xs:element-->
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -116,7 +115,7 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
-                            <xs:element name="Media" minOccurs="1" maxOccurs="1">                
+                            <!--xs:element name="Media" minOccurs="1" maxOccurs="1">                
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
                                         <xs:enumeration value="Mastercard"/>
@@ -152,7 +151,7 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                         <xs:maxLength value="3"/>
                                     </xs:restriction>
                                 </xs:simpleType>
-                            </xs:element>
+                            </xs:element-->
                         </xs:sequence>  
                     </xs:complexType>
                 </xs:element>

@@ -7,17 +7,20 @@ package com.aafes.stargate.validatetoken;
 
 import com.aafes.stargate.dao.TokenServiceDAO;
 import com.aafes.stargate.gateway.GatewayException;
+import com.aafes.stargate.util.CreditMessageTokenConstants;
 import com.aafes.tokenvalidator.Message;
 import com.aafes.tokenvalidator.Message.Response;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -46,18 +49,15 @@ import org.xml.sax.SAXException;
  */
 @Path("/token")
 public class TokenGeneratorService {
+    private TokenServiceDAO tokenServiceDAO;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TokenGeneratorService.class.getSimpleName());
     private String sMethodName = "";
     private final String CLASS_NAME = TokenGeneratorService.this.getClass().getSimpleName();
-
-    //@EJB
-    //private TokenValidatorService tokenValidatorService;
     private String SCHEMA_PATH = "src/main/resources/jaxb/tokenvalidator/TokenValidator.xsd";
-    
     
     @POST
     @Consumes("application/xml")
-    @Produces("application/xml")
+    @Produces("text/plain")
     public String postXml(String requestXML) {
         sMethodName = "postXml";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
@@ -69,8 +69,7 @@ public class TokenGeneratorService {
                 LOG.error("Invalid Request TokenGeneratorService");
             } else if (ValidatedXML != null) {
                 Message requestMessage = unmarshalWithValidation(requestXML);
-                Message responseMessage = generateToken(requestMessage);
-                responseXML = marshal(responseMessage);
+                responseXML = generateToken(requestMessage);
                 LOG.info("To Client TokenGeneratorService: " + responseXML);
             } else LOG.error("Invalid Request");
         } catch (JAXBException | SAXException e) {
@@ -82,14 +81,14 @@ public class TokenGeneratorService {
         return responseXML;
     }
 
-    private String marshal(Message request) {
-        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        StringWriter sw = new StringWriter();
-        JAXB.marshal(request, sw);
-        String xmlString = sw.toString();
-        LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        return xmlString;
-    }
+//    private String marshal(Message request) {
+//        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+//        StringWriter sw = new StringWriter();
+//        JAXB.marshal(request, sw);
+//        String xmlString = sw.toString();
+//        LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+//        return xmlString;
+//    }
 
     private Message unmarshalWithValidation(String xml) throws SAXException, JAXBException {
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
@@ -97,7 +96,7 @@ public class TokenGeneratorService {
         LOG.info("In unmarshalWithValidation - start ");
         StringReader reader = new StringReader(xml);
         JAXBContext jc = JAXBContext.newInstance(Message.class);
-        Unmarshaller unmarshaller = jc.createUnmarshaller();
+        //Unmarshaller unmarshaller = jc.createUnmarshaller();
         JAXBContext jaxbContext = JAXBContext.newInstance(Message.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
@@ -155,67 +154,74 @@ public class TokenGeneratorService {
         else return "";
     }
     
-    private Message generateToken(Message requestMessage) {
+    private String generateToken(Message requestMessage) {
         sMethodName = "generateToken";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        Message responseMessage = null;
+        //Message responseMessage = null;
         boolean dataInsertedFlg = false;
+        String tokenNumber = "";
         try {
             Date dateObj = new Date();
-            DateFormat dateFormat1 = new SimpleDateFormat("yyyymmddHHmmss");
+            DateFormat dateFormat1 = new SimpleDateFormat("yyyyMMddHHmmss");
             String creTime = dateFormat1.format(dateObj);
-            String tokenNumber = generateRandomToken();
-            TokenServiceDAO tokenServiceDao = new TokenServiceDAO();
+            tokenNumber = generateSecureRandomToken();
+            if(tokenServiceDAO == null) tokenServiceDAO = new TokenServiceDAO();
             CrosssiteRequestTokenTable tokenObj = new CrosssiteRequestTokenTable();
-            
             tokenObj.setTokenid(tokenNumber);
-            tokenObj.setTokenstatus("Active");
+            tokenObj.setTokenstatus(CreditMessageTokenConstants.STATUS_ACTIVE);
             tokenObj.setTokencredatetime(creTime);
             tokenObj.setIdentityuuid(requestMessage.getHeader().getIdentityUUID());
-            tokenObj.setTermid(requestMessage.getHeader().getTermId());
-            tokenObj.setCustomerid(requestMessage.getHeader().getCustomerID());
-            tokenObj.setMedia(requestMessage.getRequest().get(0).getMedia());
-            tokenObj.setAccount(requestMessage.getRequest().get(0).getAccount());
+            //tokenObj.setTermid(requestMessage.getHeader().getTermId());
+            //tokenObj.setCustomerid(requestMessage.getHeader().getCustomerID());
+            //tokenObj.setMedia(requestMessage.getRequest().get(0).getMedia());
+            //tokenObj.setAccount(requestMessage.getRequest().get(0).getAccount());
             
-            dataInsertedFlg = tokenServiceDao.insertTokenDetails(tokenObj);
+            dataInsertedFlg = tokenServiceDAO.insertTokenDetails(tokenObj);
             if(dataInsertedFlg) LOG.info("Data Inserted in table stargate.crosssiterequesttokentable successfully!");
             else LOG.info("Data Insertion in table stargate.crosssiterequesttokentable FAILED!");
-            responseMessage = mapResponse(requestMessage, requestMessage.getRequest().get(0).getMedia(), tokenNumber, dataInsertedFlg);
+            //responseMessage = mapResponse(requestMessage, tokenNumber, dataInsertedFlg);
         } catch (Exception ex) {
             LOG.error("Error while creating cross site request token " + ex.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOG.info("Method " + sMethodName + " ENDED." + " Class Name " + CLASS_NAME);
-        return responseMessage;
+        return tokenNumber;
     }
     
-    private Message mapResponse(Message cm, String media, String tokenNumber, boolean dataInsertedFlg) {
-        sMethodName = "mapResponse";
+//    private Message mapResponse(Message cm, String tokenNumber, boolean dataInsertedFlg) {
+//        sMethodName = "mapResponse";
+//        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+//        Response response = new Response();
+//        cm.getRequest().clear();
+//        cm.getResponse().clear();
+//        if(dataInsertedFlg){
+//            //response.setReasonCode("01");
+//            //response.setResponseType("Approved");
+//            response.setTokenId(tokenNumber);
+//            //response.setMedia(media);
+//        }else{
+//            //response.setReasonCode("03");
+//            //response.setResponseType("Decline");
+//            response.setTokenId("0");
+//        }
+//        
+//        cm.getResponse().add(response);
+//        LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+//        return cm;
+//    }
+    
+    private String generateSecureRandomToken(){
+        sMethodName = "generateSecureRandomToken";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        Response response = new Response();
-        cm.getRequest().clear();
-        cm.getResponse().clear();
-        if(dataInsertedFlg){
-            response.setReasonCode("01");
-            response.setResponseType("Approved");
-            response.setTokenId(tokenNumber);
-            response.setMedia(media);
-        }else{
-            response.setReasonCode("03");
-            response.setResponseType("Decline");
+        SecureRandom randomNumber = null;
+        int nextToken = 0;
+        try {
+            randomNumber = SecureRandom.getInstance("SHA1PRNG");
+            nextToken = randomNumber.nextInt(900000) + 100000;
+            LOG.info("Token Value " + nextToken);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(TokenGeneratorService.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        cm.getResponse().add(response);
-        LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        return cm;
-    }
-    
-    private String generateRandomToken(){
-        sMethodName = "generateRandomToken";
-        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        Random r = new Random(System.currentTimeMillis());
-        int nextToken = r.nextInt(100000) * 10;
-        LOG.info("Token Value " + nextToken);
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         return String.valueOf(nextToken);
     }

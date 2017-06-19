@@ -205,9 +205,5 @@ tokenid text,
 tokenstatus text,
 tokencredatetime text,
 identityuuid text,
-termid text,
-customerid text,
-media text,
-account text,
 primary key (tokenid, identityuuid)
 ) with default_time_to_live = 300;

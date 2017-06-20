@@ -207,4 +207,4 @@ tokencredatetime text,
 identityuuid text,
 clientipaddress text,
 primary key (tokenid, identityuuid, clientipaddress)
-);
+); 

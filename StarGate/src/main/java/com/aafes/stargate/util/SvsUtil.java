@@ -10,6 +10,7 @@ import com.svs.svsxml.service.SVSXMLWayService;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;
@@ -49,5 +50,16 @@ public class SvsUtil {
         
         return sVSXMLWay;
     }
-    
+ 
+    public static String getClientIPAddress(HttpServletRequest req){
+        String remoteAddr = "";
+
+        if (req != null) {
+            remoteAddr = req.getHeader("X-Forwarded-For");
+            if (remoteAddr == null || "".equals(remoteAddr)) {
+                remoteAddr = req.getRemoteAddr();
+            }
+        }
+         return remoteAddr;
+    }  
 }

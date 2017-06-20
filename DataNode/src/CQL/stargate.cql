@@ -205,5 +205,6 @@ tokenid text,
 tokenstatus text,
 tokencredatetime text,
 identityuuid text,
-primary key (tokenid, identityuuid)
-) with default_time_to_live = 300;
+clientipaddress text,
+primary key (tokenid, identityuuid, clientipaddress)
+);

@@ -21,6 +21,8 @@ public class CrosssiteRequestTokenTable {
     private String tokencredatetime;
     @ClusteringColumn(1)
     private String identityuuid;
+    @ClusteringColumn(2)
+    private String clientipaddress;
     //private String termid;
     //private String customerid;
     //private String media;
@@ -136,5 +138,19 @@ public class CrosssiteRequestTokenTable {
      */
     public void setTokencredatetime(String tokencredatetime) {
         this.tokencredatetime = tokencredatetime;
+    }
+
+    /**
+     * @return the clientipaddress
+     */
+    public String getClientipaddress() {
+        return clientipaddress;
+    }
+
+    /**
+     * @param clientipaddress the clientipaddress to set
+     */
+    public void setClientipaddress(String clientipaddress) {
+        this.clientipaddress = clientipaddress;
     }
 }

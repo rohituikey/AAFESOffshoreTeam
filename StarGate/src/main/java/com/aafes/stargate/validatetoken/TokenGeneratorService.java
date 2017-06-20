@@ -8,8 +8,10 @@ package com.aafes.stargate.validatetoken;
 import com.aafes.stargate.dao.TokenServiceDAO;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.util.CreditMessageTokenConstants;
+import com.aafes.stargate.util.SvsUtil;
 import com.aafes.tokenvalidator.Message;
-import com.aafes.tokenvalidator.Message.Response;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -18,15 +20,16 @@ import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.EJB;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -49,18 +52,22 @@ import org.xml.sax.SAXException;
  */
 @Path("/token")
 public class TokenGeneratorService {
+
     private TokenServiceDAO tokenServiceDAO;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TokenGeneratorService.class.getSimpleName());
     private String sMethodName = "";
     private final String CLASS_NAME = TokenGeneratorService.this.getClass().getSimpleName();
     private String SCHEMA_PATH = "src/main/resources/jaxb/tokenvalidator/TokenValidator.xsd";
-    
+
     @POST
     @Consumes("application/xml")
     @Produces("text/plain")
-    public String postXml(String requestXML) {
+    public String postXml(String requestXML, @Context HttpServletRequest req) {
         sMethodName = "postXml";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+
+        String clientIPAddress = SvsUtil.getClientIPAddress(req);
+
         String responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error></ErrorInformation>";
         try {
             LOG.info("From Client TokenGeneratorService: " + requestXML);
@@ -69,9 +76,12 @@ public class TokenGeneratorService {
                 LOG.error("Invalid Request TokenGeneratorService");
             } else if (ValidatedXML != null) {
                 Message requestMessage = unmarshalWithValidation(requestXML);
-                responseXML = generateToken(requestMessage);
+                checkAndUpdateDuplicateToken(requestMessage.getHeader().getIdentityUUID(), clientIPAddress);
+                responseXML = generateToken(requestMessage, clientIPAddress);
                 LOG.info("To Client TokenGeneratorService: " + responseXML);
-            } else LOG.error("Invalid Request");
+            } else {
+                LOG.error("Invalid Request");
+            }
         } catch (JAXBException | SAXException e) {
             LOG.error(e.toString());
         } catch (Exception ex) {
@@ -81,22 +91,12 @@ public class TokenGeneratorService {
         return responseXML;
     }
 
-//    private String marshal(Message request) {
-//        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-//        StringWriter sw = new StringWriter();
-//        JAXB.marshal(request, sw);
-//        String xmlString = sw.toString();
-//        LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-//        return xmlString;
-//    }
-
     private Message unmarshalWithValidation(String xml) throws SAXException, JAXBException {
+        sMethodName = "unmarshalWithValidation";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         Message request = new Message();
-        LOG.info("In unmarshalWithValidation - start ");
         StringReader reader = new StringReader(xml);
         JAXBContext jc = JAXBContext.newInstance(Message.class);
-        //Unmarshaller unmarshaller = jc.createUnmarshaller();
         JAXBContext jaxbContext = JAXBContext.newInstance(Message.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
@@ -137,7 +137,7 @@ public class TokenGeneratorService {
     }
 
     public static String getStringFromDocument(Document doc) throws TransformerException {
-         LOG.info("Method FilterRequestXML started. Class Name TokenGeneratorService");
+        LOG.info("Method getStringFromDocument started. Class Name TokenGeneratorService");
         StringWriter writer = null;
         try {
             DOMSource domSource = new DOMSource(doc);
@@ -149,12 +149,15 @@ public class TokenGeneratorService {
         } catch (Exception ex) {
             LOG.error(ex.toString());
         }
-        LOG.info("Method FilterRequestXML ended. Class Name TokenGeneratorService");
-        if(null != writer) return writer.toString();
-        else return "";
+        LOG.info("Method getStringFromDocument ended. Class Name TokenGeneratorService");
+        if (null != writer) {
+            return writer.toString();
+        } else {
+            return "";
+        }
     }
-    
-    private String generateToken(Message requestMessage) {
+
+    private String generateToken(Message requestMessage, String clientIPAddress) {
         sMethodName = "generateToken";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         //Message responseMessage = null;
@@ -165,20 +168,26 @@ public class TokenGeneratorService {
             DateFormat dateFormat1 = new SimpleDateFormat("yyyyMMddHHmmss");
             String creTime = dateFormat1.format(dateObj);
             tokenNumber = generateSecureRandomToken();
-            if(tokenServiceDAO == null) tokenServiceDAO = new TokenServiceDAO();
+            if (tokenServiceDAO == null) {
+                tokenServiceDAO = new TokenServiceDAO();
+            }
             CrosssiteRequestTokenTable tokenObj = new CrosssiteRequestTokenTable();
             tokenObj.setTokenid(tokenNumber);
             tokenObj.setTokenstatus(CreditMessageTokenConstants.STATUS_ACTIVE);
             tokenObj.setTokencredatetime(creTime);
             tokenObj.setIdentityuuid(requestMessage.getHeader().getIdentityUUID());
+            tokenObj.setClientipaddress(clientIPAddress);
             //tokenObj.setTermid(requestMessage.getHeader().getTermId());
             //tokenObj.setCustomerid(requestMessage.getHeader().getCustomerID());
             //tokenObj.setMedia(requestMessage.getRequest().get(0).getMedia());
             //tokenObj.setAccount(requestMessage.getRequest().get(0).getAccount());
-            
+
             dataInsertedFlg = tokenServiceDAO.insertTokenDetails(tokenObj);
-            if(dataInsertedFlg) LOG.info("Data Inserted in table stargate.crosssiterequesttokentable successfully!");
-            else LOG.info("Data Insertion in table stargate.crosssiterequesttokentable FAILED!");
+            if (dataInsertedFlg) {
+                LOG.info("Data Inserted in table stargate.crosssiterequesttokentable successfully!");
+            } else {
+                LOG.info("Data Insertion in table stargate.crosssiterequesttokentable FAILED!");
+            }
             //responseMessage = mapResponse(requestMessage, tokenNumber, dataInsertedFlg);
         } catch (Exception ex) {
             LOG.error("Error while creating cross site request token " + ex.getMessage());
@@ -187,7 +196,7 @@ public class TokenGeneratorService {
         LOG.info("Method " + sMethodName + " ENDED." + " Class Name " + CLASS_NAME);
         return tokenNumber;
     }
-    
+
 //    private Message mapResponse(Message cm, String tokenNumber, boolean dataInsertedFlg) {
 //        sMethodName = "mapResponse";
 //        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
@@ -209,8 +218,7 @@ public class TokenGeneratorService {
 //        LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
 //        return cm;
 //    }
-    
-    private String generateSecureRandomToken(){
+    private String generateSecureRandomToken() {
         sMethodName = "generateSecureRandomToken";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         SecureRandom randomNumber = null;
@@ -220,9 +228,43 @@ public class TokenGeneratorService {
             nextToken = randomNumber.nextInt(900000) + 100000;
             LOG.info("Token Value " + nextToken);
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(TokenGeneratorService.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
         }
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         return String.valueOf(nextToken);
+    }
+
+    private void checkAndUpdateDuplicateToken(String identityUuid, String clientIPAddress) {
+        sMethodName = "checkAndUpdateDuplicateToken";
+        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        boolean dataUpdateFlg = false;
+        String tokenId, identityUuidLocal, tokenStatus = CreditMessageTokenConstants.STATUS_INACTIVE, clientIPAddressLocal;
+        try {
+            TokenServiceDAO tokenServiceDAO = null;
+            if (tokenServiceDAO == null) {
+                tokenServiceDAO = new TokenServiceDAO();
+            }
+            ResultSet resultSet = tokenServiceDAO.findActiveTokens(identityUuid, CreditMessageTokenConstants.STATUS_ACTIVE,
+                    clientIPAddress);
+
+            if (resultSet != null) {
+                if(resultSet.all() != null && resultSet.all().size() > 0)
+                    LOG.info("Active tokens found for identityUuid " + identityUuid + ", clientIPAddress " + clientIPAddress);
+                
+                for(Row row : resultSet){
+                    tokenId = row.getString("tokenid");
+                    identityUuidLocal = row.getString("identityuuid");
+                    clientIPAddressLocal = row.getString("clientipaddress");
+                    
+                    dataUpdateFlg = tokenServiceDAO.updateTokenStatus(tokenStatus, tokenId, identityUuidLocal, clientIPAddressLocal);
+                    if(dataUpdateFlg)
+                        LOG.info("Duplicate Data Udpated. tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus +
+                        ", clientIPAddress " + clientIPAddressLocal);
+                }
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
+        }
+        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
     }
 }

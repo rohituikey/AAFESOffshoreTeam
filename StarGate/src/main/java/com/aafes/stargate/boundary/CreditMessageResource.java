@@ -3,18 +3,22 @@ package com.aafes.stargate.boundary;
 import com.aafes.credit.Message;
 import com.aafes.stargate.control.Authorizer;
 import com.aafes.stargate.util.CreditMessageTokenConstants;
+import com.aafes.stargate.util.SvsUtil;
 import com.aafes.stargate.validatetoken.TokenValidatorService;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
@@ -62,12 +66,12 @@ public class CreditMessageResource {
     @POST
     @Consumes("application/xml")
     @Produces("application/xml")
-
-    public String postXml(String requestXML, @QueryParam("tokenId") String tokenId) {
+    
+    public String postXml(String requestXML, @QueryParam("tokenId") String tokenId, @Context HttpServletRequest req) {
         String responseXML = "";
         boolean tokenValidateFlg = false;
         TokenValidatorService tokenValidatorService = null;
-        String uuid = "";
+        String uuid = "", clientIPAddress = "";
         try {
             if (null != tokenId && !tokenId.isEmpty()) {
                 LOG.info("From Client CreditMessageResource: " + requestXML);
@@ -83,12 +87,16 @@ public class CreditMessageResource {
                         tokenValidatorService = new TokenValidatorService();
                     }
                     uuid = requestMessage.getHeader().getIdentityUUID();
-                    tokenValidateFlg = tokenValidatorService.validateToken(tokenId, uuid);
+                    clientIPAddress = SvsUtil.getClientIPAddress(req);
+                    tokenValidateFlg = tokenValidatorService.validateToken(tokenId, uuid, clientIPAddress);
                     if (tokenValidateFlg) {
                         //Message requestMessage = unmarshalWithValidation(requestXML);
                         Message responseMessage = authorizer.authorize(requestMessage);
                         //putInfoOnHealthChecker(responseMessage);
-
+                        
+                        tokenValidateFlg = tokenValidatorService.udpateTokenStatus(CreditMessageTokenConstants.STATUS_INACTIVE, 
+                                tokenId, uuid, clientIPAddress);
+                        
                         responseXML = marshal(responseMessage);
                         LOG.info("To Client CreditMessageResource: " + responseXML);
                     } else {
@@ -114,11 +122,6 @@ public class CreditMessageResource {
         } catch (Exception ex) {
             Logger.getLogger(CreditMessageResource.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        if (tokenValidatorService == null) {
-            tokenValidatorService = new TokenValidatorService();
-        }
-        tokenValidateFlg = tokenValidatorService.udpateTokenStatus(CreditMessageTokenConstants.STATUS_INACTIVE, tokenId, uuid);
         return responseXML;
     }
 

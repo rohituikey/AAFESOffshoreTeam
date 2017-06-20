@@ -9,6 +9,8 @@ import com.aafes.stargate.dao.TokenServiceDAO;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.util.CreditMessageTokenConstants;
 import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import java.util.List;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -21,7 +23,7 @@ public class TokenValidatorService {
     String sMethodName = "";
     final String CLASS_NAME = TokenValidatorService.this.getClass().getSimpleName();
 
-    public boolean validateToken(String tokenStr, String identityUuid) {
+    public boolean validateToken(String tokenStr, String identityUuid, String clientIPAddress) {
         sMethodName = "validateToken";
         boolean tokenValidateFlg = false;
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
@@ -31,9 +33,9 @@ public class TokenValidatorService {
                     tokenServiceDAO = new TokenServiceDAO();
                 }
                 ResultSet tokenObj = null;
-                tokenObj = tokenServiceDAO.validateToken(tokenStr, identityUuid, CreditMessageTokenConstants.STATUS_ACTIVE);
-
-                if (tokenObj != null) tokenValidateFlg = true;
+                tokenObj = tokenServiceDAO.validateToken(tokenStr, identityUuid, CreditMessageTokenConstants.STATUS_ACTIVE, clientIPAddress);
+                List<Row> rowList = tokenObj.all();
+                if(rowList != null && rowList.size() > 0) tokenValidateFlg = true;
             }
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
@@ -43,14 +45,14 @@ public class TokenValidatorService {
         return tokenValidateFlg;
     }
     
-    public boolean udpateTokenStatus(String tokenStatus, String tokenId, String identityUuid) {
+    public boolean udpateTokenStatus(String tokenStatus, String tokenId, String identityUuid, String clientIPAddress) {
         sMethodName = "udpateTokenStatus";
         boolean tokenValidateFlg = false;
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         try {
             if (null != tokenId) {
                 if (tokenServiceDAO == null)  tokenServiceDAO = new TokenServiceDAO();
-                tokenValidateFlg = tokenServiceDAO.updateTokenStatus(tokenStatus, tokenId, identityUuid);
+                tokenValidateFlg = tokenServiceDAO.updateTokenStatus(tokenStatus, tokenId, identityUuid, clientIPAddress);
             }
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());

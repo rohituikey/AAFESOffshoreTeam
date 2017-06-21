@@ -26,7 +26,7 @@ public class TokenServiceDAO {
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TokenServiceDAO.class.getSimpleName());
     private final String CLASS_NAME = TokenServiceDAO.this.getClass().getSimpleName();
     private String sMethodName = "";
-    private CassandraSessionFactory factory = new CassandraSessionFactory();
+    private CassandraSessionFactory factory;
     private Mapper mapper;
     private Session session = null;
 
@@ -70,8 +70,10 @@ public class TokenServiceDAO {
         } catch (Exception ex) {
             LOG.error("Error while creating cross site request token " + ex.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
-        } finally{
-            if(session != null) session.close();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
         return dataInsertedFlg;
     }
@@ -85,67 +87,73 @@ public class TokenServiceDAO {
         try {
 //            if (factory == null) factory = new CassandraSessionFactory();
 //            factory.setSeedHost("localhost");
-            if(session == null) session = factory.getSession();
-            if (mapper == null) mapper = new MappingManager(session).mapper(CrosssiteRequestTokenTable.class);
-            query = "SELECT * FROM stargate.crosssiterequesttokentable where tokenid = '" + tokenStr + "'" +
-                    " and identityuuid = '" +identityUuid + "'" + " and tokenstatus = '" + tokenStatus + "'" +
-                    " and clientIPAddress = '" + clientIPAddress + "' ALLOW FILTERING;";
+            if (session == null) {
+                session = factory.getSession();
+            }
+            if (mapper == null) {
+                mapper = new MappingManager(session).mapper(CrosssiteRequestTokenTable.class);
+            }
+            query = "SELECT * FROM stargate.crosssiterequesttokentable where tokenid = '" + tokenStr + "'"
+                    + " and identityuuid = '" + identityUuid + "'" + " and tokenstatus = '" + tokenStatus + "'"
+                    + " and clientIPAddress = '" + clientIPAddress + "' ALLOW FILTERING;";
             resultSet = session.execute(query);
         } catch (Exception ex) {
             LOG.error("Error while creating cross site request token " + ex.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
-        } finally{
+        } finally {
             //if(session != null) session.close();
         }
-        
+
         return resultSet;//(CrosssiteRequestTokenTable) mapper.get(tokenStr, identityUuid, CreditMessageTokenConstants.STATUS_ACTIVE);
     }
-    
-    public boolean updateTokenStatus(String tokenStatus, String tokenId, String identityUuid, String clientIPAddress){
+
+    public boolean updateTokenStatus(String tokenStatus, String tokenId, String identityUuid, String clientIPAddress) {
         sMethodName = "updateTokenStatus";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        
+
         String updateQuery = "";
         boolean dataInsertedFlg = false;
-        List<Row> rowList = null;
+        //List<Row> rowList = null;
         ResultSet resultSet = null;
         try {
 //            if (factory == null) {
 //                factory = new CassandraSessionFactory();
 //            }
 //            factory.setSeedHost("localhost");
-            if(session == null)session = factory.getSession();
+            if (session == null) {
+                session = factory.getSession();
+            }
             if (mapper == null) {
                 mapper = new MappingManager(session).mapper(CrosssiteRequestTokenTable.class);
             }
-            
+
             updateQuery = "UPDATE stargate.crosssiterequesttokentable SET "
-                    + "tokenstatus = '" + tokenStatus +"' WHERE tokenid = '" + tokenId + "'" 
-                    + " AND identityuuid = '" + identityUuid + "' and clientIPAddress = '" + clientIPAddress + "';" ;
-            
+                    + "tokenstatus = '" + tokenStatus + "' WHERE tokenid = '" + tokenId + "'"
+                    + " AND identityuuid = '" + identityUuid + "' and clientIPAddress = '" + clientIPAddress + "';";
+
             resultSet = session.execute(updateQuery);
 
-            if(resultSet != null){
+            if (resultSet != null) {
                 //rowList = resultSet.all();
                 //if(rowList != null && rowList.size() > 0){
-                    LOG.info("Data Udpated. tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus);
-                    dataInsertedFlg = true;
+                LOG.info("Data Udpated. tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus);
+                dataInsertedFlg = true;
                 //}else  LOG.error("Data Udpatation failed ! tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus +
                 //", clientIPAddress " + clientIPAddress);
-            }else{
-                LOG.error("Data Udpatation failed ! tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus +
-                ", clientIPAddress " + clientIPAddress);
+            } else {
+                LOG.error("Data Udpatation failed ! tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus
+                        + ", clientIPAddress " + clientIPAddress);
             }
-            
+
         } catch (Exception ex) {
             LOG.error("Error while creating cross site request token " + ex.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
-        } finally{
+        } finally {
             //if(session != null) session.close();
         }
         return dataInsertedFlg;
     }
-    
+
     public ResultSet findActiveTokens(String identityUuid, String tokenStatus, String clientIPAddress) {
         sMethodName = "findActiveTokens";
         String query = "";
@@ -154,15 +162,19 @@ public class TokenServiceDAO {
         try {
 //            if (factory == null) factory = new CassandraSessionFactory();
 //            factory.setSeedHost("localhost");
-            if(session == null) session = factory.getSession();
-            if (mapper == null) mapper = new MappingManager(session).mapper(CrosssiteRequestTokenTable.class);
-            query = "SELECT * FROM stargate.crosssiterequesttokentable where identityuuid = '" +identityUuid + "'" 
+            if (session == null) {
+                session = factory.getSession();
+            }
+            if (mapper == null) {
+                mapper = new MappingManager(session).mapper(CrosssiteRequestTokenTable.class);
+            }
+            query = "SELECT * FROM stargate.crosssiterequesttokentable where identityuuid = '" + identityUuid + "'"
                     + " and tokenstatus = '" + tokenStatus + "' and clientIPAddress = '" + clientIPAddress + "' ALLOW FILTERING;";
             resultSet = session.execute(query);
         } catch (Exception ex) {
             LOG.error("Error while creating cross site request token " + ex.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
-        } finally{
+        } finally {
         }
         return resultSet;
     }

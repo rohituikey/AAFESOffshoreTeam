@@ -40,7 +40,7 @@ public class TokenEndPointService {
     public String lookupAccount(Transaction t) throws ProcessingException{
        log.info("TokenServicer#lookupAccount#Start.......");
         // REMOVE
-        if(tokenEndpoint == null) tokenEndpoint = "http://localhost:8080/tokenizer/1/tokenmessage";
+        //if(tokenEndpoint == null) tokenEndpoint = "http://localhost:8080/tokenizer/1/tokenmessage";
         Client client = ClientBuilder.newBuilder().build();
         WebTarget target = client.target(tokenEndpoint);
         log.info("TokenServicer#lookupAccount#Done WebTarget.........");

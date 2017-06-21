@@ -25,7 +25,6 @@ public class TransactionDAO {
         mapper = new MappingManager(session).mapper(Transaction.class);
     }
 
-
     public void save(Transaction transaction) {
         mapper.save(transaction);
     }
@@ -33,6 +32,15 @@ public class TransactionDAO {
     public Transaction find(String identityuuid, String rrn, String requesttype) {
         return (Transaction) mapper.get(identityuuid, rrn, requesttype);
     }
+
+    public String getCountAttempt(Transaction transaction) {
+        return ((Transaction) mapper.get(transaction.getIdentityUuid(), transaction.getRrn(), transaction.getRequestType())).getNumberOfAttempts();
+    }
+
+    public void updateCountAttepmt(Transaction transaction) {
+        mapper.saveQuery("update stargate.transactions set numberOfAttempts='" + transaction.getNumberOfAttempts() + "' where identityUUID='" + transaction.getIdentityUuid() + "'and rrn='" + transaction.getRrn() + "'and requesttype='" + transaction.getRequestType() + "'");
+    }
+
 //
 //    public void delete(Transaction transaction) {
 //        mapper.delete(transaction);
@@ -40,5 +48,5 @@ public class TransactionDAO {
     @EJB
     public void setCassandraSessionFactory(CassandraSessionFactory factory) {
         this.factory = factory;
-}
+    }
 }

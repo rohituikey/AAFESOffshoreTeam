@@ -14,6 +14,7 @@ import com.aafes.stargate.control.MQServ;
 import com.aafes.stargate.gateway.Gateway;
 import static com.aafes.stargate.gateway.vision.Common.convertStackTraceToString;
 import com.aafes.stargate.stub.CIDValidationStub;
+import com.aafes.stargate.timeout.TimeoutProcessor;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
@@ -39,7 +40,9 @@ public class EcommStrategy extends BaseStrategy {
     @Inject
     private String enableStub;
     
-    
+    @EJB
+    private TimeoutProcessor timeoutProcessor;
+
     @Override
     public Transaction processRequest(Transaction t) {
 
@@ -67,6 +70,10 @@ public class EcommStrategy extends BaseStrategy {
                     t.setPlanNumber("10001");
                     t = gateway.processMessage(t);
                 }
+                
+                //for timeout
+            timeoutProcessor.processResponse(t);
+                
             }
 
         } catch (AuthorizerException e) {
@@ -223,5 +230,12 @@ public class EcommStrategy extends BaseStrategy {
         this.enableStub = enableStub;
     }
     
+     public TimeoutProcessor getTimeoutProcessor() {
+        return timeoutProcessor;
+    }
+
+    public void setTimeoutProcessor(TimeoutProcessor timeoutProcessor) {
+        this.timeoutProcessor = timeoutProcessor;
+    }
     
 }

@@ -21,8 +21,8 @@ public class TimeoutProcessor {
 
     @EJB
     private TransactionDAO transactionDAO;
-    @EJB
-    private Transaction t;
+    
+    private Transaction t = new Transaction();
 
     public Transaction processResponse(Transaction t) {
         //visionGateway

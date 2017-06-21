@@ -209,4 +209,4 @@ clientipaddress text,
 primary key (tokenid, identityuuid, clientipaddress)
 );
 
-ALTER TABLE transactions ADD numberOfAttempts text;
+ALTER TABLE stargate.transactions ADD numberOfAttempts text;

@@ -239,6 +239,7 @@ public class TokenGeneratorService {
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         boolean dataUpdateFlg = false;
         String tokenId, identityUuidLocal, tokenStatus = CreditMessageTokenConstants.STATUS_INACTIVE, clientIPAddressLocal;
+        List<Row> resultSetRows = null;
         try {
             TokenServiceDAO tokenServiceDAO = null;
             if (tokenServiceDAO == null) {
@@ -248,10 +249,11 @@ public class TokenGeneratorService {
                     clientIPAddress);
 
             if (resultSet != null) {
-                if(resultSet.all() != null && resultSet.all().size() > 0)
+                resultSetRows = resultSet.all();
+                if(resultSetRows != null && resultSetRows.size() > 0)
                     LOG.info("Active tokens found for identityUuid " + identityUuid + ", clientIPAddress " + clientIPAddress);
                 
-                for(Row row : resultSet){
+                for(Row row : resultSetRows){
                     tokenId = row.getString("tokenid");
                     identityUuidLocal = row.getString("identityuuid");
                     clientIPAddressLocal = row.getString("clientipaddress");

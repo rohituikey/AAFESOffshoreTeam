@@ -85,7 +85,7 @@ public class TokenServiceDAO {
         try {
 //            if (factory == null) factory = new CassandraSessionFactory();
 //            factory.setSeedHost("localhost");
-            session = factory.getSession();
+            if(session == null) session = factory.getSession();
             if (mapper == null) mapper = new MappingManager(session).mapper(CrosssiteRequestTokenTable.class);
             query = "SELECT * FROM stargate.crosssiterequesttokentable where tokenid = '" + tokenStr + "'" +
                     " and identityuuid = '" +identityUuid + "'" + " and tokenstatus = '" + tokenStatus + "'" +
@@ -108,13 +108,13 @@ public class TokenServiceDAO {
         String updateQuery = "";
         boolean dataInsertedFlg = false;
         List<Row> rowList = null;
+        ResultSet resultSet = null;
         try {
 //            if (factory == null) {
 //                factory = new CassandraSessionFactory();
 //            }
 //            factory.setSeedHost("localhost");
-            session = factory.getSession();
-            ResultSet resultSet = null;
+            if(session == null)session = factory.getSession();
             if (mapper == null) {
                 mapper = new MappingManager(session).mapper(CrosssiteRequestTokenTable.class);
             }
@@ -126,12 +126,12 @@ public class TokenServiceDAO {
             resultSet = session.execute(updateQuery);
 
             if(resultSet != null){
-                rowList = resultSet.all();
-                if(rowList != null && rowList.size() > 0){
+                //rowList = resultSet.all();
+                //if(rowList != null && rowList.size() > 0){
                     LOG.info("Data Udpated. tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus);
                     dataInsertedFlg = true;
-                }else  LOG.error("Data Udpatation failed ! tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus +
-                ", clientIPAddress " + clientIPAddress);
+                //}else  LOG.error("Data Udpatation failed ! tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus +
+                //", clientIPAddress " + clientIPAddress);
             }else{
                 LOG.error("Data Udpatation failed ! tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus +
                 ", clientIPAddress " + clientIPAddress);
@@ -141,7 +141,7 @@ public class TokenServiceDAO {
             LOG.error("Error while creating cross site request token " + ex.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         } finally{
-            if(session != null) session.close();
+            //if(session != null) session.close();
         }
         return dataInsertedFlg;
     }
@@ -154,7 +154,7 @@ public class TokenServiceDAO {
         try {
 //            if (factory == null) factory = new CassandraSessionFactory();
 //            factory.setSeedHost("localhost");
-            session = factory.getSession();
+            if(session == null) session = factory.getSession();
             if (mapper == null) mapper = new MappingManager(session).mapper(CrosssiteRequestTokenTable.class);
             query = "SELECT * FROM stargate.crosssiterequesttokentable where identityuuid = '" +identityUuid + "'" 
                     + " and tokenstatus = '" + tokenStatus + "' and clientIPAddress = '" + clientIPAddress + "' ALLOW FILTERING;";

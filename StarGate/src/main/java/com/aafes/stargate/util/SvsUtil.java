@@ -53,13 +53,12 @@ public class SvsUtil {
  
     public static String getClientIPAddress(HttpServletRequest req){
         String remoteAddr = "";
-
         if (req != null) {
             remoteAddr = req.getHeader("X-Forwarded-For");
             if (remoteAddr == null || "".equals(remoteAddr)) {
                 remoteAddr = req.getRemoteAddr();
             }
         }
-         return remoteAddr;
-    }  
+        return remoteAddr;
+    }
 }

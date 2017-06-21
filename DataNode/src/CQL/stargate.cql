@@ -207,4 +207,6 @@ tokencredatetime text,
 identityuuid text,
 clientipaddress text,
 primary key (tokenid, identityuuid, clientipaddress)
-); 
+);
+
+ALTER TABLE transactions ADD numberOfAttempts text;

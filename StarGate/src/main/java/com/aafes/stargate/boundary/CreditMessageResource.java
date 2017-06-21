@@ -93,12 +93,9 @@ public class CreditMessageResource {
                         //Message requestMessage = unmarshalWithValidation(requestXML);
                         Message responseMessage = authorizer.authorize(requestMessage);
                         //putInfoOnHealthChecker(responseMessage);
-                        
-                        tokenValidateFlg = tokenValidatorService.udpateTokenStatus(CreditMessageTokenConstants.STATUS_INACTIVE, 
-                                tokenId, uuid, clientIPAddress);
-                        
-                        responseXML = marshal(responseMessage);
-                        LOG.info("To Client CreditMessageResource: " + responseXML);
+                    tokenValidateFlg = tokenValidatorService.udpateTokenStatus(CreditMessageTokenConstants.STATUS_INACTIVE, tokenId, uuid, clientIPAddress);
+                    responseXML = marshal(responseMessage);
+                    LOG.info("To Client CreditMessageResource: " + responseXML);
                     } else {
                         LOG.error("Invalid Request");
                         responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Unauthorized Transactions</Error>"
@@ -122,6 +119,8 @@ public class CreditMessageResource {
         } catch (Exception ex) {
             Logger.getLogger(CreditMessageResource.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        
         return responseXML;
     }
 

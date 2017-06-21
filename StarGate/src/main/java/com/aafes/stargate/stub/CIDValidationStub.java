@@ -7,6 +7,7 @@ package com.aafes.stargate.stub;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.util.StarGateConstants;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -15,14 +16,11 @@ import com.aafes.stargate.util.StarGateConstants;
 public class CIDValidationStub {
     
      public  static boolean validateStub(Transaction t) {
-        if (t.getComment().equalsIgnoreCase(StarGateConstants.VALID_APPROVED)) 
-            return true;
-        else if(t.getComment().equalsIgnoreCase(StarGateConstants.INVALID_DECLINE))
-             return false;
-        else if(t.getComment().equalsIgnoreCase(StarGateConstants.INVALID_APPROVED))
+         
+        if (t.getComment().toUpperCase().contains(StarGateConstants.INVALID)) 
             return false;
-        else if(t.getComment().equalsIgnoreCase(StarGateConstants.VALID_DECLINE))
-         return true;
+        else if(t.getComment().toUpperCase().contains(StarGateConstants.VALID))
+            return true;
         else 
             return true; 
     }

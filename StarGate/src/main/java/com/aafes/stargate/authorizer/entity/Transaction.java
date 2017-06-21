@@ -1,7 +1,6 @@
 package com.aafes.stargate.authorizer.entity;
 
 import com.datastax.driver.mapping.annotations.ClusteringColumn;
-import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 import com.datastax.driver.mapping.annotations.Transient;
 
@@ -31,7 +30,6 @@ final public class Transaction {
 //    public void setCardPresence(String cardPresence) {
 //        this.cardPresence = cardPresence;
 //    }
-
     public String getInputCode() {
         return inputCode;
     }
@@ -41,22 +39,21 @@ final public class Transaction {
     }
 
     //Header Fields
-  
     private String authHour = "";
     @ClusteringColumn(0)
     private String identityUuid = "";
     private String localDateTime = "";
     private String settleIndicator = "";
-    
+
     private String orderNumber = "";
     private String transactionId = "";
     private String termId = "";
     private String comment = "";
     private String customerId = "";
-    
+
     //Request Fields
     @ClusteringColumn(1)
-    private String rrn  = "";
+    private String rrn = "";
     private String media = "";
     @ClusteringColumn(2)
     private String requestType = "";
@@ -127,8 +124,7 @@ final public class Transaction {
     private String prodDetailCount = "";
     private String serviceCode = "";
     private String paymentType = "";
-    
-    
+
     // Response Fields
     private String reasonCode = "";
     private String authNumber = "";
@@ -142,18 +138,18 @@ final public class Transaction {
     private String origAcctType = "";
     private String modifiedAcctValue = "";
     private String originalRequestType = "";
-       
+
     //General Fields
     private String requestXmlDateTime = "";
     private String responseXmlDateTime = "";
-    private String requestAuthDateTime ="";
+    private String requestAuthDateTime = "";
     private String responseAuthDateTime = "";
     private String facility = "";
     @Transient
     private String strategy = "";
     @Transient
     private String tokenBankName = "";
-    
+
     // MilStar Gateway Fields
     @Transient
     private String deviceType = "";
@@ -170,13 +166,13 @@ final public class Transaction {
     private String ZipCode = "";
     private String inputCode = "";
     private String sequenceNumber = "";
-   // private String ResponseCode = "";
-    
+    // private String ResponseCode = "";
+
     // FDMS Gateway Fields
     private String divisionnumber = "";
-    private String currencycode="";
-    private String transactiontype="";
-    private String actioncode="";
+    private String currencycode = "";
+    private String transactiontype = "";
+    private String actioncode = "";
 //    private String cardPresence = "";
     private String billpaymentindicator = "";
     private String telephonetype = "";
@@ -184,7 +180,10 @@ final public class Transaction {
     private String authoriztionCode = "";
     private String avsResponseCode = "";
     private String csvResponseCode = "";
-    
+
+//  to check number of attempts
+    private String numberOfAttempts = "";
+
     public Transaction() {
 
     }
@@ -300,8 +299,6 @@ final public class Transaction {
     public void setPan(String pan) {
         this.pan = pan;
     }
-
-
 
     public String getEncryptedPayLoad() {
         return encryptedPayLoad;
@@ -831,8 +828,6 @@ final public class Transaction {
         this.originalRequestType = originalRequestType;
     }
 
-   
-
     public String getFacility() {
         return facility;
     }
@@ -845,8 +840,6 @@ final public class Transaction {
 //    public String toString() {
 //        return "Transaction{" + "authHour=" + authHour + ", identityUuid=" + identityUuid + ", localDateTime=" + localDateTime + ", settleIndicator=" + settleIndicator + ", orderNumber=" + orderNumber + ", comment=" + comment + ", customerId=" + customerId + ", media=" + media + ", requestType=" + requestType + ", reversal=" + reversal + ", voidFlag=" + voidFlag + ", inputType=" + inputType + ", upc=" + upc + ", primaryAccountNumber=" + primaryAccountNumber + ", expiration=" + expiration + ", cvv=" + cvv + ", track1=" + track1 + ", track2=" + track2 + ", amount=" + amount + ", essoLoadAmount=" + essoLoadAmount + ", planNumber=" + planNumber + ", originalOrder=" + originalOrder + ", zipCode=" + zipCode + ", requestDescription=" + requestDescription + ", cardholderName=" + cardholderName + ", billingAddress=" + billingAddress + ", billingCountry=" + billingCountry + ", billingZipCode=" + billingZipCode + ", email=" + email + ", billingPhone=" + billingPhone + ", shippingAddress=" + shippingAddress + ", shippingCountry=" + shippingCountry + ", shippingZipCode=" + shippingZipCode + ", shippingPhone=" + shippingPhone + ", responseType=" + responseType + ", authNumber=" + authNumber + ", reasonCode=" + reasonCode + ", milstarNumber=" + milstarNumber + ", balanceAmount=" + balanceAmount + ", responseDescription=" + responseDescription + ", avsResponse=" + avsResponse + ", panToken=" + panToken + ", systemDateTime=" + systemDateTime + ", facility=" + facility + ", settleTs=" + settleTs + ", originalRequestType=" + originalRequestType + '}';
 //    }
-
-
     public String getSTAN() {
         return STAN;
     }
@@ -878,7 +871,6 @@ final public class Transaction {
 //    public void setResponseCode(String ResponseCode) {
 //        this.ResponseCode = ResponseCode;
 //    }
-
     public String getZipCode() {
         return ZipCode;
     }
@@ -964,7 +956,7 @@ final public class Transaction {
      */
     public String getStrategy() {
         return strategy;
-}
+    }
 
     /**
      * @param strategy the strategy to set
@@ -1123,6 +1115,12 @@ final public class Transaction {
         this.tokenBankName = tokenBankName;
     }
 
-        
+    public String getNumberOfAttempts() {
+        return numberOfAttempts;
+    }
+
+    public void setNumberOfAttempts(String numberOfAttempts) {
+        this.numberOfAttempts = numberOfAttempts;
+    }
 
 }

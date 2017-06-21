@@ -61,6 +61,7 @@ public class CreditMessageResource {
      *
      * @param requestXML
      * @param tokenId
+     * @param req
      * @return the request XML document with added response data
      */
     @POST

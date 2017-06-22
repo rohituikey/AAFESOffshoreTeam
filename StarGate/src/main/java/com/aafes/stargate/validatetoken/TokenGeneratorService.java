@@ -61,7 +61,7 @@ public class TokenGeneratorService {
     @POST
     @Consumes("application/xml")
     @Produces("text/plain")
-    public String postXml(String requestXML, @Context HttpServletRequest req) {
+    public String postXml(String requestXML) {
         sMethodName = "postXml";
         boolean validateUserFlg = false;
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);

@@ -10,15 +10,14 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Authorizer;
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.Gateway;
-import com.aafes.stargate.gateway.GatewayFactory;
+import com.aafes.stargate.timeout.TimeoutProcessor;
 import com.aafes.stargate.tokenizer.TokenBusinessService;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
-import com.aafes.stargate.util.StarGateConstants;
-import com.aafes.stargate.util.StrategyType;
 import com.aafes.stargate.util.TransactionType;
 import com.aafes.starsettler.imported.SettleConstant;
 import com.aafes.starsettler.imported.SettleMessageDAO;
@@ -42,10 +41,13 @@ public class RetailStrategy extends BaseStrategy {
 
     @EJB
     private SettleMessageDAO settleMessageDAO;
+
     @EJB
     private Configurator configurator;
     @EJB
     private TokenBusinessService tokenBusinessService;
+    @EJB
+    private TimeoutProcessor timeoutProcessor;
 
     SettleEntity settleEntity;
     private static final org.slf4j.Logger LOG
@@ -85,6 +87,9 @@ public class RetailStrategy extends BaseStrategy {
                 }
             }
 
+            //for timeout
+            timeoutProcessor.processResponse(t);
+            
             //if Authorized, save in settle message repository to settle
             if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                 getToken(t);
@@ -106,21 +111,21 @@ public class RetailStrategy extends BaseStrategy {
         return settleEntity;
     }
 
-    private void getToken(Transaction t)
-    {
+    private void getToken(Transaction t) {
         if ("Pan".equalsIgnoreCase(t.getPan())) {
-               
-                if (tokenBusinessService != null
-                        && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
-                    try {
-                        tokenBusinessService.issueToken(t);
-                    } catch (ProcessingException e) {
-                        LOG.error("Cannot generate token. Token Service Error");
-                    }
 
+            if (tokenBusinessService != null
+                    && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
+                try {
+                    tokenBusinessService.issueToken(t);
+                } catch (ProcessingException e) {
+                    LOG.error("Cannot generate token. Token Service Error");
                 }
-                  }
+
+            }
+        }
     }
+
     /**
      *
      * @param t
@@ -157,10 +162,10 @@ public class RetailStrategy extends BaseStrategy {
         }
 
         if (t.getTokenId() != null && !t.getTokenId().trim().isEmpty()) {
-                    settleEntity.setCardToken(t.getTokenId());
-                    settleEntity.setTokenBankName(t.getTokenBankName());
-                }
-        
+            settleEntity.setCardToken(t.getTokenId());
+            settleEntity.setTokenBankName(t.getTokenBankName());
+        }
+
         settleEntityList.add(settleEntity);
         settleMessageDAO.save(settleEntityList);
     }
@@ -242,4 +247,11 @@ public class RetailStrategy extends BaseStrategy {
         return ts;
     }
 
+    public TimeoutProcessor getTimeoutProcessor() {
+        return timeoutProcessor;
+    }
+
+    public void setTimeoutProcessor(TimeoutProcessor timeoutProcessor) {
+        this.timeoutProcessor = timeoutProcessor;
+    }
 }

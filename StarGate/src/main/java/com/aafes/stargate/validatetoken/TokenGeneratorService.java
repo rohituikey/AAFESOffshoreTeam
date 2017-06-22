@@ -8,7 +8,6 @@ package com.aafes.stargate.validatetoken;
 import com.aafes.stargate.dao.TokenServiceDAO;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.util.CreditMessageTokenConstants;
-import com.aafes.stargate.util.SvsUtil;
 import com.aafes.tokenvalidator.Message;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -64,9 +63,8 @@ public class TokenGeneratorService {
     @Produces("text/plain")
     public String postXml(String requestXML, @Context HttpServletRequest req) {
         sMethodName = "postXml";
+        boolean validateUserFlg = false;
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-
-        String clientIPAddress = SvsUtil.getClientIPAddress(req);
 
         String responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error></ErrorInformation>";
         try {
@@ -76,12 +74,16 @@ public class TokenGeneratorService {
                 LOG.error("Invalid Request TokenGeneratorService");
             } else if (ValidatedXML != null) {
                 Message requestMessage = unmarshalWithValidation(requestXML);
-                checkAndUpdateDuplicateToken(requestMessage.getHeader().getIdentityUUID(), clientIPAddress);
-                responseXML = generateToken(requestMessage, clientIPAddress);
-                LOG.info("To Client TokenGeneratorService: " + responseXML);
+                //checkAndUpdateDuplicateToken(requestMessage.getHeader().getIdentityUUID());
+                validateUserFlg = validateUserDetails(requestMessage);
+                if(validateUserFlg){
+                    responseXML = generateToken(requestMessage);
+                }else responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid credentials"
+                        + "</Error></ErrorInformation>";
             } else {
                 LOG.error("Invalid Request");
             }
+            LOG.info("To Client TokenGeneratorService: " + responseXML);
         } catch (JAXBException | SAXException e) {
             LOG.error(e.toString());
         } catch (Exception ex) {
@@ -157,7 +159,7 @@ public class TokenGeneratorService {
         }
     }
 
-    private String generateToken(Message requestMessage, String clientIPAddress) {
+    private String generateToken(Message requestMessage) {
         sMethodName = "generateToken";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         //Message responseMessage = null;
@@ -176,7 +178,6 @@ public class TokenGeneratorService {
             tokenObj.setTokenstatus(CreditMessageTokenConstants.STATUS_ACTIVE);
             tokenObj.setTokencredatetime(creTime);
             tokenObj.setIdentityuuid(requestMessage.getHeader().getIdentityUUID());
-            tokenObj.setClientipaddress(clientIPAddress);
             //tokenObj.setTermid(requestMessage.getHeader().getTermId());
             //tokenObj.setCustomerid(requestMessage.getHeader().getCustomerID());
             //tokenObj.setMedia(requestMessage.getRequest().get(0).getMedia());
@@ -234,39 +235,82 @@ public class TokenGeneratorService {
         return String.valueOf(nextToken);
     }
 
-    private void checkAndUpdateDuplicateToken(String identityUuid, String clientIPAddress) {
-        sMethodName = "checkAndUpdateDuplicateToken";
+//    private void checkAndUpdateDuplicateToken(String identityUuid) {
+//        sMethodName = "checkAndUpdateDuplicateToken";
+//        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+//        boolean dataUpdateFlg = false;
+//        String tokenId, identityUuidLocal, tokenStatus = CreditMessageTokenConstants.STATUS_EXPIRED;
+//        List<Row> resultSetRows = null;
+//        try {
+//            TokenServiceDAO tokenServiceDAO = null;
+//            if (tokenServiceDAO == null) {
+//                tokenServiceDAO = new TokenServiceDAO();
+//            }
+//            ResultSet resultSet = tokenServiceDAO.findActiveTokens(identityUuid, CreditMessageTokenConstants.STATUS_ACTIVE);
+//
+//            if (resultSet != null) {
+//                resultSetRows = resultSet.all();
+//                if(resultSetRows != null && resultSetRows.size() > 0)
+//                    LOG.info("Active tokens found for identityUuid " + identityUuid);
+//                
+//                for(Row row : resultSetRows){
+//                    tokenId = row.getString("tokenid");
+//                    identityUuidLocal = row.getString("identityuuid");
+//                    
+//                    dataUpdateFlg = tokenServiceDAO.updateTokenStatus(tokenStatus, tokenId, identityUuidLocal);
+//                    if(dataUpdateFlg)
+//                        LOG.info("Duplicate Data Udpated. tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus);
+//                }
+//            }
+//        } catch (Exception ex) {
+//            Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
+//        }
+//        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+//    }
+    
+//    private void saveUserDetails(Message requestMessage) {
+//        sMethodName = "saveUserDetails";
+//        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+//        boolean dataInsertedFlg = false;
+//        try {
+//            if (tokenServiceDAO == null) tokenServiceDAO = new TokenServiceDAO();
+//
+//            CrosssiteRequestUsertable tokenUserDetObj = new CrosssiteRequestUsertable();
+//            tokenUserDetObj.setIdentityuuid(requestMessage.getHeader().getIdentityUUID());
+//            tokenUserDetObj.setUserid(requestMessage.getHeader().getUerId());
+//            tokenUserDetObj.setPassword(requestMessage.getHeader().getPassword());
+//            
+//            dataInsertedFlg = tokenServiceDAO.insertUserDetails(tokenUserDetObj);
+//
+//            if (dataInsertedFlg) LOG.info("Data Inserted in table stargate.crosssiterequestusertable successfully!");
+//            else LOG.info("Data Insertion in table stargate.crosssiterequestusertable FAILED!");
+//
+//        } catch (Exception ex) {
+//            Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
+//        }
+//        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+//    }
+    
+    private boolean validateUserDetails(Message requestMessage) {
+        sMethodName = "validateUserDetails";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        boolean dataUpdateFlg = false;
-        String tokenId, identityUuidLocal, tokenStatus = CreditMessageTokenConstants.STATUS_INACTIVE, clientIPAddressLocal;
-        List<Row> resultSetRows = null;
+        boolean userValidated = false;
         try {
-            TokenServiceDAO tokenServiceDAO = null;
-            if (tokenServiceDAO == null) {
-                tokenServiceDAO = new TokenServiceDAO();
-            }
-            ResultSet resultSet = tokenServiceDAO.findActiveTokens(identityUuid, CreditMessageTokenConstants.STATUS_ACTIVE,
-                    clientIPAddress);
+            if (tokenServiceDAO == null) tokenServiceDAO = new TokenServiceDAO();
 
-            if (resultSet != null) {
-                resultSetRows = resultSet.all();
-                if(resultSetRows != null && resultSetRows.size() > 0)
-                    LOG.info("Active tokens found for identityUuid " + identityUuid + ", clientIPAddress " + clientIPAddress);
-                
-                for(Row row : resultSetRows){
-                    tokenId = row.getString("tokenid");
-                    identityUuidLocal = row.getString("identityuuid");
-                    clientIPAddressLocal = row.getString("clientipaddress");
-                    
-                    dataUpdateFlg = tokenServiceDAO.updateTokenStatus(tokenStatus, tokenId, identityUuidLocal, clientIPAddressLocal);
-                    if(dataUpdateFlg)
-                        LOG.info("Duplicate Data Udpated. tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus +
-                        ", clientIPAddress " + clientIPAddressLocal);
-                }
-            }
+            CrosssiteRequestUsertable tokenUserDetObj = new CrosssiteRequestUsertable();
+            tokenUserDetObj.setIdentityuuid(requestMessage.getHeader().getIdentityUUID());
+            tokenUserDetObj.setUserid(requestMessage.getHeader().getUerId());
+            tokenUserDetObj.setPassword(requestMessage.getHeader().getPassword());
+            
+            userValidated = tokenServiceDAO.validateUserDetails(tokenUserDetObj);
+
+            if (userValidated) LOG.info("User Validated successfully!");
+            else LOG.info("User Validation Failed!");
         } catch (Exception ex) {
             Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
         }
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        return userValidated;
     }
 }

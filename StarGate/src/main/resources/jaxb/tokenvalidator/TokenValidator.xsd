@@ -35,6 +35,18 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
+                            <xs:element name="UerId" minOccurs="1" maxOccurs="1">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string"/>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="Password" minOccurs="1" maxOccurs="1">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:length value="8"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
                             <!--xs:element name="LocalDateTime" type="xs:dateTime" minOccurs="1" maxOccurs="1"/>
                             <xs:element name="termId" minOccurs='1' maxOccurs='1'>
                                 <xs:simpleType>

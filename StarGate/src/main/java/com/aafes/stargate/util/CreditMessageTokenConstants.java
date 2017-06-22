@@ -12,5 +12,5 @@ package com.aafes.stargate.util;
 public class CreditMessageTokenConstants {
     
     public static final String STATUS_ACTIVE = "Active";
-    public static final String STATUS_INACTIVE = "InActive";
+    public static final String STATUS_EXPIRED = "Expired";
 }

@@ -205,8 +205,14 @@ tokenid text,
 tokenstatus text,
 tokencredatetime text,
 identityuuid text,
-clientipaddress text,
-primary key (tokenid, identityuuid, clientipaddress)
+primary key (tokenid, identityuuid)
+);
+
+create table stargate.crosssiterequestusertable(
+identityuuid text,
+userid text,
+password text,
+primary key (identityuuid)
 );
 
 ALTER TABLE transactions ADD numberOfAttempts text;

@@ -68,6 +68,7 @@ public class Authorizer {
             bDoneMApreq = true;
             
             findFacility(t);
+           
             if (t.getFacility() == null || t.getFacility().isEmpty()
                     || t.getStrategy() == null || t.getStrategy().isEmpty()) {
                 LOG.info("UUID not found in facmapper .....");
@@ -171,8 +172,16 @@ public class Authorizer {
                     return cm;
                 }
 
-            } else {
+            }else if (storedTran != null && storedTran.getReasonCode().contains("000") && !storedTran.getNumberOfAttempts().equals(1)) {
+                isDuplicateTransaction = false;
+                BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
+                t = baseStrategy.processRequest(t);
+                t.setResponseXmlDateTime(getSystemDateTime());
+                mapResponse(t, cm);
+            }
+            else {
                 LOG.info("Transaction found. So replying from the cache...");
+                
                 isDuplicateTransaction = true;
                 mapResponse(storedTran, cm);
             }

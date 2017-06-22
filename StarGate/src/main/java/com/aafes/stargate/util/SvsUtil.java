@@ -5,15 +5,11 @@
  */
 package com.aafes.stargate.util;
 
-import static com.sun.corba.se.spi.presentation.rmi.StubAdapter.request;
 import com.svs.svsxml.service.SVSXMLWay;
 import com.svs.svsxml.service.SVSXMLWayService;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;

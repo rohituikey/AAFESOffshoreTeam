@@ -33,8 +33,8 @@ public class TokenServiceDAO {
 
     @PostConstruct
     public void postConstruct() {
-        if (factory == null) factory = new CassandraSessionFactory();
-        factory.setSeedHost("localhost");
+//        if (factory == null) factory = new CassandraSessionFactory();
+//        factory.setSeedHost("localhost");
         session = factory.getSession();
         mapper = new MappingManager(session).mapper(CrosssiteRequestTokenTable.class);
     }
@@ -62,7 +62,7 @@ public class TokenServiceDAO {
 //                factory = new CassandraSessionFactory();
 //            }
 //            factory.setSeedHost("localhost");
-            postConstruct();
+//            postConstruct();
             mapper.save(tokenObj);
             LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
             dataInsertedFlg = true;
@@ -70,9 +70,7 @@ public class TokenServiceDAO {
             LOG.error("Error while creating cross site request token " + ex.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         } finally {
-            if (session != null) {
-                session.close();
-            }
+//            if (session != null) session.close();
         }
         return dataInsertedFlg;
     }
@@ -84,7 +82,7 @@ public class TokenServiceDAO {
         CrosssiteRequestTokenTable obj = null;
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         try {
-            postConstruct();
+//            postConstruct();
             query = "SELECT * FROM stargate.crosssiterequesttokentable where tokenid = '" + tokenStr + "'"
                     + " and identityuuid = '" + identityUuid + "'" + " and tokenstatus = '" + tokenStatus + "'"
                     + " ALLOW FILTERING;";
@@ -107,7 +105,7 @@ public class TokenServiceDAO {
         //List<Row> rowList = null;
         ResultSet resultSet = null;
         try {
-            postConstruct();
+//            postConstruct();
             updateQuery = "UPDATE stargate.crosssiterequesttokentable SET "
                     + "tokenstatus = '" + tokenStatus + "' WHERE tokenid = '" + tokenId + "'"
                     + " AND identityuuid = '" + identityUuid + "';";
@@ -139,7 +137,7 @@ public class TokenServiceDAO {
         ResultSet resultSet = null;
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         try {
-            postConstruct();
+//            postConstruct();
             query = "SELECT * FROM stargate.crosssiterequesttokentable where identityuuid = '" + identityUuid + "'"
                     + " and tokenstatus = '" + tokenStatus + "' ALLOW FILTERING;";
             resultSet = session.execute(query);
@@ -180,7 +178,7 @@ public class TokenServiceDAO {
         List<Row> rowList = null;
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         try {
-            postConstruct();
+//            postConstruct();
             query = "SELECT * FROM stargate.crosssiterequestusertable where identityuuid = '" + tokenObj.getIdentityuuid() + "'"
                     + " and userid = '" + tokenObj.getUserid() + "' and password = '" + tokenObj.getPassword() + "' ALLOW FILTERING;";
             resultSet = session.execute(query);

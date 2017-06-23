@@ -72,7 +72,7 @@ public class EcommStrategy extends BaseStrategy {
                 }
                 
                 //for timeout
-            timeoutProcessor.processResponse(t);
+            t=timeoutProcessor.processResponse(t);
                 
             }
 

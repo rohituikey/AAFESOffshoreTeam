@@ -88,7 +88,7 @@ public class RetailStrategy extends BaseStrategy {
             }
 
             //for timeout
-            timeoutProcessor.processResponse(t);
+            t=timeoutProcessor.processResponse(t);
             
             //if Authorized, save in settle message repository to settle
             if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {

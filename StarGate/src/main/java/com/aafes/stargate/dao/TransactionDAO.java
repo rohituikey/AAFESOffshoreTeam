@@ -33,12 +33,17 @@ public class TransactionDAO {
         return (Transaction) mapper.get(identityuuid, rrn, requesttype);
     }
 
-    public String getCountAttempt(Transaction transaction) {
-        return ((Transaction) mapper.get(transaction.getIdentityUuid(), transaction.getRrn(), transaction.getRequestType())).getNumberOfAttempts();
+    public Mapper getMapper() {
+        return mapper;
+    }
+
+    public void setMapper(Mapper mapper) {
+        this.mapper = mapper;
     }
 
     public void updateCountAttepmt(Transaction transaction) {
-        mapper.saveQuery("update stargate.transactions set numberOfAttempts='" + transaction.getNumberOfAttempts() + "' where identityUUID='" + transaction.getIdentityUuid() + "'and rrn='" + transaction.getRrn() + "'and requesttype='" + transaction.getRequestType() + "'");
+        String query = "update stargate.transactions set numberOfAttempts='" + transaction.getNumberOfAttempts() + "' where identityUUID='" + transaction.getIdentityUuid() + "'and rrn='" + transaction.getRrn() + "'and requesttype='" + transaction.getRequestType().toLowerCase() + "'";
+        factory.getSession().execute(query);
     }
 
 //

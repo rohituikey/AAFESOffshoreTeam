@@ -5,7 +5,6 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.Gateway;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
-import com.aafes.stargate.util.TimerUtil;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.SessionContext;

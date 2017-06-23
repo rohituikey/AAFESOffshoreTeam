@@ -3,12 +3,15 @@ package com.aafes.stargate.gateway.fdms;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.Gateway;
+import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import com.aafes.stargate.util.TimerUtil;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.ejb.Timeout;
+import javax.ejb.Timer;
 import org.slf4j.LoggerFactory;
 
 @Stateless
@@ -23,21 +26,38 @@ public class CompassGateway   extends Gateway {
     @Resource
     private SessionContext context;
     
-    @Timeout
-
+    private Transaction transaction = new Transaction();
     
 
     public void createTimer(long duration) {
-      context.getTimerService().createTimer(2500, "My timer");
+      context.getTimerService().createTimer(duration, "My timer");
+      System.out.println("timer");
    }
+    
+     @Timeout
+     public void timeout(Timer timer) {
+         
+        // processMessage(transaction);
+         
+        Transaction localTransaction = new Transaction();
+        localTransaction = transaction;
+        localTransaction.setRequestType(RequestType.REVERSAL);
+        transaction = cgp.execute(localTransaction);
+        transaction.setResponseType(ResponseType.TIMEOUT);
+        transaction.setDescriptionField("Time out occured");
+        transaction.setReasonCode("TIMEOUT OCCURED");
+     }
     
     @Override
     public Transaction processMessage(Transaction t) {
-
+        transaction = t;
         try {
             this.validateTransaction(t);
             if (cgp != null) {
+                 createTimer(25000);
+                    //t.setRequestAuthDateTime(ResponseType.TIMEOUT);
                 t = cgp.execute(t);
+                
             } else {
                 t.setResponseType(ResponseType.DECLINED);
                 t.setDescriptionField("INTERNAL SERVER ERROR");
@@ -48,7 +68,7 @@ public class CompassGateway   extends Gateway {
             t.setDescriptionField(e.getMessage());
         }
 
-        return t;
+        return transaction;
     }
 
     private void validateTransaction(Transaction t) throws GatewayException {

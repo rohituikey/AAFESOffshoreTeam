@@ -11,6 +11,7 @@ import com.aafes.stargate.authorizer.BaseStrategy;
 import com.aafes.stargate.authorizer.BaseStrategyFactory;
 import com.aafes.stargate.authorizer.entity.Facility;
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.fdms.FDMSStub;
 import com.aafes.stargate.tokenizer.TokenBusinessService;
 import com.aafes.stargate.util.AVSResponseReasonCode;
@@ -56,6 +57,8 @@ public class Authorizer {
     private String enableFDMSStub;
     @EJB
     private FDMSStub fDMSStub;
+    @EJB
+    private TransactionDAO transactionDAO;
     
     private boolean isDuplicateTransaction = false;
 
@@ -175,6 +178,10 @@ public class Authorizer {
             }else if (storedTran != null && storedTran.getReasonCode().contains("000") && !storedTran.getNumberOfAttempts().equals(1)) {
                 isDuplicateTransaction = false;
                 BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
+                String numberOfAttempts = storedTran.getNumberOfAttempts();
+                int counter = (numberOfAttempts.isEmpty() || null==numberOfAttempts || numberOfAttempts.trim().equals("")) ? 0 : Integer.parseInt(numberOfAttempts+1);
+                storedTran.setNumberOfAttempts(String.valueOf(counter));
+                transactionDAO.updateCountAttepmt(storedTran);
                 t = baseStrategy.processRequest(t);
                 t.setResponseXmlDateTime(getSystemDateTime());
                 mapResponse(t, cm);
@@ -744,5 +751,15 @@ public class Authorizer {
     public void setBaseStrategyFactory(BaseStrategyFactory baseStrategyFactory) {
         this.baseStrategyFactory = baseStrategyFactory;
     }
+
+    public TransactionDAO getTransactionDAO() {
+        return transactionDAO;
+    }
+
+    public void setTransactionDAO(TransactionDAO transactionDAO) {
+        this.transactionDAO = transactionDAO;
+    }
+    
+    
 
 }

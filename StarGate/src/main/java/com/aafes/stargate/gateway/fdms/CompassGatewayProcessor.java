@@ -104,6 +104,7 @@ public class CompassGatewayProcessor {
 
             log.info("compassUser :" + compassUser + ", compassPassword:" + compassPassword);
 
+            
             result = port.onlineTrans(otr);
             log.info("got result.......");
 

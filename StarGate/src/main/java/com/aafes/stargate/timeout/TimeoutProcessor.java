@@ -19,12 +19,11 @@ import javax.ejb.Stateless;
 @Stateless
 public class TimeoutProcessor {
 
-    @EJB
-    private TransactionDAO transactionDAO;
     
     private Transaction t = new Transaction();
 
     public Transaction processResponse(Transaction t) {
+       
         //visionGateway
         switch (t.getMedia()) {
             case MediaType.MIL_STAR:
@@ -39,41 +38,21 @@ public class TimeoutProcessor {
     }
 
     private void handleVisionGateway(Transaction t) {
-        if ((null == t.getReasonCode() || t.getReasonCode().isEmpty() || t.getReasonCode().trim().equals("")) || (ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType()) && (t.getReasonCode().equals("130") || t.getReasonCode().equals("99") || t.getReasonCode().equals("130")))) {
-            t.setResponseType(ResponseType.TIMEOUT);
-        }
+       
+        if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)
+                        && t.getResponseType().equalsIgnoreCase(ResponseType.DECLINED)
+                        && "20001".equalsIgnoreCase(t.getPlanNumber())
+                        && ("364".equalsIgnoreCase(t.getReasonCode())
+                        || "190".equalsIgnoreCase(t.getReasonCode())
+                        || "023".equalsIgnoreCase(t.getReasonCode()))) {
+                      t.setResponseType(ResponseType.TIMEOUT);
+                      t.setReasonCode("9001");
+                }
     }
 
     private void handleCompassGateway(Transaction t) {
-        if ((null == t.getReasonCode() || t.getReasonCode().isEmpty() || t.getReasonCode().trim().equals(""))) {
+       
+        if ((ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())) && (t.getReasonCode().equals("000"))) 
             t.setResponseType(ResponseType.TIMEOUT);
-        }
-        if ((ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())) && (t.getReasonCode().equals("000"))) {
-            t.setResponseType(ResponseType.TIMEOUT);
-            String counter = transactionDAO.getCountAttempt(t);
-            int count = counter != null ? Integer.parseInt(counter) : 0;
-            if (count == 0 || count < 1) {
-                count++;
-                t.setNumberOfAttempts(String.valueOf(count));
-                transactionDAO.updateCountAttepmt(t);
-            }
-        }
+       }
     }
-
-    public TransactionDAO getTransactionDAO() {
-        return transactionDAO;
-    }
-
-    public void setTransactionDAO(TransactionDAO transactionDAO) {
-        this.transactionDAO = transactionDAO;
-    }
-
-    public Transaction getT() {
-        return t;
-    }
-
-    public void setT(Transaction t) {
-        this.t = t;
-    }
-
-}

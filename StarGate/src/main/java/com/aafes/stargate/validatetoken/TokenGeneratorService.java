@@ -86,8 +86,10 @@ public class TokenGeneratorService {
             LOG.info("To Client TokenGeneratorService: " + responseXML);
         } catch (JAXBException | SAXException e) {
             LOG.error(e.toString());
+             throw new GatewayException("INTERNAL SYSTEM ERROR");
         } catch (Exception ex) {
             Logger.getLogger(TokenGeneratorService.class.getName()).log(Level.SEVERE, null, ex);
+             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         return responseXML;
@@ -133,6 +135,7 @@ public class TokenGeneratorService {
         } catch (Exception ex) {
             LOG.error(ex.toString());
             retString = null;
+             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOG.info("Method FilterRequestXML ended. Class Name TokenGeneratorService");
         return retString;
@@ -150,6 +153,7 @@ public class TokenGeneratorService {
             transformer.transform(domSource, result);
         } catch (Exception ex) {
             LOG.error(ex.toString());
+             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOG.info("Method getStringFromDocument ended. Class Name TokenGeneratorService");
         if (null != writer) {
@@ -230,6 +234,7 @@ public class TokenGeneratorService {
             LOG.info("Token Value " + nextToken);
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
+             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         return String.valueOf(nextToken);
@@ -309,6 +314,7 @@ public class TokenGeneratorService {
             else LOG.info("User Validation Failed!");
         } catch (Exception ex) {
             Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
+            throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         return userValidated;

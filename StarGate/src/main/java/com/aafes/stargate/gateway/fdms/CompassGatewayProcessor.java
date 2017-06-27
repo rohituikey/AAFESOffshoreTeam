@@ -16,7 +16,7 @@ import com.firstdata.cmpwsapi.schemas.cmpmsg.FR;
 import com.firstdata.cmpwsapi.schemas.cmpmsg.OnlineAF;
 import com.firstdata.cmpwsapi.schemas.cmpmsg.PA;
 import com.firstdata.cmpwsapi.schemas.cmpmsg.Transaction;
-import com.sun.xml.internal.ws.client.BindingProviderProperties;
+//import com.sun.xml.internal.ws.client.BindingProviderProperties;
        
 import java.net.URI;
 import java.net.URL;
@@ -99,8 +99,9 @@ public class CompassGatewayProcessor {
             requestContext.put(BindingProvider.USERNAME_PROPERTY, compassUser);
             requestContext.put(BindingProvider.PASSWORD_PROPERTY, compassPassword);
             
-            requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, 60000);
-            requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, 60000);
+            requestContext.put("com.sun.xml.internal.ws.request.timeout", 60000);
+            requestContext.put("com.sun.xml.internal.ws.connect.timeout", 60000);
+           
 
           
             log.info("compassUser :" + compassUser + ", compassPassword:" + compassPassword);

@@ -46,6 +46,7 @@ public class VisionPlusProcessor {
 //    private Configurator configurator;
 
     public Transaction authorize(Transaction t) throws InterruptedException {
+        Thread.sleep(40000);
         return t;
     }
 //        LOG.debug("Pushing data into MQ CID and AuthNumber :", t.getTraceId() + ", " + t.getAuthNumber());

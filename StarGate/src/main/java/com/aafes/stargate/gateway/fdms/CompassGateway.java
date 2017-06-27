@@ -6,6 +6,7 @@ import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.Gateway;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -16,35 +17,22 @@ import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
 
 @Stateless
-public class CompassGateway   extends Gateway {
+public class CompassGateway extends Gateway {
 
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(CompassGateway.class.getSimpleName());
 
     @EJB
     private CompassGatewayProcessor cgp;
-    
+
 //    
 //    @Resource
 //    private SessionContext context;
-    
     @EJB
     private Configurator configurator;
-    
-    
+
     private Transaction transaction = new Transaction();
-    
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
     @Override
     public Transaction processMessage(Transaction t) {
         transaction = t;
@@ -54,7 +42,7 @@ public class CompassGateway   extends Gateway {
                 final ExecutorService service = Executors.newSingleThreadExecutor();
                 try {
                     final Future<?> f = service.submit(() -> {
-                        transaction= cgp.execute(t);
+                        transaction = cgp.execute(t);
                     });
                     f.get(25, TimeUnit.SECONDS);
                 } catch (final TimeoutException e) {
@@ -63,8 +51,14 @@ public class CompassGateway   extends Gateway {
                     transaction.setResponseType(ResponseType.TIMEOUT);
                     transaction.setDescriptionField("Time out occured");
                     transaction.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
-                } catch (final Exception e) {
-                    throw new RuntimeException(e);
+                } catch (ExecutionException ex) {
+                    t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
+                    t.setResponseType(ResponseType.DECLINED);
+                    t.setDescriptionField("INTERNAL_SERVER_ERROR");
+                } catch (InterruptedException ex) {
+                    t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
+                    t.setResponseType(ResponseType.DECLINED);
+                    t.setDescriptionField("INTERNAL_SERVER_ERROR");
                 } finally {
                     service.shutdown();
                 }
@@ -76,19 +70,19 @@ public class CompassGateway   extends Gateway {
         } catch (GatewayException e) {
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField(e.getMessage());
+        } catch (Exception e) {
+            t.setResponseType(ResponseType.DECLINED);
+            t.setDescriptionField(e.getMessage());
         }
-
         return transaction;
     }
 
     private void validateTransaction(Transaction t) throws GatewayException {
-        
-       
+
     }
 
     public void setCgp(CompassGatewayProcessor cgp) {
         this.cgp = cgp;
     }
 
-    
 }

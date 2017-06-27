@@ -28,54 +28,48 @@ public class VisionGateway extends Gateway {
     @EJB
     private Configurator configurator;
 
-    private Transaction t;
+    private Transaction transaction;
 
     private long expirationTime = 25;
 
     final ExecutorService service = Executors.newSingleThreadExecutor();
 
     @Override
-    public Transaction processMessage(Transaction transaction) {
-        t = transaction;
+    public Transaction processMessage(Transaction t) {
+        this.transaction = t;
         try {
-            this.validateTransaction(t);
+            this.validateTransaction(transaction);
             if (vpp != null) {
                 final Future<?> f = service.submit(() -> {
-                    try {
-                        t = vpp.authorize(t);
-                    } catch (InterruptedException ex) {
-                        t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
-                        t.setResponseType(ResponseType.DECLINED);
-                        t.setDescriptionField("INTERNAL_SERVER_ERROR");
-                    }
+                    transaction = vpp.authorize(transaction);
                 });
 
                 System.out.println("Timeout Not Occured");
-                t.setResponseType(ResponseType.APPROVED);
-                t.setAuthNumber("123456");
+                transaction.setResponseType(ResponseType.APPROVED);
+                transaction.setAuthNumber("123456");
                 f.get(expirationTime, TimeUnit.SECONDS);
             } else {
-                t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
-                t.setResponseType(ResponseType.DECLINED);
-                t.setDescriptionField("INTERNAL_SERVER_ERROR");
-                return t;
+                transaction.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
+                transaction.setResponseType(ResponseType.DECLINED);
+                transaction.setDescriptionField("INTERNAL_SERVER_ERROR");
+                return transaction;
             }
         } catch (TimeoutException Te) {
-            t.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
-            t.setResponseType(ResponseType.TIMEOUT);
-            t.setDescriptionField(Te.getMessage());
+            transaction.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
+            transaction.setResponseType(ResponseType.TIMEOUT);
+            transaction.setDescriptionField(Te.getMessage());
         } catch (GatewayException e) {
-            t.setReasonCode(configurator.get(e.getMessage()));
-            t.setResponseType(ResponseType.DECLINED);
-            t.setDescriptionField(e.getMessage());
+            transaction.setReasonCode(configurator.get(e.getMessage()));
+            transaction.setResponseType(ResponseType.DECLINED);
+            transaction.setDescriptionField(e.getMessage());
         } catch (Exception e) {
-            t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
-            t.setResponseType(ResponseType.DECLINED);
-            t.setDescriptionField("INTERNAL_SERVER_ERROR");
+            transaction.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
+            transaction.setResponseType(ResponseType.DECLINED);
+            transaction.setDescriptionField("INTERNAL_SERVER_ERROR");
         } finally {
             service.shutdown();
         }
-        return t;
+        return transaction;
     }
 
     private void validateTransaction(Transaction t) throws GatewayException {

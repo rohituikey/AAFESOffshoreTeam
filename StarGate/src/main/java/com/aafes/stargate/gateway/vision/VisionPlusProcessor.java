@@ -20,6 +20,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.jms.JMSException;
@@ -45,8 +46,12 @@ public class VisionPlusProcessor {
 //    @EJB
 //    private Configurator configurator;
 
-    public Transaction authorize(Transaction t) throws InterruptedException {
-        Thread.sleep(40000);
+    public Transaction authorize(Transaction t) {
+        try {
+            Thread.sleep(40000);
+        } catch (InterruptedException ex) {
+            java.util.logging.Logger.getLogger(VisionPlusProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return t;
     }
 //        LOG.debug("Pushing data into MQ CID and AuthNumber :", t.getTraceId() + ", " + t.getAuthNumber());

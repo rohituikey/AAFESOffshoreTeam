@@ -3,18 +3,18 @@ package com.aafes.stargate.gateway.vision;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.Gateway;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
 import org.slf4j.LoggerFactory;
 
 @Stateless
@@ -27,49 +27,49 @@ public class VisionGateway extends Gateway {
     private VisionPlusProcessor vpp;
     @EJB
     private Configurator configurator;
+    @Resource
+    private SessionContext context;
+    private Transaction t;
 
-    private Transaction transaction;
+    private long expirationTime = 25000;
 
-    private long expirationTime = 25;
-
-    final ExecutorService service = Executors.newSingleThreadExecutor();
+    @Timeout
+    public void programmaticTimeout(Timer timer) {
+        if (null == t || null == t.getReasonCode() || t.getReasonCode().isEmpty() || t.getReasonCode().isEmpty()) {
+            t.setResponseType(ResponseType.TIMEOUT);
+            t.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
+        }
+        timer.cancel();
+    }
 
     @Override
-    public Transaction processMessage(Transaction t) {
-        this.transaction = t;
+    public Transaction processMessage(Transaction transaction) {
+        t = transaction;
         try {
-            this.validateTransaction(transaction);
+            this.validateTransaction(t);
             if (vpp != null) {
-                final Future<?> f = service.submit(() -> {
-                    transaction = vpp.authorize(transaction);
-                });
-
-                System.out.println("Timeout Not Occured");
-                transaction.setResponseType(ResponseType.APPROVED);
-                transaction.setAuthNumber("123456");
-                f.get(expirationTime, TimeUnit.SECONDS);
+                context.getTimerService().createTimer(expirationTime, "time Expired");
+                t = vpp.authorize(t);
+                validateResponse(t);
             } else {
-                transaction.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
-                transaction.setResponseType(ResponseType.DECLINED);
-                transaction.setDescriptionField("INTERNAL_SERVER_ERROR");
-                return transaction;
+                t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
+                t.setResponseType(ResponseType.DECLINED);
+                t.setDescriptionField("INTERNAL_SERVER_ERROR");
+                return t;
             }
-        } catch (TimeoutException Te) {
-            transaction.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
-            transaction.setResponseType(ResponseType.TIMEOUT);
-            transaction.setDescriptionField(Te.getMessage());
         } catch (GatewayException e) {
-            transaction.setReasonCode(configurator.get(e.getMessage()));
-            transaction.setResponseType(ResponseType.DECLINED);
-            transaction.setDescriptionField(e.getMessage());
+            t.setReasonCode(configurator.get(e.getMessage()));
+            t.setResponseType(ResponseType.DECLINED);
+            t.setDescriptionField(e.getMessage());
         } catch (Exception e) {
-            transaction.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
-            transaction.setResponseType(ResponseType.DECLINED);
-            transaction.setDescriptionField("INTERNAL_SERVER_ERROR");
-        } finally {
-            service.shutdown();
+            t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
+            t.setResponseType(ResponseType.DECLINED);
+            t.setDescriptionField("INTERNAL_SERVER_ERROR");
         }
-        return transaction;
+        t.setResponseType(ResponseType.APPROVED);
+        t.setAuthNumber("123456");
+
+        return t;
     }
 
     private void validateTransaction(Transaction t) throws GatewayException {
@@ -147,4 +147,13 @@ public class VisionGateway extends Gateway {
         this.configurator = configurator;
     }
 
+    private void validateResponse(Transaction t) {
+        if (("SALE".equalsIgnoreCase(t.getRequestType())) && t.getResponseType().equalsIgnoreCase(ResponseType.DECLINED)
+                && ("130".equalsIgnoreCase(t.getReasonCode())
+                || "99".equalsIgnoreCase(t.getReasonCode())
+                || "97".equalsIgnoreCase(t.getReasonCode()))) {
+            t.setResponseType(ResponseType.TIMEOUT);
+            t.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
+        }
+    }
 }

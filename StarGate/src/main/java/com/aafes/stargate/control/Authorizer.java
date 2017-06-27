@@ -119,7 +119,8 @@ public class Authorizer {
                         t.getRrn(), t.getRequestType());
             }
 
-            if (storedTran == null) {
+            
+            if (storedTran == null || !isDeuplicateTrans(storedTran)) {
 
                 isDuplicateTransaction = false;
                 /**
@@ -175,20 +176,8 @@ public class Authorizer {
                     return cm;
                 }
 
-            }else if (storedTran != null && storedTran.getReasonCode().contains("000") && !storedTran.getNumberOfAttempts().equals(1)) {
-                isDuplicateTransaction = false;
-                BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
-                String numberOfAttempts = storedTran.getNumberOfAttempts();
-                int counter = (numberOfAttempts.isEmpty() || null==numberOfAttempts || numberOfAttempts.trim().equals("")) ? 0 : Integer.parseInt(numberOfAttempts+1);
-                storedTran.setNumberOfAttempts(String.valueOf(counter));
-                transactionDAO.updateCountAttepmt(storedTran);
-                t = baseStrategy.processRequest(t);
-                t.setResponseXmlDateTime(getSystemDateTime());
-                mapResponse(t, cm);
-            }
-            else {
+            }else {
                 LOG.info("Transaction found. So replying from the cache...");
-                
                 isDuplicateTransaction = true;
                 mapResponse(storedTran, cm);
             }
@@ -631,6 +620,8 @@ public class Authorizer {
         response.setResponseType(t.getResponseType());
         response.setDescriptionField(t.getDescriptionField());
         response.setRRN(t.getRrn());
+        
+        
 
         if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
             // We add these fields only if it is approved
@@ -760,6 +751,17 @@ public class Authorizer {
         this.transactionDAO = transactionDAO;
     }
     
-    
+
+    /**
+     * 
+     * @param storedTran
+     * @return 
+     */
+    private boolean isDeuplicateTrans(Transaction storedTran){
+       if(storedTran != null && storedTran.getReasonCode().contains("000") && !storedTran.getNumberOfAttempts().equals(1)) {
+           return false;
+            }
+       return true;
+   } 
 
 }

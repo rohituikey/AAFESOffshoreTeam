@@ -31,12 +31,14 @@ public class TokenServiceDAO {
     private String sMethodName = "";
     private CassandraSessionFactory factory;
     private Mapper mapper;
+    private Mapper mapper1;
     private Session session = null;
 
     @PostConstruct
     public void postConstruct() {
         session = factory.getSession();
         mapper = new MappingManager(session).mapper(CrosssiteRequestTokenTable.class);
+        mapper1 = new MappingManager(session).mapper(CrosssiteRequestUsertable.class);
     }
 
     public TokenServiceDAO(){
@@ -100,19 +102,12 @@ public class TokenServiceDAO {
     public boolean validateUserDetails(CrosssiteRequestUsertable tokenObj) {
         sMethodName = "validateUserDetails";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        String query = "";
         boolean userValidateFlg = false;
-        ResultSet resultSet = null;
-        List<Row> rowList = null;
+        CrosssiteRequestUsertable obj;
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         try {
-            query = "SELECT * FROM stargate.crosssiterequestusertable where identityuuid = '" + tokenObj.getIdentityuuid() + "'"
-                    + " and userid = '" + tokenObj.getUserid() + "' and password = '" + tokenObj.getPassword() + "' ALLOW FILTERING;";
-            resultSet = session.execute(query);
-            if(resultSet != null){
-                rowList = resultSet.all();
-                if(rowList != null && rowList.size() > 0) userValidateFlg = true;
-            }
+              obj = (CrosssiteRequestUsertable) mapper1.get(tokenObj.getIdentityuuid(), tokenObj.getUserid(), tokenObj.getPassword());
+              if(obj != null) userValidateFlg = true;
         } catch (Exception ex) {
             LOG.error("Error while creating cross site request token " + ex.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
@@ -127,7 +122,7 @@ public class TokenServiceDAO {
         this.factory = factory;
     }
     
-    //    public ResultSet findActiveTokens(String identityUuid, String tokenStatus) {
+//    public ResultSet findActiveTokens(String identityUuid, String tokenStatus) {
 //        sMethodName = "findActiveTokens";
 //        String query = "";
 //        ResultSet resultSet = null;

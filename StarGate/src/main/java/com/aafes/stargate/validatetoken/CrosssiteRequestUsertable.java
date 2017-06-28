@@ -16,7 +16,9 @@ import com.datastax.driver.mapping.annotations.Table;
 public class CrosssiteRequestUsertable {
     @ClusteringColumn(0)
     private String identityuuid;
+    @ClusteringColumn(1)
     private String userid;
+    @ClusteringColumn(2)
     private String password;
     
     /**

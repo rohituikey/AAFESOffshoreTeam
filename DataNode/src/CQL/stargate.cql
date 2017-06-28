@@ -212,7 +212,7 @@ create table stargate.crosssiterequestusertable(
 identityuuid text,
 userid text,
 password text,
-primary key (identityuuid)
+primary key (identityuuid, userid, password)
 );
 
 ALTER TABLE transactions ADD numberOfAttempts text;

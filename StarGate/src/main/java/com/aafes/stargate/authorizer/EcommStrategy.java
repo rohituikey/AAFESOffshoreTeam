@@ -13,6 +13,7 @@ import com.aafes.stargate.control.CustInfo;
 import com.aafes.stargate.control.MQServ;
 import com.aafes.stargate.gateway.Gateway;
 import static com.aafes.stargate.gateway.vision.Common.convertStackTraceToString;
+import com.aafes.stargate.gateway.vision.FutureVisionGateway;
 import com.aafes.stargate.stub.CIDValidationStub;
 import com.aafes.stargate.timeout.TimeoutProcessor;
 import com.aafes.stargate.util.MediaType;
@@ -59,6 +60,8 @@ public class EcommStrategy extends BaseStrategy {
             //Send transaction to Gateway
             Gateway gateway = super.pickGateway(t);
             if (gateway != null) {
+//                FutureVisionGateway visionGateway = new FutureVisionGateway();
+//                t = visionGateway.processMessage(t);
                 t = gateway.processMessage(t);
                 // check response from t, if declined flip plan number and send it again for authorization
                 if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)

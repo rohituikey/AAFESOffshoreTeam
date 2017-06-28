@@ -55,7 +55,6 @@ public class CompassGateway extends Gateway {
         if (t.getRequestType().equalsIgnoreCase("SALE")&& t.getReasonCode().equalsIgnoreCase("000")) {
                     t.setResponseType(ResponseType.TIMEOUT);
                     t.setDescriptionField("Connection TimeOut");
-                    t.setNumberOfAttempts("1");
                 }
         else if (t.getReasonCode().equals(configurator.get("TIMEOUT_EXCEPTION"))){
             t.setRequestType(RequestType.REVERSAL);

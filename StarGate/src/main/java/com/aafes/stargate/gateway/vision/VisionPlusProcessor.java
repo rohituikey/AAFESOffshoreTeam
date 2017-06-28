@@ -5,25 +5,22 @@
  */
 package com.aafes.stargate.gateway.vision;
 
-import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.gateway.MQGatewayException;
-//import com.aafes.stargate.gateway.vision.entity.CICSTranId;
-//import com.aafes.stargate.gateway.vision.entity.CICSHandlerBean;
+import com.aafes.stargate.gateway.vision.entity.CICSHandlerBean;
+import com.aafes.stargate.gateway.vision.entity.CICSTranId;
 import com.aafes.stargate.util.DeviceType;
 import com.aafes.stargate.util.ResponseType;
 import com.solab.iso8583.IsoMessage;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.jms.JMSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +32,8 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class VisionPlusProcessor {
 
-//    private static final Logger LOG = LoggerFactory.getLogger(
-//            VisionPlusProcessor.class.getSimpleName());
+    private static final Logger LOG = LoggerFactory.getLogger(
+            VisionPlusProcessor.class.getSimpleName());
 //    @EJB
 //    private CICSHandlerBean mqhandler;
 //
@@ -55,9 +52,9 @@ public class VisionPlusProcessor {
         return t;
     }
 //        LOG.debug("Pushing data into MQ CID and AuthNumber :", t.getTraceId() + ", " + t.getAuthNumber());
-//
-//        String correlationId = null;
-//        // Sending MQ Message.
+
+        String correlationId = null;
+        // Sending MQ Message.
 //        try {
 //            // VisionPlusFormatter vpFormatter = new VisionPlusFormatter();
 //            IsoMessage isoMsg = vpFormatter.toISO8583(t);
@@ -102,15 +99,17 @@ public class VisionPlusProcessor {
 //
 //            // Reading MQ Message.ii
 //            getResponse(correlationId, t);
-//        } catch (IOException ioex) {
-//            correlationId = null;
-//
-//            t.setResponseType(ResponseType.DECLINED);
-//            t.setReasonCode("ERR");
-//            t.setDescriptionField("ERR");
-//            LOG.error(com.aafes.stargate.gateway.vision.Common.
-//                    convertStackTraceToString(ioex));
-//        } catch (GatewayException cex) {
+//        } 
+////        catch (IOException ioex) {
+////            correlationId = null;
+////
+////            t.setResponseType(ResponseType.DECLINED);
+////            t.setReasonCode("ERR");
+////            t.setDescriptionField("ERR");
+////            LOG.error(com.aafes.stargate.gateway.vision.Common.
+////                    convertStackTraceToString(ioex));
+////        }
+//        catch (GatewayException cex) {
 //            correlationId = null;
 //
 //            t.setResponseType(ResponseType.DECLINED);
@@ -147,7 +146,7 @@ public class VisionPlusProcessor {
 //    private void getResponse(String correlationId, Transaction t) {
 //        byte[] rsp = null;
 //        if (correlationId != null) {
-//            try {
+////            try {
 //                // Catching may have to reverse the transaction.
 //                /**
 //                 * Uncomment below line for actual vision call
@@ -160,32 +159,32 @@ public class VisionPlusProcessor {
 //                 */
 //                //CICSMockBean.getMockdata(t);
 //                LOG.debug("Pulling data from MQ CID and AuthNumber :", t.getTraceId() + ", " + t.getAuthNumber());
-//            } catch (JMSException ex) {
-//                t.setResponseType(ResponseType.TIMEOUT);
-//                t.setReasonCode(configurator.get("TIME_OUT"));
-//                LOG.error("JMS exception: " + ex);
-//            } catch (UnsupportedEncodingException ex) {
-//                t.setResponseType(ResponseType.TIMEOUT);
-//                t.setReasonCode(configurator.get("TIME_OUT"));
-//                LOG.error("UnsupportedEncodingException exception: " + ex);
-//            } catch (ParseException ex) {
-//                t.setResponseType(ResponseType.TIMEOUT);
-//                t.setReasonCode(configurator.get("TIME_OUT"));
-//                LOG.error("ParseException exception: " + ex);
-//            } catch (GatewayException cex) {
-//                t.setResponseType(ResponseType.TIMEOUT);
-//                t.setReasonCode(configurator.get("TIME_OUT"));
-//                LOG.error("Credit Exception: " + cex);
-//            } catch (IOException ex) {
-//                t.setResponseType(ResponseType.TIMEOUT);
-//                t.setReasonCode("ERR");
-//                LOG.error("IOException: " + ex);
-//            } catch (Exception ex) {
-//                t.setResponseType(ResponseType.TIMEOUT);
-//                t.setReasonCode("ERR");
-//                LOG.error("Exception: " + ex);
-//            }
-//        }
+//            } 
+////            catch (JMSException ex) {
+////                t.setResponseType(ResponseType.TIMEOUT);
+////                t.setReasonCode(configurator.get("TIME_OUT"));
+////                LOG.error("JMS exception: " + ex);
+////            } catch (UnsupportedEncodingException ex) {
+////                t.setResponseType(ResponseType.TIMEOUT);
+////                t.setReasonCode(configurator.get("TIME_OUT"));
+////                LOG.error("UnsupportedEncodingException exception: " + ex);
+////            } catch (ParseException ex) {
+////                t.setResponseType(ResponseType.TIMEOUT);
+////                t.setReasonCode(configurator.get("TIME_OUT"));
+////                LOG.error("ParseException exception: " + ex);
+////            } catch (GatewayException cex) {
+////                t.setResponseType(ResponseType.TIMEOUT);
+////                t.setReasonCode(configurator.get("TIME_OUT"));
+////                LOG.error("Credit Exception: " + cex);
+////            } catch (IOException ex) {
+////                t.setResponseType(ResponseType.TIMEOUT);
+////                t.setReasonCode("ERR");
+////                LOG.error("IOException: " + ex);
+////            } catch (Exception ex) {
+////                t.setResponseType(ResponseType.TIMEOUT);
+////                t.setReasonCode("ERR");
+////                LOG.error("Exception: " + ex);
+////            }
 //    }
 //
 //    public CICSHandlerBean getMqhandler() {

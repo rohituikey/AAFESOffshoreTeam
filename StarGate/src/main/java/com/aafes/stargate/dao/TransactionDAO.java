@@ -40,12 +40,6 @@ public class TransactionDAO {
     public void setMapper(Mapper mapper) {
         this.mapper = mapper;
     }
-
-    public void updateCountAttepmt(Transaction transaction) {
-        String query = "update stargate.transactions set numberOfAttempts='" + transaction.getNumberOfAttempts() + "' where identityUUID='" + transaction.getIdentityUuid() + "'and rrn='" + transaction.getRrn() + "'and requesttype='" + transaction.getRequestType().toLowerCase() + "'";
-        factory.getSession().execute(query);
-    }
-
 //
 //    public void delete(Transaction transaction) {
 //        mapper.delete(transaction);

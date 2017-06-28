@@ -181,9 +181,6 @@ final public class Transaction {
     private String avsResponseCode = "";
     private String csvResponseCode = "";
 
-//  to check number of attempts
-    private String numberOfAttempts = "";
-
     public Transaction() {
 
     }
@@ -1114,13 +1111,4 @@ final public class Transaction {
     public void setTokenBankName(String tokenBankName) {
         this.tokenBankName = tokenBankName;
     }
-
-    public String getNumberOfAttempts() {
-        return numberOfAttempts;
-    }
-
-    public void setNumberOfAttempts(String numberOfAttempts) {
-        this.numberOfAttempts = numberOfAttempts;
-    }
-
 }

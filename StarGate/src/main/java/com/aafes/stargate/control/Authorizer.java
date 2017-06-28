@@ -59,7 +59,7 @@ public class Authorizer {
     private FDMSStub fDMSStub;
     @EJB
     private TransactionDAO transactionDAO;
-    
+
     private boolean isDuplicateTransaction = false;
 
     public Message authorize(Message cm) {
@@ -69,9 +69,9 @@ public class Authorizer {
         try {
             mapRequest(t, cm);
             bDoneMApreq = true;
-            
+
             findFacility(t);
-           
+
             if (t.getFacility() == null || t.getFacility().isEmpty()
                     || t.getStrategy() == null || t.getStrategy().isEmpty()) {
                 LOG.info("UUID not found in facmapper .....");
@@ -82,7 +82,6 @@ public class Authorizer {
                 return cm;
             }
 
-            
             /**
              * Remove if condition after Junit test case modified for Authorizer
              */
@@ -101,7 +100,6 @@ public class Authorizer {
                 }
             }
 
-            
             Transaction storedTran = null;
             if (t.getReversal() != null
                     && t.getReversal().equalsIgnoreCase(RequestType.SALE)) {
@@ -119,8 +117,7 @@ public class Authorizer {
                         t.getRrn(), t.getRequestType());
             }
 
-            
-            if (storedTran == null || !isDeuplicateTrans(storedTran)) {
+            if (storedTran == null) {
 
                 isDuplicateTransaction = false;
                 /**
@@ -176,7 +173,7 @@ public class Authorizer {
                     return cm;
                 }
 
-            }else {
+            } else {
                 LOG.info("Transaction found. So replying from the cache...");
                 isDuplicateTransaction = true;
                 mapResponse(storedTran, cm);
@@ -620,8 +617,6 @@ public class Authorizer {
         response.setResponseType(t.getResponseType());
         response.setDescriptionField(t.getDescriptionField());
         response.setRRN(t.getRrn());
-        
-        
 
         if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
             // We add these fields only if it is approved
@@ -657,7 +652,7 @@ public class Authorizer {
                 if (tokenBusinessService != null
                         && !isDuplicateTransaction
                         && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)
-                        &&  (t.getTokenId() == null || t.getTokenId().trim().isEmpty())) {
+                        && (t.getTokenId() == null || t.getTokenId().trim().isEmpty())) {
                     try {
                         tokenBusinessService.issueToken(t);
                     } catch (ProcessingException e) {
@@ -750,18 +745,5 @@ public class Authorizer {
     public void setTransactionDAO(TransactionDAO transactionDAO) {
         this.transactionDAO = transactionDAO;
     }
-    
-
-    /**
-     * 
-     * @param storedTran
-     * @return 
-     */
-    private boolean isDeuplicateTrans(Transaction storedTran){
-       if(storedTran != null && storedTran.getReasonCode().contains("000") && !storedTran.getNumberOfAttempts().equals(1)) {
-           return false;
-            }
-       return true;
-   } 
 
 }

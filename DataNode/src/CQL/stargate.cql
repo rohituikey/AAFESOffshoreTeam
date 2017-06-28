@@ -206,7 +206,7 @@ tokenstatus text,
 tokencredatetime text,
 identityuuid text,
 primary key (tokenid, identityuuid)
-);
+)  with default_time_to_live = 3600;
 
 create table stargate.crosssiterequestusertable(
 identityuuid text,

@@ -5,6 +5,7 @@
  */
 package com.aafes.stargate.validatetoken;
 
+import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.dao.TokenServiceDAO;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.util.CreditMessageTokenConstants;
@@ -15,32 +16,52 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author burangir
  */
+@Stateless
 public class TokenValidatorService {
+    @EJB
     private TokenServiceDAO tokenServiceDAO;
+    @EJB
+    private Configurator configurator;
+    
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TokenValidatorService.class.getSimpleName());
     String sMethodName = "";
     final String CLASS_NAME = TokenValidatorService.this.getClass().getSimpleName();
+
+    /**
+     * @param tokenServiceDAO the tokenServiceDAO to set
+     */
+    public void setTokenServiceDAO(TokenServiceDAO tokenServiceDAO) {
+        this.tokenServiceDAO = tokenServiceDAO;
+    }
+
+    /**
+     * @param configurator the configurator to set
+     */
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
 
     public boolean validateToken(String tokenStr, String identityUuid) {
         sMethodName = "validateToken";
         boolean tokenValidateFlg = false, tokenUpdateFlg = false;
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        CrosssiteRequestTokenTable tokenObjLocal;
         try {
             if (null != tokenStr) {
-                if (tokenServiceDAO == null) {
-                    tokenServiceDAO = new TokenServiceDAO();
-                }
-                ResultSet tokenObj = null;
-                tokenObj = tokenServiceDAO.validateToken(tokenStr, identityUuid, CreditMessageTokenConstants.STATUS_ACTIVE);
-                List<Row> rowList = tokenObj.all();
-                if(rowList != null && rowList.size() > 0){
-                    tokenValidateFlg = validateTokenExpiry(rowList);
+                tokenObjLocal = tokenServiceDAO.validateToken(tokenStr, identityUuid, CreditMessageTokenConstants.STATUS_ACTIVE);
+               
+                if(tokenObjLocal != null && tokenObjLocal.getTokenstatus().equalsIgnoreCase(CreditMessageTokenConstants.STATUS_ACTIVE)){
+                    tokenValidateFlg = true;
+              
+                    tokenValidateFlg = validateTokenExpiry(tokenObjLocal);
                     if(!tokenValidateFlg){ 
                         tokenUpdateFlg = udpateTokenStatus(CreditMessageTokenConstants.STATUS_EXPIRED, tokenStr, identityUuid);
                         if(tokenUpdateFlg)
@@ -62,7 +83,7 @@ public class TokenValidatorService {
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         try {
             if (null != tokenId) {
-                if (tokenServiceDAO == null)  tokenServiceDAO = new TokenServiceDAO();
+                if (tokenServiceDAO == null)  setTokenServiceDAO(new TokenServiceDAO());
                 tokenValidateFlg = tokenServiceDAO.updateTokenStatus(tokenStatus, tokenId, identityUuid);
             }
         } catch (Exception e) {
@@ -73,23 +94,27 @@ public class TokenValidatorService {
         return tokenValidateFlg;
     }
     
-    private boolean validateTokenExpiry(List<Row> rowList){
+    private boolean validateTokenExpiry(CrosssiteRequestTokenTable tokenObjLocal){
         sMethodName = "validateTokenExpiry";
         boolean tokenValidFlg = true;
         String tokenGenerationDateTime, tokenId;
         DateFormat dateFormat1 = new SimpleDateFormat("yyyyMMddHHmmss");
         Date tokenGenerationDateTimeDt;
+        int tokenExpiryDuration = 0;
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         try {
-                Date dateObj = new Date();
-                for(Row row : rowList){
-                    tokenId = row.getString("tokenid");
-                    tokenGenerationDateTime = row.getString("tokencredatetime");
+                if(configurator.get("TOKEN_EXPIRY_DURATION") != null)
+                    tokenExpiryDuration = Integer.parseInt(configurator.get("TOKEN_EXPIRY_DURATION"));
+                else LOGGER.error("stargate.properties do not have value TOKEN_EXPIRY_DURATION. Please add it.");
+                if(tokenExpiryDuration > 0){
+                    Date dateObj = new Date();
+                    tokenId = tokenObjLocal.getTokenid();
+                    tokenGenerationDateTime = tokenObjLocal.getTokencredatetime();
                     tokenGenerationDateTimeDt = dateFormat1.parse(tokenGenerationDateTime);
                     dateObj = dateFormat1.parse(dateFormat1.format(dateObj));
 
                     long differenceInSeconds = TimeUnit.MILLISECONDS.toSeconds(dateObj.getTime() - tokenGenerationDateTimeDt.getTime());
-                    if(differenceInSeconds >= 300){
+                    if(differenceInSeconds >= tokenExpiryDuration){
                         LOGGER.info("Token " + tokenId + " is expired. Need to generate new token");
                         tokenValidFlg = false;
                     }
@@ -100,5 +125,5 @@ public class TokenValidatorService {
         }
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         return tokenValidFlg;
-        }  
+    }  
 }

@@ -9,7 +9,7 @@ import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.Table;
 
 /**
- *
+ * MAPPING CLASS FOR TABLE STARGATE.CROSSSITEREQUESTUSERTABLE
  * @author burangir
  */
 @Table(keyspace = "stargate", name = "crosssiterequestusertable")

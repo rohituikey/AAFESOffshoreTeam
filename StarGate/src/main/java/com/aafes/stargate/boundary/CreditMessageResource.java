@@ -11,10 +11,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
@@ -48,9 +48,18 @@ public class CreditMessageResource {
 
     @EJB
     private Authorizer authorizer;
+    @EJB
+    private TokenValidatorService tokenValidatorService;
 
     //TODO
     private String SCHEMA_PATH = "src/main/resources/jaxb/creditmessage/CreditMessage12S1.xsd";
+
+    /**
+     * @param tokenValidatorService the tokenValidatorService to set
+     */
+    public void setTokenValidatorService(TokenValidatorService tokenValidatorService) {
+        this.tokenValidatorService = tokenValidatorService;
+    }
 
     /**
      * Process a new credit authorization request.
@@ -63,25 +72,18 @@ public class CreditMessageResource {
     @Consumes("application/xml")
     @Produces("application/xml")
     
-    public String postXml(String requestXML, @QueryParam("tokenId") String tokenId) {
-        String responseXML = "";
+    public String postXml(String requestXML, @HeaderParam("tokenId") String tokenId) {
+        String responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error></ErrorInformation>";
         boolean tokenValidateFlg = false;
-        TokenValidatorService tokenValidatorService = null;
         String uuid = "";
         try {
             if (null != tokenId && !tokenId.isEmpty()) {
                 LOG.info("From Client CreditMessageResource: " + requestXML);
                 String ValidatedXML = FilterRequestXML(requestXML);
-                if (requestXML.contains("DOCTYPE")
-                        || requestXML.contains("CDATA")) {
+                if (requestXML.contains("DOCTYPE") || requestXML.contains("CDATA")) {
                     LOG.error("Invalid Request CreditMessageResource");
-                    responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
-                            + "</ErrorInformation>";
                 } else if (ValidatedXML != null) {
                     Message requestMessage = unmarshalWithValidation(requestXML);
-                    if (tokenValidatorService == null) {
-                        tokenValidatorService = new TokenValidatorService();
-                    }
                     uuid = requestMessage.getHeader().getIdentityUUID();
                     tokenValidateFlg = tokenValidatorService.validateToken(tokenId, uuid);
                     if (tokenValidateFlg) {
@@ -92,30 +94,17 @@ public class CreditMessageResource {
                     responseXML = marshal(responseMessage);
                     LOG.info("To Client CreditMessageResource: " + responseXML);
                     } else {
-                        LOG.error("Invalid Request");
+                        LOG.error("Invalid Token");
                         responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Unauthorized Transactions</Error>"
                                 + "</ErrorInformation>";
                     }
-                } else {
-                    LOG.error("Invalid Request");
-                    responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
-                            + "</ErrorInformation>";
-                }
-            } else {
-                LOG.error("Invalid Request");
-                responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
-                        + "</ErrorInformation>";
-            }
+                } else LOG.error("Invalid Request");
+            } else  LOG.error("Invalid Request: tokenId not present in request header.");
         } catch (JAXBException | SAXException e) {
-
-            responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
-                    + "</ErrorInformation>";
             LOG.error(e.toString());
         } catch (Exception ex) {
             Logger.getLogger(CreditMessageResource.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        
         return responseXML;
     }
 

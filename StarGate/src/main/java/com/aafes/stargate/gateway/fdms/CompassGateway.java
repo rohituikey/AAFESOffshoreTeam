@@ -2,7 +2,9 @@ package com.aafes.stargate.gateway.fdms;
 
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.Gateway;
+import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -16,6 +18,9 @@ public class CompassGateway extends Gateway {
 
     @EJB
     private CompassGatewayProcessor cgp;
+    
+    @EJB 
+    private Configurator configurator;
 
     @Override
     public Transaction processMessage(Transaction t) {
@@ -42,9 +47,9 @@ public class CompassGateway extends Gateway {
 
     }
 
-    public void setCgp(CompassGatewayProcessor cgp) {
-        this.cgp = cgp;
-    }
+//    public void setCgp(CompassGatewayProcessor cgp) {
+//        this.cgp = cgp;
+//    }
     
     private void validateResponse(Transaction t){
         if (t.getRequestType().equalsIgnoreCase("SALE")&& t.getReasonCode().equalsIgnoreCase("000")) {
@@ -52,6 +57,17 @@ public class CompassGateway extends Gateway {
                     t.setDescriptionField("Connection TimeOut");
                     t.setNumberOfAttempts("1");
                 }
+        else if (t.getReasonCode().equals(configurator.get("TIMEOUT_EXCEPTION"))){
+            t.setRequestType(RequestType.REVERSAL);
+            InitiateReversal initiateResponse = new InitiateReversal(t);
+            Thread triggerResponse = new Thread(initiateResponse);
+            triggerResponse.start();
+        }
 
     }
+
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
+    
             }

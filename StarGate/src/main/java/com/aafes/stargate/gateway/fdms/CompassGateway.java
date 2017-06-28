@@ -4,40 +4,26 @@ import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.Gateway;
 import com.aafes.stargate.util.ResponseType;
-import javax.annotation.Resource;
 import javax.ejb.EJB;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
-import javax.ejb.Timeout;
 import org.slf4j.LoggerFactory;
 
 @Stateless
-public class CompassGateway   extends Gateway {
+public class CompassGateway extends Gateway {
 
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(CompassGateway.class.getSimpleName());
 
     @EJB
     private CompassGatewayProcessor cgp;
-    
-    @Resource
-    private SessionContext context;
-    
-    @Timeout
 
-    
-
-    public void createTimer(long duration) {
-      context.getTimerService().createTimer(2500, "My timer");
-   }
-    
     @Override
     public Transaction processMessage(Transaction t) {
 
         try {
-            this.validateTransaction(t);
-            if (cgp != null) {
+            if (this.validateTransaction(t)) {
                 t = cgp.execute(t);
+                validateResponse(t);
             } else {
                 t.setResponseType(ResponseType.DECLINED);
                 t.setDescriptionField("INTERNAL SERVER ERROR");
@@ -51,14 +37,21 @@ public class CompassGateway   extends Gateway {
         return t;
     }
 
-    private void validateTransaction(Transaction t) throws GatewayException {
-        
-       
+    private boolean validateTransaction(Transaction t) throws GatewayException {
+        return true;
+
     }
 
     public void setCgp(CompassGatewayProcessor cgp) {
         this.cgp = cgp;
     }
-
     
-}
+    private void validateResponse(Transaction t){
+        if (t.getRequestType().equalsIgnoreCase("SALE")&& t.getReasonCode().equalsIgnoreCase("000")) {
+                    t.setResponseType(ResponseType.TIMEOUT);
+                    t.setDescriptionField("Connection TimeOut");
+                    t.setNumberOfAttempts("1");
+                }
+
+    }
+            }

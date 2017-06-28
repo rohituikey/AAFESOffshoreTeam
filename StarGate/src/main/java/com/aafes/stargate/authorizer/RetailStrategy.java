@@ -83,13 +83,15 @@ public class RetailStrategy extends BaseStrategy {
 
             } else {
                 if (gateway != null) {
+                    //            FutureVisionGateway visionGateway = new FutureVisionGateway();
+//                t = visionGateway.processMessage(t);
                     t = gateway.processMessage(t);
                 }
             }
 
             //for timeout
-            timeoutProcessor.processResponse(t);
-            
+            t = timeoutProcessor.processResponse(t);
+
             //if Authorized, save in settle message repository to settle
             if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                 getToken(t);

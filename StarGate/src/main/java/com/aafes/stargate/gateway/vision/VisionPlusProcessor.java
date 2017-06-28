@@ -1,39 +1,40 @@
-///*
-// * To change this license header, choose License Headers in Project Properties.
-// * To change this template file, choose Tools | Templates
-// * and open the template in the editor.
-// */
-//package com.aafes.stargate.gateway.vision;
-//
-//import com.aafes.stargate.gateway.GatewayException;
-//import com.aafes.stargate.authorizer.entity.Transaction;
-//import com.aafes.stargate.control.Configurator;
-//import com.aafes.stargate.gateway.MQGatewayException;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.aafes.stargate.gateway.vision;
+
+import com.aafes.stargate.gateway.GatewayException;
+import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.gateway.MQGatewayException;
 //import com.aafes.stargate.gateway.vision.entity.CICSTranId;
 //import com.aafes.stargate.gateway.vision.entity.CICSHandlerBean;
-//import com.aafes.stargate.util.DeviceType;
-//import com.aafes.stargate.util.ResponseType;
-//import com.solab.iso8583.IsoMessage;
-//import java.io.IOException;
-//import java.io.UnsupportedEncodingException;
-//import java.text.DateFormat;
-//import java.text.ParseException;
-//import java.text.SimpleDateFormat;
-//import java.util.Date;
-//import javax.ejb.EJB;
-//import javax.ejb.Stateless;
-//import javax.jms.JMSException;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import com.aafes.stargate.util.DeviceType;
+import com.aafes.stargate.util.ResponseType;
+import com.solab.iso8583.IsoMessage;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.jms.JMSException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ *
+ * @author nguyentul
+ */
 //
-///**
-// *
-// * @author nguyentul
-// */
-////
-//@Stateless
-//public class VisionPlusProcessor {
-//
+@Stateless
+public class VisionPlusProcessor {
+
 //    private static final Logger LOG = LoggerFactory.getLogger(
 //            VisionPlusProcessor.class.getSimpleName());
 //    @EJB
@@ -44,8 +45,15 @@
 //
 //    @EJB
 //    private Configurator configurator;
-//
-//    public Transaction authorize(Transaction t) {
+
+    public Transaction authorize(Transaction t) {
+        try {
+            Thread.sleep(40000);
+        } catch (InterruptedException ex) {
+            java.util.logging.Logger.getLogger(VisionPlusProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return t;
+    }
 //        LOG.debug("Pushing data into MQ CID and AuthNumber :", t.getTraceId() + ", " + t.getAuthNumber());
 //
 //        String correlationId = null;
@@ -208,4 +216,4 @@
 //    public void setVpFormatter(VisionPlusFormatter vpFormatter) {
 //        this.vpFormatter = vpFormatter;
 //    }
-//}
+}

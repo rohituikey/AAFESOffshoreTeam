@@ -1,6 +1,5 @@
 package com.aafes.stargate.gateway.fdms;
 
-import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.util.AVSResponseReasonCode;
@@ -17,9 +16,8 @@ import com.firstdata.cmpwsapi.schemas.cmpmsg.FR;
 import com.firstdata.cmpwsapi.schemas.cmpmsg.OnlineAF;
 import com.firstdata.cmpwsapi.schemas.cmpmsg.PA;
 import com.firstdata.cmpwsapi.schemas.cmpmsg.Transaction;
-import com.ibm.mq.jms.MQQueueConnection;
-import com.ibm.mq.jms.MQQueueConnectionFactory;
-import com.ibm.msg.client.wmq.WMQConstants;
+//import com.sun.xml.internal.ws.client.BindingProviderProperties;
+       
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
@@ -27,10 +25,9 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.jms.JMSException;
-import javax.ws.rs.ProcessingException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.WebServiceException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -101,9 +98,15 @@ public class CompassGatewayProcessor {
                     = ((BindingProvider) port).getRequestContext();
             requestContext.put(BindingProvider.USERNAME_PROPERTY, compassUser);
             requestContext.put(BindingProvider.PASSWORD_PROPERTY, compassPassword);
+            
+            requestContext.put("com.sun.xml.internal.ws.request.timeout", 60000);
+            requestContext.put("com.sun.xml.internal.ws.connect.timeout", 60000);
+           
 
+          
             log.info("compassUser :" + compassUser + ", compassPassword:" + compassPassword);
 
+            
             result = port.onlineTrans(otr);
             log.info("got result.......");
 
@@ -116,7 +119,16 @@ public class CompassGatewayProcessor {
             t.setReasonCode(configurator.get(e.getMessage()));
 //            mapResponse(result, t);
             return t;
-        } catch (Exception e) {
+        } catch (WebServiceException e) {
+            log.error("CompassGatewayProcessor#execute#Exception : " + e.toString());
+            t.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
+            t.setResponseType(ResponseType.TIMEOUT);
+            t.setDescriptionField(e.getMessage());
+            t.setRequestType("Resersal");
+            execute(t);
+            return t;
+        } 
+        catch (Exception e) {
             log.error("CompassGatewayProcessor#execute#Exception : " + e.toString());
             t.setDescriptionField("INVALID_COMPASS_ENDPOINT");
             t.setResponseType(ResponseType.DECLINED);

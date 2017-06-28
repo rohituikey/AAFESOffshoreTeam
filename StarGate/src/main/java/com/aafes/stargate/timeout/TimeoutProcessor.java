@@ -6,7 +6,7 @@
 package com.aafes.stargate.timeout;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.stargate.dao.TransactionDAO;
+import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.ResponseType;
 import javax.ejb.EJB;
@@ -19,11 +19,13 @@ import javax.ejb.Stateless;
 @Stateless
 public class TimeoutProcessor {
 
+    @EJB
+    private Configurator configurator;
     
     private Transaction t = new Transaction();
 
     public Transaction processResponse(Transaction t) {
-       
+
         //visionGateway
         switch (t.getMedia()) {
             case MediaType.MIL_STAR:
@@ -38,21 +40,27 @@ public class TimeoutProcessor {
     }
 
     private void handleVisionGateway(Transaction t) {
-       
-        if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)
-                        && t.getResponseType().equalsIgnoreCase(ResponseType.DECLINED)
-                        && "20001".equalsIgnoreCase(t.getPlanNumber())
-                        && ("364".equalsIgnoreCase(t.getReasonCode())
-                        || "190".equalsIgnoreCase(t.getReasonCode())
-                        || "023".equalsIgnoreCase(t.getReasonCode()))) {
-                      t.setResponseType(ResponseType.TIMEOUT);
-                      t.setReasonCode("9001");
-                }
+
+        if (t.getResponseType().equalsIgnoreCase(ResponseType.DECLINED)
+                && "20001".equalsIgnoreCase(t.getPlanNumber())
+                && ("364".equalsIgnoreCase(t.getReasonCode())
+                || "190".equalsIgnoreCase(t.getReasonCode())
+                || "023".equalsIgnoreCase(t.getReasonCode()))) {
+            t.setResponseType(ResponseType.TIMEOUT);
+            t.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
+        }
     }
 
     private void handleCompassGateway(Transaction t) {
-       
-        if ((ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())) && (t.getReasonCode().equals("000"))) 
+
+        if ((ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())) && (t.getReasonCode().equals("000"))) {
             t.setResponseType(ResponseType.TIMEOUT);
-       }
+            t.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
+        }
     }
+
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
+    
+}

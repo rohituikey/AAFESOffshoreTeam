@@ -44,10 +44,11 @@ public class FutureVisionGateway extends Gateway {
                     transaction = vpp.authorize(transaction);
                 });
 
+                f.get(expirationTime, TimeUnit.SECONDS);
                 System.out.println("Timeout Not Occured");
                 transaction.setResponseType(ResponseType.APPROVED);
                 transaction.setAuthNumber("123456");
-                f.get(expirationTime, TimeUnit.SECONDS);
+                validateResponse(t);
             } else {
                 transaction.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
                 transaction.setResponseType(ResponseType.DECLINED);
@@ -145,6 +146,12 @@ public class FutureVisionGateway extends Gateway {
      */
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
+    }
+
+    private void validateResponse(Transaction t) {
+        if(t.getReasonCode().equals("97") || t.getReasonCode().equals("130") || t.getReasonCode().equals("99") )
+       t.setResponseType(ResponseType.TIMEOUT);
+            t.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
     }
 
 }

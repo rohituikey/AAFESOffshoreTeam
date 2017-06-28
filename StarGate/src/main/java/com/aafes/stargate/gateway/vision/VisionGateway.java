@@ -50,7 +50,6 @@ public class VisionGateway extends Gateway {
             if (vpp != null) {
                 context.getTimerService().createTimer(expirationTime, "time Expired");
                 t = vpp.authorize(t);
-                validateResponse(t);
             } else {
                 t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
                 t.setResponseType(ResponseType.DECLINED);
@@ -68,7 +67,7 @@ public class VisionGateway extends Gateway {
         }
         t.setResponseType(ResponseType.APPROVED);
         t.setAuthNumber("123456");
-
+        validateResponse(t);
         return t;
     }
 

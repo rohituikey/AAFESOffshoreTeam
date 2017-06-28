@@ -10,8 +10,8 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Authorizer;
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.Configurator;
-import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.Gateway;
+import com.aafes.stargate.gateway.vision.FutureVisionGateway;
 import com.aafes.stargate.timeout.TimeoutProcessor;
 import com.aafes.stargate.tokenizer.TokenBusinessService;
 import com.aafes.stargate.util.InputType;
@@ -48,6 +48,8 @@ public class RetailStrategy extends BaseStrategy {
     private TokenBusinessService tokenBusinessService;
     @EJB
     private TimeoutProcessor timeoutProcessor;
+    @EJB
+    private FutureVisionGateway futureVisionGateway;
 
     SettleEntity settleEntity;
     private static final org.slf4j.Logger LOG
@@ -83,14 +85,10 @@ public class RetailStrategy extends BaseStrategy {
 
             } else {
                 if (gateway != null) {
-                    //            FutureVisionGateway visionGateway = new FutureVisionGateway();
-//                t = visionGateway.processMessage(t);
-                    t = gateway.processMessage(t);
+                    t = futureVisionGateway.processMessage(t);
+//                    t = gateway.processMessage(t);
                 }
             }
-
-            //for timeout
-            t = timeoutProcessor.processResponse(t);
 
             //if Authorized, save in settle message repository to settle
             if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
@@ -256,4 +254,11 @@ public class RetailStrategy extends BaseStrategy {
     public void setTimeoutProcessor(TimeoutProcessor timeoutProcessor) {
         this.timeoutProcessor = timeoutProcessor;
     }
+
+    public void setFutureVisionGateway(FutureVisionGateway futureVisionGateway) {
+        this.futureVisionGateway = futureVisionGateway;
+    }
+    
+    
+    
 }

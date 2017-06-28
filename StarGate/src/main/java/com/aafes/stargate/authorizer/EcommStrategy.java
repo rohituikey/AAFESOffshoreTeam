@@ -60,8 +60,6 @@ public class EcommStrategy extends BaseStrategy {
             //Send transaction to Gateway
             Gateway gateway = super.pickGateway(t);
             if (gateway != null) {
-//                FutureVisionGateway visionGateway = new FutureVisionGateway();
-//                t = visionGateway.processMessage(t);
                 t = gateway.processMessage(t);
                 // check response from t, if declined flip plan number and send it again for authorization
                 if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)
@@ -73,9 +71,6 @@ public class EcommStrategy extends BaseStrategy {
                     t.setPlanNumber("10001");
                     t = gateway.processMessage(t);
                 }
-                
-                //for timeout
-            t=timeoutProcessor.processResponse(t);
                 
             }
 

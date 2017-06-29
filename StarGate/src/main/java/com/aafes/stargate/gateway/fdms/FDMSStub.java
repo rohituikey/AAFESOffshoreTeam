@@ -21,6 +21,7 @@ public class FDMSStub {
 
         if (t.getIdentityUuid() != null
                 && (t.getIdentityUuid().equals("7081959f-ee14-495c-b22f-a0f602a8730f")
+                || t.getIdentityUuid().equals("ecca7eb6-1314-4cb4-b156-eaf6929aebd5")
                 || t.getIdentityUuid().equals("ecca7eb6-1314-4cb4-b156-eaf6929aebd5"))) {
 
             if (t.getAccount() != null
@@ -31,8 +32,9 @@ public class FDMSStub {
                     || t.getAccount().equals("6011000990099818") //Discover
                     || t.getAccount().equals("6510000000001248") //Discover
                     )) {
-                t.setReasonCode("100");
-                t.setResponseType(ResponseType.APPROVED);
+                t.setReasonCode("000");
+                t.setResponseType(ResponseType.TIMEOUT);
+                //t.setNumberOfAttempts("1");
 
                 return true;
             }

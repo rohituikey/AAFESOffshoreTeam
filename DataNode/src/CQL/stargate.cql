@@ -215,4 +215,3 @@ password text,
 primary key (identityuuid, userid, password)
 );
 
-ALTER TABLE transactions ADD numberOfAttempts text;

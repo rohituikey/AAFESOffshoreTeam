@@ -7,7 +7,10 @@ package com.aafes.stargate.gateway.fdms;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.TranRepository;
+import com.aafes.stargate.gateway.vision.entity.CICSHandlerBean;
 import javax.ejb.EJB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -18,9 +21,12 @@ public class InitiateReversal implements Runnable {
     @EJB
     private CompassGatewayProcessor cgp;
     @EJB
-    private TranRepository transactioRepository;
+    private TranRepository transactionRepository;
 
     private Transaction t;
+
+    private static final Logger LOG
+            = LoggerFactory.getLogger(CICSHandlerBean.class.getSimpleName());
 
     public InitiateReversal(Transaction t) {
         this.t = t;
@@ -29,18 +35,19 @@ public class InitiateReversal implements Runnable {
     @Override
     public void run() {
         try {
-            cgp.execute(t);
-            transactioRepository.save(t);
+            t = cgp.execute(t);
         } catch (Exception e) {
+            LOG.error("Exception occured while initiaing reversal " + e.getMessage());
         }
+        transactionRepository.save(t);
     }
 
     public void setCgp(CompassGatewayProcessor cgp) {
         this.cgp = cgp;
     }
 
-    public void setTransactioRepository(TranRepository transactioRepository) {
-        this.transactioRepository = transactioRepository;
+    public void setTransactionRepository(TranRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
     }
 
 }

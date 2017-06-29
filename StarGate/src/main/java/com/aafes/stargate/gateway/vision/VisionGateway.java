@@ -152,7 +152,6 @@ public class VisionGateway extends Gateway {
                 || "99".equalsIgnoreCase(t.getReasonCode())
                 || "97".equalsIgnoreCase(t.getReasonCode()))) {
             t.setResponseType(ResponseType.TIMEOUT);
-            t.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
             t.setDescriptionField("Connection TimeOut");
         }
     }

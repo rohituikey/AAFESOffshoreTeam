@@ -17,7 +17,7 @@ import com.firstdata.cmpwsapi.schemas.cmpmsg.OnlineAF;
 import com.firstdata.cmpwsapi.schemas.cmpmsg.PA;
 import com.firstdata.cmpwsapi.schemas.cmpmsg.Transaction;
 //import com.sun.xml.internal.ws.client.BindingProviderProperties;
-       
+
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
@@ -27,6 +27,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,9 @@ public class CompassGatewayProcessor {
 
     @Inject
     private String wsdlLocation;
+    
+    @Inject
+    private String fdmsTimeout;
 
     @EJB
     private Configurator configurator;
@@ -98,18 +102,12 @@ public class CompassGatewayProcessor {
                     = ((BindingProvider) port).getRequestContext();
             requestContext.put(BindingProvider.USERNAME_PROPERTY, compassUser);
             requestContext.put(BindingProvider.PASSWORD_PROPERTY, compassPassword);
-            
-            requestContext.put("com.sun.xml.internal.ws.request.timeout", 60000);
-            requestContext.put("com.sun.xml.internal.ws.connect.timeout", 60000);
-           
 
-          
-            log.info("compassUser :" + compassUser + ", compassPassword:" + compassPassword);
+            requestContext.put("com.sun.xml.internal.ws.request.timeout", Integer.valueOf(fdmsTimeout));
+            requestContext.put("com.sun.xml.internal.ws.connect.timeout", Integer.valueOf(fdmsTimeout));
 
-            
-            result = port.onlineTrans(otr);
+            //result = port.onlineTrans(otr);
             log.info("got result.......");
-
             mapResponse(result, t);
 
         } catch (GatewayException e) {
@@ -119,16 +117,20 @@ public class CompassGatewayProcessor {
             t.setReasonCode(configurator.get(e.getMessage()));
 //            mapResponse(result, t);
             return t;
-        } catch (WebServiceException e) {
+        } //        } catch (com.sun.xml.internal.ws.client.ClientTransportException e) {
+        //            log.error("CompassGatewayProcessor#execute#Exception : " + e.toString());
+        //            t.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
+        //            t.setResponseType(ResponseType.TIMEOUT);
+        //            t.setDescriptionField(e.getMessage());
+        //            return t;
+        //        } 
+        catch (WebServiceException e) {
             log.error("CompassGatewayProcessor#execute#Exception : " + e.toString());
             t.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
             t.setResponseType(ResponseType.TIMEOUT);
             t.setDescriptionField(e.getMessage());
-            t.setRequestType("Resersal");
-            execute(t);
             return t;
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("CompassGatewayProcessor#execute#Exception : " + e.toString());
             t.setDescriptionField("INVALID_COMPASS_ENDPOINT");
             t.setResponseType(ResponseType.DECLINED);
@@ -151,13 +153,11 @@ public class CompassGatewayProcessor {
 
         String account = String.format("%-19s", t.getAccount());
         soapTran.setAccountNumber(account);
-        
-        if(t.getExpiration() != null)
-        {
-             String[] dates = {t.getExpiration().substring(0, 2),t.getExpiration().substring(2)};
-             soapTran.setExpirationDate(dates[1] + dates[0]);
+
+        if (t.getExpiration() != null) {
+            String[] dates = {t.getExpiration().substring(0, 2), t.getExpiration().substring(2)};
+            soapTran.setExpirationDate(dates[1] + dates[0]);
         }
-        
 
         String divisionNumber = String.format("%010d", 805602);
         t.setDivisionnumber(divisionNumber);
@@ -197,7 +197,7 @@ public class CompassGatewayProcessor {
             pa.setResponseDate(t.getResponseDate());
             pa.setAuthorizationCode(t.getAuthNumber());
             oaf.setPA(pa);
-        } else  {
+        } else {
 
             log.info("FDMS Auth request.......");
 
@@ -270,7 +270,7 @@ public class CompassGatewayProcessor {
                 oaf.setFR(fr);
             }
 
-        } 
+        }
 
         otr.setAdditionalFormats(oaf);
 
@@ -360,4 +360,8 @@ public class CompassGatewayProcessor {
         this.wsdlLocation = wsdlLocation;
     }
 
+    public void setFdmsTimeout(String fdmsTimeout) {
+        this.fdmsTimeout = fdmsTimeout;
+    }
+    
 }

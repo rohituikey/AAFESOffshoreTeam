@@ -6,6 +6,7 @@
 package com.aafes.stargate.gateway.fdms;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.control.TranRepository;
 import javax.ejb.EJB;
 
 /**
@@ -16,11 +17,10 @@ public class InitiateReversal implements Runnable {
 
     @EJB
     private CompassGatewayProcessor cgp;
-    Transaction t;
+    @EJB
+    private TranRepository transactioRepository;
 
-    public void setCgp(CompassGatewayProcessor cgp) {
-        this.cgp = cgp;
-    }
+    private Transaction t;
 
     public InitiateReversal(Transaction t) {
         this.t = t;
@@ -30,8 +30,17 @@ public class InitiateReversal implements Runnable {
     public void run() {
         try {
             cgp.execute(t);
+            transactioRepository.save(t);
         } catch (Exception e) {
         }
+    }
+
+    public void setCgp(CompassGatewayProcessor cgp) {
+        this.cgp = cgp;
+    }
+
+    public void setTransactioRepository(TranRepository transactioRepository) {
+        this.transactioRepository = transactioRepository;
     }
 
 }

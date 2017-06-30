@@ -56,6 +56,9 @@ public class SettleXMLHandler {
     private String pid;
     @Inject
     private String sid;
+    
+    @Inject
+    private String divisionNumber;
 
     public SettleXMLHandler() throws ParserConfigurationException {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -103,13 +106,20 @@ public class SettleXMLHandler {
             Element sRecord = null;
             Element ioiRecord = null;
             Element addressRecord = null;
+            Element iRecord = null;
+            Element billToAddress = null;
+            Element fARecord = null;
 
             for (SettleEntity settleEntity : fdmsDataList) {
 
-                batchRecord = doc.createElement("cmpmsg:BatchRecord");
+                batchRecord = doc.createElement("cmp:BatchRecord");
                 sRecord = doc.createElement("cmpmsg:SRecord");
+                iRecord = doc.createElement("cmpmsg:IRecord");
                 ioiRecord = doc.createElement("cmpmsg:IOI");
                 addressRecord = doc.createElement("cmpmsg:LA");
+                billToAddress = doc.createElement("cmpmsg:BillToAddress");
+                fARecord = doc.createElement("cmpmsg:FARecord");
+                
 
                 String orderNumber = "";
                 orderNumber = settleEntity.getOrderNumber();
@@ -151,7 +161,7 @@ public class SettleXMLHandler {
                 sRecord.appendChild(expTag);
 
                 Element divTag = doc.createElement("cmpmsg:DivisionNumber");
-                Text divValue = doc.createTextNode("0000100002");
+                Text divValue = doc.createTextNode(divisionNumber);
                 divTag.appendChild(divValue);
                 sRecord.appendChild(divTag);
 
@@ -165,6 +175,16 @@ public class SettleXMLHandler {
                 curCodeTag.appendChild(curCodeValue);
                 sRecord.appendChild(curCodeTag);
 
+                Element tranTypeTag = doc.createElement("cmpmsg:TransactionType");
+                Text tranTypeValue = doc.createTextNode("7");
+                tranTypeTag.appendChild(tranTypeValue);
+                sRecord.appendChild(tranTypeTag);
+
+                Element actionCodeTag = doc.createElement("cmpmsg:ActionCode");
+                Text actionCodeValue = doc.createTextNode(settleEntity.getTransactionType());
+                actionCodeTag.appendChild(actionCodeValue);
+                sRecord.appendChild(actionCodeTag);
+                
                 Element respReasonCodeTag = doc.createElement("cmpmsg:ResponseReasonCode");
                 Text respReasonCodeValue = null;
                 if (settleEntity.getTransactionType().equalsIgnoreCase(TransactionType.Deposit)) {
@@ -190,20 +210,11 @@ public class SettleXMLHandler {
                 avsaavTag.appendChild(avsaavValue);
                 sRecord.appendChild(avsaavTag);
 
-                Element tranTypeTag = doc.createElement("cmpmsg:TransactionType");
-                Text tranTypeValue = doc.createTextNode("7");
-                tranTypeTag.appendChild(tranTypeValue);
-                sRecord.appendChild(tranTypeTag);
-
-                Element actionCodeTag = doc.createElement("cmpmsg:ActionCode");
-                Text actionCodeValue = doc.createTextNode(settleEntity.getTransactionType());
-                actionCodeTag.appendChild(actionCodeValue);
-                sRecord.appendChild(actionCodeTag);
-
                 Element tracingNumberTag = doc.createElement("cmpmsg:TrackingNumber");
                 Text tracingNumberValue = doc.createTextNode(settleEntity.getBatchId() + settleEntity.getSequenceId());
                 tracingNumberTag.appendChild(tracingNumberValue);
                 ioiRecord.appendChild(tracingNumberTag);
+                iRecord.appendChild(ioiRecord);
 
                 Element nameTag = doc.createElement("cmpmsg:NameText");
                 Text nameValue = null;
@@ -235,21 +246,39 @@ public class SettleXMLHandler {
                 }
 
                 add1 = String.format("%-28s", add1);
-                add2 = String.format("%-28s", add2);
+                
 
                 Element address1Tag = doc.createElement("cmpmsg:Address1");
                 Text address1Value = doc.createTextNode(add1.toUpperCase());
-
-                Element address2Tag = doc.createElement("cmpmsg:Address2");
-                Text address2Value = doc.createTextNode(add2.toUpperCase());
                 address1Tag.appendChild(address1Value);
                 addressRecord.appendChild(address1Tag);
-                address2Tag.appendChild(address2Value);
-                addressRecord.appendChild(address2Tag);
+                    
+                if(add2 != null 
+                        && !(add2.equalsIgnoreCase(""))){
+                    add2 = String.format("%-28s", add2);
+                    Element address2Tag = doc.createElement("cmpmsg:Address2");
+                    Text address2Value = doc.createTextNode(add2.toUpperCase());
+                    address2Tag.appendChild(address2Value);
+                    addressRecord.appendChild(address2Tag);
+                }
     //            Element address3Tag = doc.createElement("cmpmsg:Address3");
     //            Text address3Value = doc.createTextNode(settleEntity.getAddressLine3().toUpperCase());
     //            address3Tag.appendChild(address3Value);
     //            addressRecord.appendChild(address3Tag);
+    
+                Element countryTag = doc.createElement("cmpmsg:CountryCode");
+                Text countryValue = null;
+                if (settleEntity.getCountryCode().equalsIgnoreCase("US")
+                        || settleEntity.getCountryCode().equalsIgnoreCase("UK")
+                        || settleEntity.getCountryCode().equalsIgnoreCase("CA")
+                        || settleEntity.getCountryCode().equalsIgnoreCase("GB")) {
+                    countryValue = doc.createTextNode(settleEntity.getCountryCode());
+                } else {
+                    countryValue = doc.createTextNode("");
+                }
+                countryTag.appendChild(countryValue);
+                addressRecord.appendChild(countryTag);
+                
                 String city = "";
                 city = settleEntity.getCity();
                 city = String.format("%-20s", city);
@@ -275,18 +304,9 @@ public class SettleXMLHandler {
     //            Text countryValue = doc.createTextNode(settleEntity.getCountryCode().toUpperCase());
     //            countryTag.appendChild(countryValue);
     //            addressRecord.appendChild(countryTag);
-                Element countryTag = doc.createElement("cmpmsg:CountryCode");
-                Text countryValue = null;
-                if (settleEntity.getCountryCode().equalsIgnoreCase("US")
-                        || settleEntity.getCountryCode().equalsIgnoreCase("UK")
-                        || settleEntity.getCountryCode().equalsIgnoreCase("CA")
-                        || settleEntity.getCountryCode().equalsIgnoreCase("GB")) {
-                    countryValue = doc.createTextNode(settleEntity.getCountryCode());
-                } else {
-                    countryValue = doc.createTextNode("");
-                }
-                countryTag.appendChild(countryValue);
-                addressRecord.appendChild(countryTag);
+            
+                billToAddress.appendChild(addressRecord);
+                fARecord.appendChild(billToAddress);
 
                 batchRecord.appendChild(sRecord);
 
@@ -310,12 +330,12 @@ public class SettleXMLHandler {
 
                     shipTotalTag.appendChild(shipTotalValue);
                     issoRecord.appendChild(shipTotalTag);
-
-                    batchRecord.appendChild(issoRecord);
+                    
+                    iRecord.appendChild(issoRecord);
                 }
 
-                batchRecord.appendChild(ioiRecord);
-                batchRecord.appendChild(addressRecord);
+                batchRecord.appendChild(iRecord);
+                batchRecord.appendChild(fARecord);
 
                 doc.getFirstChild().insertBefore(batchRecord, node);
 
@@ -390,4 +410,10 @@ public class SettleXMLHandler {
     public void setSid(String sid) {
         this.sid = sid;
     }
+
+    public void setDivisionNumber(String divisionNumber) {
+        this.divisionNumber = divisionNumber;
+    }
+    
+    
 }

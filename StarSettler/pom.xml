@@ -240,6 +240,58 @@
                         </goals>
                         <configuration>
                             <schemaIncludes>
+                                <include>jaxb/fdms/cmpapi/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-cmpapi.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-cmpapi</id>
+                    </execution>
+                </executions>
+                <configuration>
+                    <catalog>src/main/resources/jaxb/catalog.xml</catalog>
+                    <catalogResolver>org.jvnet.jaxb2.maven2.resolver.tools.ClasspathCatalogResolver</catalogResolver>
+                    <forceRegenerate>true</forceRegenerate>
+                    <generateDirectory>${project.build.directory}/generated-sources/xjc</generateDirectory>
+                    <verbose>true</verbose>
+                </configuration>
+            </plugin>
+<!--            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.12.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/fdms/cmpmsg/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-cmpmsg.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-cmpmsg</id>
+                    </execution>
+                </executions>
+                <configuration>
+                    <catalog>src/main/resources/jaxb/catalog.xml</catalog>
+                    <catalogResolver>org.jvnet.jaxb2.maven2.resolver.tools.ClasspathCatalogResolver</catalogResolver>
+                    <forceRegenerate>true</forceRegenerate>
+                    <generateDirectory>${project.build.directory}/generated-sources/xjc</generateDirectory>
+                    <verbose>true</verbose>
+                </configuration>
+            </plugin>-->
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.12.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
                                 <include>jaxb/tokenmessage/*.xsd</include>
                             </schemaIncludes>
                             <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-tokenmessage.episode</episodeFile>

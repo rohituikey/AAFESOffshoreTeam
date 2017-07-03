@@ -131,7 +131,7 @@ public class FirstDataGatewayBean {
             DateFormat dateFormat = new SimpleDateFormat("MMddyyyy_hh-mm-ss");
             String createdDate = dateFormat.format(date);
 
-            String filename = sourcePath + finalBatchId + "_" + pid + "_" + createdDate + "_REQ.XML";
+            String filename = sourcePath + finalBatchId + "_" + pid + "_" + createdDate + "_REQ.LB000391.zip";
             log.info("FDMS Batch Settlement filename is : " + filename);
             File file = new File(filename);
             // if file doesn't exists, then create it

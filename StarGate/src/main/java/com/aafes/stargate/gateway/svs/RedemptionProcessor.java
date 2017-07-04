@@ -65,12 +65,12 @@ public class RedemptionProcessor extends Processor {
                 redemptionRequest.setInvoiceNumber(t.getOrderNumber());
             }
 
-            log.info("REQUEST----> Invoice Number " + redemptionRequest.getInvoiceNumber());
+            log.debug("REQUEST----> Invoice Number " + redemptionRequest.getInvoiceNumber());
 
             SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
             RedemptionResponse redemptionResponse = sVSXMLWay.redemption(redemptionRequest);
 
-            log.info("RESPONSE---->AuthorizationCode " + redemptionResponse.getAuthorizationCode() + "||AMOUNT " + redemptionResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + redemptionResponse.getReturnCode().getReturnCode() + "||RETURN  CODE  DISCRIPTION " + redemptionResponse.getReturnCode().getReturnDescription());
+            log.debug("RESPONSE---->AuthorizationCode " + redemptionResponse.getAuthorizationCode() + "||AMOUNT " + redemptionResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + redemptionResponse.getReturnCode().getReturnCode() + "||RETURN  CODE  DISCRIPTION " + redemptionResponse.getReturnCode().getReturnDescription());
             if (redemptionResponse != null) {
 
                 t.setBalanceAmount((long) redemptionResponse.getApprovedAmount().getAmount());
@@ -90,10 +90,10 @@ public class RedemptionProcessor extends Processor {
                 }
             }
         } catch (Exception e) {
-            log.error(("Error in processBalanceInquiry method responce" + e));
+            log.error(("Error in processBalanceInquiry method i.e responce is null" + e));
             throw new GatewayException("INTERNAL SERVER ERROR");
         }
-
+        log.debug("rrn number is--" + t.getRrn());
     }
 
 }

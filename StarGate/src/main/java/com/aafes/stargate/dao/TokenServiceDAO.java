@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 @Stateless
 public class TokenServiceDAO {
+
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TokenServiceDAO.class.getSimpleName());
     private final String CLASS_NAME = TokenServiceDAO.this.getClass().getSimpleName();
     private String sMethodName = "";
@@ -41,9 +42,9 @@ public class TokenServiceDAO {
         mapper1 = new MappingManager(session).mapper(CrosssiteRequestUsertable.class);
     }
 
-    public TokenServiceDAO(){
+    public TokenServiceDAO() {
     }
-    
+
     public boolean insertTokenDetails(CrosssiteRequestTokenTable tokenObj) {
         sMethodName = "insertTokenDetails";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
@@ -57,6 +58,7 @@ public class TokenServiceDAO {
         } finally {
         }
         LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+        LOG.debug("uuid is .."+tokenObj.getIdentityuuid());
         return dataInsertedFlg;
     }
 
@@ -71,6 +73,7 @@ public class TokenServiceDAO {
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         } finally {
         }
+        LOG.debug("");
         return tokenObjLocal;
     }
 
@@ -82,46 +85,52 @@ public class TokenServiceDAO {
         boolean dataInsertedFlg = false;
         ResultSet resultSet = null;
         try {
-            updateQuery = "UPDATE stargate.crosssiterequesttokentable SET tokenstatus = '" + tokenStatus + 
-                    "' WHERE tokenid = '" + tokenId + "' AND identityuuid = '" + identityUuid + "';";
+            updateQuery = "UPDATE stargate.crosssiterequesttokentable SET tokenstatus = '" + tokenStatus
+                    + "' WHERE tokenid = '" + tokenId + "' AND identityuuid = '" + identityUuid + "';";
 
             resultSet = session.execute(updateQuery);
 
             if (resultSet != null) {
                 LOG.info("Data Udpated. tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus);
                 dataInsertedFlg = true;
-            } else  LOG.error("Data Udpatation failed ! tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus);
-        } catch (Exception ex) {
-            LOG.error("Error while creating cross site request token " + ex.getMessage());
-            throw new GatewayException("INTERNAL SYSTEM ERROR");
-        } finally {
-        }
-        return dataInsertedFlg;
-    }
-    
-    public boolean validateUserDetails(CrosssiteRequestUsertable tokenObj) {
-        sMethodName = "validateUserDetails";
-        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        boolean userValidateFlg = false;
-        CrosssiteRequestUsertable obj;
-        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        try {
-              obj = (CrosssiteRequestUsertable) mapper1.get(tokenObj.getIdentityuuid(), tokenObj.getUserid(), tokenObj.getPassword());
-              if(obj != null) userValidateFlg = true;
+            } else {
+                LOG.error("Data Udpatation failed ! tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus);
+            }
         } catch (Exception ex) {
             LOG.error("Error while creating cross site request token " + ex.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         } finally {
         }
         LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+        LOG.debug("Method " + sMethodName + "uuid no--" + identityUuid + "( " + " Class Name " + CLASS_NAME);
+        return dataInsertedFlg;
+    }
+
+    public boolean validateUserDetails(CrosssiteRequestUsertable tokenObj) {
+        sMethodName = "validateUserDetails";
+        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        boolean userValidateFlg = false;
+        CrosssiteRequestUsertable obj;
+        try {
+            obj = (CrosssiteRequestUsertable) mapper1.get(tokenObj.getIdentityuuid(), tokenObj.getUserid(), tokenObj.getPassword());
+            if (obj != null) {
+                userValidateFlg = true;
+            }
+        } catch (Exception ex) {
+            LOG.error("Error while creating cross site request token " + ex.getMessage());
+            throw new GatewayException("INTERNAL SYSTEM ERROR");
+        } finally {
+        }
+        LOG.debug("Method " + sMethodName + "uuid no--" + tokenObj.getIdentityuuid() + "( " + " Class Name " + CLASS_NAME);
+        LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         return userValidateFlg;
     }
-    
+
     @EJB
     public void setCassandraSessionFactory(CassandraSessionFactory factory) {
         this.factory = factory;
     }
-    
+
 //    public ResultSet findActiveTokens(String identityUuid, String tokenStatus) {
 //        sMethodName = "findActiveTokens";
 //        String query = "";
@@ -138,5 +147,4 @@ public class TokenServiceDAO {
 //        }
 //        return resultSet;
 //    }
-    
 }

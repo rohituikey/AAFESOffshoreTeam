@@ -7,7 +7,6 @@ package com.aafes.stargate.gateway.fdms;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.TranRepository;
-import com.aafes.stargate.gateway.vision.entity.CICSHandlerBean;
 import javax.ejb.EJB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,7 @@ public class InitiateReversal implements Runnable {
     private Transaction t;
 
     private static final Logger LOG
-            = LoggerFactory.getLogger(CICSHandlerBean.class.getSimpleName());
+            = LoggerFactory.getLogger(InitiateReversal.class.getSimpleName());
 
     public InitiateReversal(Transaction t) {
         this.t = t;

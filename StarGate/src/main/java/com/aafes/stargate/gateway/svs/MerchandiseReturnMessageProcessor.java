@@ -75,14 +75,14 @@ public class MerchandiseReturnMessageProcessor extends Processor {
                 transaction.setAuthNumber(response.getAuthorizationCode());
                 transaction.setBalanceAmount((long) (response.getBalanceAmount().getAmount()*100));
 
-                LOGGER.info("ReturnDescription : " + String.valueOf(response.getReturnCode().getReturnDescription()));
+                LOGGER.debug("ReturnDescription : " + String.valueOf(response.getReturnCode().getReturnDescription()));
             } else {
                 transaction.setResponseType(ResponseType.DECLINED);
             }
 
         } catch (Exception e) {
-            LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
+            LOGGER.error("Exception occured in " + sMethodName + ".responce is null Exception  : " + e.getMessage());
             throw new GatewayException("INTERNAL_SERVER_ERROR");
-        }
+        }LOGGER.debug("rrn number is--"+transaction.getRrn());
     }
 }

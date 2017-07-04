@@ -34,8 +34,8 @@ public class ProcessorFactory {
     @EJB
     private NetworkMessageProcessor networkMessageProcessor;
     @EJB
-    private RedemptionProcessor redemptionProcessor;  
-    
+    private RedemptionProcessor redemptionProcessor;
+
     public Processor pickProcessor(Transaction t) {
 
         Processor processor = null;
@@ -46,36 +46,43 @@ public class ProcessorFactory {
             switch (requestType) {
 
                 case RequestType.INQUIRY:
+                    log.info("processing balanceInquiryProcessor");
                     processor = balanceInquiryProcessor;
                     break;
                 case RequestType.PREAUTH:
+                    log.info("processing preAuthorizationProcessor");
                     processor = preAuthorizationProcessor;
                     break;
                 case RequestType.FINAL_AUTH:
+                    log.info("processing sVSFinalAuthProcessor");
                     processor = sVSFinalAuthProcessor;
                     break;
                 case RequestType.REVERSAL:
                     // Future
                     break;
                 case RequestType.REFUND:
+                    log.info("processing merchandiseReturnMessageProcessor");
                     processor = merchandiseReturnMessageProcessor;
                     break;
                 case RequestType.ISSUE:
+                    log.info("processing issueProcessor");
                     processor = issueProcessor;
                     break;
                 //added
                 case RequestType.NETWORK:
+                    log.info("processing networkMessageProcessor");
                     processor = networkMessageProcessor;
                     break;
                 case RequestType.REDEMPTION:
+                    log.info("processing redemptionProcessor");
                     processor = redemptionProcessor;
                     break;
- 
+
                 default:
                     log.info("No Matching request type found.");
 
             }
-        }
+        }log.debug("rrn number is"+t.getRrn());
 
         return processor;
     }

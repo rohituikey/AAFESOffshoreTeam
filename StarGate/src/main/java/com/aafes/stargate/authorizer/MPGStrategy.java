@@ -8,6 +8,7 @@ package com.aafes.stargate.authorizer;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.Gateway;
 import javax.ejb.Stateless;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -16,8 +17,12 @@ import javax.ejb.Stateless;
 @Stateless
 public class MPGStrategy extends BaseStrategy {
 
+        private static final org.slf4j.Logger LOG
+            = LoggerFactory.getLogger(MPGStrategy.class.getSimpleName());
+
     @Override
     public Transaction processRequest(Transaction t) {
+        LOG.info(" MPGStrategy class ,process requst method is started");
 
         boolean mpgFieldsValid = this.validateMPGFields(t);
         if (!mpgFieldsValid) {
@@ -25,13 +30,12 @@ public class MPGStrategy extends BaseStrategy {
         }
 
         //Send transaction to Gateway
-       
         Gateway gateway = super.pickGateway(t);
         if (gateway != null) {
             t = gateway.processMessage(t);
-           
-        }
 
+        }
+        LOG.info(" MPGStrategy class ,process requst method is ended");
         return t;
     }
 

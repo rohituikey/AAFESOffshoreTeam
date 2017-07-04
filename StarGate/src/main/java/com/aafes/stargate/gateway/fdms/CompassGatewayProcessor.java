@@ -49,7 +49,7 @@ public class CompassGatewayProcessor {
 
     @Inject
     private String wsdlLocation;
-    
+
     @Inject
     private String fdmsTimeout;
 
@@ -81,7 +81,7 @@ public class CompassGatewayProcessor {
 
         try {
 
-            log.info("CompassGatewayProcessor#execute.......");
+            log.info("CompassGatewayProcessor#execute.....started..");
 
             OnlineTransRequest otr = formOnlineTransRequest(t);
 
@@ -125,24 +125,26 @@ public class CompassGatewayProcessor {
         //            return t;
         //        } 
         catch (WebServiceException e) {
-            log.error("CompassGatewayProcessor#execute#Exception : " + e.toString());
+            log.error("CompassGatewayProcessor#execute#Exception : " + e.toString()+"   reason is TIMEOUT_EXCEPTION");
             t.setReasonCode(configurator.get("TIMEOUT_EXCEPTION"));
             t.setResponseType(ResponseType.TIMEOUT);
             t.setDescriptionField(e.getMessage());
             return t;
         } catch (Exception e) {
-            log.error("CompassGatewayProcessor#execute#Exception : " + e.toString());
+            log.error("CompassGatewayProcessor#execute#Exception : " + e.toString()+"  reason is INVALID_COMPASS_ENDPOINT");
             t.setDescriptionField("INVALID_COMPASS_ENDPOINT");
             t.setResponseType(ResponseType.DECLINED);
             t.setReasonCode(configurator.get("INVALID_COMPASS_ENDPOINT"));
 //            mapResponse(result, t);
             return t;
         }
+        log.info("CompassGatewayProcessor#execute.....ended..");
+        log.debug("rrn number is " + t.getRrn());
         return t;
     }
 
     private OnlineTransRequest formOnlineTransRequest(com.aafes.stargate.authorizer.entity.Transaction t) {
-
+        log.info("compassgateway processor's formOnlineTransRequest method started");
         OnlineTransRequest otr = new OnlineTransRequest();
 
         //<cmpmsg:Transaction>
@@ -275,7 +277,7 @@ public class CompassGatewayProcessor {
         otr.setAdditionalFormats(oaf);
 
         otr.setTransaction(soapTran);
-
+        log.info("compassgateway processor's formOnlineTransRequest method started");
         return otr;
     }
 
@@ -363,5 +365,5 @@ public class CompassGatewayProcessor {
     public void setFdmsTimeout(String fdmsTimeout) {
         this.fdmsTimeout = fdmsTimeout;
     }
-    
+
 }

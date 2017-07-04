@@ -47,7 +47,7 @@ public class TokenEndPointService {
                 
         TokenMessage tm = new TokenMessage();
         TokenMessage.Request request = new TokenMessage.Request();
-        request.setAccount(t.getAccount());
+        request.setAccount("006491570000000301'");
         request.setAccountType(AccountTypeType.TOKEN);
         request.setMedia(t.getMedia());
         request.setRequestType(RequestTypeType.LOOKUP);
@@ -63,6 +63,8 @@ public class TokenEndPointService {
         if(tm.getResponse() != null) {
             return tm.getResponse().getAccount();
         }
+        log.debug("rrn number is "+t.getRrn());
+               log.info("TokenServicer#lookupAccount#ENDED.........");
         return "";
        
     }
@@ -93,6 +95,8 @@ public class TokenEndPointService {
         if(tm.getResponse() != null) {
             return tm.getResponse().getAccount();
         }
+        log.debug("rrn number is "+t.getRrn());  
+        log.info("TokenServicer#issueToken#END.......");
         return "";
        
     }

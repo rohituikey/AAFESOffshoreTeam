@@ -44,12 +44,12 @@ public class NetworkMessageProcessor extends Processor {
         networkRequest.setRoutingID(StarGateConstants.ROUTING_ID);
         networkRequest.setNetworkCode(StarGateConstants.NETWOK_CODE);
 
-        LOGGER.info("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "return code :" + t.getReasonCode());
+        LOGGER.debug("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "return code :" + t.getReasonCode());
 
         NetworkResponse networkResponse = sVSXMLWay.network(networkRequest);
         try {
             if (networkResponse != null) {
-                LOGGER.info("return code : " + networkResponse.getReturnCode().getReturnCode());
+                LOGGER.debug("return code : " + networkResponse.getReturnCode().getReturnCode());
 
                 t.setAuthoriztionCode(networkResponse.getAuthorizationCode());
                 t.setReasonCode(networkResponse.getReturnCode().getReturnCode());
@@ -62,8 +62,8 @@ public class NetworkMessageProcessor extends Processor {
             }
 
         } catch (GatewayException e) {
-            LOGGER.error(("Error in Network Message method responce" + e));
+            LOGGER.error(("Error in Network Message method i.e. responce is null" + e));
             throw new GatewayException("INTERNAL SERVER ERROR");
-        }
+        }LOGGER.debug("rrn number is--"+t.getRrn());
     }
 }

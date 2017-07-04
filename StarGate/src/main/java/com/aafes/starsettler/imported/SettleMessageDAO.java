@@ -57,6 +57,8 @@ public class SettleMessageDAO {
     
     public SettleEntity find(String uuid, String ordernumber, String rrn, String transactionid)
     {
+        LOG.info("SetteleMessageDAO.find method is started");
+                
         SettleEntity settleEntity = null;
         String query = "";
             query = "SELECT *  FROM starsettler.settlemessages where identityuuid = '" + uuid
@@ -121,8 +123,9 @@ public class SettleMessageDAO {
                 settleEntity.setAuthoriztionCode(row.getString("authoriztioncode"));
                 settleEntity.setAvsResponseCode(row.getString("avsresponsecode"));
                 settleEntity.setTokenBankName(row.getString("tokenbankname"));
-        }
-        
+        }       LOG.debug("rrn number is "+rrn);
+                LOG.info("SetteleMessageDAO.find method is ended");
+
         return settleEntity;
     }
 

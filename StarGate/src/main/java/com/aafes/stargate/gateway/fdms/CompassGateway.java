@@ -12,19 +12,19 @@ import org.slf4j.LoggerFactory;
 
 @Stateless
 public class CompassGateway extends Gateway {
-
+    
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(CompassGateway.class.getSimpleName());
-
+    
     @EJB
     private CompassGatewayProcessor cgp;
     
-    @EJB 
+    @EJB    
     private Configurator configurator;
-
+    
     @Override
     public Transaction processMessage(Transaction t) {
-
+        LOG.info("CompassGateway.processMessage method is started");
         try {
             if (this.validateTransaction(t)) {
                 t = cgp.execute(t);
@@ -35,38 +35,39 @@ public class CompassGateway extends Gateway {
                 return t;
             }
         } catch (GatewayException e) {
+            LOG.error(e.toString());
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField(e.getMessage());
         }
-
+        LOG.debug(("rrn number is " + t.getRrn()));
         return t;
     }
-
+    
     private boolean validateTransaction(Transaction t) throws GatewayException {
         return true;
-
+        
     }
 
 //    public void setCgp(CompassGatewayProcessor cgp) {
 //        this.cgp = cgp;
 //    }
-    
-    private void validateResponse(Transaction t){
-        if (t.getRequestType().equalsIgnoreCase("SALE")&& t.getReasonCode().equalsIgnoreCase("000")) {
-                    t.setResponseType(ResponseType.TIMEOUT);
-                    t.setDescriptionField("Connection TimeOut");
-                }
-        else if (t.getReasonCode().equals(configurator.get("TIMEOUT_EXCEPTION"))){
+    private void validateResponse(Transaction t) {
+        LOG.info("in compassGateway validateResponse method is started");
+        if (t.getRequestType().equalsIgnoreCase("SALE") && t.getReasonCode().equalsIgnoreCase("000")) {
+            t.setResponseType(ResponseType.TIMEOUT);
+            t.setDescriptionField("Connection TimeOut");
+        } else if (t.getReasonCode().equals(configurator.get("TIMEOUT_EXCEPTION"))) {
+            LOG.info("TIMEOUT_EXCEPTION and requsting reversal ");
             t.setRequestType(RequestType.REVERSAL);
             InitiateReversal initiateResponse = new InitiateReversal(t);
             Thread triggerResponse = new Thread(initiateResponse);
             triggerResponse.start();
         }
-
+        LOG.info("in compassGateway validateResponse method is ended");        
     }
-
+    
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
     }
     
-            }
+}

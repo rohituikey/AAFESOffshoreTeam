@@ -105,7 +105,6 @@ public class IssueService {
         
         while (attempts < 4) {
             token = generateToken(tm.getRequest().getAccount(), tm.getRequest().getMedia());
-            LOG.debug("Generated Token is:" + token);
             TokenBank tokenBank = tokenizerDao.find(token, tm.getRequest().getTokenBankName());
             if (tokenBank != null) {
                 // generate again

@@ -50,10 +50,8 @@ public class LookUpService {
 //        } 
         if (tm.getRequest().getAccountType().value().equalsIgnoreCase(AccountType.PAN)) {
             vault = vaultDao.findByAccount(tm.getRequest().getAccount());
-            LOG.debug("Token details are:" + vault);
         } else {
             vault = vaultDao.findByToken(tm.getRequest().getAccount());
-            LOG.debug("Token details are:" + vault);
         }
 
         if (vault != null && vault.getAccountnumber().contains(tm.getRequest().getTokenBankName())) {

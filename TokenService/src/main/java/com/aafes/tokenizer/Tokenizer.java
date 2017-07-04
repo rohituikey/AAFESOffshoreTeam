@@ -41,7 +41,6 @@ public class Tokenizer {
                         && request.getAccountType().value().equalsIgnoreCase(AccountType.TOKEN)) {
 
                     String account = lookUpService.process(tm);
-                    LOG.debug("Account details are... " + account);
 
                     if (account != null && !account.trim().isEmpty()) {
                         response.setAccountType(AccountTypeType.PAN);
@@ -59,7 +58,6 @@ public class Tokenizer {
                 } else if (request.getRequestType().value().equalsIgnoreCase(TokenizerConstants.ISSUE)
                         && request.getAccountType().value().equalsIgnoreCase(AccountType.PAN)) {
                     String token = issueService.process(tm);
-                    LOG.debug("Token Details...... " + token);
 
                     if (token != null && !token.trim().isEmpty()) {
                         response.setAccountType(AccountTypeType.TOKEN);

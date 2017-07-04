@@ -55,7 +55,7 @@ public class TokenMessageResource {
         String responseXml = "";
         try {
 
-            LOG.info("Entry In Method..." + "postXml..." + "From Client: " + requestXml);
+            LOG.info("From Client: " + requestXml);
             String ValidatedXML = FilterRequestXML(requestXml);
             if (requestXml.contains("DOCTYPE")
                     || requestXml.contains("CDATA")) {
@@ -73,17 +73,14 @@ public class TokenMessageResource {
                         + "</ErrorInformation>";
             }
         } catch (SAXException ex) {
-            LOG.error(ex.getMessage());
             Logger.getLogger(TokenMessageResource.class.getName()).log(Level.SEVERE, null, ex);
             responseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
                     + "</ErrorInformation>";
         } catch (JAXBException ex) {
-            LOG.error(ex.getMessage());
             Logger.getLogger(TokenMessageResource.class.getName()).log(Level.SEVERE, null, ex);
             responseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
                     + "</ErrorInformation>";
         } catch (Exception e) {
-            LOG.error(e.getMessage());
             Logger.getLogger(TokenMessageResource.class.getName()).log(Level.SEVERE, null, e);
             responseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
                     + "</ErrorInformation>";
@@ -116,7 +113,6 @@ public class TokenMessageResource {
         try {
             schema = sf.newSchema(new File(SCHEMA_PATH));
         } catch (Exception e) {
-            LOG.error(e.getMessage());
             SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/TokenMessage.xsd";
             schema = sf.newSchema(new File(SCHEMA_PATH));
         }

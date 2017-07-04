@@ -6,28 +6,29 @@
 package com.aafes.tokenizer;
 
 import com.aafes.tokenservice.util.AccountType;
-import com.aafes.token.AccountTypeType;
 import com.aafes.token.TokenMessage;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-
+import org.slf4j.LoggerFactory;
 
 @Stateless
 public class LookUpService {
-    
+
     @EJB
     private VaultDao vaultDao;
     @EJB
     private TokenizerDao tokenizerDao;
-    
-    public String process(TokenMessage tm) throws ParseException
-    {
+
+    private static final org.slf4j.Logger LOG
+            = LoggerFactory.getLogger(LookUpService.class.
+                    getSimpleName());
+
+    public String process(TokenMessage tm) throws ParseException {
+        LOG.info("Entry in process method of Lookupservice..");
         String accountNumber = "";
         Vault vault = null;
-        
+
 //        if(tm.getRequest().getAccountType().value().equalsIgnoreCase(AccountType.TOKEN))
 //        {
 //           TokenBank tokenBank = tokenizerDao.find(tm.getRequest().getAccount(), tm.getRequest().getTokenBankName());
@@ -47,24 +48,20 @@ public class LookUpService {
 //               
 //           }
 //        } 
-        
-        if(tm.getRequest().getAccountType().value().equalsIgnoreCase(AccountType.PAN))
-        {
+        if (tm.getRequest().getAccountType().value().equalsIgnoreCase(AccountType.PAN)) {
             vault = vaultDao.findByAccount(tm.getRequest().getAccount());
         } else {
             vault = vaultDao.findByToken(tm.getRequest().getAccount());
         }
-        
-        
-        if(vault != null && vault.getAccountnumber().contains(tm.getRequest().getTokenBankName()))
-        {
+
+        if (vault != null && vault.getAccountnumber().contains(tm.getRequest().getTokenBankName())) {
             accountNumber = vault.getAccountnumber();
             accountNumber = accountNumber.replaceAll(tm.getRequest().getTokenBankName(), "");
         }
-        
+
+        LOG.info("Exitfrom process method of Lookupservice..");
         return accountNumber;
-                
-        
+
     }
 
     protected void setVaultDao(VaultDao vaultDao) {
@@ -74,5 +71,5 @@ public class LookUpService {
     protected void setTokenizerDao(TokenizerDao tokenizerDao) {
         this.tokenizerDao = tokenizerDao;
     }
-    
+
 }

@@ -16,7 +16,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import org.slf4j.LoggerFactory;
 
 @Stateless
@@ -32,47 +31,52 @@ public class TokenizerDao {
 
     @PostConstruct
     public void postConstruct() {
+        LOG.info("Entry in  postConstruct method of TokenizerDao......");
         Session session = factory.getSession();
         mapper = new MappingManager(session).mapper(TokenBank.class);
-         cryptoPath = System.getProperty("jboss.server.config.dir") + "/crypto.keys";
+        cryptoPath = System.getProperty("jboss.server.config.dir") + "/crypto.keys";
         logPath = System.getProperty("jboss.server.config.dir") + "/crypto.log4j.properties";
         encryptor = new Encryptor(cryptoPath, logPath);
+        LOG.info("Exit from postConstruct method of TokenizerDao......");
     }
 
     public void save(TokenBank tb) {
-        
+
+        LOG.info("Entry in  save method of TokenizerDao......");
 //         if(encryptor != null)
 //        {
 //            String encryptedToken = encryptor.encrypt(tb.getTokennumber());
 //            tb.setTokennumber(encryptedToken);
 //        }
-         
         mapper.save(tb);
+        LOG.info("Exit from save method of TokenizerDao......");
     }
 
     public TokenBank find(String tokenNumber, String tokenBankName) {
 
-       // String encryptedToken = "";
-        if(encryptor != null)
-        {
+        LOG.info("Entry in  find method of TokenizerDao......");
+        // String encryptedToken = "";
+        if (encryptor != null) {
             // encryptedToken = encryptor.encrypt(tokenNumber);
         }
+
         return (TokenBank) mapper.get(tokenNumber, tokenBankName);
 
     }
-    
+
     public List<String> getAllTokensByName(String tokenBankName) {
-         
+
+        LOG.info("Entry in  getAllTokensByName method of TokenizerDao......");
         List<String> tokensList = new ArrayList<>();
-        String query = "select * from tokenizer.tokenbank where tokenbankname = '" + tokenBankName +"' ALLOW FILTERING";
-        
+        String query = "select * from tokenizer.tokenbank where tokenbankname = '" + tokenBankName + "' ALLOW FILTERING";
 
         ResultSet result = factory.getSession().execute(query);
 
         for (Row row : result) {
             tokensList.add(row.getString("tokennumber"));
         }
-        
+
+        LOG.info("Entry in  getAllTokensByName method of TokenizerDao......");
         return tokensList;
     }
 
@@ -89,5 +93,4 @@ public class TokenizerDao {
         this.logPath = logPath;
     }
 
-    
 }

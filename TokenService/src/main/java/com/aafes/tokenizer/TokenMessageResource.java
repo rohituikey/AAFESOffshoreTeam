@@ -34,7 +34,6 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
- 
 @Path("/tokenmessage")
 public class TokenMessageResource {
 
@@ -55,21 +54,19 @@ public class TokenMessageResource {
 
         String responseXml = "";
         try {
-            
-             LOG.info("From Client: " + requestXml);
+
+            LOG.info("From Client: " + requestXml);
             String ValidatedXML = FilterRequestXML(requestXml);
-            if(requestXml.contains("DOCTYPE")
-                    ||requestXml.contains("CDATA")){
+            if (requestXml.contains("DOCTYPE")
+                    || requestXml.contains("CDATA")) {
                 LOG.error("Invalid Request");
                 responseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
                         + "</ErrorInformation>";
-            }
-            else if (ValidatedXML != null) {
-            TokenMessage requestMessage = unmarshalWithValidation(requestXml);
-            TokenMessage responseMessage = tokenizer.handle(requestMessage);
-            
-            responseXml = marshal(responseMessage);
-            LOG.info("To Client: " + responseXml);
+            } else if (ValidatedXML != null) {
+                TokenMessage requestMessage = unmarshalWithValidation(requestXml);
+                TokenMessage responseMessage = tokenizer.handle(requestMessage);
+                responseXml = marshal(responseMessage);
+                LOG.debug("To Client: " + responseXml);
             } else {
                 LOG.error("Invalid Request");
                 responseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
@@ -78,30 +75,32 @@ public class TokenMessageResource {
         } catch (SAXException ex) {
             Logger.getLogger(TokenMessageResource.class.getName()).log(Level.SEVERE, null, ex);
             responseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
-                        + "</ErrorInformation>";
+                    + "</ErrorInformation>";
         } catch (JAXBException ex) {
             Logger.getLogger(TokenMessageResource.class.getName()).log(Level.SEVERE, null, ex);
             responseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
-                        + "</ErrorInformation>";
+                    + "</ErrorInformation>";
         } catch (Exception e) {
             Logger.getLogger(TokenMessageResource.class.getName()).log(Level.SEVERE, null, e);
             responseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
-                        + "</ErrorInformation>";
+                    + "</ErrorInformation>";
         }
-
+        LOG.info("Exit from postXml method of TokenMessageResource");
         return responseXml;
     }
 
     private String marshal(TokenMessage request) {
+        LOG.info("Entry in  marshal method of TokenMessageResource......");
         StringWriter sw = new StringWriter();
         JAXB.marshal(request, sw);
         String xmlString = sw.toString();
+        LOG.info("Exit from marshal method of TokenMessageResource......");
         return xmlString;
     }
 
     private TokenMessage unmarshalWithValidation(String xml) throws SAXException, JAXBException {
+        LOG.info("Entry in unmarshalWithValidation...");
         TokenMessage request = new TokenMessage();
-
         StringReader reader = new StringReader(xml);
         JAXBContext jc = JAXBContext.newInstance(TokenMessage.class);
         Unmarshaller unmarshaller = jc.createUnmarshaller();
@@ -120,17 +119,17 @@ public class TokenMessageResource {
 
         jaxbUnmarshaller.setSchema(schema);
         request = (TokenMessage) jaxbUnmarshaller.unmarshal(reader);
-
+        LOG.info("Exit from unmarshalWithValidation Method");
         return request;
     }
 
     protected void setTokenizer(Tokenizer tokenizer) {
         this.tokenizer = tokenizer;
     }
-    
-    private static String FilterRequestXML(String xmlString) {
-        LOG.info("In filter request method.");
 
+    private static String FilterRequestXML(String xmlString) {
+
+        LOG.info("Entry In FilterRequestXML Method");
         String retString = null;
         try {
             StringReader reader = new StringReader(xmlString);
@@ -140,16 +139,18 @@ public class TokenMessageResource {
             dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             Document document = dbf.newDocumentBuilder().parse(new InputSource(reader));
             retString = getStringFromDocument(document);
-            LOG.info("Validated XML");
+            LOG.info("Exit from FilterRequestXML Method");
         } catch (Exception ex) {
-            LOG.error(ex.toString());
+            LOG.error(ex.getMessage());
             retString = null;
         }
+        LOG.info("Exit from FilterRequestXML Method");
         return retString;
     }
 
     public static String getStringFromDocument(Document doc) throws TransformerException {
 
+        LOG.info("Entry into  getStringFromDocument Method of TokenMessageResource class");
         StringWriter writer = null;
 
         try {
@@ -161,9 +162,9 @@ public class TokenMessageResource {
             transformer.transform(domSource, result);
 
         } catch (Exception ex) {
-            LOG.error(ex.toString());
+            LOG.error(ex.getMessage());
         }
-
+        LOG.info("Exit from getStringFromDocument Method of TokenMessageResource class");
         return writer.toString();
     }
 

@@ -14,7 +14,6 @@ import com.datastax.driver.mapping.Result;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import org.slf4j.LoggerFactory;
 
 @Stateless
@@ -30,14 +29,18 @@ public class VaultDao {
 
     @PostConstruct
     public void postConstruct() {
+        LOG.info("Entry in postConstruct method of VaultDao..");
         Session session = factory.getSession();
         mapper = new MappingManager(session).mapper(Vault.class);
         cryptoPath = System.getProperty("jboss.server.config.dir") + "/crypto.keys";
         logPath = System.getProperty("jboss.server.config.dir") + "/crypto.log4j.properties";
         encryptor = new Encryptor(cryptoPath, logPath);
+        LOG.info("Exit from postConstruct method of VaultDao..");
     }
 
     public void save(Vault tb) {
+
+        LOG.info("Entry in save method of VaultDao..");
         if (encryptor != null) {
             String encryptedAccount = encryptor.encrypt(tb.getAccountnumber());
 //            String encryptedToken = encryptor.encrypt(tb.getTokennumber());
@@ -46,28 +49,32 @@ public class VaultDao {
         }
 
         mapper.save(tb);
+        LOG.info("Exit from save method of VaultDao..");
     }
 
     public Vault findByToken(String tokenNumber) {
 
+        LOG.info("Entry in findByToken method of VaultDao..");
         Vault vault = null;
         if (encryptor != null) {
-          //  String encryptedToken = encryptor.encrypt(tokenNumber);
+            //  String encryptedToken = encryptor.encrypt(tokenNumber);
             vault = (Vault) mapper.get(tokenNumber);
             if (vault != null) {
                 String decryptedAccount = encryptor.decrypt(vault.getAccountnumber());
-               // String decryptedToken = encryptor.decrypt(vault.getTokennumber());
+                // String decryptedToken = encryptor.decrypt(vault.getTokennumber());
                 vault.setAccountnumber(decryptedAccount);
-              //  vault.setTokennumber(decryptedToken);
+                //  vault.setTokennumber(decryptedToken);
             }
 
         }
-
+        LOG.info("Exit from findByToken method of VaultDao..");
         return vault;
 
     }
 
     public Vault findByAccount(String accountNumber) {
+
+        LOG.info("Entry in findByAccount method of VaultDao..");
         Vault vault = null;
         ResultSet resultSet = factory.getSession().execute("select * from tokenizer.vault where accountnumber = '"
                 + accountNumber + "' allow filtering;");
@@ -84,11 +91,11 @@ public class VaultDao {
 
         if (encryptor != null && vault != null) {
             String decryptedAccount = encryptor.decrypt(vault.getAccountnumber());
-         //   String decryptedToken = encryptor.decrypt(vault.getTokennumber());
+            //   String decryptedToken = encryptor.decrypt(vault.getTokennumber());
             vault.setAccountnumber(decryptedAccount);
-          //  vault.setTokennumber(decryptedToken);
+            //  vault.setTokennumber(decryptedToken);
         }
-
+        LOG.info("Exit from findByAccount method of VaultDao..");
         return vault;
 
     }

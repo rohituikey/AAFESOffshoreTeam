@@ -6,20 +6,7 @@
 package com.aafes.stargate.gateway.vision;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.stargate.control.Configurator;
-import com.aafes.stargate.gateway.GatewayException;
-import com.aafes.stargate.gateway.MQGatewayException;
-import com.aafes.stargate.gateway.vision.entity.CICSHandlerBean;
-import com.aafes.stargate.gateway.vision.entity.CICSTranId;
-import com.aafes.stargate.util.DeviceType;
-import com.aafes.stargate.util.ResponseType;
-import com.solab.iso8583.IsoMessage;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.logging.Level;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

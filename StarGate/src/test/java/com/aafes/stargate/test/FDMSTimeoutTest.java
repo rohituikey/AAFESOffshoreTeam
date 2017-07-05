@@ -26,7 +26,7 @@ public class FDMSTimeoutTest {
     public void testfdmsTimeout() {
         CompassGateway compassGateway = new CompassGateway();
         CompassGatewayProcessor compassGatewayProcessor = new CompassGatewayProcessor();
-        compassGateway.setCgp(compassGatewayProcessor);
+        //compassGateway.setCgp(compassGatewayProcessor);
         transaction.setMedia(MediaType.AMEX);
         transaction.setStrategy(StrategyType.ECOMM);
         transaction.setIdentityUuid("c47e4366-fe72-473b-b114-523e8de5641f");

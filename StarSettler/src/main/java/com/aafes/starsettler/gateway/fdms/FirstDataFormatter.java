@@ -53,6 +53,8 @@ public class FirstDataFormatter {
     public String formatRequestXML(List<SettleEntity> fdmsDataList) throws SAXException, IOException,
             XPathExpressionException, TransformerConfigurationException, TransformerException, ParserConfigurationException {
 
+        logger.info("Entry in formatRequestXML method of FirstDataFormatter..");
+
         if (fdmsDataList != null
                 && fdmsDataList.size() > 0) {
 
@@ -65,7 +67,7 @@ public class FirstDataFormatter {
             request.setPID(pid);
             request.setSID(sid);
             request.setBatchId(fdmsDataList.get(0).getBatchId());
-            
+
             ISS001 issoRecord = null;
             BatchRecord batchRecord = null;
             S sRecord = null;
@@ -210,7 +212,7 @@ public class FirstDataFormatter {
                 batchRecord.setFARecord(faRecord);
 
                 request.getBatchRecord().add(batchRecord);
-                
+
                 if (settleEntity.getTransactionType().equalsIgnoreCase(TransactionType.Deposit)) {
                     saleAmount = saleAmount + Long.parseLong(settleEntity.getPaymentAmount());
                 } else if (settleEntity.getTransactionType().equalsIgnoreCase(TransactionType.Refund)) {
@@ -220,11 +222,10 @@ public class FirstDataFormatter {
             }
 
             BatchTotals bt = new BatchTotals();
-            
-            
+
             Long amountTotals = 0l;
             refundAmount = Long.parseLong(refundAmount.toString().replace("-", ""));
-           
+
             bt.setAmountSales(saleAmount.toString());
             bt.setAmountRefunds(refundAmount.toString());
 
@@ -232,7 +233,7 @@ public class FirstDataFormatter {
             bt.setAmountTotals(amountTotals.toString());
 
             request.setBatchTotals(bt);
-            
+            logger.info("Exit from formatRequestXML method of FirstDataFormatter..");
             return marshal(request);
         } else {
             logger.info("formatRequestXML ## fdmsDataList is empty");
@@ -247,7 +248,7 @@ public class FirstDataFormatter {
         String xmlString = sw.toString();
         return xmlString;
     }
-    
+
     private String mapCardTypeToMop(String cardType) {
         switch (cardType) {
             case "Visa":

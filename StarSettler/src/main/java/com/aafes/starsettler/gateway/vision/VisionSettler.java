@@ -9,12 +9,11 @@ import com.aafes.starsettler.control.BaseSettler;
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.util.SettleStatus;
 import com.aafes.starsettler.util.SettlerType;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -27,10 +26,15 @@ public class VisionSettler extends BaseSettler{
     
     @EJB
     private VisionService visionService;
+    
+      private static final org.slf4j.Logger LOG
+            = LoggerFactory.getLogger(VisionSettler.class.getSimpleName());
 
     // Schedular will call this method 
     @Override
     public void run(String identityUUID, String processDate) {
+        
+        LOG.info("Entry in run method of VisionSettler..");
          // TODO
         // Get Milstar Data records from Base Settler
         // And process them
@@ -44,6 +48,7 @@ public class VisionSettler extends BaseSettler{
         visionService.generateAndSendToVision(visionHashMap);
         
         super.updateStatus(milstarData, SettleStatus.In_Progress);
+        LOG.info("Exit from run method of VisionSettler..");
     }
 
    
@@ -59,7 +64,8 @@ public class VisionSettler extends BaseSettler{
      * @return 
      */
     private HashMap<String, SettleEntity> consolidateVisionData(List<SettleEntity> settleEntityList) {
-
+        
+        LOG.info("Entry in consolidateVisionData method of VisionSettler..");
         HashMap<String,SettleEntity> visionMap = new HashMap<>();
         
         settleEntityList.forEach((settleEntity) -> {
@@ -78,6 +84,7 @@ public class VisionSettler extends BaseSettler{
             }
         });
         visionMap.forEach((k, v) -> System.out.println("Key : " + k + " Value : " + v.getCardToken() + ", amount :" + v.getPaymentAmount()));
+        LOG.info("Exit from consolidateVisionData method of VisionSettler..");
         return visionMap;
     }
 

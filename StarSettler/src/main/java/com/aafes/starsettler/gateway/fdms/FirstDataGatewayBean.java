@@ -47,21 +47,24 @@ public class FirstDataGatewayBean {
     @Inject
     private String pid;
     private String finalBatchId;
-    
+
     public void settle(List<SettleEntity> fdmsData, String batchId) throws
             ParserConfigurationException, SAXException, IOException,
             XPathExpressionException, TransformerException, FirstDataException {
 
+        log.info("Entry in settle method of FirstDataGatewayBean..");
         HashMap fdmsSettlementMap = consolidateBatchRecords(fdmsData, batchId);
         List<SettleEntity> settleList = new ArrayList<SettleEntity>(fdmsSettlementMap.values());
 
         String returnXML = settleXMLHandler.formatRequestXML(settleList);
 
         createFile(returnXML);
+        log.info("Exit from settle method of FirstDataGatewayBean..");
     }
 
     private HashMap consolidateBatchRecords(List<SettleEntity> fdmsData, String batchId) throws FirstDataException {
 
+        log.info("Entry in consolidateBatchRecords method of FirstDataGatewayBean..");
         HashMap<String, SettleEntity> fdmsSettlementMap = new HashMap<>();
         finalBatchId = this.makeBatchId(batchId);
         int sequnceNumber = 1;
@@ -89,11 +92,13 @@ public class FirstDataGatewayBean {
             }
         }
 
+        log.info("Exit from consolidateBatchRecords method of FirstDataGatewayBean..");
         return fdmsSettlementMap;
     }
 
-    private String makeBatchId(String batchId) throws FirstDataException{
+    private String makeBatchId(String batchId) throws FirstDataException {
 
+        log.info("Entry in makeBatchId method of FirstDataGatewayBean..");
         try {
             if (batchId == null || batchId.trim().isEmpty()) {
                 Calendar cal = Calendar.getInstance();
@@ -110,22 +115,25 @@ public class FirstDataGatewayBean {
                 batchId = year + pacckedDay + "001";
             } else {
                 long oldBatch = Long.parseLong(batchId);
-                oldBatch ++ ;
+                oldBatch++;
                 batchId = Long.toString(oldBatch);
             }
 
         } catch (Exception e) {
+            log.error(e.getMessage());
             new FirstDataException("Unable to make batch Id");
         }
 
+        log.info("Exit from makeBatchId method of FirstDataGatewayBean..");
         return batchId;
     }
 
     private void createFile(String returnXML) throws
             UnsupportedEncodingException, IOException {
-        
-        if(returnXML != null
-                && (!returnXML.equals("")) ){
+
+        log.info("Entry in createFile method of FirstDataGatewayBean..");
+        if (returnXML != null
+                && (!returnXML.equals(""))) {
 
             Date date = new Date();
             DateFormat dateFormat = new SimpleDateFormat("MMddyyyy_hh-mm-ss");
@@ -142,7 +150,7 @@ public class FirstDataGatewayBean {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile())));
             bw.write(returnXML);
             bw.close();
-        
+            log.info("Exit from createFile method of FirstDataGatewayBean..");
         }
     }
 
@@ -152,9 +160,9 @@ public class FirstDataGatewayBean {
 
     private String format(int sequnceNumber) {
         String seq = Integer.toString(sequnceNumber);
-        
+
         seq = ("000000" + seq).substring(seq.length());
-        
+
         return seq;
     }
 

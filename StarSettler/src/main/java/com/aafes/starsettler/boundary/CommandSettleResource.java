@@ -52,7 +52,7 @@ public class CommandSettleResource {
 
             responseMessageXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>" + e.getMessage() + "</Error>"
                     + "</ErrorInformation>";
-            LOG.error(e.toString());
+            LOG.error(e.getMessage());
         }
 
         return responseMessageXml;

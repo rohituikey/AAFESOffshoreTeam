@@ -1,6 +1,5 @@
 package com.aafes.starsettler.control;
 
-import com.aafes.starsettler.dao.FacilityDAO;
 import com.aafes.starsettler.entity.CommandMessage;
 import com.aafes.starsettler.entity.*;
 import com.aafes.starsettler.tokenizer.TokenEndPointService;
@@ -8,8 +7,6 @@ import com.aafes.starsettler.util.CardType;
 import com.aafes.starsettler.util.ResponseType;
 import com.aafes.starsettler.util.SettleStatus;
 import com.aafes.starsettler.util.TransactionType;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import generated.Settlement;
 import generated.Settlement.Appeasements.Appeasement;
 import generated.Settlement.Shipment.Lines.Shipped;
@@ -50,6 +47,8 @@ public class Settler {
 
     public Settlement saveForSettle(Settlement settleMessage) throws JAXBException {
 
+        LOG.info("Entry in saveForSettle method of Settler..");
+
         List<SettleEntity> settleEntityList = new ArrayList<SettleEntity>();
         try {
             // This method will receive the settle message from settle message resource
@@ -85,24 +84,27 @@ public class Settler {
         } catch (JAXBException e) {
             throw new JAXBException(e.getMessage());
         } catch (SettlerException e) {
+            LOG.error(e.getMessage());
             Settlement.Response response = new Settlement.Response();
             response.setDescriptionField(e.getMessage());
             response.setReasonCode(configurator.get(e.getMessage()));
             response.setResponseType(ResponseType.FAILED);
             settleMessage.getResponse().add(response);
         } catch (Exception e) {
+            LOG.error(e.getMessage());
             Settlement.Response response = new Settlement.Response();
             response.setDescriptionField("INTERNAL SERVER ERROR");
             response.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
             response.setResponseType(ResponseType.FAILED);
             settleMessage.getResponse().add(response);
         }
-
+        LOG.info("Exit from saveForSettle method of Settler..");
         return settleMessage;
     }
 
     public String commandSettle(CommandMessage commandMessage) {
 
+        LOG.info("Entry in commandSettle method of Settler..");
         String response = "Success";
         try {
 
@@ -113,13 +115,17 @@ public class Settler {
             baseSettler.run(identityUUID, processDate);
 
         } catch (Exception e) {
+            LOG.error(e.getMessage());
             response = e.getMessage();
         }
 
+        LOG.info("Exit from commandSettle method of Settler..");
         return response;
     }
 
     private String findFacility(String uuid) throws SettlerException {
+
+        LOG.info("Entry in findFacility method of Settler..");
         try {
 
             Facility facility = settleRepository.getFacility(uuid);
@@ -134,10 +140,12 @@ public class Settler {
         } catch (Exception e) {
             throw new SettlerException("INVALID_UUID");
         }
+
     }
 
     private void findAuthorizationCodes(List<SettleEntity> settleEntityList, String tokenBankname) throws SettlerException {
 
+        LOG.info("Entry in findAuthorizationCodes method of Settler..");
         boolean isTokenPresent = false;
         for (SettleEntity settleEntity : settleEntityList) {
             settleEntity.setTokenBankName(tokenBankname);
@@ -157,12 +165,14 @@ public class Settler {
                 settleEntity.setAvsResponseCode(ac.getAvsResponseCode());
                 settleEntity.setCsvResponseCode(ac.getCsvResponseCode());
             }
-            
+
         }
+        LOG.info("Exit from findAuthorizationCodes method of Settler..");
     }
 
     private boolean findToken(SettleEntity se) {
 
+        LOG.info("Entry in findToken method of Settler..");
         try {
             if (tokenEndPointService != null) {
                 String accountNbr = tokenEndPointService.lookupAccount(se);
@@ -172,10 +182,10 @@ public class Settler {
             }
         } catch (Exception e) {
             LOG.info("Error while calling tokenizer for token : " + se.getCardToken());
-            LOG.error(e.toString());
+            LOG.error(e.getMessage());
             return false;
         }
-
+        LOG.info("Exit from findToken method of Settler..");
         return true;
     }
 //         private void validateDuplicateRecords(List<SettleEntity> settleEntityList) {
@@ -205,6 +215,8 @@ public class Settler {
 
     private void mapRequest(Settlement settleMessage, List<SettleEntity> settleEntityList) throws JAXBException, SettlerException {
 
+        LOG.info("Entry in mapRequest method of VaultDao..");
+
         // TODO
         // Map all request fields from settle Message to settle entity bean here
         if (settleMessage.getShipment() != null) {
@@ -224,6 +236,7 @@ public class Settler {
                         }
                     }
                 } else {
+                    LOG.error("INVALID_REQUEST");
                     throw new SettlerException("INVALID_REQUEST");
                 }
 
@@ -249,6 +262,7 @@ public class Settler {
                                     }
                                 }
                             } catch (ArithmeticException e) {
+                                LOG.error(e.getMessage());
                                 throw new SettlerException("INVALID_AMOUNT");
                             }
                             this.mapShippingPaymentNode(payment, settleEntity);
@@ -296,9 +310,12 @@ public class Settler {
             throw new SettlerException("INVALID_REQUEST");
         }
 
+        LOG.info("Exit from mapRequest Method of settler class");
     }
 
     private void mapLineHeader(Shipped lineItem, SettleEntity settleEntity) throws SettlerException {
+
+        LOG.info("Entry in mapLineHeader method of Settler..");
         settleEntity.setClientLineId(lineItem.getClientLineId());
         if (lineItem.getLineId() != null) {
             settleEntity.setLineId(lineItem.getLineId().toString());
@@ -342,9 +359,12 @@ public class Settler {
             settleEntity.setUnitTotal(lineItem.getUnitTotal().toString());
         }
         settleEntity.setCouponCode(lineItem.getCouponCode());
+        LOG.info("Exit from mapLineHeader method of Settler..");
     }
 
     private void mapLinePaymentNode(Shipped.Payments.Payment payment, SettleEntity settleEntity) throws JAXBException, SettlerException {
+
+        LOG.info("Entry in mapLinePaymentNode method of Settler..");
         settleEntity.setCardType(payment.getType());
         try {
             BigDecimal amount;
@@ -478,10 +498,12 @@ public class Settler {
 
             }
         }
+        LOG.info("Exit from mapLinePaymentNode method of Settler..");
     }
 
     private void mapShippingPaymentNode(Shipping.Payments.Payment payment, SettleEntity settleEntity) throws JAXBException, SettlerException {
 
+        LOG.info("Entry in mapShippingPaymentNode method of Settler..");
         settleEntity.setCardType(payment.getType());
         try {
             BigDecimal amount;
@@ -617,9 +639,12 @@ public class Settler {
 
             }
         }
+        LOG.info("Exit from mapShippingPaymentNode method of Settler..");
     }
 
     private void mapAppeasementPaymentNode(Appeasement.Payments.Payment payment, SettleEntity settleEntity) throws JAXBException, SettlerException {
+
+        LOG.info("Entry in mapAppeasementPaymentNode method of Settler..");
         settleEntity.setCardType(payment.getType());
         try {
             BigDecimal amount;
@@ -675,7 +700,7 @@ public class Settler {
         settleEntity.setCardReferene(payment.getCardReference());
         settleEntity.setCardToken(payment.getCardToken());
 
-        if (payment.getExpirationDate() != null && !payment.getType().equalsIgnoreCase(CardType.GIFT_CARD) ) {
+        if (payment.getExpirationDate() != null && !payment.getType().equalsIgnoreCase(CardType.GIFT_CARD)) {
             //check for valid expiration date
             String exp = payment.getExpirationDate().toString();
             if (exp != null && exp.length() == 4) {
@@ -754,9 +779,12 @@ public class Settler {
 
             }
         }
+        LOG.info("Exit from mapAppeasementPaymentNode method of Settler..");
     }
 
     private void validateSettleList(List<SettleEntity> settleEntityList) throws SettlerException {
+
+        LOG.info("Entry in validateSettleList method of Setler..");
 
         boolean lookForTotal = false;
         long total = 0;
@@ -851,12 +879,16 @@ public class Settler {
 
         }
 
+        LOG.info("Exit from validateSettleList method of Setler..");
     }
 
     private void validateMessage(Settlement requestMessage) throws JAXBException {
+
+        LOG.info("Entry in validateMessage method of Settler..");
         if (requestMessage.getShipment() != null) {
             if (requestMessage.getShipment().getLines() != null
                     && requestMessage.getShipment().getShipping() != null) {
+                LOG.error("Invalid XML");
                 throw new JAXBException("Invalid XML");
             }
         }

@@ -31,15 +31,15 @@ public class CompassGateway extends Gateway {
                 validateResponse(t);
             } else {
                 t.setResponseType(ResponseType.DECLINED);
-                t.setDescriptionField("INTERNAL SERVER ERROR");
+                t.setDescriptionField("INTERNAL SERVER ERROR" +t.getRrn());
                 return t;
             }
         } catch (GatewayException e) {
-            LOG.error(e.toString()+". ResponseType is :"+ResponseType.DECLINED+". Description is :"+e.getMessage());
+            LOG.error(e.toString()+t.getRrn());
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField(e.getMessage());
         }
-        LOG.debug(("rrn number in CompassGateway.processMessage is " + t.getRrn()));
+        LOG.info(("rrn number in CompassGateway.processMessage is " + t.getRrn()));
         LOG.info("CompassGateway.processMessage method is ended");
         return t;
     }
@@ -57,7 +57,7 @@ public class CompassGateway extends Gateway {
             t.setResponseType(ResponseType.TIMEOUT);
             t.setDescriptionField("Connection TimeOut");
         } else if (t.getReasonCode().equals(configurator.get("TIMEOUT_EXCEPTION"))) {
-            LOG.info("TIMEOUT_EXCEPTION and requsting for reversal ");
+            LOG.info("TIMEOUT_EXCEPTION and requsting for reversal "+t.getRrn());
             t.setRequestType(RequestType.REVERSAL);
             InitiateReversal initiateResponse = new InitiateReversal(t);
             Thread triggerResponse = new Thread(initiateResponse);

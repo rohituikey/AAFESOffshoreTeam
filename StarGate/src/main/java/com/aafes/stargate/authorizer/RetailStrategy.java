@@ -56,10 +56,12 @@ public class RetailStrategy extends BaseStrategy {
 
     @Override
     public Transaction processRequest(Transaction t) {
-        LOG.info("REtailStrategy.processRequest is started");
+        LOG.info("REtailStrategy.processRequest Entry ... "+t.getRrn());
         try {
 
             boolean retailFieldsValid = this.validateRetailFields(t);
+            LOG.info("retailFieldsValid "+ retailFieldsValid +"..."+t.getRrn());
+            
             if (!retailFieldsValid) {
                 LOG.info("Invalid fields");
                 return t;

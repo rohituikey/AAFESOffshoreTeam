@@ -45,7 +45,6 @@ public class SVSGatewayProcessor {
 
         }
          log.info("SVSGatewayProcessor.excute method ended");
-         log.debug("rrn number is--"+t.getRrn());
         return t;
     }
 
@@ -69,7 +68,7 @@ public class SVSGatewayProcessor {
             t.setResponseType(ResponseType.APPROVED);
             t.setReasonCode("100");
         } else {
-            log.info("invalid giftcard in processing BalanceInquiry");
+            log.info("invalid giftcard in processing BalanceInquiry"+t.getRrn());
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField("INVALID_GIFTCARD");
             t.setReasonCode("201");
@@ -78,7 +77,7 @@ public class SVSGatewayProcessor {
     }
 
     private void preAuth(Transaction t) {
-        log.info("processing preAuth.......");
+        log.info("processing preAuth......."+t.getRrn());
 
         GiftCard giftCard = svsdao.find(t.getAccount(), t.getGcpin());
 
@@ -107,7 +106,7 @@ public class SVSGatewayProcessor {
     }
 
     private void preAuthComplete(Transaction t) {
-        log.info("processing preAuthComplete.......");
+        log.info("processing preAuthComplete......."+t.getRrn());
 
         GiftCard giftCard = svsdao.find(t.getAccount(), t.getGcpin());
 

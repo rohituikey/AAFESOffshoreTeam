@@ -38,8 +38,7 @@ public class VisionPlusProcessor {
             LOG.error(ex.toString());
             java.util.logging.Logger.getLogger(VisionPlusProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
-        LOG.debug("rrn number in VisionPlusProcessor.authorize is"+ t.getRrn());
-        LOG.info("VisionPlusProcessor.authorize is ended");
+        LOG.info("VisionPlusProcessor.authorize is ended"+t.getRrn());
         return t;
     }
 //        LOG.debug("Pushing data into MQ CID and AuthNumber :", t.getTraceId() + ", " + t.getAuthNumber());

@@ -60,7 +60,7 @@ public class SettleMessageDAO {
         query = "SELECT *  FROM starsettler.settlemessages where identityuuid = '" + uuid
                 + "' and ordernumber = '" + ordernumber + "' and "
                 + " rrn = '" + rrn + "' and transactionid = '" + transactionid + "' ALLOW FILTERING";
-
+         LOG.info("Query :"+query);
         ResultSet result = factory.getSession().execute(query);
         for (Row row : result) {
             settleEntity = new SettleEntity();
@@ -119,7 +119,6 @@ public class SettleMessageDAO {
             settleEntity.setAvsResponseCode(row.getString("avsresponsecode"));
             settleEntity.setTokenBankName(row.getString("tokenbankname"));
         }
-        LOG.debug("rrn in SetteleMessageDAO.find  number is " + rrn);
         LOG.info("SetteleMessageDAO.find method is ended");
         return settleEntity;
     }

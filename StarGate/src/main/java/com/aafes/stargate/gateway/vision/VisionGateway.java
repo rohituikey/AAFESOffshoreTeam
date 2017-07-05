@@ -45,7 +45,7 @@ public class VisionGateway extends Gateway {
     @Override
     public Transaction processMessage(Transaction transaction) {
         t = transaction;
-        LOG.info("visiongateway process message method started");
+        LOG.info("visiongateway process message method started"+t.getRrn());
         try {
             this.validateTransaction(t);
             if (vpp != null) {
@@ -64,7 +64,6 @@ public class VisionGateway extends Gateway {
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField(e.getMessage());
         } catch (Exception e) {
-            LOG.error(e.toString() + "INTERNAL_SERVER_ERROR");
             t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField("INTERNAL_SERVER_ERROR");
@@ -72,8 +71,7 @@ public class VisionGateway extends Gateway {
         t.setResponseType(ResponseType.APPROVED);
         t.setAuthNumber("123456");
         validateResponse(t);
-        LOG.debug("rrn number in process messageisiongateway.processMessage is : "+t.getRrn());
-        LOG.info("visiongateway process message method ended");
+        LOG.info("visiongateway process message method ended"+t.getRrn());
         return t;
     }
 
@@ -82,45 +80,37 @@ public class VisionGateway extends Gateway {
         // Add all validations here
         if (!t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)
                 && !t.getMedia().equalsIgnoreCase(MediaType.ESSO)) {
-            LOG.error("UNSUPPORTED_CARD_TYPE");
             throw new GatewayException("UNSUPPORTED_CARD_TYPE");
         }
 
         if (!(Validator.isCreditCard(t.getAccount())
                 && t.getAccount().length() <= 19)) {
-            LOG.error("INVALID_ACCOUNT_NUMBER");
             throw new GatewayException("INVALID_ACCOUNT_NUMBER");
         }
 
         if (t.getRequestType() == null
                 || t.getRequestType().length() == 0
                 || t.getRequestType().equals("")) {
-            LOG.error("INVALID_REQUEST_TYPE");
             throw new GatewayException("INVALID_REQUEST_TYPE");
         }
 
         if (!Validator.isSignAmount(Long.toString(t.getAmount()).trim())) {
-            LOG.error("INVALID_AMOUNT");
             throw new GatewayException("INVALID_AMOUNT");
         } else if (t.getAmountSign().equalsIgnoreCase("-")
                 && !t.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
-            LOG.error("INVALID_AMOUNT");
             throw new GatewayException("INVALID_AMOUNT");
         }
 
         if (!Validator.isNumberOnly(t.getLocalDateTime())) {
-            LOG.error("INVALID_LOCAL_DATETIME");
             throw new GatewayException("INVALID_LOCAL_DATETIME");
         }
 
         if (!Validator.isExp(t.getExpiration())) {
-            LOG.error("INVALID_EXPIRATION_DATE");
             throw new GatewayException("INVALID_EXPIRATION_DATE");
         }
 
         if (t.getInputType() == null
                 || t.getInputType().length() < 0) {
-            LOG.error("INVALID_INPUT_TYPE");
             throw new GatewayException("INVALID_INPUT_TYPE");
         }
 
@@ -150,8 +140,8 @@ public class VisionGateway extends Gateway {
 //                    || t.getCvv().length() <= 2) {
 //                throw new GatewayException("INVALID_CVV");
 //            }
-        LOG.debug("rrn number in VisionGateway.validateTransaction is : "+t.getRrn());
-        LOG.info("VisionGateway.validateTransaction method is ended");
+       
+        LOG.info("VisionGateway.validateTransaction method is ended" +t.getRrn());
 
     }
 

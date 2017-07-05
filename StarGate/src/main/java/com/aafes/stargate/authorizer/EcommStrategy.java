@@ -37,12 +37,11 @@ public class EcommStrategy extends BaseStrategy {
 
     @EJB
     private TimeoutProcessor timeoutProcessor;
-    private static final org.slf4j.Logger LOG
-            = LoggerFactory.getLogger(EcommStrategy.class.getSimpleName());
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(EcommStrategy.class.getSimpleName());
 
     @Override
     public Transaction processRequest(Transaction t) {
-        LOG.info("in EcommStrategy class processRequest method is started");
+        LOG.info("EcommStrategy.processRequest Entry ..."+t.getRrn());
         try {
             boolean ecommFieldsValid = this.validateECommFields(t);
             if (!ecommFieldsValid) {
@@ -67,35 +66,40 @@ public class EcommStrategy extends BaseStrategy {
                 }
             }
         } catch (AuthorizerException e) {
-            String message = e.getClass() + e.getMessage() + e.getCause();
+            LOG.error(e.getClass() + e.getMessage() +"..."+t.getRrn());
             buildErrorResponse(t, "", e.getMessage());
             return t;
         } catch (Exception e) {
+            LOG.error(e.getMessage() +"..."+t.getRrn());
             buildErrorResponse(t, "", e.getMessage());
             return t;
         }
-        LOG.debug("rrn number in EcommStrategy.processRequest is : " + t.getRrn());
-        LOG.info("in EcommStrategy class processRequest method is ended");
+       
+       LOG.info("EcommStrategy.processRequest Exit ..."+t.getRrn());
         return t;
     }
 
     public boolean validateECommFields(Transaction t) {
-        LOG.info("validateECommFields method started in EcommStrategy class");
+        LOG.info("EcommStrategy.validateECommFields method started..."+t.getRrn());
         // Validate only fields which are required for ECOMM 
         // Settle Indicator is always false
         if ("true".equalsIgnoreCase(t.getSettleIndicator())) {
             buildErrorResponse(t, configurator.get("INVALID_SETTLE_INDICATOR"), "INVALID_SETTLE_INDICATOR");
+            LOG.error("INVALID_SETTLE_INDICATOR ..."+t.getRrn());
             return false;
         }
+
         if (t.getVoidFlag() != null && !t.getVoidFlag().isEmpty()) {
             //TODO : Remove below line when handling voids
             buildErrorResponse(t, configurator.get("VOID_IS_NOT_SUPPORTED"), "VOID_IS_NOT_SUPPORTED");
+            LOG.error("VOID_IS_NOT_SUPPORTED ..."+t.getRrn());
             return false;
         }
         if (t.getOrderNumber() != null && !t.getOrderNumber().isEmpty()
                 && t.getOrderNumber().length() > 22) {
             //TODO : Remove below line when handling voids
             buildErrorResponse(t, configurator.get("INVALID_ORDER_NUMBER"), "INVALID_ORDER_NUMBER");
+            LOG.error("INVALID_ORDER_NUMBER ..."+t.getRrn());
             return false;
         }
         // Bin Range     
@@ -163,7 +167,7 @@ public class EcommStrategy extends BaseStrategy {
                 }
             }
         }
-        LOG.info("validateECommFields method ended in EcommStrategy class");
+        LOG.info("EcommStrategy.validateECommFields Exit ..."+t.getRrn());
         return true;
     }
 
@@ -171,11 +175,10 @@ public class EcommStrategy extends BaseStrategy {
         t.setReasonCode(reasonCode);
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
-        LOG.error("Exception/Error Occured .reasonCode is : "+reasonCode+"description : "+description);
     }
 
     private void CIDValidation(Transaction t) {
-        LOG.info("CIDValidation method started in class EcommStrategy");
+        LOG.info("EcommStrategy.CIDValidation Entry ..."+t.getRrn());
 
         boolean authorizedForMilstar = true;
         if (enableStub != null && enableStub.trim().equalsIgnoreCase("true")) //
@@ -184,19 +187,18 @@ public class EcommStrategy extends BaseStrategy {
         } else {
             //If we fail to perform this check let the authorization go through.
             try {
-                LOG.debug("Calling custInfo ");
+                LOG.info("Calling custInfo ");
                 CustInfo custInfo = new CustInfo();
                 String ssn = custInfo.callCustomerLookup(t.getCustomerId());
                 if (ssn != null && !ssn.equals("")) {
                     MQServ mqServ = new MQServ();
                     authorizedForMilstar = mqServ.callMatch(ssn, t.getAccount());
                 } else {
-                    LOG.error("Unable to lookup the ssn for cid");
+                    LOG.error("Unable to lookup the ssn for cid ..."+t.getRrn());
                     throw new AuthorizerException("Unable to lookup the ssn for cid " + t.getCustomerId());
                 }
             } catch (Exception ce) {
-                String longDescription = "Unable to perform the milstar cid lookup " + ce.getMessage() + ".";
-                LOG.warn(longDescription);
+                LOG.warn("Unable to perform the milstar cid lookup " + ce.getMessage() + "."+t.getRrn());
                 LOG.error(convertStackTraceToString(ce));
                 t.setComment("Unable to perform the milstar cid lookup");
             }
@@ -204,7 +206,8 @@ public class EcommStrategy extends BaseStrategy {
         if (!authorizedForMilstar) {
             throw new AuthorizerException("Customer ID is not authorized to use the milstar card"); //buildResponseMessage(message, rrn, 'D', "995", "NOT ALLOWD", "Customer ID is not authorized to use the milstar card");                                 
         }
-        LOG.info("CIDValidation method  ended in class EcommStrategy");
+       LOG.info("EcommStrategy.CIDValidation Exit ..."+t.getRrn());
+
     }
 
     /**

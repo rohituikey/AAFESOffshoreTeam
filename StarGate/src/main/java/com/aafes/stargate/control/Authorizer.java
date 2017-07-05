@@ -70,7 +70,7 @@ public class Authorizer {
             findFacility(t);
             if (t.getFacility() == null || t.getFacility().isEmpty()
                     || t.getStrategy() == null || t.getStrategy().isEmpty()) {
-                LOG.info("UUID not found in facmapper .ResponseType "+ResponseType.DECLINED);
+                LOG.info("UUID not found in facmapper .ResponseType "+t.getRrn());
                 t.setReasonCode(configurator.get("INVALID_UUID"));
                 t.setDescriptionField("INVALID_UUID");
                 t.setResponseType(ResponseType.DECLINED);
@@ -87,7 +87,7 @@ public class Authorizer {
                     && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
                 bTokenCall = tokenBusinessService.lookUpAccount(t);
                 if (!bTokenCall) {
-                    LOG.info("Token Not found.ResponseType"+ResponseType.DECLINED);
+                    LOG.info("Token Not found.ResponseType"+t.getRrn());
                     t.setReasonCode(configurator.get("TOKEN_NOTFOUND"));
                     t.setResponseType(ResponseType.DECLINED);
                     t.setDescriptionField("TOKEN_NOTFOUND");
@@ -131,7 +131,7 @@ public class Authorizer {
                         LOG.info("No record found.");
                     }
                 }
-                LOG.info("Transaction not found. So processing to find Strategy ");
+                LOG.info("Transaction not found. So processing to find Strategy "+t.getRrn());
                 BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
                 if (baseStrategy != null) {
                     Transaction authTran = checkReversalTransaction(t);
@@ -139,7 +139,7 @@ public class Authorizer {
                             || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
                             && (t.getReversal() != null
                             && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL))) {
-                        LOG.info("Don't call Vision / SVS for MilStar / GiftCard Reversals.");
+                        LOG.info("Don't call Vision / SVS for MilStar / GiftCard Reversals." +t.getRrn());
                     } else {
                         t = baseStrategy.processRequest(t);
                     }
@@ -151,13 +151,12 @@ public class Authorizer {
                         authTran.setReversal(RequestType.REVERSAL);
                         tranRepository.saveAndUpdate(t, authTran);
                     } else {
-                        LOG.info("Saving transaction.....");
+                        LOG.info("Saving transaction....."+t.getRrn());
                         encryptValues(t);
                         tranRepository.save(t);
                     }
                 } else {
                     // TODO: Confirm response description
-                    LOG.info("Responce declained due to invalid uuid.ResponseType" + ResponseType.DECLINED);
                     t.setReasonCode(configurator.get("INVALID_UUID"));
                     t.setDescriptionField("INVALID_UUID");
                     t.setResponseType(ResponseType.DECLINED);
@@ -165,7 +164,7 @@ public class Authorizer {
                     return cm;
                 }
             } else {
-                LOG.info("Transaction found. So replying from the cache...");
+                LOG.info("Transaction found. So replying from the cache..."+t.getRrn());
                 isDuplicateTransaction = true;
                 mapResponse(storedTran, cm);
             }
@@ -175,10 +174,9 @@ public class Authorizer {
             t.setDescriptionField(e.getMessage());
             t.setResponseType(ResponseType.DECLINED);
             mapResponse(t, cm);
-            LOG.error("Exception caught" + e.toString()+".ResponseType :"+ResponseType.DECLINED);
             return cm;
         } catch (ProcessingException e) {
-            LOG.error("Exception caught" + e.toString() + "TOKENIZER_CONNECTION_ERROR");
+            LOG.error("Exception caught" + e.toString() );
             t.setReasonCode(configurator.get("TOKENIZER_CONNECTION_ERROR"));
             t.setDescriptionField("TOKENIZER_CONNECTION_ERROR");
             t.setResponseType(ResponseType.DECLINED);
@@ -199,7 +197,7 @@ public class Authorizer {
             mapResponse(t, cm);
             return cm;
         }
-        LOG.info("Authorizer.authorize method ended");
+        LOG.info("Authorizer.authorize method exit");
         return cm;
     }
 
@@ -210,7 +208,7 @@ public class Authorizer {
         if (t.getReversal() != null
                 && t.getReversal().equalsIgnoreCase(RequestType.SALE)) {
 
-            LOG.info("Reversal request.......");
+            LOG.info("Reversal request......."+t.getRrn());
 
             if (MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia())) {
 

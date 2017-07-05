@@ -43,7 +43,7 @@ public class GatewayFactory {
             = LoggerFactory.getLogger(GatewayFactory.class.getSimpleName());
 
     public Gateway pickGateway(Transaction t) {
-        LOG.info("Gatewayfacory's pickGateway method is started");
+        LOG.info("Gatewayfacory's pickGateway method is started" +t.getRrn());
         Gateway gateway = null;
         String mediaType = t.getMedia();
 
@@ -76,8 +76,8 @@ public class GatewayFactory {
                 // Add more gateways
             }
         }
-        LOG.debug("RRN number in Gatewayfacory.pickGateway is : "+t.getRrn());
-        LOG.info("gatewayfacory pick gateway method is ended");
+        LOG.info("Gatewayfacory.pickGateway exit : "+t.getRrn());
+        
         return null;
     }
 

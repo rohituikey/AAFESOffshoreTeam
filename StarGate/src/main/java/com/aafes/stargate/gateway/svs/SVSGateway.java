@@ -34,7 +34,6 @@ public class SVSGateway extends Gateway {
     public Transaction processMessage(Transaction t) {
 
         try {
-            LOG.info("processMessage method started in class SVSGateway ");
             boolean validateTransactionFlg = this.validateTransaction(t);
             if (validateTransactionFlg) {
                 if (svsgp != null) {
@@ -49,11 +48,10 @@ public class SVSGateway extends Gateway {
                 return t;
             }
         } catch (GatewayException e) {
-            LOG.error(e.toString()+"responceTYpe is DECLINED");
+            LOG.error(e.toString());
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField(e.getMessage());
         }
-        LOG.debug("rrn number SVSGateway.processMessage is "+t.getRrn());
         LOG.info("processMessage method ended in class SVSGateway ");
         return t;
     }
@@ -72,6 +70,8 @@ public class SVSGateway extends Gateway {
 //                return false;
 //            }
         }
+
+
         LOG.info("Method validateTransaction ended. Class Name SVSGateway");
         return true;
     }
@@ -80,7 +80,6 @@ public class SVSGateway extends Gateway {
         t.setReasonCode(reasonCode);
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
-        LOG.error("Exception/Error occured . ResponseType is :"+ResponseType.DECLINED+".description : "+description);
     }
 
     public void setSvsgp(SVSGatewayProcessor svsgp) {

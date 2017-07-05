@@ -34,7 +34,7 @@ public class TokenBusinessService {
         } else {
             return false;
         }
-        log.debug("rrn number in TokenBusinessService#lookup is : "+t.getRrn());
+        log.info("rrn number in TokenBusinessService#lookup is : "+t.getRrn());
         log.info("TokenBusinessService#lookup#End.......");
         return true;
     }
@@ -43,9 +43,8 @@ public class TokenBusinessService {
 
         log.info("TokenBusinessService#modifyTran#Start.......");
         String token = tokenEndPointService.issueToken(t);
-        log.info(token);
         t.setTokenId(token);
-        log.debug("rrn number in TokenBusinessService.issueToken is :"+t.getRrn());
+        log.info("rrn number in TokenBusinessService.issueToken is :"+token +"RRN Number"+t.getRrn());
         log.info("TokenBusinessService#modifyTran#end.......");
     }
 

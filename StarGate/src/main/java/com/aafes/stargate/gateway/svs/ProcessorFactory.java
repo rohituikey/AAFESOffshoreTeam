@@ -41,7 +41,7 @@ public class ProcessorFactory {
         String requestType = t.getRequestType();
 
         if (requestType != null) {
-        log.info("ProcessorFactory.pickProcessor's requestType is : "+requestType);
+        log.info("ProcessorFactory.pickProcessor's requestType is : "+requestType +":RRN Numebr"+t.getRrn());
             switch (requestType) {
 
                 case RequestType.INQUIRY:
@@ -73,7 +73,7 @@ public class ProcessorFactory {
                     log.info("No Matching request type found.");
             }
         }
-        log.debug("rrn number in ProcessorFactory.pickProcessor's is:"+t.getRrn());
+        log.info("rrn number in ProcessorFactory.pickProcessor's is:"+t.getRrn());
         return processor;
     }
 

@@ -71,7 +71,7 @@ public class CreditMessageResource {
     @Consumes("application/xml")
     @Produces("application/xml")
     public String postXml(String requestXML, @HeaderParam("tokenId") String tokenId) {
-        LOG.info("CreditMessage Resource.postXml method is started");
+        LOG.info("CreditMessage Resource.postXml entry ");
         String responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error></ErrorInformation>";
         boolean tokenValidateFlg = false;
         String uuid = "";
@@ -104,12 +104,12 @@ public class CreditMessageResource {
                 LOG.error("Invalid Request: tokenId not present in request header.");
             }
         } catch (JAXBException | SAXException e) {
-            LOG.error(e.toString() + "JAXBException or SAXException ");
+            LOG.error(e.toString());
         } catch (Exception ex) {
             Logger.getLogger(CreditMessageResource.class.getName()).log(Level.SEVERE, null, ex);
             LOG.error(ex.toString());
         }
-        LOG.info("CreditMessage Resource.postXml method ended and returned the responce xml");
+        LOG.info("CreditMessage Resource.postXml exit.");
         return responseXML;
     }
 

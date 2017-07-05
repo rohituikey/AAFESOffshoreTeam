@@ -22,8 +22,7 @@ public class MPGStrategy extends BaseStrategy {
 
     @Override
     public Transaction processRequest(Transaction t) {
-        LOG.info(" MPGStrategy class ,process requst method is started");
-
+        LOG.info("MPGStrategy.processRequest Entry ..."+t.getRrn());
         boolean mpgFieldsValid = this.validateMPGFields(t);
         if (!mpgFieldsValid) {
             return t;
@@ -34,8 +33,7 @@ public class MPGStrategy extends BaseStrategy {
         if (gateway != null) {
             t = gateway.processMessage(t);
         }
-        LOG.debug("rrn number in MPGStrategy.processRequst is : "+t.getRrn());
-        LOG.info(" MPGStrategy class ,process requst method is ended");
+        LOG.info("MPGStrategy.processRequest Exit ..."+t.getRrn());
         return t;
     }
 

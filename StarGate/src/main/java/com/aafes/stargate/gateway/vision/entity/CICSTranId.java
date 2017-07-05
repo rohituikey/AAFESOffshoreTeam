@@ -1,5 +1,7 @@
-///*
-// * To change this license header, choose License Headers in Project Properties.
+package com.aafes.stargate.gateway.vision.entity;
+
+/**
+  To change this license header, choose License Headers in Project Properties.
 // * To change this template file, choose Tools | Templates
 // * and open the template in the editor.
 // */
@@ -10,8 +12,9 @@
 ///**
 // *
 // * @author nguyentul
-// */
-//final public class CICSTranId {
+ 
+ 
+final public class CICSTranId {
 //    
 //    public static final String DEFAULT = "ROMQ";
 //    public static final String INTERNET = "INMQ";
@@ -22,4 +25,4 @@
 //    public static final String MCSS = "MCMQ";
 //    public static final String NEXCOM = "NXMQ";
 //    
-//}
+}

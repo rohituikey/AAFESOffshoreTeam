@@ -31,7 +31,7 @@ public class VisionGatewayStub extends Gateway {
             t.setResponseType(ResponseType.DECLINED);
             t.setReasonCode("200");
         }
-        LOGGER.debug("rrn number is "+t.getRrn());
+        LOGGER.debug("rrn number in VisionGatewayStub.processMessage is : "+t.getRrn());
         return t;
     }
     

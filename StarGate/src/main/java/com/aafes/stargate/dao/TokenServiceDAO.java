@@ -10,11 +10,9 @@ import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.validatetoken.CrosssiteRequestTokenTable;
 import com.aafes.stargate.validatetoken.CrosssiteRequestUsertable;
 import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
-import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -58,7 +56,7 @@ public class TokenServiceDAO {
         } finally {
         }
         LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        LOG.debug("uuid is .."+tokenObj.getIdentityuuid());
+        LOG.debug("uuid in TokenServiceDAO.insertTokenDetails  is :"+tokenObj.getIdentityuuid());
         return dataInsertedFlg;
     }
 
@@ -73,7 +71,7 @@ public class TokenServiceDAO {
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         } finally {
         }
-        LOG.debug("");
+        LOG.debug("Uuid in TokenServiceDAO.validateToken is :"+identityUuid);
         return tokenObjLocal;
     }
 
@@ -102,7 +100,7 @@ public class TokenServiceDAO {
         } finally {
         }
         LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        LOG.debug("Method " + sMethodName + "uuid no--" + identityUuid + "( " + " Class Name " + CLASS_NAME);
+        LOG.debug("Method " + sMethodName  +  " , Class Name " + CLASS_NAME + "uuid nois : " + identityUuid);
         return dataInsertedFlg;
     }
 

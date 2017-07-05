@@ -33,8 +33,8 @@ public class MPGStrategy extends BaseStrategy {
         Gateway gateway = super.pickGateway(t);
         if (gateway != null) {
             t = gateway.processMessage(t);
-
         }
+        LOG.debug("rrn number in MPGStrategy.processRequst is : "+t.getRrn());
         LOG.info(" MPGStrategy class ,process requst method is ended");
         return t;
     }

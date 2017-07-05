@@ -30,10 +30,9 @@ public class SVSFinalAuthProcessor extends Processor {
     private static final org.slf4j.Logger LOGGER
             = LoggerFactory.getLogger(SVSFinalAuthProcessor.class.getSimpleName());
 
-
     @Override
     public void processRequest(Transaction transaction) {
-        LOGGER.info("Gift Card Request Type : " + transaction.getRequestType());
+        LOGGER.info("SVSFinalAuthProcessor.processRequest is started");
 
         try {
             SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
@@ -48,11 +47,9 @@ public class SVSFinalAuthProcessor extends Processor {
             request.setCard(card);
             request.setDate(SvsUtil.formatLocalDateTime());
 
-         
             request.setCheckForDuplicate(StarGateConstants.TRUE);
 
             //request.setStan(transaction.getSTAN());
-
             //Merchant details 
             Merchant merchant = new Merchant();
             merchant.setDivision(StarGateConstants.MERCHANT_DIVISION_NUMBER);
@@ -63,8 +60,8 @@ public class SVSFinalAuthProcessor extends Processor {
 
             request.setRoutingID(StarGateConstants.ROUTING_ID);
             double amt = transaction.getAmount();
-            amt = amt/100;
-            
+            amt = amt / 100;
+
             Amount amount = new Amount();
             amount.setCurrency(StarGateConstants.CURRENCY);
             amount.setAmount(amt);
@@ -73,36 +70,38 @@ public class SVSFinalAuthProcessor extends Processor {
             //invoice number should be last 8 digits of order Number
             request.setInvoiceNumber(transaction.getOrderNumber().substring(transaction.getOrderNumber().length() - 8));
             LOGGER.debug("Amount Details : " + amount.getCurrency() + amount.getAmount() + "Transacion ID: " + transaction.getTransactionId() + " Invoice Number : " + request.getInvoiceNumber());
-            
+
             PreAuthCompleteResponse response = sVSXMLWay.preAuthComplete(request);
-            
-            if(null!=response.getReturnCode())
-            {
-            transaction.setReasonCode(response.getReturnCode().getReturnCode());
-            if(transaction.getReasonCode().equalsIgnoreCase("01"))
-                    {
-                        transaction.setResponseType(ResponseType.APPROVED);
-                    } else {
-                        transaction.setResponseType(ResponseType.DECLINED);
-                    }
-            transaction.setDescriptionField(response.getReturnCode().getReturnDescription());
+
+            if (null != response.getReturnCode()) {
+                LOGGER.debug("Approved Amount Details : " + amount.getCurrency() + response.getApprovedAmount()+"response : Authorization code :" + response.getAuthorizationCode());
+                transaction.setReasonCode(response.getReturnCode().getReturnCode());
+                if (transaction.getReasonCode().equalsIgnoreCase("01")) {
+                    transaction.setResponseType(ResponseType.APPROVED);
+                } else {
+                    transaction.setResponseType(ResponseType.DECLINED);
+                }
+                transaction.setDescriptionField(response.getReturnCode().getReturnDescription());
             }
-            transaction.setAuthNumber(response.getAuthorizationCode());            
+            transaction.setAuthNumber(response.getAuthorizationCode());
             //approved amount
-            if(response.getApprovedAmount()!=null)
-            transaction.setAmtPreAuthorized((long)(response.getApprovedAmount().getAmount()*100));
+            if (response.getApprovedAmount() != null) {
+                transaction.setAmtPreAuthorized((long) (response.getApprovedAmount().getAmount() * 100));
+            }
             //balance amount
-            if(response.getBalanceAmount()!=null)
-            transaction.setBalanceAmount((long) (response.getBalanceAmount().getAmount()*100));
+            if (response.getBalanceAmount() != null) {
+                transaction.setBalanceAmount((long) (response.getBalanceAmount().getAmount() * 100));
+            }
             transaction.setCurrencycode(StarGateConstants.CURRENCY);
-            if(response.getCard().getCardNumber()!=null)
-            transaction.setCardReferenceID(response.getCard().getCardNumber());
-           
-            LOGGER.info("response : Authorization code :" + response.getAuthorizationCode());
+            if (response.getCard().getCardNumber() != null) {
+                transaction.setCardReferenceID(response.getCard().getCardNumber());
+            }
         } catch (Exception e) {
             LOGGER.error("responce is null and Unexpected exception: " + e.getMessage());
-            throw new GatewayException ("INTERNAL SYSTEM ERROR");
-            
-        }LOGGER.debug("rrn number is--"+transaction.getRrn());
+            throw new GatewayException("INTERNAL SYSTEM ERROR");
+
+        }
+        LOGGER.debug("rrn number in SVSFinalAuthProcessor.processRequest  is :" + transaction.getRrn());
+        LOGGER.info("SVSFinalAuthProcessor.processRequest is ended");
     }
 }

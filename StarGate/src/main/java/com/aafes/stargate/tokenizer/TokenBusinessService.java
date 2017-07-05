@@ -34,7 +34,8 @@ public class TokenBusinessService {
         } else {
             return false;
         }
-        log.debug("rrn number is "+t.getRrn());
+        log.debug("rrn number in TokenBusinessService#lookup is : "+t.getRrn());
+        log.info("TokenBusinessService#lookup#End.......");
         return true;
     }
 
@@ -44,7 +45,8 @@ public class TokenBusinessService {
         String token = tokenEndPointService.issueToken(t);
         log.info(token);
         t.setTokenId(token);
-        log.debug("rrn number is "+t.getRrn());
+        log.debug("rrn number in TokenBusinessService.issueToken is :"+t.getRrn());
+        log.info("TokenBusinessService#modifyTran#end.......");
     }
 
     public void setTokenEndPointService(TokenEndPointService service) {

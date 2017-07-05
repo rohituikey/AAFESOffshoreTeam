@@ -3,7 +3,6 @@ package com.aafes.stargate.gateway.vision;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Configurator;
-import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.Gateway;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.MediaType;
@@ -73,7 +72,7 @@ public class VisionGateway extends Gateway {
         t.setResponseType(ResponseType.APPROVED);
         t.setAuthNumber("123456");
         validateResponse(t);
-        LOG.debug("rrn number is "+t.getRrn());
+        LOG.debug("rrn number in process messageisiongateway.processMessage is : "+t.getRrn());
         LOG.info("visiongateway process message method ended");
         return t;
     }
@@ -151,7 +150,7 @@ public class VisionGateway extends Gateway {
 //                    || t.getCvv().length() <= 2) {
 //                throw new GatewayException("INVALID_CVV");
 //            }
-        LOG.debug("rrn number is."+t.getRrn());
+        LOG.debug("rrn number in VisionGateway.validateTransaction is : "+t.getRrn());
         LOG.info("VisionGateway.validateTransaction method is ended");
 
     }
@@ -168,7 +167,6 @@ public class VisionGateway extends Gateway {
     }
 
     private void validateResponse(Transaction t) {
-        LOG.info("VisionGateWay.validateResponce is started");
         if (("SALE".equalsIgnoreCase(t.getRequestType())) && t.getResponseType().equalsIgnoreCase(ResponseType.DECLINED)
                 && ("130".equalsIgnoreCase(t.getReasonCode())
                 || "99".equalsIgnoreCase(t.getReasonCode())
@@ -176,6 +174,5 @@ public class VisionGateway extends Gateway {
             t.setResponseType(ResponseType.TIMEOUT);
             t.setDescriptionField("Connection TimeOut");
         }
-        LOG.info("VisionGateWay.validateResponce is started");
     }
 }

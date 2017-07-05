@@ -38,7 +38,7 @@ public class VisionPlusProcessor {
             LOG.error(ex.toString());
             java.util.logging.Logger.getLogger(VisionPlusProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
-        LOG.debug("rrn number is"+ t.getRrn());
+        LOG.debug("rrn number in VisionPlusProcessor.authorize is"+ t.getRrn());
         LOG.info("VisionPlusProcessor.authorize is ended");
         return t;
     }

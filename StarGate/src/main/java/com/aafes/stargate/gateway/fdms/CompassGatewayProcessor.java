@@ -38,9 +38,6 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class CompassGatewayProcessor {
 
-    private static final org.slf4j.Logger log
-            = LoggerFactory.getLogger(CompassGatewayProcessor.class.getSimpleName());
-
     @Inject
     private String compassUser;
 
@@ -59,9 +56,9 @@ public class CompassGatewayProcessor {
     private final static QName CMPWSAPISERVICE_QNAME = new QName("http://firstdata.com/cmpwsapi/schemas/cmpapi", "CMPWSApiService");
 
     OnlineTransResponse result = new OnlineTransResponse();
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(CompassGatewayProcessor.class.getSimpleName());
 
     public CompassGatewayProcessor() {
-
     }
 
     @PostConstruct
@@ -69,22 +66,17 @@ public class CompassGatewayProcessor {
         try {
             log.info("Decrypting passwords");
             decryptValues();
-
         } catch (Exception ex) {
             log.error("Unable to Decrypt values" + ex.getMessage());
         }
     }
 
     @SuppressWarnings("UnusedAssignment")
-    public com.aafes.stargate.authorizer.entity.Transaction
-            execute(com.aafes.stargate.authorizer.entity.Transaction t) {
-
+    public com.aafes.stargate.authorizer.entity.Transaction execute(com.aafes.stargate.authorizer.entity.Transaction t) {
+            log.info("CompassGatewayProcessor#execute.....started..");
         try {
 
-            log.info("CompassGatewayProcessor#execute.....started..");
-
             OnlineTransRequest otr = formOnlineTransRequest(t);
-
             log.info("CompassGatewayProcessor#execute#OnlineTransResponse......");
             /**
              * SOAP calling logic
@@ -160,7 +152,6 @@ public class CompassGatewayProcessor {
             String[] dates = {t.getExpiration().substring(0, 2), t.getExpiration().substring(2)};
             soapTran.setExpirationDate(dates[1] + dates[0]);
         }
-
         String divisionNumber = String.format("%010d", 805602);
         t.setDivisionnumber(divisionNumber);
         soapTran.setDivisionNumber(divisionNumber);
@@ -179,7 +170,7 @@ public class CompassGatewayProcessor {
         String transactionType = "7";
         t.setTransactiontype(transactionType);
         soapTran.setTransactionType(transactionType);
-
+        
         OnlineAF oaf = new OnlineAF();
         String actionCode = "";
 
@@ -187,9 +178,7 @@ public class CompassGatewayProcessor {
 
         if (t.getReversal() != null
                 && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
-
             log.info("FDMS Reversal request.......");
-
             actionCode = "AR";
             t.setActioncode(actionCode);
             soapTran.setActionCode(actionCode);
@@ -200,9 +189,7 @@ public class CompassGatewayProcessor {
             pa.setAuthorizationCode(t.getAuthNumber());
             oaf.setPA(pa);
         } else {
-
             log.info("FDMS Auth request.......");
-
             actionCode = "AU";
             t.setActioncode(actionCode);
             soapTran.setActionCode(actionCode);
@@ -221,9 +208,7 @@ public class CompassGatewayProcessor {
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
                     log.info("FDMS Auth request Array Index Outr of bounds exception.......");
-
                 }
-
                 ab.setNameText(cardHolderName.toUpperCase());
             }
             if (t.getBillingPhone() != null
@@ -271,17 +256,15 @@ public class CompassGatewayProcessor {
                 fr.setCardSecurityPresence(cardSecurityPresence);
                 oaf.setFR(fr);
             }
-
         }
-
         otr.setAdditionalFormats(oaf);
-
         otr.setTransaction(soapTran);
         log.info("compassgateway processor's formOnlineTransRequest method started");
         return otr;
     }
 
     private String mapRequestTypeToMop(String mediaType) {
+        log.info("CompassGatewayProcessor.mapRequestTypeToMap mediaType is : "+mediaType);
         switch (mediaType.toUpperCase()) {
             case "VISA":
                 return "VI";
@@ -329,8 +312,8 @@ public class CompassGatewayProcessor {
         this.compassPassword = compassPassword;
     }
 
-    private void mapResponse(OnlineTransResponse result,
-            com.aafes.stargate.authorizer.entity.Transaction t) {
+    private void mapResponse(OnlineTransResponse result,com.aafes.stargate.authorizer.entity.Transaction t) {
+        log.info("CompassGatewayProcessor.mapResponce started");
         log.info("result.getResponseReasonCode() : " + result.getResponseReasonCode());
 
         t.setReasonCode(result.getResponseReasonCode());
@@ -343,7 +326,6 @@ public class CompassGatewayProcessor {
         } else {
             t.setAvsResponseCode(AVSResponseReasonCode.NOTVERIFIED);
         }
-
         t.setCsvResponseCode(result.getCSVResponseCode());
 
         if (t.getReasonCode().equalsIgnoreCase("100")) {
@@ -353,6 +335,7 @@ public class CompassGatewayProcessor {
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField(ResponseType.DECLINED);
         }
+        log.info("CompassGatewayProcessor.mapResponce ended");
     }
 
     /**

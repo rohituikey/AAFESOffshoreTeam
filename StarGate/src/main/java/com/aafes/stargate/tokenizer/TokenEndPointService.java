@@ -5,7 +5,6 @@
  */
 package com.aafes.stargate.tokenizer;
 
-
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.token.AccountTypeType;
 import com.aafes.token.RequestTypeType;
@@ -28,14 +27,10 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class TokenEndPointService {
     
-    
     @Inject
     private String tokenEndpoint;
     
-    
-     private static final org.slf4j.Logger log
-            = LoggerFactory.getLogger(TokenEndPointService.class.getSimpleName());
-    
+     private static final org.slf4j.Logger log = LoggerFactory.getLogger(TokenEndPointService.class.getSimpleName());
     
     public String lookupAccount(Transaction t) throws ProcessingException{
        log.info("TokenServicer#lookupAccount#Start.......");
@@ -55,7 +50,6 @@ public class TokenEndPointService {
         tm.setRequest(request);
       //  request.set
         Entity entity = Entity.entity(tm, MediaType.APPLICATION_XML);
-         
         Response response = target.request(MediaType.APPLICATION_XML).post(entity);
          
         tm = response.readEntity(TokenMessage.class);    
@@ -63,12 +57,10 @@ public class TokenEndPointService {
         if(tm.getResponse() != null) {
             return tm.getResponse().getAccount();
         }
-        log.debug("rrn number is "+t.getRrn());
+        log.debug("rrn number in TokenServicer#lookupAccount is : "+t.getRrn());
                log.info("TokenServicer#lookupAccount#ENDED.........");
         return "";
-       
     }
-    
     
     public String issueToken(Transaction t) throws ProcessingException{
         log.info("TokenServicer#issueToken#Start.......");
@@ -88,14 +80,13 @@ public class TokenEndPointService {
         request.setTokenBankName(t.getTokenBankName());
         tm.setRequest(request);
         Entity entity = Entity.entity(tm, MediaType.APPLICATION_XML);
-         
         Response response = target.request(MediaType.APPLICATION_XML).post(entity);
          
         tm = response.readEntity(TokenMessage.class);       
         if(tm.getResponse() != null) {
             return tm.getResponse().getAccount();
         }
-        log.debug("rrn number is "+t.getRrn());  
+        log.debug("rrn number in TokenServicer#issueToken is : "+t.getRrn());  
         log.info("TokenServicer#issueToken#END.......");
         return "";
        

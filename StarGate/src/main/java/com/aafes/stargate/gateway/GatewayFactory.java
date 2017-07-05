@@ -43,42 +43,40 @@ public class GatewayFactory {
             = LoggerFactory.getLogger(GatewayFactory.class.getSimpleName());
 
     public Gateway pickGateway(Transaction t) {
-        LOG.info("gatewayfacory's pick gateway method is started");
+        LOG.info("Gatewayfacory's pickGateway method is started");
         Gateway gateway = null;
         String mediaType = t.getMedia();
 
         if (mediaType == null || mediaType.isEmpty()) {
             mediaType = GetMediaTypeByAccountNbr.getCardType(t.getAccount());
         }
-
         System.out.println(mediaType);
         if (mediaType != null) {
             t.setMedia(mediaType);
+            LOG.info("Gatewayfacory.pickGateway media type is :"+mediaType);
             switch (mediaType) {
                 case MediaType.MIL_STAR:
                     if (enableStub != null && enableStub.equalsIgnoreCase("true")) {
-                        LOG.info("MediaType is MIL_STAR ..stub is enabled so processing visionGatewaySimulator");
                         gateway = visionGatewaySimulator;
                     } else {
-                        LOG.info("MediaType is MIL_STAR ..stub is disabled so processing visionGateway");
                         gateway = visionGateway;
                     }
                     return gateway;
+                    
                 case MediaType.VISA:
                 case MediaType.MASTER:
                 case MediaType.DISCOVER:
                 case MediaType.AMEX:
-                    LOG.info("MediaType is visa/master/discover/amex ..  processing compassGateway");
                     gateway = compassGateway;
                     return gateway;
 
                 case MediaType.GIFT_CARD:
                     gateway = sVSGateway;
-                    LOG.info("MediaType is giftcard ..  processing sVSGateway");
                     return gateway;
                 // Add more gateways
             }
         }
+        LOG.debug("RRN number in Gatewayfacory.pickGateway is : "+t.getRrn());
         LOG.info("gatewayfacory pick gateway method is ended");
         return null;
     }

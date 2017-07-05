@@ -18,8 +18,7 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class ProcessorFactory {
 
-    private static final org.slf4j.Logger log
-            = LoggerFactory.getLogger(ProcessorFactory.class.getSimpleName());
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(ProcessorFactory.class.getSimpleName());
 
     @EJB
     private BalanceInquiryProcessor balanceInquiryProcessor;
@@ -42,48 +41,39 @@ public class ProcessorFactory {
         String requestType = t.getRequestType();
 
         if (requestType != null) {
-
+        log.info("ProcessorFactory.pickProcessor's requestType is : "+requestType);
             switch (requestType) {
 
                 case RequestType.INQUIRY:
-                    log.info("processing balanceInquiryProcessor");
                     processor = balanceInquiryProcessor;
                     break;
                 case RequestType.PREAUTH:
-                    log.info("processing preAuthorizationProcessor");
                     processor = preAuthorizationProcessor;
                     break;
                 case RequestType.FINAL_AUTH:
-                    log.info("processing sVSFinalAuthProcessor");
                     processor = sVSFinalAuthProcessor;
                     break;
                 case RequestType.REVERSAL:
                     // Future
                     break;
                 case RequestType.REFUND:
-                    log.info("processing merchandiseReturnMessageProcessor");
                     processor = merchandiseReturnMessageProcessor;
                     break;
                 case RequestType.ISSUE:
-                    log.info("processing issueProcessor");
                     processor = issueProcessor;
                     break;
                 //added
                 case RequestType.NETWORK:
-                    log.info("processing networkMessageProcessor");
                     processor = networkMessageProcessor;
                     break;
                 case RequestType.REDEMPTION:
-                    log.info("processing redemptionProcessor");
                     processor = redemptionProcessor;
                     break;
-
                 default:
                     log.info("No Matching request type found.");
-
             }
-        }log.debug("rrn number is"+t.getRrn());
-
+        }
+        log.debug("rrn number in ProcessorFactory.pickProcessor's is:"+t.getRrn());
         return processor;
     }
 

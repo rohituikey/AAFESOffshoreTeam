@@ -8,7 +8,6 @@ package com.aafes.stargate.gateway.svs;
 import com.aafes.stargate.authorizer.entity.GiftCard;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.dao.SVSDAO;
-import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,7 +51,6 @@ public class SVSGatewayProcessor {
 
     private void processBalanceInquiry(Transaction t) {
         log.info("processing BalanceInquiry.......");
-
         GiftCard giftCard = svsdao.find(t.getAccount(), t.getGcpin());
 
         if (giftCard == null) {

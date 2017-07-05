@@ -26,13 +26,12 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class RedemptionProcessor extends Processor {
 
-    private static final org.slf4j.Logger log
-            = LoggerFactory.getLogger(RedemptionProcessor.class.getSimpleName());
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(RedemptionProcessor.class.getSimpleName());
 
     @Override
     public void processRequest(Transaction t) {
         try {
-            log.info("Method...... " + "processRedemptionRequest.......");
+            log.info("RedemptionProcessor.processRequest  is started");
 
             RedemptionRequest redemptionRequest = new RedemptionRequest();
             Amount amount = new Amount();
@@ -70,9 +69,8 @@ public class RedemptionProcessor extends Processor {
             SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
             RedemptionResponse redemptionResponse = sVSXMLWay.redemption(redemptionRequest);
 
-            log.debug("RESPONSE---->AuthorizationCode " + redemptionResponse.getAuthorizationCode() + "||AMOUNT " + redemptionResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + redemptionResponse.getReturnCode().getReturnCode() + "||RETURN  CODE  DISCRIPTION " + redemptionResponse.getReturnCode().getReturnDescription());
             if (redemptionResponse != null) {
-
+                log.debug("RESPONSE---->AuthorizationCode " + redemptionResponse.getAuthorizationCode() + "||AMOUNT " + redemptionResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + redemptionResponse.getReturnCode().getReturnCode() + "||RETURN  CODE  DISCRIPTION " + redemptionResponse.getReturnCode().getReturnDescription());
                 t.setBalanceAmount((long) redemptionResponse.getApprovedAmount().getAmount());
                 t.setCurrencycode(StarGateConstants.CURRENCY);
 
@@ -90,10 +88,11 @@ public class RedemptionProcessor extends Processor {
                 }
             }
         } catch (Exception e) {
-            log.error(("Error in processBalanceInquiry method i.e responce is null" + e));
+            log.error(("Error in RedemptionProcessor.processRequest i.e responce is null" + e));
             throw new GatewayException("INTERNAL SERVER ERROR");
         }
-        log.debug("rrn number is--" + t.getRrn());
+        log.debug("rrn number in RedemptionProcessor.processRequest  is :" + t.getRrn());
+        log.info("RedemptionProcessor.processRequest  is ended");
     }
 
 }

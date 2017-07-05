@@ -71,7 +71,6 @@ public class TokenGeneratorService {
 
     @EJB
     private TokenServiceDAO tokenServiceDAO;
-
     private CrosssiteRequestTokenTable tokenObj;
     private CrosssiteRequestUsertable tokenUserDetObj;
 
@@ -93,7 +92,7 @@ public class TokenGeneratorService {
     public String postXml(String requestXML) {
         sMethodName = "postXml";
         boolean validateUserFlg = false;
-        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        LOG.info("Method " + sMethodName + " started." + "in  Class Name " + CLASS_NAME);
 
         String responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error></ErrorInformation>";
         try {
@@ -131,7 +130,7 @@ public class TokenGeneratorService {
 
     private Message unmarshalWithValidation(String xml) throws SAXException, JAXBException {
         sMethodName = "unmarshalWithValidation";
-        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        LOG.info("Method " + sMethodName + " started." + "in  Class Name " + CLASS_NAME);
         Message request = new Message();
         StringReader reader = new StringReader(xml);
         JAXBContext jaxbContext = JAXBContext.newInstance(Message.class);
@@ -155,7 +154,6 @@ public class TokenGeneratorService {
 
     private static String FilterRequestXML(String xmlString) {
         LOG.info("Method FilterRequestXML started. Class Name TokenGeneratorService");
-
         String retString = null;
         try {
             StringReader reader = new StringReader(xmlString);
@@ -227,7 +225,7 @@ public class TokenGeneratorService {
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOG.info("Method " + sMethodName + " ENDED." + " Class Name " + CLASS_NAME);
-        LOG.debug("uuid no is.." + requestMessage.getHeader().getIdentityUUID());
+        LOG.debug("uuid no in"+CLASS_NAME+"."+sMethodName+"  is : " + requestMessage.getHeader().getIdentityUUID());
         return tokenNumber;
     }
 
@@ -270,6 +268,7 @@ public class TokenGeneratorService {
             }
         } catch (Exception ex) {
             Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
+            LOG.error(ex.toString());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOG.debug("uuid no is.." + requestMessage.getHeader().getIdentityUUID());

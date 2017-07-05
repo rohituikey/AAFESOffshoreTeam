@@ -53,6 +53,7 @@ public class SVSGateway extends Gateway {
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField(e.getMessage());
         }
+        LOG.debug("rrn number SVSGateway.processMessage is "+t.getRrn());
         LOG.info("processMessage method ended in class SVSGateway ");
         return t;
     }
@@ -71,8 +72,6 @@ public class SVSGateway extends Gateway {
 //                return false;
 //            }
         }
-
-
         LOG.info("Method validateTransaction ended. Class Name SVSGateway");
         return true;
     }
@@ -81,6 +80,7 @@ public class SVSGateway extends Gateway {
         t.setReasonCode(reasonCode);
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
+        LOG.error("Exception/Error occured . ResponseType is :"+ResponseType.DECLINED+".description : "+description);
     }
 
     public void setSvsgp(SVSGatewayProcessor svsgp) {

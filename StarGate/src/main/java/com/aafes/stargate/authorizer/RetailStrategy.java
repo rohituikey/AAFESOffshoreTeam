@@ -67,7 +67,6 @@ public class RetailStrategy extends BaseStrategy {
 
             // Send transaction to Gateway. 
             Gateway gateway = super.pickGateway(t);
-
             if (t.getReversal() != null && t.getReversal().equalsIgnoreCase(RequestType.SALE)) {
                 t.setRequestType(RequestType.REFUND);
                 if (gateway != null) {
@@ -102,17 +101,13 @@ public class RetailStrategy extends BaseStrategy {
             buildErrorResponse(t, "", e.getMessage());
             return t;
         }
+        LOG.debug("rrn number in REtailStrategy.processRequest is :  " + t.getRrn());
         LOG.info("REtailStrategy.processRequest is ended");
-        LOG.debug("rrn number is   " + t.getRrn());
         return t;
     }
 
     private SettleEntity findSettleEntity(Transaction t) {
-        LOG.info("REtailStrategy.findSettleEntity is started");
         SettleEntity settleEntity = settleMessageDAO.find(t.getIdentityUuid(), t.getOrderNumber(), t.getRrn(), t.getTransactionId());
-        LOG.info("REtailStrategy.findSettleEntity is ended");
-
-        LOG.debug("rrn number is   " + t.getRrn());
         return settleEntity;
     }
 
@@ -174,7 +169,7 @@ public class RetailStrategy extends BaseStrategy {
 
         settleEntityList.add(settleEntity);
         settleMessageDAO.save(settleEntityList);
-        LOG.debug("rrn number is" + t.getRrn());
+        LOG.debug("rrn number in RetailStrategy.saveTOSettle is: " + t.getRrn());
         LOG.info("RetailStrategy.saveTOSettle method is ended");
 
     }
@@ -192,7 +187,6 @@ public class RetailStrategy extends BaseStrategy {
             LOG.info("Validating fields if Swiped");
             if ((t.getTrack2() == null || t.getTrack2().trim().isEmpty())
                     && (t.getTrack1() == null || t.getTrack1().trim().isEmpty())) {
-                LOG.error("Track 1&2 data is null or INVALID_TRACK_DATA");
                 this.buildErrorResponse(t, "INVALID_TRACK_DATA", "INVALID_TRACK_DATA");
                 return false;
             }
@@ -205,7 +199,6 @@ public class RetailStrategy extends BaseStrategy {
                 this.buildErrorResponse(t, "INVALID_ACCOUNT_NUMBER", "INVALID_ACCOUNT_NUMBER");
                 return false;
             } else if (t.getExpiration() == null || t.getExpiration().trim().isEmpty()) {
-                LOG.info("Expiration date: " + t.getExpiration() + "  INVALID_EXPIRATION_DATE");
                 this.buildErrorResponse(t, "INVALID_EXPIRATION_DATE", "INVALID_EXPIRATION_DATE");
                 return false;
             }
@@ -231,14 +224,12 @@ public class RetailStrategy extends BaseStrategy {
         // Milstar transaction should have a Plan Number
         if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)) {
             if (PlanNbr == null || PlanNbr.equalsIgnoreCase("") || PlanNbr.trim().isEmpty()) {
-                LOG.error("INVALID_PLAN_NUMBER");
                 this.buildErrorResponse(t, "INVALID_PLAN_NUMBER", "INVALID_PLAN_NUMBER");
                 return false;
             }
         }
 
         if (t.getSettleIndicator() == null || !t.getSettleIndicator().equalsIgnoreCase(SettleConstant.TRUE)) {
-            LOG.error("INVALID_SETTLE_INDICATOR");
             this.buildErrorResponse(t, "INVALID_SETTLE_INDICATOR", "INVALID_SETTLE_INDICATOR");
             return false;
         }
@@ -250,6 +241,7 @@ public class RetailStrategy extends BaseStrategy {
         t.setReasonCode(configurator.get(reasonCode));
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
+        LOG.error("Exception/Error occured. reasonCode:" + reasonCode + " .description" + description);
     }
 
     private String getSystemDate() {

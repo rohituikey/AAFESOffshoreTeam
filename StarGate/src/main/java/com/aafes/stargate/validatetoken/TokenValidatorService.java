@@ -9,12 +9,9 @@ import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.dao.TokenServiceDAO;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.util.CreditMessageTokenConstants;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -31,7 +28,7 @@ public class TokenValidatorService {
     @EJB
     private Configurator configurator;
     
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TokenValidatorService.class.getSimpleName());
+        private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TokenValidatorService.class.getSimpleName());
     String sMethodName = "";
     final String CLASS_NAME = TokenValidatorService.this.getClass().getSimpleName();
 
@@ -74,6 +71,7 @@ public class TokenValidatorService {
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+        LOGGER.debug("uuid is"+identityUuid);
         return tokenValidateFlg;
     }
     
@@ -84,11 +82,12 @@ public class TokenValidatorService {
         try {
             if (null != tokenId) {
                 if (tokenServiceDAO == null)  setTokenServiceDAO(new TokenServiceDAO());
+                LOGGER.info("calling  TokenServiceDAO.updateTokenStatus to update the table");
                 tokenValidateFlg = tokenServiceDAO.updateTokenStatus(tokenStatus, tokenId, identityUuid);
             }
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
-            throw new GatewayException("INTERNAL SYSTEM ERROR");
+            throw new GatewayException("GatewayException-->INTERNAL SYSTEM ERROR during update the token");
         }
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         return tokenValidateFlg;

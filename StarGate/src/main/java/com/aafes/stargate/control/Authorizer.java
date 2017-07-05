@@ -14,7 +14,6 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.fdms.FDMSStub;
 import com.aafes.stargate.tokenizer.TokenBusinessService;
-import com.aafes.stargate.util.AVSResponseReasonCode;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
@@ -38,9 +37,6 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class Authorizer {
 
-    private static final org.slf4j.Logger LOG
-            = LoggerFactory.getLogger(Authorizer.class.getSimpleName());
-
     @EJB
     private TranRepository tranRepository;
     @EJB
@@ -61,8 +57,11 @@ public class Authorizer {
     private TransactionDAO transactionDAO;
 
     private boolean isDuplicateTransaction = false;
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Authorizer.class.getSimpleName());
 
     public Message authorize(Message cm) {
+
+        LOG.info("Authorizer.authorize method started");
         Transaction t = new Transaction();
         boolean bTokenCall = false;
         boolean bDoneMApreq = false;
@@ -79,6 +78,7 @@ public class Authorizer {
                 t.setDescriptionField("INVALID_UUID");
                 t.setResponseType(ResponseType.DECLINED);
                 mapResponse(t, cm);
+
                 return cm;
             }
 
@@ -166,6 +166,7 @@ public class Authorizer {
                     }
                 } else {
                     // TODO: Confirm response description
+                    LOG.info("Responce declained due to invalid uuid");
                     t.setReasonCode(configurator.get("INVALID_UUID"));
                     t.setDescriptionField("INVALID_UUID");
                     t.setResponseType(ResponseType.DECLINED);
@@ -186,14 +187,14 @@ public class Authorizer {
             mapResponse(t, cm);
             return cm;
         } catch (ProcessingException e) {
-            LOG.error("Exception caught" + e.toString());
+            LOG.error("Exception caught" + e.toString() + "TOKENIZER_CONNECTION_ERROR");
             t.setReasonCode(configurator.get("TOKENIZER_CONNECTION_ERROR"));
             t.setDescriptionField("TOKENIZER_CONNECTION_ERROR");
             t.setResponseType(ResponseType.DECLINED);
             mapResponse(t, cm);
             return cm;
         } catch (Exception e) {
-            LOG.error("Exception caught" + e.toString());
+            LOG.error("Exception caught" + e.toString() + "  INTERNAL_SERVER_ERROR");
             t.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
             t.setDescriptionField("INTERNAL_SERVER_ERROR");
             if (!bTokenCall && bDoneMApreq) {
@@ -207,7 +208,7 @@ public class Authorizer {
             mapResponse(t, cm);
             return cm;
         }
-
+        LOG.info("Authorizer.authorize method ended");
         return cm;
     }
 
@@ -318,6 +319,7 @@ public class Authorizer {
     }
 
     private void findFacility(Transaction t) {
+        LOG.info("Authorizer.findFacility method started");
         String uuid = t.getIdentityUuid();
         Facility facility = facilityDAO.get(uuid);
         if (facility != null) {
@@ -326,12 +328,12 @@ public class Authorizer {
             t.setDeviceType(facility.getDeviceType());
             t.setTokenBankName(facility.getTokenBankName());
         }
-
+        LOG.info("Authorizer.findFacility method ended");
     }
 
     // Map the inbound Message to a Transaction.
     private Transaction mapRequest(Transaction transaction, Message requestMessage) {
-
+        LOG.info("Authorizer.mapRequest method started");
         transaction.setRequestXmlDateTime(this.getSystemDateTime());
 
         Header header = requestMessage.getHeader();
@@ -360,6 +362,7 @@ public class Authorizer {
 
         // Mapping Request Fields
         if (requestMessage.getRequest() != null && requestMessage.getRequest().size() > 1) {
+            LOG.error("AuthorizerException due to Multiple requests");
             throw new AuthorizerException("MULTIPLE_REQUESTS");
         }
         Request request = requestMessage.getRequest().get(0);
@@ -386,6 +389,7 @@ public class Authorizer {
                 transaction.setAccountTypeType(request.getPan().value());
                 transaction.setPan(request.getPan().value());
             } else {
+                LOG.error("AuthorizerException due to invalid Token tag or not  PAN tag value PAN");
                 throw new AuthorizerException("INVALID_PAN_TAG");
             }
 
@@ -397,6 +401,7 @@ public class Authorizer {
                 transaction.setAccountTypeType(request.getToken().value());
                 transaction.setTokenId(request.getAccount());
             } else {
+                LOG.error("AuthorizerException due to invalid Token tag or not  Token tag value TOKEN");
                 throw new AuthorizerException("INVALID_TOKEN_TAG");
             }
         }
@@ -412,9 +417,11 @@ public class Authorizer {
             if (exp != null && exp.length() == 4) {
                 String month = exp.substring(2, 4);
                 if (Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1) {
+                    LOG.error("AuthorizerException due to invalid Expiration date");
                     throw new AuthorizerException("INVALID_EXPIRATION_DATE");
                 }
             } else {
+                LOG.error("AuthorizerException due to invalid Expiration date");
                 throw new AuthorizerException("INVALID_EXPIRATION_DATE");
             }
             transaction.setExpiration(request.getExpiration().toString());
@@ -430,15 +437,18 @@ public class Authorizer {
                             && !transaction.getRequestType().trim().isEmpty()
                             && !transaction.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
                         if (amt.longValueExact() < 0) {
+                            LOG.error("AuthorizerException due to invalid amount");
                             throw new AuthorizerException("INVALID_AMOUNT");
                         }
                     }
                     transaction.setAmount(amt.longValueExact());
                 } else {
+                    LOG.error("AuthorizerException due to invalid amount");
                     throw new AuthorizerException("INVALID_AMOUNT");
                 }
             }
         } catch (ArithmeticException e) {
+            LOG.error("AuthorizerException due to invalid amount" + e.getMessage());
             throw new AuthorizerException("INVALID_AMOUNT");
         }
 
@@ -551,6 +561,7 @@ public class Authorizer {
                     transaction.setShippingPhone(addressVerServc.getShippingPhone().toString());
                 }
             } catch (NumberFormatException e) {
+                LOG.error("NumberFormatException-->AuthorizerException due to invalid phone number or format ");
                 throw new AuthorizerException("INVALID_PHONE_NUM");
             }
 
@@ -578,8 +589,10 @@ public class Authorizer {
         if (getAuthTime() != null) {
             String authHour = getAuthTime().substring(0, 8);
             transaction.setAuthHour(authHour);
-
         }
+
+        LOG.debug(transaction.getRrn().toString() + "RRN number in class name-->Authorizer..method name-->mapRequest");
+        LOG.info("Authorizer.mapRequest method ended");
         return transaction;
     }
 
@@ -609,7 +622,7 @@ public class Authorizer {
     }
 
     private void mapResponse(Transaction t, Message cm) {
-
+        LOG.info("Authorizer.mapResponse method started");
         Response response = new Response();
         cm.getRequest().clear();
         cm.getHeader().setComment(t.getComment());
@@ -656,7 +669,7 @@ public class Authorizer {
                     try {
                         tokenBusinessService.issueToken(t);
                     } catch (ProcessingException e) {
-                        LOG.error("Cannot generate token. Token Service Error");
+                        LOG.error("Cannot generate token. Token Service Error " + e);
                     }
 
                 }

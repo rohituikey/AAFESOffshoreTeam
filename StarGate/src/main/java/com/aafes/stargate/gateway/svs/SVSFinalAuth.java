@@ -85,7 +85,7 @@ public class SVSFinalAuth {
             if(response.getCard().getCardNumber()!=null)
             transaction.setCardReferenceID(response.getCard().getCardNumber());
            
-            LOGGER.info("response : Authorization code :" + response.getAuthorizationCode());
+            LOGGER.debug("response : Authorization code :" + response.getAuthorizationCode());
         } catch (Exception e) {
             LOGGER.error("Unexpected exception: " + e.getMessage());
             throw new GatewayException ("INTERNAL SYSTEM ERROR");

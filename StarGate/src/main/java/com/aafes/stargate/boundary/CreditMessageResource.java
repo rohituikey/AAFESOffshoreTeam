@@ -42,14 +42,13 @@ import org.xml.sax.SAXException;
 @Path("/creditmessage")
 public class CreditMessageResource {
 
-    private static final org.slf4j.Logger LOG
-            = LoggerFactory.getLogger(CreditMessageResource.class.
-                    getSimpleName());
-
     @EJB
     private Authorizer authorizer;
     @EJB
     private TokenValidatorService tokenValidatorService;
+
+    private static final org.slf4j.Logger LOG
+            = LoggerFactory.getLogger(CreditMessageResource.class.getSimpleName());
 
     //TODO
     private String SCHEMA_PATH = "src/main/resources/jaxb/creditmessage/CreditMessage12S1.xsd";
@@ -71,8 +70,9 @@ public class CreditMessageResource {
     @POST
     @Consumes("application/xml")
     @Produces("application/xml")
-    
+
     public String postXml(String requestXML, @HeaderParam("tokenId") String tokenId) {
+        LOG.info("CreditMessage Resource.postXml method started");
         String responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error></ErrorInformation>";
         boolean tokenValidateFlg = false;
         String uuid = "";
@@ -90,21 +90,29 @@ public class CreditMessageResource {
                         //Message requestMessage = unmarshalWithValidation(requestXML);
                         Message responseMessage = authorizer.authorize(requestMessage);
                         //putInfoOnHealthChecker(responseMessage);
-                    tokenValidateFlg = tokenValidatorService.udpateTokenStatus(CreditMessageTokenConstants.STATUS_EXPIRED, tokenId, uuid);
-                    responseXML = marshal(responseMessage);
-                    LOG.info("To Client CreditMessageResource: " + responseXML);
+                        tokenValidateFlg = tokenValidatorService.udpateTokenStatus(CreditMessageTokenConstants.STATUS_EXPIRED, tokenId, uuid);
+                        responseXML = marshal(responseMessage);
+                        LOG.info("To Client CreditMessageResource: " + responseXML);
                     } else {
-                        LOG.error("Invalid Token");
+                        LOG.error("Invalid Token -->Unauthorized Transactions");
                         responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Unauthorized Transactions</Error>"
                                 + "</ErrorInformation>";
                     }
-                } else LOG.error("Invalid Request");
-            } else  LOG.error("Invalid Request: tokenId not present in request header.");
+                } else {
+                    LOG.error("Invalid Request");
+                }
+            } else {
+                LOG.error("Invalid Request: tokenId not present in request header.");
+            }
         } catch (JAXBException | SAXException e) {
-            LOG.error(e.toString());
+            LOG.error(e.toString() + "JAXBException or SAXException ");
         } catch (Exception ex) {
             Logger.getLogger(CreditMessageResource.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error(ex.toString());
         }
+        LOG.info("CreditMessage Resource.postXml method ended and returned the responce xml");
+        LOG.debug("CreditMessageResource.postXml RRN number is ");
+
         return responseXML;
     }
 
@@ -144,6 +152,7 @@ public class CreditMessageResource {
 //        return request;
 //    }
     private String marshal(Message request) {
+          LOG.info(" marshal method started");
         StringWriter sw = new StringWriter();
         JAXB.marshal(request, sw);
         String xmlString = sw.toString();
@@ -165,6 +174,7 @@ public class CreditMessageResource {
         try {
             schema = sf.newSchema(new File(SCHEMA_PATH));
         } catch (Exception e) {
+            LOG.info("Schema file taking from server location");
             SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/CreditMessage12S1.xsd";
             schema = sf.newSchema(new File(SCHEMA_PATH));
         }
@@ -176,7 +186,7 @@ public class CreditMessageResource {
     }
 
     private static String FilterRequestXML(String xmlString) {
-        LOG.info("In filter request method.");
+        LOG.info(" filter request method started");
 
         String retString = null;
         try {
@@ -192,10 +202,13 @@ public class CreditMessageResource {
             LOG.error(ex.toString());
             retString = null;
         }
+        LOG.info(" filter request method ended");
+
         return retString;
     }
 
     public static String getStringFromDocument(Document doc) throws TransformerException {
+        LOG.info(" getStringFromDocument method started");
 
         StringWriter writer = null;
 
@@ -210,7 +223,7 @@ public class CreditMessageResource {
         } catch (Exception ex) {
             LOG.error(ex.toString());
         }
-
+        LOG.info(" getStringFromDocument method ended");
         return writer.toString();
     }
 }

@@ -34,6 +34,7 @@ public class SVSGateway extends Gateway {
     public Transaction processMessage(Transaction t) {
 
         try {
+            LOG.info("processMessage method started in class SVSGateway ");
             boolean validateTransactionFlg = this.validateTransaction(t);
             if (validateTransactionFlg) {
                 if (svsgp != null) {
@@ -48,10 +49,11 @@ public class SVSGateway extends Gateway {
                 return t;
             }
         } catch (GatewayException e) {
+            LOG.error(e.toString()+"responceTYpe is DECLINED");
             t.setResponseType(ResponseType.DECLINED);
             t.setDescriptionField(e.getMessage());
         }
-
+        LOG.info("processMessage method ended in class SVSGateway ");
         return t;
     }
 

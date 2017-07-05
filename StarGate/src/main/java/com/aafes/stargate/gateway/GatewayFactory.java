@@ -15,6 +15,7 @@ import com.aafes.stargate.util.MediaType;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -38,8 +39,11 @@ public class GatewayFactory {
     @EJB
     private VisionGatewayStub visionGatewaySimulator;
 
+   private static final org.slf4j.Logger LOG
+            = LoggerFactory.getLogger(GatewayFactory.class.getSimpleName());
+
     public Gateway pickGateway(Transaction t) {
-        System.out.println("Inside Base");
+        LOG.info("gatewayfacory's pick gateway method is started");
         Gateway gateway = null;
         String mediaType = t.getMedia();
 
@@ -53,8 +57,10 @@ public class GatewayFactory {
             switch (mediaType) {
                 case MediaType.MIL_STAR:
                     if (enableStub != null && enableStub.equalsIgnoreCase("true")) {
+                        LOG.info("MediaType is MIL_STAR ..stub is enabled so processing visionGatewaySimulator");
                         gateway = visionGatewaySimulator;
                     } else {
+                        LOG.info("MediaType is MIL_STAR ..stub is disabled so processing visionGateway");
                         gateway = visionGateway;
                     }
                     return gateway;
@@ -62,16 +68,18 @@ public class GatewayFactory {
                 case MediaType.MASTER:
                 case MediaType.DISCOVER:
                 case MediaType.AMEX:
+                    LOG.info("MediaType is visa/master/discover/amex ..  processing compassGateway");
                     gateway = compassGateway;
                     return gateway;
 
                 case MediaType.GIFT_CARD:
                     gateway = sVSGateway;
+                    LOG.info("MediaType is giftcard ..  processing sVSGateway");
                     return gateway;
                 // Add more gateways
             }
         }
-
+        LOG.info("gatewayfacory pick gateway method is ended");
         return null;
     }
 

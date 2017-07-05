@@ -7,7 +7,6 @@ package com.aafes.stargate.gateway.fdms;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.TranRepository;
-//import com.aafes.stargate.gateway.vision.entity.CICSHandlerBean;
 import javax.ejb.EJB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

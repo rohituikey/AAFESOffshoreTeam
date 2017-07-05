@@ -47,6 +47,8 @@ public class SvsUtil {
         Map<String, Object> requestContext = ((BindingProvider) sVSXMLWay).getRequestContext();
         requestContext.put(BindingProvider.USERNAME_PROPERTY, "extspeedfcuat");
         requestContext.put(BindingProvider.PASSWORD_PROPERTY, "Rc464Fc14");
+//        requestContext.put("com.sun.xml.internal.ws.request.timeout", 60);
+//        requestContext.put("com.sun.xml.ws.request.timeout", 60);
 
         return sVSXMLWay;
     }

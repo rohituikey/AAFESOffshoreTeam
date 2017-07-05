@@ -6,18 +6,16 @@
 package com.aafes.stargate.web;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.tokenvalidator.Message;
-import com.aafes.tokenvalidator.Message.Header;
-import com.aafes.tokenvalidator.Message.Request;
-import com.aafes.tokenvalidator.RequestTypeType;
+import com.aafes.token.AccountTypeType;
+import com.aafes.token.TokenMessage;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 
 /**
  *
@@ -27,38 +25,33 @@ public class TimeoutMain {
 
     static Transaction t = new Transaction();
 
-    public String lookupAccount(String uuid, String uname, String pwd) throws ProcessingException {
-        try{
+    public String lookupAccount(Transaction t) throws ProcessingException {
+        try {
 
-        String tokenEndpoint = "http://localhost:8989/stargate/1/token/";
-        
-        ClientBuilder abc = ClientBuilder.newBuilder();
-        Client client = abc.build();
-        WebTarget target = client.target(tokenEndpoint);
+            String tokenEndpoint = "http://localhost:8080/stargate/1/token/";
+            ClientBuilder abc = ClientBuilder.newBuilder();
+            Client client = abc.build();
+            WebTarget target = client.target(tokenEndpoint);
 
-        Message tm = new Message();
-        Header header = new Header();
-        header.setIdentityUUID(uuid);
-        header.setUerId(uname);
-        header.setPassword(pwd);
-        
-        tm.setHeader(header);
-        
-        Request rq = new Request();
-        rq.setRequestType(RequestTypeType.TOKEN);
-        tm.setHeader(header);
-        
-        //target.property("com.sun.xml.internal.ws.request.timeout", 6000);
-        //target.property("com.sun.xml.ws.request.timeout", 6000);
-        Entity entity = Entity.entity(tm, MediaType.APPLICATION_XML);
+            TokenMessage tm = new TokenMessage();
+            TokenMessage.Request request = new TokenMessage.Request();
+            request.setAccount(t.getAccount());
+            request.setAccountType(AccountTypeType.TOKEN);
+            request.setMedia(t.getMedia());
+            request.setRequestType(com.aafes.token.RequestTypeType.LOOKUP);
+            request.setTokenBankName(t.getTokenBankName());
+            tm.setRequest(request);
 
-        Response response = null;
-        Builder req = null;
- 
-            req = target.request(MediaType.TEXT_PLAIN);
-            response = req.post(entity);
-            tm = response.readEntity(Message.class);
-
+//            target.property("com.sun.xml.internal.ws.request.timeout", 6000);
+//            target.property("com.sun.xml.ws.request.timeout", 6000);
+            Entity entity = Entity.entity(tm, MediaType.APPLICATION_XML);
+            try {
+                Response response = target.request(MediaType.TEXT_PLAIN).post(entity);
+                tm = response.readEntity(TokenMessage.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new ProcessingException(e.getCause());
+            }
             if (tm.getResponse() != null) {
                 return tm.getResponse().toString();
             }
@@ -70,17 +63,28 @@ public class TimeoutMain {
     }
 
     public static void main(String[] args) {
-        try{
+        try {
 //            t.setIdentityUuid("0ee1c509-2c70-4bcd-b261-f94f1fe6c43b");
 //            t.setUserId("tmpUserName");
 //            t.setP
-            String res = new TimeoutMain().lookupAccount("0ee1c509-2c70-4bcd-b261-f94f1fe6c43b","tmpUserName","65656565");
+
+            t.setAccount("787632787632");
+            t.setMedia("Milstar");
+            t.setTokenBankName("01");
+            String res = new TimeoutMain().lookupAccount(t);
             if (!res.equals("")) {
                 System.out.println("time out error");
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 }
+//        Message tm = new Message();
+//        Header header = new Header();
+//        header.setIdentityUUID(uuid);
+//        header.setUerId(uname);
+//        header.setPassword(pwd);
+//        tm.setHeader(header);
+            // tm.setHeader(header);

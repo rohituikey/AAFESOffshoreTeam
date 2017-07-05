@@ -33,7 +33,7 @@ public class BalanceInquiryProcessor extends Processor {
 
     @Override
     public void processRequest(Transaction t) {
-        log.info("Method...... " + "processBalanceInquiry.......");
+        log.info("Method......started " + "processBalanceInquiry.......");
 
         SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
 
@@ -64,11 +64,11 @@ public class BalanceInquiryProcessor extends Processor {
 
         balanceInquiryRequest.setRoutingID(StarGateConstants.ROUTING_ID);
 //        balanceInquiryRequest.setStan(t.getSTAN());
-        log.info("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "||TransactionId " + t.getTransactionId() + "||Invoice Number " + t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
+        log.debug("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "||TransactionId " + t.getTransactionId() + "||Invoice Number " + t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
 
         BalanceInquiryResponse balanceInquiryResponse = sVSXMLWay.balanceInquiry(balanceInquiryRequest);
         try {
-            log.info("RESPONSE---->AuthorizationCode " + balanceInquiryResponse.getAuthorizationCode() + "||AMOUNT " + balanceInquiryResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + balanceInquiryResponse.getReturnCode().getReturnCode() + "||RETURN CODE DISCRIPTION" + balanceInquiryResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + balanceInquiryResponse.getReturnCode().getReturnDescription());
+            log.debug("RESPONSE---->AuthorizationCode " + balanceInquiryResponse.getAuthorizationCode() + "||AMOUNT " + balanceInquiryResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + balanceInquiryResponse.getReturnCode().getReturnCode() + "||RETURN CODE DISCRIPTION" + balanceInquiryResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + balanceInquiryResponse.getReturnCode().getReturnDescription());
 
             if (balanceInquiryResponse != null) {
 
@@ -90,9 +90,10 @@ public class BalanceInquiryProcessor extends Processor {
                         t.setResponseType(ResponseType.DECLINED);
                     }
                 }
+                log.debug("rrn number is--"+t.getRrn());
             }
         } catch (GatewayException e) {
-            log.error(("Error in processBalanceInquiry method responce" + e));
+            log.error(("Error in processBalanceInquiry method i.e responce is null " + e));
             throw new GatewayException("INTERNAL SERVER ERROR");
         }
     }

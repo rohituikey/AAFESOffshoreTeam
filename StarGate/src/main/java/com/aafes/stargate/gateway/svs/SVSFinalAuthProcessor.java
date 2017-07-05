@@ -72,7 +72,7 @@ public class SVSFinalAuthProcessor extends Processor {
             request.setTransactionID(transaction.getRrn() + "0000");
             //invoice number should be last 8 digits of order Number
             request.setInvoiceNumber(transaction.getOrderNumber().substring(transaction.getOrderNumber().length() - 8));
-            LOGGER.info("Amount Details : " + amount.getCurrency() + amount.getAmount() + "Transacion ID: " + transaction.getTransactionId() + " Invoice Number : " + request.getInvoiceNumber());
+            LOGGER.debug("Amount Details : " + amount.getCurrency() + amount.getAmount() + "Transacion ID: " + transaction.getTransactionId() + " Invoice Number : " + request.getInvoiceNumber());
             
             PreAuthCompleteResponse response = sVSXMLWay.preAuthComplete(request);
             
@@ -100,9 +100,9 @@ public class SVSFinalAuthProcessor extends Processor {
            
             LOGGER.info("response : Authorization code :" + response.getAuthorizationCode());
         } catch (Exception e) {
-            LOGGER.error("Unexpected exception: " + e.getMessage());
+            LOGGER.error("responce is null and Unexpected exception: " + e.getMessage());
             throw new GatewayException ("INTERNAL SYSTEM ERROR");
             
-        }
+        }LOGGER.debug("rrn number is--"+transaction.getRrn());
     }
 }

@@ -31,11 +31,15 @@ public class VisionPlusProcessor {
 //    private Configurator configurator;
 
     public Transaction authorize(Transaction t) {
+        LOG.info("VisionPlusProcessor.authorize is started");
         try {
             Thread.sleep(40000);
         } catch (InterruptedException ex) {
+            LOG.error(ex.toString());
             java.util.logging.Logger.getLogger(VisionPlusProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
+        LOG.debug("rrn number is"+ t.getRrn());
+        LOG.info("VisionPlusProcessor.authorize is ended");
         return t;
     }
 //        LOG.debug("Pushing data into MQ CID and AuthNumber :", t.getTraceId() + ", " + t.getAuthNumber());

@@ -152,17 +152,18 @@ public class PreAuthorizationProcessor extends Processor{
                 if(preAuthResponseObj.getBalanceAmount() != null)
                     t.setBalanceAmount((long) (preAuthResponseObj.getBalanceAmount().getAmount()*100));
                
-                LOGGER.info("AuthorizationCode : " + preAuthResponseObj.getAuthorizationCode());
+                LOGGER.debug("AuthorizationCode : " + preAuthResponseObj.getAuthorizationCode());
 
                 if(preAuthResponseObj.getCard() != null) t.setCardSequenceNumber(preAuthResponseObj.getCard().getCardNumber());
                 t.setAuthNumber(preAuthResponseObj.getAuthorizationCode());
                 t.setSTAN(preAuthResponseObj.getStan());
                 t.setTransactionId(preAuthResponseObj.getTransactionID());
             }else LOGGER.error("Response Object is NULL " + sMethodName + " " + CLASS_NAME);
+            
         } catch (Exception e) {
-            LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
+            LOGGER.error("Exception occured in " + sMethodName + ".responce is null Exception  : " + e.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
-        }
+        }LOGGER.debug("rrn number is--"+t.getRrn());
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
     }
 }

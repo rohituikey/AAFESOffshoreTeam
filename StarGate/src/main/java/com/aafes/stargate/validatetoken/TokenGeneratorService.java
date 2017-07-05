@@ -43,23 +43,27 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- *  THE SERVICE IS USED TO GENERATE A 6 DIGIT RANDOM SECURE NUMERIC TOKEN.
- *  TOKEN HAS LIFE OF 1 HOUR AFTER WHICH THE TOKEN STATUS WILL BE HANGED TO 'EXPIRED'.
- *  TABLE MAPPING IS STARGATE.CROSSSITEREQUESTTOKENTABLE.
- *  TOKEN CAN BE USED TO VALIDATE THE TRANSACTIONS RECEIVED TO STARGATE, IF THE TOKEN IS VALID THEN ONLY THE TRANSACTION IN 
- *  VALID AND PROCESSED FURTHER.
- *  <?xml version="1.0" encoding="UTF-8"?>
-    <ns1:Message xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:ns1='http://www.aafes.com/tokenvalidator'
-    xsi:schemaLocation='http://www.aafes.com/tokenvalidator file:<TokenValidator.XSD PATH>' MajorVersion="3" MinorVersion="1" FixVersion="0">
-    <ns1:Header>
-        <ns1:IdentityUUID>UUID value</ns1:IdentityUUID>
-        <ns1:UerId>user name value</ns1:UerId>
-        <ns1:Password>password value</ns1:Password>
-    </ns1:Header>
-    <ns1:Request>
-        <ns1:RequestType>Token</ns1:RequestType>
-    </ns1:Request>
-    </ns1:Message>
+ * THE SERVICE IS USED TO GENERATE A 6 DIGIT RANDOM SECURE NUMERIC TOKEN. TOKEN
+ * HAS LIFE OF 1 HOUR AFTER WHICH THE TOKEN STATUS WILL BE HANGED TO 'EXPIRED'.
+ * TABLE MAPPING IS STARGATE.CROSSSITEREQUESTTOKENTABLE. TOKEN CAN BE USED TO
+ * VALIDATE THE TRANSACTIONS RECEIVED TO STARGATE, IF THE TOKEN IS VALID THEN
+ * ONLY THE TRANSACTION IN VALID AND PROCESSED FURTHER.
+ * <?xml version="1.0" encoding="UTF-8"?>
+ * <ns1:Message xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ * xmlns:ns1='http://www.aafes.com/tokenvalidator'
+ * xsi:schemaLocation='http://www.aafes.com/tokenvalidator
+ * file:<TokenValidator.XSD PATH>' MajorVersion="3" MinorVersion="1"
+ * FixVersion="0">
+ * <ns1:Header>
+ * <ns1:IdentityUUID>UUID value</ns1:IdentityUUID>
+ * <ns1:UerId>user name value</ns1:UerId>
+ * <ns1:Password>password value</ns1:Password>
+ * </ns1:Header>
+ * <ns1:Request>
+ * <ns1:RequestType>Token</ns1:RequestType>
+ * </ns1:Request>
+ * </ns1:Message>
+ *
  * @author burangir
  */
 @Path("/token")
@@ -67,10 +71,10 @@ public class TokenGeneratorService {
 
     @EJB
     private TokenServiceDAO tokenServiceDAO;
-    
+
     private CrosssiteRequestTokenTable tokenObj;
     private CrosssiteRequestUsertable tokenUserDetObj;
-    
+
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TokenGeneratorService.class.getSimpleName());
     private String sMethodName = "";
     private final String CLASS_NAME = TokenGeneratorService.this.getClass().getSimpleName();
@@ -96,24 +100,30 @@ public class TokenGeneratorService {
             LOG.info("From Client TokenGeneratorService: " + requestXML);
             String ValidatedXML = FilterRequestXML(requestXML);
             if (requestXML.contains("DOCTYPE") || requestXML.contains("CDATA")) {
-                LOG.error("Invalid Request TokenGeneratorService");
+                LOG.error("Invalid Request type TokenGeneratorService");
             } else if (ValidatedXML != null) {
                 Message requestMessage = unmarshalWithValidation(requestXML);
+                 LOG.debug("uuid no is.." + requestMessage.getHeader().getIdentityUUID());
                 //checkAndUpdateDuplicateToken(requestMessage.getHeader().getIdentityUUID());
                 validateUserFlg = validateUserDetails(requestMessage);
-                
-                if(validateUserFlg) responseXML = generateToken(requestMessage);
-                else responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid credentials"
-                        + "</Error></ErrorInformation>";
-            } else  LOG.error("Invalid Request");
+              
+                if (validateUserFlg) {
+                    responseXML = generateToken(requestMessage);
+                } else {
+                    responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid credentials"
+                            + "</Error></ErrorInformation>";
+                }
+            } else {
+                LOG.error("Invalid Request ");
+            }
 
             LOG.info("To Client TokenGeneratorService: " + responseXML);
         } catch (JAXBException | SAXException e) {
             LOG.error(e.toString());
-            throw new GatewayException("INTERNAL SYSTEM ERROR");
+            throw new GatewayException("INTERNAL SYSTEM ERROR-->SAXException/JAXBException.. " + e);
         } catch (Exception ex) {
             Logger.getLogger(TokenGeneratorService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new GatewayException("INTERNAL SYSTEM ERROR");
+            throw new GatewayException("INTERNAL SYSTEM ERROR" + ex);
         }
         LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         return responseXML;
@@ -132,6 +142,7 @@ public class TokenGeneratorService {
         try {
             schema = sf.newSchema(new File(SCHEMA_PATH));
         } catch (Exception e) {
+            LOG.info("Schema file taking from server location");
             SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/TokenValidator.xsd";
             schema = sf.newSchema(new File(SCHEMA_PATH));
         }
@@ -179,8 +190,11 @@ public class TokenGeneratorService {
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOG.info("Method getStringFromDocument ended. Class Name TokenGeneratorService");
-        if (null != writer)  return writer.toString();
-        else  return "";
+        if (null != writer) {
+            return writer.toString();
+        } else {
+            return "";
+        }
     }
 
     private String generateToken(Message requestMessage) {
@@ -190,24 +204,30 @@ public class TokenGeneratorService {
         String tokenNumber = "";
         Date dateObj = new Date();
         DateFormat dateFormat1 = new SimpleDateFormat("yyyyMMddHHmmss");
-        
+
         try {
             String creTime = dateFormat1.format(dateObj);
             tokenNumber = generateSecureRandomToken();
-            if(tokenObj == null) tokenObj = new CrosssiteRequestTokenTable();
+            if (tokenObj == null) {
+                tokenObj = new CrosssiteRequestTokenTable();
+            }
             tokenObj.setTokenid(tokenNumber);
             tokenObj.setTokenstatus(CreditMessageTokenConstants.STATUS_ACTIVE);
             tokenObj.setTokencredatetime(creTime);
             tokenObj.setIdentityuuid(requestMessage.getHeader().getIdentityUUID());
 
             dataInsertedFlg = tokenServiceDAO.insertTokenDetails(tokenObj);
-            if (dataInsertedFlg) LOG.info("Data Inserted in table stargate.crosssiterequesttokentable successfully!");
-            else LOG.info("Data Insertion in table stargate.crosssiterequesttokentable FAILED!");
+            if (dataInsertedFlg) {
+                LOG.info("Data Inserted in table stargate.crosssiterequesttokentable successfully!");
+            } else {
+                LOG.info("Data Insertion in table stargate.crosssiterequesttokentable FAILED!");
+            }
         } catch (Exception ex) {
             LOG.error("Error while creating cross site request token " + ex.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
         LOG.info("Method " + sMethodName + " ENDED." + " Class Name " + CLASS_NAME);
+        LOG.debug("uuid no is.." + requestMessage.getHeader().getIdentityUUID());
         return tokenNumber;
     }
 
@@ -222,34 +242,41 @@ public class TokenGeneratorService {
             LOG.info("Token Value " + nextToken);
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
-             throw new GatewayException("INTERNAL SYSTEM ERROR");
+            LOG.equals("NoSuchAlgorithmException"+ex.toString());
+            throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
-        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         return String.valueOf(nextToken);
     }
-    
+
     private boolean validateUserDetails(Message requestMessage) {
         sMethodName = "validateUserDetails";
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         boolean userValidated = false;
         try {
-            if(tokenUserDetObj == null) tokenUserDetObj = new CrosssiteRequestUsertable();
+            if (tokenUserDetObj == null) {
+                tokenUserDetObj = new CrosssiteRequestUsertable();
+            }
             tokenUserDetObj.setIdentityuuid(requestMessage.getHeader().getIdentityUUID());
             tokenUserDetObj.setUserid(requestMessage.getHeader().getUerId());
             tokenUserDetObj.setPassword(requestMessage.getHeader().getPassword());
-            
+
             userValidated = tokenServiceDAO.validateUserDetails(tokenUserDetObj);
-            
-            if (userValidated) LOG.info("User Validated successfully!");
-            else LOG.info("User Validation Failed!");
+
+            if (userValidated) {
+                LOG.info("User Validated successfully!");
+            } else {
+                LOG.info("User Validation Failed!");
+            }
         } catch (Exception ex) {
             Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
+        LOG.debug("uuid no is.." + requestMessage.getHeader().getIdentityUUID());
         LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         return userValidated;
     }
-    
+
 //    private void checkAndUpdateDuplicateToken(String identityUuid) {
 //        sMethodName = "checkAndUpdateDuplicateToken";
 //        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
@@ -282,7 +309,6 @@ public class TokenGeneratorService {
 //        }
 //        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
 //    }
-    
 //    private void saveUserDetails(Message requestMessage) {
 //        sMethodName = "saveUserDetails";
 //        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);

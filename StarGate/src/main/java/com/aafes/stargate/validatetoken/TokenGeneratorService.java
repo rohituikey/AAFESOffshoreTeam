@@ -79,7 +79,6 @@ public class TokenGeneratorService {
     private String sMethodName = "";
     private final String CLASS_NAME = TokenGeneratorService.this.getClass().getSimpleName();
     private String SCHEMA_PATH = "src/main/resources/jaxb/tokenvalidator/TokenValidator.xsd";
-
     /**
      * @param tokenServiceDAO the tokenServiceDAO to set
      */

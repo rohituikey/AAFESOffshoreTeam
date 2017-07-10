@@ -55,7 +55,6 @@ public class Authorizer {
     private FDMSStub fDMSStub;
     @EJB
     private TransactionDAO transactionDAO;
-
     private boolean isDuplicateTransaction = false;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Authorizer.class.getSimpleName());
 
@@ -68,17 +67,14 @@ public class Authorizer {
         try {
             mapRequest(t, cm);
             bDoneMApreq = true;
-
             findFacility(t);
-
             if (t.getFacility() == null || t.getFacility().isEmpty()
                     || t.getStrategy() == null || t.getStrategy().isEmpty()) {
-                LOG.info("UUID not found in facmapper .....");
+                LOG.info("UUID not found in facmapper .ResponseType "+t.getRrn());
                 t.setReasonCode(configurator.get("INVALID_UUID"));
                 t.setDescriptionField("INVALID_UUID");
                 t.setResponseType(ResponseType.DECLINED);
                 mapResponse(t, cm);
-
                 return cm;
             }
 
@@ -91,7 +87,7 @@ public class Authorizer {
                     && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
                 bTokenCall = tokenBusinessService.lookUpAccount(t);
                 if (!bTokenCall) {
-                    LOG.info("Token Not found");
+                    LOG.info("Token Not found.ResponseType"+t.getRrn());
                     t.setReasonCode(configurator.get("TOKEN_NOTFOUND"));
                     t.setResponseType(ResponseType.DECLINED);
                     t.setDescriptionField("TOKEN_NOTFOUND");
@@ -99,7 +95,6 @@ public class Authorizer {
                     return cm;
                 }
             }
-
             Transaction storedTran = null;
             if (t.getReversal() != null
                     && t.getReversal().equalsIgnoreCase(RequestType.SALE)) {
@@ -116,7 +111,6 @@ public class Authorizer {
                 storedTran = tranRepository.find(t.getIdentityUuid(),
                         t.getRrn(), t.getRequestType());
             }
-
             if (storedTran == null) {
 
                 isDuplicateTransaction = false;
@@ -137,18 +131,15 @@ public class Authorizer {
                         LOG.info("No record found.");
                     }
                 }
-
-                LOG.info("Transaction not found. So processing...");
+                LOG.info("Transaction not found. So processing to find Strategy "+t.getRrn());
                 BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
                 if (baseStrategy != null) {
-
                     Transaction authTran = checkReversalTransaction(t);
-
                     if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
                             || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
                             && (t.getReversal() != null
                             && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL))) {
-                        LOG.info("Don't call Vision / SVS for MilStar / GiftCard Reversals.");
+                        LOG.info("Don't call Vision / SVS for MilStar / GiftCard Reversals." +t.getRrn());
                     } else {
                         t = baseStrategy.processRequest(t);
                     }
@@ -160,22 +151,20 @@ public class Authorizer {
                         authTran.setReversal(RequestType.REVERSAL);
                         tranRepository.saveAndUpdate(t, authTran);
                     } else {
-                        LOG.info("Saving transaction.....");
+                        LOG.info("Saving transaction....."+t.getRrn());
                         encryptValues(t);
                         tranRepository.save(t);
                     }
                 } else {
                     // TODO: Confirm response description
-                    LOG.info("Responce declained due to invalid uuid");
                     t.setReasonCode(configurator.get("INVALID_UUID"));
                     t.setDescriptionField("INVALID_UUID");
                     t.setResponseType(ResponseType.DECLINED);
                     mapResponse(t, cm);
                     return cm;
                 }
-
             } else {
-                LOG.info("Transaction found. So replying from the cache...");
+                LOG.info("Transaction found. So replying from the cache..."+t.getRrn());
                 isDuplicateTransaction = true;
                 mapResponse(storedTran, cm);
             }
@@ -187,7 +176,7 @@ public class Authorizer {
             mapResponse(t, cm);
             return cm;
         } catch (ProcessingException e) {
-            LOG.error("Exception caught" + e.toString() + "TOKENIZER_CONNECTION_ERROR");
+            LOG.error("Exception caught" + e.toString() );
             t.setReasonCode(configurator.get("TOKENIZER_CONNECTION_ERROR"));
             t.setDescriptionField("TOKENIZER_CONNECTION_ERROR");
             t.setResponseType(ResponseType.DECLINED);
@@ -208,7 +197,7 @@ public class Authorizer {
             mapResponse(t, cm);
             return cm;
         }
-        LOG.info("Authorizer.authorize method ended");
+        LOG.info("Authorizer.authorize method exit");
         return cm;
     }
 
@@ -219,7 +208,7 @@ public class Authorizer {
         if (t.getReversal() != null
                 && t.getReversal().equalsIgnoreCase(RequestType.SALE)) {
 
-            LOG.info("Reversal request.......");
+            LOG.info("Reversal request......."+t.getRrn());
 
             if (MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia())) {
 
@@ -287,7 +276,6 @@ public class Authorizer {
 
             LOG.info("Auth request.......");
         }
-
         return authTran;
 
     }
@@ -355,9 +343,7 @@ public class Authorizer {
         if (header.getTermId() != null) {
             transaction.setTermId(header.getTermId());
         }
-
         transaction.setComment(header.getComment());
-
         transaction.setCustomerId(header.getCustomerID());
 
         // Mapping Request Fields
@@ -366,16 +352,12 @@ public class Authorizer {
             throw new AuthorizerException("MULTIPLE_REQUESTS");
         }
         Request request = requestMessage.getRequest().get(0);
-
         transaction.setRrn(request.getRRN());
         transaction.setMedia(request.getMedia());
-        if (request.getRequestType() != null && !request.getRequestType().value().
-                isEmpty()) {
+        if (request.getRequestType() != null && !request.getRequestType().value().isEmpty()) {
             transaction.setRequestType(request.getRequestType().value());
         }
-        if (request.getReversal() != null && !request.getReversal().value().
-                isEmpty()) {
-
+        if (request.getReversal() != null && !request.getReversal().value().isEmpty()) {
             transaction.setReversal(request.getReversal().value());
         }
         if (request.getVoid() != null && !request.getVoid().value().isEmpty()) {
@@ -451,7 +433,6 @@ public class Authorizer {
             LOG.error("AuthorizerException due to invalid amount" + e.getMessage());
             throw new AuthorizerException("INVALID_AMOUNT");
         }
-
         transaction.setGcpin(request.getGCpin());
         transaction.setInputType(request.getInputType());
         transaction.setDescriptionField(request.getDescriptionField());
@@ -564,9 +545,7 @@ public class Authorizer {
                 LOG.error("NumberFormatException-->AuthorizerException due to invalid phone number or format ");
                 throw new AuthorizerException("INVALID_PHONE_NUM");
             }
-
             transaction.setEmail(addressVerServc.getEmail());
-
         }
         transaction.setZipCode(request.getZipCode());
         transaction.setUpc(request.getUPC());
@@ -583,15 +562,12 @@ public class Authorizer {
             long n = amtPreAuth.longValueExact();
             transaction.setAmtPreAuthorized(n);
         }
-
         transaction.setPaymentType(request.getPymntType());
-
         if (getAuthTime() != null) {
             String authHour = getAuthTime().substring(0, 8);
             transaction.setAuthHour(authHour);
         }
-
-        LOG.debug(transaction.getRrn().toString() + "RRN number in class name-->Authorizer..method name-->mapRequest");
+        LOG.debug("RRN number in class Authorizer..method mapRequest :" + transaction.getRrn());
         LOG.info("Authorizer.mapRequest method ended");
         return transaction;
     }
@@ -635,31 +611,25 @@ public class Authorizer {
             // We add these fields only if it is approved
             response.setMedia(t.getMedia());
             response.setAuthNumber(t.getAuthNumber());
-
-            if (t.getPlanNumber() != null && !t.getPlanNumber().trim().isEmpty()
-                    && t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)) {
-                response.setPlanNumber(BigInteger.valueOf(Long.
-                        valueOf(t.getPlanNumber())));
+            if (t.getPlanNumber() != null && !t.getPlanNumber().trim().isEmpty() && t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)) {
+                response.setPlanNumber(BigInteger.valueOf(Long.valueOf(t.getPlanNumber())));
             }
             if (t.getMilstarNumber() != null && !t.getMilstarNumber().trim().isEmpty()) {
                 response.setMilstarNumber(t.getMilstarNumber());
             }
-            if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)
-                    || t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD)) {
+            if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR) || t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD)) {
                 response.setBalanceAmount(BigDecimal.valueOf(t.getBalanceAmount()).movePointLeft(2));
                 if (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) {
                     response.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()).movePointLeft(2));
                 }
             }
             if (response.getCardReferenceID() != null) {
-                response.setCardReferenceID(BigInteger.valueOf(Long.
-                        valueOf(t.getCardReferenceID())));
+                response.setCardReferenceID(BigInteger.valueOf(Long.valueOf(t.getCardReferenceID())));
             }
 //            if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)) {
 //                response.setPartialAmount(BigDecimal.valueOf(t.getPartialAmount()).movePointLeft(2));
 //            }
             response.setOrigReqType(t.getRequestType());
-
             if ("Pan".equalsIgnoreCase(t.getPan())) {
                 response.setOrigAcctType("Pan");
                 if (tokenBusinessService != null
@@ -671,7 +641,6 @@ public class Authorizer {
                     } catch (ProcessingException e) {
                         LOG.error("Cannot generate token. Token Service Error " + e);
                     }
-
                 }
                 if (t.getTokenId() != null && !t.getTokenId().trim().isEmpty()) {
                     response.setModifiedAcctValue(t.getTokenId());
@@ -679,21 +648,16 @@ public class Authorizer {
 
                 //response.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()).movePointLeft(2));
             }
-
-            if (t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD)
-                    && t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
-
+            if (t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD) && t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
                 Response.VrtGcAcctInfo GcInfo = new Response.VrtGcAcctInfo();
                 GcInfo.setVrtGcAcctNbr(new BigInteger(String.valueOf(t.getAccount())));
                 GcInfo.setVrtGCPin(t.getGcpin());
                 response.setVrtGcAcctInfo(GcInfo);
-
             }
             if (t.getSettleRs() != null && !t.getSettleRs().trim().isEmpty()) {
                 response.setSettleRs(t.getSettleRs());
                 response.setSettleAmt(BigDecimal.valueOf(t.getSettleAmt()));
             }
-
             if (t.getMedia().equalsIgnoreCase(MediaType.VISA)
                     || t.getMedia().equalsIgnoreCase(MediaType.MASTER)
                     || t.getMedia().equalsIgnoreCase(MediaType.DISCOVER)
@@ -708,6 +672,8 @@ public class Authorizer {
 //        Response.WEXResponsePayAtPumpData wexRespData = new Response.WEXResponsePayAtPumpData();
 //        wexRespData.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()));
         cm.getResponse().add(response);
+        LOG.debug("RRN number in Authorizer.mapResponse method is :" + t.getRrn());
+        LOG.info("Authorizer.mapResponse method ended ");
     }
 
     public void setTranRepository(TranRepository tranRepository) {

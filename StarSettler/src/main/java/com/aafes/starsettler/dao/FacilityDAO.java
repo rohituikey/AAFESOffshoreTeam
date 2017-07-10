@@ -36,6 +36,7 @@ public class FacilityDAO {
 //    }
 
     public Facility get(String facilityId) {
+        LOG.info("Entry in get method of FacitilityDao..");
         return (Facility) mapper.get(facilityId);
     }
 

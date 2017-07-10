@@ -33,12 +33,14 @@ public class InitiateReversal implements Runnable {
 
     @Override
     public void run() {
+                    LOG.info("Run Method of initiaing reversal " +t.getRrn());
         try {
             t = cgp.execute(t);
         } catch (Exception e) {
             LOG.error("Exception occured while initiaing reversal " + e.getMessage());
         }
         transactionRepository.save(t);
+         LOG.info("Run Method of initiaing reversal exit " +t.getRrn());
     }
 
     public void setCgp(CompassGatewayProcessor cgp) {

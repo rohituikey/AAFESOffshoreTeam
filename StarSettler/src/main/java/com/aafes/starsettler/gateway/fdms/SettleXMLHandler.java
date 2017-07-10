@@ -144,7 +144,7 @@ public class SettleXMLHandler {
                     }
                 } catch (Exception e) {
                     logger.info("Error while calling tokenizer for token : " + token);
-                    logger.error(e.toString());
+                    logger.error(e.getMessage());
                 }
 
                 Text accValue = doc.createTextNode(accountNbr);

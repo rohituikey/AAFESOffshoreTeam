@@ -55,6 +55,7 @@ public class TestFDMSXSD {
     @Produces("application/xml")
     public String postXml(String requestXML) {
 
+        LOG.info("Entry in postXml method of TestFDMSXSD..");
         String responseXML = "";
 
         try {
@@ -63,7 +64,7 @@ public class TestFDMSXSD {
             Long refundAmount = 0l;
 
             BatchTransRequest request = new BatchTransRequest();
-            
+
             request.setPID("123");
             request.setSID("321");
             request.setBatchId("batch1");
@@ -177,16 +178,20 @@ public class TestFDMSXSD {
             Logger.getLogger(SettleMessageResource.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        LOG.info("Exit from postXml method of TestFDMSXSD..");
         return responseXML;
 
     }
 
     private String marshal(BatchTransRequest request) {
+
+        LOG.info("Entry in marshal method of TestFDMSXSD..");
         StringWriter sw = new StringWriter();
-        
+
         JAXB.marshal(request, sw);
         String xmlString = sw.toString();
+        LOG.info("Exit from marshal method of TestFDMSXSD..");
         return xmlString;
-    
+
     }
 }

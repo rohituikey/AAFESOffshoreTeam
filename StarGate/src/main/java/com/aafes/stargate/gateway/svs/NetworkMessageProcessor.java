@@ -29,7 +29,7 @@ public class NetworkMessageProcessor extends Processor {
 
     @Override
     public void processRequest(Transaction t) {
-
+        LOGGER.info("NetworkMessageProcessor.processRequest is started");
         SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
         NetworkRequest networkRequest = new NetworkRequest();
         networkRequest.setDate(SvsUtil.formatLocalDateTime());
@@ -50,7 +50,6 @@ public class NetworkMessageProcessor extends Processor {
         try {
             if (networkResponse != null) {
                 LOGGER.debug("return code : " + networkResponse.getReturnCode().getReturnCode());
-
                 t.setAuthoriztionCode(networkResponse.getAuthorizationCode());
                 t.setReasonCode(networkResponse.getReturnCode().getReturnCode());
                 t.setDescriptionField(networkResponse.getReturnCode().getReturnDescription());
@@ -60,10 +59,11 @@ public class NetworkMessageProcessor extends Processor {
                     t.setResponseType(ResponseType.DECLINED);
                 }
             }
-
         } catch (GatewayException e) {
-            LOGGER.error(("Error in Network Message method i.e. responce is null" + e));
+            LOGGER.error(("Exception/Error in NetworkMessage.processRequest  i.e. responce is null" + e));
             throw new GatewayException("INTERNAL SERVER ERROR");
-        }LOGGER.debug("rrn number is--"+t.getRrn());
+        }
+        LOGGER.debug("rrn number in NetworkMessageProcessor.processRequest is : "+t.getRrn());
+        LOGGER.info("NetworkMessageProcessor.processRequest is ended");
     }
 }

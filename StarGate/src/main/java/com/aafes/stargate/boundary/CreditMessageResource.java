@@ -70,9 +70,8 @@ public class CreditMessageResource {
     @POST
     @Consumes("application/xml")
     @Produces("application/xml")
-
     public String postXml(String requestXML, @HeaderParam("tokenId") String tokenId) {
-        LOG.info("CreditMessage Resource.postXml method started");
+        LOG.info("CreditMessage Resource.postXml entry ");
         String responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error></ErrorInformation>";
         boolean tokenValidateFlg = false;
         String uuid = "";
@@ -105,14 +104,12 @@ public class CreditMessageResource {
                 LOG.error("Invalid Request: tokenId not present in request header.");
             }
         } catch (JAXBException | SAXException e) {
-            LOG.error(e.toString() + "JAXBException or SAXException ");
+            LOG.error(e.toString());
         } catch (Exception ex) {
             Logger.getLogger(CreditMessageResource.class.getName()).log(Level.SEVERE, null, ex);
             LOG.error(ex.toString());
         }
-        LOG.info("CreditMessage Resource.postXml method ended and returned the responce xml");
-        LOG.debug("CreditMessageResource.postXml RRN number is ");
-
+        LOG.info("CreditMessage Resource.postXml exit.");
         return responseXML;
     }
 
@@ -152,7 +149,7 @@ public class CreditMessageResource {
 //        return request;
 //    }
     private String marshal(Message request) {
-          LOG.info(" marshal method started");
+        LOG.info(" marshal method started");
         StringWriter sw = new StringWriter();
         JAXB.marshal(request, sw);
         String xmlString = sw.toString();
@@ -167,9 +164,7 @@ public class CreditMessageResource {
         Unmarshaller unmarshaller = jc.createUnmarshaller();
         JAXBContext jaxbContext = JAXBContext.newInstance(Message.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
-        SchemaFactory sf = SchemaFactory.newInstance(
-                XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema;
         try {
             schema = sf.newSchema(new File(SCHEMA_PATH));
@@ -178,7 +173,6 @@ public class CreditMessageResource {
             SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/CreditMessage12S1.xsd";
             schema = sf.newSchema(new File(SCHEMA_PATH));
         }
-
         jaxbUnmarshaller.setSchema(schema);
         request = (Message) jaxbUnmarshaller.unmarshal(reader);
         LOG.info("In unmarshalWithValidation - end ");
@@ -186,8 +180,7 @@ public class CreditMessageResource {
     }
 
     private static String FilterRequestXML(String xmlString) {
-        LOG.info(" filter request method started");
-
+        LOG.info(" filter request method started in CreditMessageResource class ");
         String retString = null;
         try {
             StringReader reader = new StringReader(xmlString);
@@ -202,16 +195,13 @@ public class CreditMessageResource {
             LOG.error(ex.toString());
             retString = null;
         }
-        LOG.info(" filter request method ended");
-
+        LOG.info(" filter request method ended in CreditMessageResource class");
         return retString;
     }
 
     public static String getStringFromDocument(Document doc) throws TransformerException {
         LOG.info(" getStringFromDocument method started");
-
         StringWriter writer = null;
-
         try {
             DOMSource domSource = new DOMSource(doc);
             writer = new StringWriter();
@@ -219,7 +209,6 @@ public class CreditMessageResource {
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
             transformer.transform(domSource, result);
-
         } catch (Exception ex) {
             LOG.error(ex.toString());
         }

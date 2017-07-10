@@ -70,8 +70,8 @@ public class TokenValidatorService {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
+        LOGGER.debug("uuid in "+CLASS_NAME+"'"+sMethodName+"is  : "+identityUuid);
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        LOGGER.debug("uuid is"+identityUuid);
         return tokenValidateFlg;
     }
     

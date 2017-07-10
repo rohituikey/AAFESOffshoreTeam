@@ -32,6 +32,8 @@ public class Configurator {
     }
 
     public void load() {
+
+        LOG.info("Entry in load method of Congigurator..");
         String baseDir = System.getProperty("jboss.server.config.dir");
         String defaultPath = baseDir + "/starsettler.properties";
         String path = System.getProperty("starsettler.properties", defaultPath);
@@ -43,16 +45,17 @@ public class Configurator {
             properties.putAll(System.getProperties());
             System.setProperties(properties);
         } catch (IOException ex) {
-            LOG.error(ex.toString());
+            LOG.error(ex.getMessage());
         } finally {
             if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    LOG.error(e.toString());
+                    LOG.error(e.getMessage());
                 }
             }
         }
+        LOG.info("Entry in load method of Congigurator..");
     }
 
     @javax.enterprise.inject.Produces
@@ -80,7 +83,6 @@ public class Configurator {
 //        String value = System.getProperty(name);
 //        return Integer.parseInt(value);
 //    }
-
     @javax.enterprise.inject.Produces
     public long getLong(InjectionPoint ip) {
         String clssName = ip.getMember().getDeclaringClass().getName();

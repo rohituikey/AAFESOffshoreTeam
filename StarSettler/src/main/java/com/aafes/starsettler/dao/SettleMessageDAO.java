@@ -60,6 +60,8 @@ public class SettleMessageDAO {
     }
 
     public List<SettleEntity> getFDMSData(String identityuuid, String processDate, String settleStatus) {
+
+        LOG.info("Entry in getFDMSData method of Settlemessagedao..");
         List<SettleEntity> fdmsData = new ArrayList<SettleEntity>();
 
         if (processDate == null || processDate.isEmpty()) {
@@ -147,17 +149,20 @@ public class SettleMessageDAO {
             }
 
         }
+        LOG.info("Exit from getFDMSData method of Settlemessagedao..");
         return fdmsData;
     }
 
     public List<SettleEntity> getVisionData(String identityuuid, String processDate, String settleStatus) {
+
+        LOG.info("Entry in getVisionData method of Settlemessagedao..");
         List<SettleEntity> visionData = new ArrayList<SettleEntity>();
 
         if (processDate == null || processDate.isEmpty()) {
             processDate = this.getProcessDate();
         }
         String query = "";
-        if (identityuuid != null && !identityuuid.isEmpty() ) {
+        if (identityuuid != null && !identityuuid.isEmpty()) {
             query = "SELECT " + buildCoulumns() + " FROM starsettler.settlemessages where receiveddate = '" + processDate
                     + "' and settlestatus = '" + settleStatus
                     + "' and identityUUID = '" + identityuuid + "' ALLOW FILTERING";
@@ -229,11 +234,13 @@ public class SettleMessageDAO {
             }
 
         }
-
+        LOG.info("Exit from getVisionData method of Settlemessagedao..");
         return visionData;
     }
 
     public List<SettleEntity> getAll(String identityuuid, String processDate, String settleStatus) {
+
+        LOG.info("Entry in getAll method of Settlemessagedao..");
         List<SettleEntity> settleRecords = new ArrayList<SettleEntity>();
 
         if (processDate == null || processDate.isEmpty()) {
@@ -312,11 +319,13 @@ public class SettleMessageDAO {
             settleRecords.add(settleEntity);
         }
 
+        LOG.info("Exit from getAll method of Settlemessagedao..");
         return settleRecords;
     }
 
     public void updateStatus(List<SettleEntity> settleDataList, String status) {
 
+        LOG.info("Entry in updateStatus method of Settlemessagedao..");
         settleDataList.forEach((settleData) -> {
 
             String query = "update starsettler.settlemessages set settlestatus ='" + status
@@ -331,10 +340,12 @@ public class SettleMessageDAO {
         }
         );
 
+        LOG.info("Exit from updateStatus method of Settlemessagedao..");
     }
 
     public String getBatchId() {
 
+        LOG.info("Entry in getBatchId method of Settlemessagedao..");
         String batchId = "";
         String query = "select batchid from starsettler.batchidxref "
                 + "where processdate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
@@ -344,6 +355,7 @@ public class SettleMessageDAO {
             batchId = rs.getString("batchid");
             break;
         }
+        LOG.info("Exit from getBatchId method of Settlemessagedao..");
         return batchId;
 
     }
@@ -411,17 +423,22 @@ public class SettleMessageDAO {
     }
 
     private String getProcessDate() {
+
+        LOG.info("Entry in getProcessDate method of Settlemessagedao..");
         // TODO
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         String processDate = dateFormat.format(new Date());
+        LOG.info("Exit from getProcessDate method of Settlemessagedao..");
         return processDate;
     }
-    
+
     public List<SettleEntity> getRetailData(String uuid, String processDate, String settleStatus) {
+
+        LOG.info("Entry in getRetailData method of Settlemessagedao..");
         List<SettleEntity> retailData = new ArrayList<>();
-       
+
         if (processDate == null || processDate.isEmpty()) {
             processDate = this.getProcessDate();
         }
@@ -442,7 +459,7 @@ public class SettleMessageDAO {
         String cardType = "";
         for (Row row : result) {
             cardType = row.getString("cardtype");
-            if (cardType != null &&  (cardType.equalsIgnoreCase(CardType.MIL_STAR))) {
+            if (cardType != null && (cardType.equalsIgnoreCase(CardType.MIL_STAR))) {
                 SettleEntity settleEntity = new SettleEntity();
                 settleEntity.setIdentityUUID(row.getString("identityuuid"));
                 settleEntity.setLineId(row.getString("lineId"));
@@ -502,22 +519,26 @@ public class SettleMessageDAO {
             }
 
         }
+        LOG.info("Exit from getRetailData method of Settlemessagedao..");
         return retailData;
     }
-    
+
     public List<String> getIdentityUuidList(String strategyStr) {
+
+        LOG.info("Entry in getIdentityUuidList method of Settlemessagedao..");
         List<String> decaUuIdList = new ArrayList<String>();
-        
+
         String query = "";
-            query = "SELECT *  FROM stargate.facmapper where strategy = '" + strategyStr
-                    + "' ALLOW FILTERING";
-        
+        query = "SELECT *  FROM stargate.facmapper where strategy = '" + strategyStr
+                + "' ALLOW FILTERING";
+
         ResultSet result = factory.getSession().execute(query);
-        
+
         for (Row row : result) {
-        
+
             decaUuIdList.add(row.getString("uuid"));
         }
+        LOG.info("Exit from getIdentityUuidList method of Settlemessagedao..");
         return decaUuIdList;
     }
 
@@ -528,6 +549,7 @@ public class SettleMessageDAO {
 
     public void updateFdmsData(List<SettleEntity> fdmsData, String status) {
 
+        LOG.info("Entry in updateFdmsData method of Settlemessagedao..");
         for (SettleEntity settleData : fdmsData) {
             String query = "update starsettler.settlemessages set "
                     + " batchid = '" + settleData.getBatchId() + "',"
@@ -542,10 +564,12 @@ public class SettleMessageDAO {
                     + "' and transactionid='" + settleData.getTransactionId() + "';";
             factory.getSession().execute(query);
         }
-
+        LOG.info("Exit from updateFdmsData method of Settlemessagedao..");
     }
 
     public void updateBatchRef(List<SettleEntity> fdmsData, String processDate) {
+
+        LOG.info("Entry in updateBatchRef method of Settlemessagedao..");
 
         if (processDate == null || processDate.isEmpty()) {
             processDate = this.getProcessDate();
@@ -561,10 +585,12 @@ public class SettleMessageDAO {
             factory.getSession().execute(query);
         }
 
+        LOG.info("Exit from updateBatchRef method of Settlemessagedao..");
     }
 
     public boolean validateDuplicateRecords(List<SettleEntity> settledData) {
 
+        LOG.info("Entry in validateDuplicateRecords method of Settlemessagedao..");
         boolean recordDuplicate = false;
 
         for (SettleEntity settleData : settledData) {
@@ -586,6 +612,7 @@ public class SettleMessageDAO {
             }
 
         }
+        LOG.info("Exit from  validateDuplicateRecords method of Settlemessagedao..");
         return recordDuplicate;
     }
 }

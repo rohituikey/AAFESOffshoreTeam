@@ -75,14 +75,14 @@ public class SVSIssueProcessor extends Processor {
             } else {
                 t.setResponseType(ResponseType.DECLINED);
             }
-
             LOGGER.debug("ReturnDescription : " + String.valueOf(response.getReturnCode().getReturnDescription()));
 
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ".ewsponce is null Exception  : " + e.getMessage());
             throw new GatewayException("INTERNAL_SERVER_ERROR");
         }
-        LOGGER.debug("rrn number is--" + t.getRrn());
+        LOGGER.debug("rrn number in  SVSIssueProcessor."+sMethodName+" is : " + t.getRrn());
+        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
     }
 
     private String appendZeroForFourDigitPin(String gcPin) {

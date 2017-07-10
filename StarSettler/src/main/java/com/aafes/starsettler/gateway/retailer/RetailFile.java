@@ -45,6 +45,7 @@ public class RetailFile {
 
     public void createFile(String createdDate, String sourcePath, List<SettleEntity> retailDataMap) throws UnsupportedEncodingException, IOException {
         
+        LOGGER.info("Entry in createFile method of RetailFile..");
         if(retailDataMap !=null
                 && retailDataMap.size() > 0)
         {
@@ -76,12 +77,13 @@ public class RetailFile {
                  accountNbr = tokenEndPointService.lookupAccount(entry);
             }catch(Exception e){
                 LOGGER.info("Error while calling tokenizer for token : "+token);
-                LOGGER.error(e.toString());
+                LOGGER.error(e.getMessage());
             }
             
             try {
                 accountNbr = String.format("%019d", Long.parseLong(accountNbr));
             } catch (NumberFormatException n) {
+                LOGGER.error(n.getMessage());
                 accountNbr = String.format("%19s", accountNbr);
             }
             
@@ -160,6 +162,7 @@ public class RetailFile {
             System.out.println(dayofYear);
             return Integer.parseInt(dayofYear);
         } catch (NumberFormatException | NullPointerException e) {
+            LOGGER.error(e.getMessage());
             System.out.println("getDayOfTheYear exception" + e);
         }
         return -1;

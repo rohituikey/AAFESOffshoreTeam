@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class EcommStrategy extends BaseStrategy {
 
-   
-
     @EJB
     private Configurator configurator;
 
@@ -39,15 +37,12 @@ public class EcommStrategy extends BaseStrategy {
 
     @EJB
     private TimeoutProcessor timeoutProcessor;
-    //added 
-        private static final org.slf4j.Logger LOG
-            = LoggerFactory.getLogger(EcommStrategy.class.getSimpleName());
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(EcommStrategy.class.getSimpleName());
 
     @Override
     public Transaction processRequest(Transaction t) {
-
+        LOG.info("EcommStrategy.processRequest Entry ..."+t.getRrn());
         try {
-
             boolean ecommFieldsValid = this.validateECommFields(t);
             if (!ecommFieldsValid) {
                 return t;
@@ -55,7 +50,6 @@ public class EcommStrategy extends BaseStrategy {
             if (t.getMedia().equals(MediaType.MIL_STAR)) {
                 CIDValidation(t);
             }
-
             //Send transaction to Gateway
             Gateway gateway = super.pickGateway(t);
             if (gateway != null) {
@@ -70,47 +64,44 @@ public class EcommStrategy extends BaseStrategy {
                     t.setPlanNumber("10001");
                     t = gateway.processMessage(t);
                 }
-
             }
-
         } catch (AuthorizerException e) {
-            String message = e.getClass() + e.getMessage() + e.getCause();
-            LOG.error(message);
+            LOG.error(e.getClass() + e.getMessage() +"..."+t.getRrn());
             buildErrorResponse(t, "", e.getMessage());
             return t;
         } catch (Exception e) {
-            LOG.error(e.toString());
+            LOG.error(e.getMessage() +"..."+t.getRrn());
             buildErrorResponse(t, "", e.getMessage());
             return t;
         }
+       
+       LOG.info("EcommStrategy.processRequest Exit ..."+t.getRrn());
         return t;
     }
 
     public boolean validateECommFields(Transaction t) {
-        LOG.info("validateECommFields method started");
+        LOG.info("EcommStrategy.validateECommFields method started..."+t.getRrn());
         // Validate only fields which are required for ECOMM 
         // Settle Indicator is always false
         if ("true".equalsIgnoreCase(t.getSettleIndicator())) {
             buildErrorResponse(t, configurator.get("INVALID_SETTLE_INDICATOR"), "INVALID_SETTLE_INDICATOR");
-            LOG.error("INVALID_SETTLE_INDICATOR");
+            LOG.error("INVALID_SETTLE_INDICATOR ..."+t.getRrn());
             return false;
         }
 
         if (t.getVoidFlag() != null && !t.getVoidFlag().isEmpty()) {
             //TODO : Remove below line when handling voids
             buildErrorResponse(t, configurator.get("VOID_IS_NOT_SUPPORTED"), "VOID_IS_NOT_SUPPORTED");
-            LOG.error("VOID_IS_NOT_SUPPORTED");
+            LOG.error("VOID_IS_NOT_SUPPORTED ..."+t.getRrn());
             return false;
         }
-
         if (t.getOrderNumber() != null && !t.getOrderNumber().isEmpty()
                 && t.getOrderNumber().length() > 22) {
             //TODO : Remove below line when handling voids
             buildErrorResponse(t, configurator.get("INVALID_ORDER_NUMBER"), "INVALID_ORDER_NUMBER");
-            LOG.error("INVALID_ORDER_NUMBER");
+            LOG.error("INVALID_ORDER_NUMBER ..."+t.getRrn());
             return false;
         }
-
         // Bin Range     
         String mediaType = t.getMedia();
         String PlanNbr = t.getPlanNumber();
@@ -123,14 +114,11 @@ public class EcommStrategy extends BaseStrategy {
         if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)) {
             if (PlanNbr.equalsIgnoreCase("") || PlanNbr.trim().isEmpty()) {
                 buildErrorResponse(t, configurator.get("INVALID_CREDIT_PLAN"), "INVALID_CREDIT_PLAN");
-                                LOG.error("INVALID_CREDIT_PLAN");
                 return false;
             }
-
             if (!RequestType.SALE.equalsIgnoreCase(t.getRequestType())) {
                 if (t.getReversal() == null || t.getReversal().trim().isEmpty()) {
                     buildErrorResponse(t, configurator.get("INVALID_REQUEST_TYPE"), "INVALID_REQUEST_TYPE");
-                                    LOG.error("INVALID_REQUEST_TYPE");
                     return false;
                 }
             }
@@ -141,7 +129,6 @@ public class EcommStrategy extends BaseStrategy {
                     + "|" + RequestType.INQUIRY + "|"
                     + "|" + RequestType.REFUND)) {
                 buildErrorResponse(t, configurator.get("INVALID_REQUEST_TYPE"), "INVALID_REQUEST_TYPE");
-                LOG.error("INVALID_REQUEST_TYPE");
                 return false;
             }
         } else if (t.getMedia().equalsIgnoreCase(MediaType.VISA)
@@ -151,43 +138,36 @@ public class EcommStrategy extends BaseStrategy {
             if (!RequestType.SALE.equalsIgnoreCase(t.getRequestType())) {
                 if (t.getReversal() == null || t.getReversal().trim().isEmpty()) {
                     buildErrorResponse(t, configurator.get("INVALID_REQUEST_TYPE"), "INVALID_REQUEST_TYPE");
-                    LOG.error("INVALID_REQUEST_TYPE");
                     return false;
                 }
             }
         }
-
         // AVS Verification
         if (!t.getMedia().equalsIgnoreCase(MediaType.GIFT_CARD)) {
             if (t.getZipCode() == null || t.getZipCode().trim().isEmpty()) {
                 if (t.getBillingZipCode() == null
                         || t.getBillingZipCode().trim().isEmpty()) {
                     buildErrorResponse(t, configurator.get("INVALID_ADDRESS"), "INVALID_ADDRESS");
-                    LOG.error("INVALID_ADDRESS");
                     return false;
                 }
                 if (t.getBillingAddress1() == null
                         || t.getBillingAddress1().trim().isEmpty()) {
                     buildErrorResponse(t, configurator.get("INVALID_ADDRESS"), "INVALID_ADDRESS");
-                    LOG.error("INVALID_ADDRESS");                    
                     return false;
                 }
                 if (t.getBillingCountryCode() == null
                         || t.getBillingCountryCode().trim().isEmpty()) {
                     buildErrorResponse(t, configurator.get("INVALID_ADDRESS"), "INVALID_ADDRESS");
-                    LOG.error("INVALID_ADDRESS");                    
                     return false;
                 }
-
                 if (t.getCardHolderName() == null
                         || t.getCardHolderName().trim().isEmpty()) {
                     buildErrorResponse(t, configurator.get("INVALID_ADDRESS"), "INVALID_ADDRESS");
-                    LOG.error("INVALID_ADDRESS");                    
                     return false;
                 }
             }
         }
-        LOG.info("validateECommFields method ended");
+        LOG.info("EcommStrategy.validateECommFields Exit ..."+t.getRrn());
         return true;
     }
 
@@ -198,7 +178,7 @@ public class EcommStrategy extends BaseStrategy {
     }
 
     private void CIDValidation(Transaction t) {
-        LOG.info("CIDValidation started in class EcommStrategy");
+        LOG.info("EcommStrategy.CIDValidation Entry ..."+t.getRrn());
 
         boolean authorizedForMilstar = true;
         if (enableStub != null && enableStub.trim().equalsIgnoreCase("true")) //
@@ -207,28 +187,26 @@ public class EcommStrategy extends BaseStrategy {
         } else {
             //If we fail to perform this check let the authorization go through.
             try {
-                LOG.debug("Calling custInfo ");
-
+                LOG.info("Calling custInfo ");
                 CustInfo custInfo = new CustInfo();
                 String ssn = custInfo.callCustomerLookup(t.getCustomerId());
                 if (ssn != null && !ssn.equals("")) {
                     MQServ mqServ = new MQServ();
                     authorizedForMilstar = mqServ.callMatch(ssn, t.getAccount());
                 } else {
+                    LOG.error("Unable to lookup the ssn for cid ..."+t.getRrn());
                     throw new AuthorizerException("Unable to lookup the ssn for cid " + t.getCustomerId());
                 }
             } catch (Exception ce) {
-                String longDescription = "Unable to perform the milstar cid lookup " + ce.getMessage() + ".";
-                LOG.warn(longDescription);
+                LOG.warn("Unable to perform the milstar cid lookup " + ce.getMessage() + "."+t.getRrn());
                 LOG.error(convertStackTraceToString(ce));
                 t.setComment("Unable to perform the milstar cid lookup");
-
             }
         }
         if (!authorizedForMilstar) {
             throw new AuthorizerException("Customer ID is not authorized to use the milstar card"); //buildResponseMessage(message, rrn, 'D', "995", "NOT ALLOWD", "Customer ID is not authorized to use the milstar card");                                 
         }
-        LOG.info("CIDValidation ended in class EcommStrategy");
+       LOG.info("EcommStrategy.CIDValidation Exit ..."+t.getRrn());
 
     }
 

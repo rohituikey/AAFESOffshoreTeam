@@ -1,9 +1,13 @@
+
+package com.aafes.stargate.gateway.vision.entity;
+import javax.ejb.Stateless;
+
 ///*
 // * To change this license header, choose License Headers in Project Properties.
 // * To change this template file, choose Tools | Templates
 // * and open the template in the editor.
 // */
-//package com.aafes.stargate.gateway.vision.entity;
+
 //
 //import com.aafes.stargate.authorizer.entity.Transaction;
 //import com.aafes.stargate.gateway.GatewayException;
@@ -55,8 +59,8 @@
 // *
 // * @author nguyentul
 // */
-//@Stateless
-//public class CICSHandlerBean {
+@Stateless
+public class CICSHandlerBean {
 //
 //    private static final Logger LOG
 //            = LoggerFactory.getLogger(CICSHandlerBean.class.getSimpleName());
@@ -483,4 +487,4 @@
 //            LOG.error(ex.toString());
 //        }
 //    }
-//}
+}

@@ -10,11 +10,9 @@ import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.validatetoken.CrosssiteRequestTokenTable;
 import com.aafes.stargate.validatetoken.CrosssiteRequestUsertable;
 import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
-import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -46,8 +44,8 @@ public class TokenServiceDAO {
     }
 
     public boolean insertTokenDetails(CrosssiteRequestTokenTable tokenObj) {
-        sMethodName = "insertTokenDetails";
-        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        
+        LOG.info("TokenServiceDAO.insertTokenDetails entry" );
         boolean dataInsertedFlg = false;
         try {
             mapper.save(tokenObj);
@@ -57,15 +55,16 @@ public class TokenServiceDAO {
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         } finally {
         }
-        LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        LOG.debug("uuid is .."+tokenObj.getIdentityuuid());
+       
+        LOG.info("uuid in TokenServiceDAO.insertTokenDetails  is :"+tokenObj.getIdentityuuid());
+        LOG.info("TokenServiceDAO.insertTokenDetails exit" );
         return dataInsertedFlg;
     }
 
     public CrosssiteRequestTokenTable validateToken(String tokenStr, String identityUuid, String tokenStatus) {
-        sMethodName = "validateToken";
+         LOG.info("TokenServiceDAO.validateToken entry" );
         CrosssiteRequestTokenTable tokenObjLocal;
-        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+       
         try {
             tokenObjLocal = (CrosssiteRequestTokenTable) mapper.get(tokenStr, identityUuid);
         } catch (Exception ex) {
@@ -73,13 +72,13 @@ public class TokenServiceDAO {
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         } finally {
         }
-        LOG.debug("");
+               LOG.info("TokenServiceDAO.validateToken exit" );
         return tokenObjLocal;
     }
 
     public boolean updateTokenStatus(String tokenStatus, String tokenId, String identityUuid) {
-        sMethodName = "updateTokenStatus";
-        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+      
+                LOG.info("TokenServiceDAO.updateTokenStatus entry" );
 
         String updateQuery = "";
         boolean dataInsertedFlg = false;
@@ -88,10 +87,11 @@ public class TokenServiceDAO {
             updateQuery = "UPDATE stargate.crosssiterequesttokentable SET tokenstatus = '" + tokenStatus
                     + "' WHERE tokenid = '" + tokenId + "' AND identityuuid = '" + identityUuid + "';";
 
+         LOG.info("TokenServiceDAO.updateTokenStatus query :"+ updateQuery);
+
             resultSet = session.execute(updateQuery);
 
             if (resultSet != null) {
-                LOG.info("Data Udpated. tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus);
                 dataInsertedFlg = true;
             } else {
                 LOG.error("Data Udpatation failed ! tokenid " + tokenId + ", identityuuid " + identityUuid + ", Status " + tokenStatus);
@@ -101,14 +101,14 @@ public class TokenServiceDAO {
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         } finally {
         }
-        LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        LOG.debug("Method " + sMethodName + "uuid no--" + identityUuid + "( " + " Class Name " + CLASS_NAME);
+        LOG.info("TokenServiceDAO.updateTokenStatus exit" );
+       
         return dataInsertedFlg;
     }
 
     public boolean validateUserDetails(CrosssiteRequestUsertable tokenObj) {
-        sMethodName = "validateUserDetails";
-        LOG.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+       
+        LOG.info("TokenServiceDAO.validateUserDetails entry" );
         boolean userValidateFlg = false;
         CrosssiteRequestUsertable obj;
         try {
@@ -121,8 +121,7 @@ public class TokenServiceDAO {
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         } finally {
         }
-        LOG.debug("Method " + sMethodName + "uuid no--" + tokenObj.getIdentityuuid() + "( " + " Class Name " + CLASS_NAME);
-        LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+         LOG.info("TokenServiceDAO.validateUserDetails exit"); 
         return userValidateFlg;
     }
 

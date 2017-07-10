@@ -17,7 +17,6 @@ import com.svs.svsxml.beans.Card;
 import com.svs.svsxml.beans.Merchant;
 import com.svs.svsxml.service.SVSXMLWay;
 import javax.ejb.Stateless;
-import javax.enterprise.inject.Stereotype;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -27,13 +26,11 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class BalanceInquiryProcessor extends Processor {
 
-    private static final org.slf4j.Logger log
-            = LoggerFactory.getLogger(BalanceInquiryProcessor.class.getSimpleName());
-
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(BalanceInquiryProcessor.class.getSimpleName());
 
     @Override
     public void processRequest(Transaction t) {
-        log.info("Method......started " + "processBalanceInquiry.......");
+        log.info("Method started processRequest in BalanceInquiryProcessor .");
 
         SVSXMLWay sVSXMLWay = SvsUtil.setUserNamePassword();
 
@@ -61,7 +58,6 @@ public class BalanceInquiryProcessor extends Processor {
         balanceInquiryRequest.setTransactionID(t.getRrn() + "0000");
         balanceInquiryRequest.setDate(SvsUtil.formatLocalDateTime());
         balanceInquiryRequest.setInvoiceNumber(t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
-
         balanceInquiryRequest.setRoutingID(StarGateConstants.ROUTING_ID);
 //        balanceInquiryRequest.setStan(t.getSTAN());
         log.debug("REQUEST---->AuthorizationCode " + t.getAuthoriztionCode() + "||TransactionId " + t.getTransactionId() + "||Invoice Number " + t.getOrderNumber().substring(t.getOrderNumber().length() - 8));
@@ -71,9 +67,7 @@ public class BalanceInquiryProcessor extends Processor {
             log.debug("RESPONSE---->AuthorizationCode " + balanceInquiryResponse.getAuthorizationCode() + "||AMOUNT " + balanceInquiryResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + balanceInquiryResponse.getReturnCode().getReturnCode() + "||RETURN CODE DISCRIPTION" + balanceInquiryResponse.getBalanceAmount().getAmount() + "||RETURN  CODE  " + balanceInquiryResponse.getReturnCode().getReturnDescription());
 
             if (balanceInquiryResponse != null) {
-
                 t.setAuthNumber(balanceInquiryResponse.getAuthorizationCode());
-
                 if (balanceInquiryResponse.getBalanceAmount() != null) {
                     t.setBalanceAmount((long) (balanceInquiryResponse.getBalanceAmount().getAmount()*100));
                     t.setCurrencycode(StarGateConstants.CURRENCY);
@@ -90,7 +84,8 @@ public class BalanceInquiryProcessor extends Processor {
                         t.setResponseType(ResponseType.DECLINED);
                     }
                 }
-                log.debug("rrn number is--"+t.getRrn());
+                log.debug("rrn number in BalanceInquiryProcessor.processRequest is : "+t.getRrn());
+                log.info("Method ended processRequest in BalanceInquiryProcessor .");
             }
         } catch (GatewayException e) {
             log.error(("Error in processBalanceInquiry method i.e responce is null " + e));

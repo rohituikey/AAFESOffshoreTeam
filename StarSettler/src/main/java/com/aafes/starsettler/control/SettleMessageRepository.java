@@ -27,8 +27,8 @@ public class SettleMessageRepository {
     @EJB
     private FacilityDAO facilityDAO;
     @EJB
-    private TransactionDAO transactionDAO;        
-      
+    private TransactionDAO transactionDAO;   
+    
      
 
     public void save(List<SettleEntity> settleEntityList) {

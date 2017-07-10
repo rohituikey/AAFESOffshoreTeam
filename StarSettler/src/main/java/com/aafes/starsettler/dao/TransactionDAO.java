@@ -29,6 +29,7 @@ public class TransactionDAO {
 
     public AuthorizationCodes find(SettleEntity settleEntity) {
         
+        LOG.info("Entry in find method of TransactionDao..");
         AuthorizationCodes ac = new AuthorizationCodes();
         
         String query = "select reasoncode,responsedate,authoriztioncode,avsresponsecode,csvresponsecode"
@@ -43,7 +44,7 @@ public class TransactionDAO {
             ac.setAvsResponseCode(rs.getString("avsresponsecode"));
             ac.setCsvResponseCode(rs.getString("csvresponsecode"));
         }
-        
+        LOG.info("Exit from find method of TransactionDao..");
         return ac;
     }
 

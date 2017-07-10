@@ -65,20 +65,19 @@ public class SettleMessageResource {
 
             // Unmarshal against XSD
             // Send the settle message to Setler
-             String ValidatedXML = FilterRequestXML(requestXML);
-              if(requestXML.contains("DOCTYPE")
-                    ||requestXML.contains("CDATA")){
+            String ValidatedXML = FilterRequestXML(requestXML);
+            if (requestXML.contains("DOCTYPE")
+                    || requestXML.contains("CDATA")) {
                 LOG.error("Invalid Request");
                 responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
                         + "</ErrorInformation>";
-            }
-            else if (ValidatedXML != null) {
-            Settlement requestMessage = unmarshalWithValidation(requestXML);
+            } else if (ValidatedXML != null) {
+                Settlement requestMessage = unmarshalWithValidation(requestXML);
 
-            Settlement responseMessage = settler.saveForSettle(requestMessage);
+                Settlement responseMessage = settler.saveForSettle(requestMessage);
 
-            responseXML = marshal(responseMessage);
-            LOG.info("To Client: " + responseXML);
+                responseXML = marshal(responseMessage);
+                LOG.info("To Client: " + responseXML);
             } else {
                 LOG.error("Invalid Request");
                 responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
@@ -88,7 +87,7 @@ public class SettleMessageResource {
 
             responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
                     + "</ErrorInformation>";
-            LOG.error(e.toString());
+            LOG.error(e.getMessage());
         } catch (Exception ex) {
             Logger.getLogger(SettleMessageResource.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -98,13 +97,17 @@ public class SettleMessageResource {
     }
 
     private String marshal(Settlement request) {
+        LOG.info("Entry in marshal method of SettleMessageResource..");
         StringWriter sw = new StringWriter();
         JAXB.marshal(request, sw);
         String xmlString = sw.toString();
+        LOG.info("Exit from marshal Method of SettleMessageResource..");
         return xmlString;
     }
 
     private Settlement unmarshalWithValidation(String xml) throws SAXException, JAXBException {
+        
+        LOG.info("Entry in unmarshalWithValidation method of SettleMessageResource..");
         Settlement request = new Settlement();
 
         StringReader reader = new StringReader(xml);
@@ -126,6 +129,7 @@ public class SettleMessageResource {
 
         jaxbUnmarshaller.setSchema(schema);
         request = (Settlement) jaxbUnmarshaller.unmarshal(reader);
+        LOG.info("Exit from unmarshalWithValidation Method of SettleMessageResource..");
 
         return request;
     }
@@ -136,9 +140,9 @@ public class SettleMessageResource {
     public void setSettler(Settler settler) {
         this.settler = settler;
     }
-    
+
     private static String FilterRequestXML(String xmlString) {
-        LOG.info("In filter request method.");
+        LOG.info("Entry in FilterRequestXML method of SettleMessageResource");
 
         String retString = null;
         try {
@@ -151,14 +155,16 @@ public class SettleMessageResource {
             retString = getStringFromDocument(document);
             LOG.info("Validated XML");
         } catch (Exception ex) {
-            LOG.error(ex.toString());
+            LOG.error(ex.getMessage());
             retString = null;
         }
+        LOG.info("Exit from FilterRequestXML method of SettleMessageResource");
         return retString;
     }
 
     public static String getStringFromDocument(Document doc) throws TransformerException {
 
+        LOG.info("Entry in getStringFromDocument method of SettleMessageResource");
         StringWriter writer = null;
 
         try {
@@ -170,8 +176,9 @@ public class SettleMessageResource {
             transformer.transform(domSource, result);
 
         } catch (Exception ex) {
-            LOG.error(ex.toString());
+            LOG.error(ex.getMessage());
         }
+        LOG.info("Exit from getStringFromDocument method of SettleMessageResource");
 
         return writer.toString();
     }

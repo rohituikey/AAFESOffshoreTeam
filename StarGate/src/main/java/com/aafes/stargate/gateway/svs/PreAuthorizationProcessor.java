@@ -56,7 +56,6 @@ import com.svs.svsxml.beans.Merchant;
 import com.svs.svsxml.beans.PreAuthRequest;
 import com.svs.svsxml.beans.PreAuthResponse;
 import com.svs.svsxml.service.SVSXMLWay;
-import java.math.BigDecimal;
 import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
 
@@ -163,7 +162,8 @@ public class PreAuthorizationProcessor extends Processor{
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ".responce is null Exception  : " + e.getMessage());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
-        }LOGGER.debug("rrn number is--"+t.getRrn());
+        }
+        LOGGER.debug("rrn number in "+CLASS_NAME+"."+sMethodName+" is : "+t.getRrn());
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
     }
 }

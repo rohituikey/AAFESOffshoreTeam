@@ -83,6 +83,8 @@ public class MerchandiseReturnMessageProcessor extends Processor {
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ".responce is null Exception  : " + e.getMessage());
             throw new GatewayException("INTERNAL_SERVER_ERROR");
-        }LOGGER.debug("rrn number is--"+transaction.getRrn());
+        }
+        LOGGER.debug("rrn number in "+CLASS_NAME+"."+sMethodName+" is : "+transaction.getRrn());
+        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
     }
 }

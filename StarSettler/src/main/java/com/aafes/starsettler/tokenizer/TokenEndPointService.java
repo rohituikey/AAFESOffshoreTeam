@@ -5,7 +5,6 @@
  */
 package com.aafes.starsettler.tokenizer;
 
-
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.token.AccountTypeType;
 import com.aafes.token.RequestTypeType;
@@ -27,49 +26,46 @@ import org.slf4j.LoggerFactory;
  */
 @Stateless
 public class TokenEndPointService {
-    
-    
+
     @Inject
     private String tokenEndpoint;
-    
-    
-     private static final org.slf4j.Logger log
+
+    private static final org.slf4j.Logger log
             = LoggerFactory.getLogger(TokenEndPointService.class.getSimpleName());
-    
-    
-     public String lookupAccount(SettleEntity t) throws ProcessingException{
-       log.info("TokenServicer#lookupAccount#Start.......");
-        
+
+    public String lookupAccount(SettleEntity t) throws ProcessingException {
+
+        log.info("Entry in lookupAccount method of TokenEndPointService..");
+
         Client client = ClientBuilder.newBuilder().build();
         WebTarget target = client.target(tokenEndpoint);
         log.info("TokenServicer#lookupAccount#Done WebTarget.........");
-                
+
         TokenMessage tm = new TokenMessage();
         TokenMessage.Request request = new TokenMessage.Request();
         request.setAccount(t.getCardToken());
         request.setAccountType(AccountTypeType.TOKEN);
         request.setMedia(t.getCardType());
         request.setRequestType(RequestTypeType.LOOKUP);
-         request.setTokenBankName(t.getTokenBankName());
+        request.setTokenBankName(t.getTokenBankName());
         tm.setRequest(request);
-      //  request.set
+        //  request.set
         Entity entity = Entity.entity(tm, MediaType.APPLICATION_XML);
-         
+
         Response response = target.request(MediaType.APPLICATION_XML).post(entity);
-         
-        tm = response.readEntity(TokenMessage.class);    
+
+        tm = response.readEntity(TokenMessage.class);
         log.info("TokenServicer#lookupAccount#Got response.........");
-        if(tm.getResponse() != null) {
+        log.info("Exit from lookupAccount method of TokenEndPointService..");
+        if (tm.getResponse() != null) {
             return tm.getResponse().getAccount();
         }
         return "";
-       
+
     }
-    
 
     public void setTokenEndpoint(String tokenEndpoint) {
         this.tokenEndpoint = tokenEndpoint;
     }
-    
-    
+
 }

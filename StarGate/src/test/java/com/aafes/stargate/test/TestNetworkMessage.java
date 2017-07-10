@@ -22,7 +22,7 @@ import org.junit.Test;
  *
  * @author alugumetlas
  */
-
+@Ignore
 public class TestNetworkMessage {
     
    

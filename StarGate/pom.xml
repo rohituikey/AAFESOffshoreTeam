@@ -12,7 +12,8 @@
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.test.skip>true</maven.test.skip>
+        <maven.test.skip>false</maven.test.skip>
+        <jenkins.e2eTests.reportsDirectory>target/StarGate-reports</jenkins.e2eTests.reportsDirectory>
     </properties>
     <repositories>
 

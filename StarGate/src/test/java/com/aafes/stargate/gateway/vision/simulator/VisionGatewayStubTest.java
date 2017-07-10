@@ -17,6 +17,7 @@ import org.junit.Ignore;
  *
  * @author uikuyr
  */
+@Ignore
 public class VisionGatewayStubTest {
     
     private Transaction transaction;

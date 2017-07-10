@@ -16,6 +16,7 @@ import com.aafes.stargate.util.RequestType;
 import java.net.MalformedURLException;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author alugumetlas
  */
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class TestRedemptionRequest {
 

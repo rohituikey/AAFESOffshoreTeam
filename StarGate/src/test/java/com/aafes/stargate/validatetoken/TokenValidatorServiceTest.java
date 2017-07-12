@@ -8,6 +8,7 @@ package com.aafes.stargate.validatetoken;
 import com.aafes.stargate.boundary.CreditMessageResource;
 import java.net.MalformedURLException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author burangir
  */
+@Ignore
 public class TokenValidatorServiceTest {
     
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TokenValidatorServiceTest.class.getSimpleName());

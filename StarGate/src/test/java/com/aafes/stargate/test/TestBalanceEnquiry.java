@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author alugumetlas
  *
  */
+@Ignore
 public class TestBalanceEnquiry {
 
     Transaction transaction = new Transaction();

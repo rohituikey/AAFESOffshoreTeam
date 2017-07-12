@@ -25,7 +25,6 @@ final public class ApplicationConfig extends Application {
     }
 
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(com.aafes.starsettler.boundary.CommandSettleResource.class);
         resources.add(com.aafes.starsettler.boundary.SettleMessageResource.class);
         resources.add(com.aafes.starsettler.boundary.TestFDMSXSD.class);
     }

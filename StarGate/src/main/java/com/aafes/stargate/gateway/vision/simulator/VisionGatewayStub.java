@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 @Stateless
 public class VisionGatewayStub extends Gateway {
-     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(NetworkMessageProcessor.class.getSimpleName());
+     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(VisionGatewayStub.class.getSimpleName());
 
     @Override
     public Transaction processMessage(Transaction t) {

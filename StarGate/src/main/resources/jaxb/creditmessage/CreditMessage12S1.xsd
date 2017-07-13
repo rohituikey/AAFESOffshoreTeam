@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <!--
-This version contains the KeepAlive messaging required by IBM/Deca. Also includes new RequestTypeType of TrnCancel, Virtual GC Issue, VrtResponse, GCPin (expanded to length=8). 
-Increased the length of termId to max 8 digits a/n. Made Reason Code a variable length 1-3. Cleaned up extra spaces after some elements and refactored the AVS section. 12-May-2017
--->
+This version contains the KeepAlive messaging required by IBM/Deca. Also Change WEXRequestPayAtPumpData to WEXRequestData and 
+changed WEXResponsePayAtPumpData to WEXResponseData, also changed the WEX data from integers to strings. Added PricePerUnit to 
+figure WEX Price per gallon or liter.  Added NonFuelProdCodes and pricing for WEX. Also changed PlanNumber. Added origRRN for use 
+in Transaction Cancels and/or Refunds. 28-June-2017.-->
 
 <xs:schema
     xmlns="http://www.aafes.com/credit"
@@ -222,27 +223,27 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
-                            <xs:element name="WEXRequestPayAtPumpData" minOccurs="0" maxOccurs="1">
+                            <xs:element name="WEXRequestData" minOccurs="0" maxOccurs="1">
                                 <xs:complexType>
                                     <xs:sequence minOccurs="1" maxOccurs="1">
                                         <xs:element name="DriverId" minOccurs="1" maxOccurs="1"> 
                                             <xs:simpleType>
-                                                <xs:restriction base="xs:integer" >
-                                                    <xs:totalDigits value="10"/>
+                                                <xs:restriction base="xs:string" >
+                                                    <xs:length value="10"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
                                         <xs:element name="Odometer" minOccurs="1" maxOccurs="1"> 
                                             <xs:simpleType>
-                                                <xs:restriction base="xs:integer">
-                                                    <xs:totalDigits value="9"/>                                                     
+                                                <xs:restriction base="xs:string">
+                                                    <xs:length value="9"/>                                                     
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element> 
                                         <xs:element name="RestrictCode" minOccurs="0" maxOccurs="1"> 
                                             <xs:simpleType>
-                                                <xs:restriction base="xs:integer" >
-                                                    <xs:totalDigits value="2"/>    
+                                                <xs:restriction base="xs:string" >
+                                                    <xs:length value="2"/>    
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
@@ -255,7 +256,7 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                             </xs:simpleType>
                                         </xs:element>
                                         <!-- Service Code values are Self, Full and Other --> 
-                                        <xs:element name="ServiceCode" minOccurs="0" maxOccurs="1">
+                                        <xs:element name="ServiceCode" minOccurs="0" maxOccurs="2">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
                                                     <xs:enumeration value="S"/>
@@ -264,7 +265,7 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element> 
-                                        <xs:element name="FuelProdCode" minOccurs="0" maxOccurs="1"> 
+                                        <xs:element name="FuelProdCode" minOccurs="0" maxOccurs="2"> 
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:integer">
                                                     <xs:totalDigits value="3"/>
@@ -272,7 +273,7 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                             </xs:simpleType>
                                         </xs:element>
                                         <!-- Qty Pumped is Zero on PreAuth Request but populated in Final Request total number of gallons or liters pumped. --> 
-                                        <xs:element name="QtyPumped" minOccurs="0" maxOccurs="1">
+                                        <xs:element name="QtyPumped" minOccurs="0" maxOccurs="2">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:decimal" >
                                                     <xs:fractionDigits value="3"/>    
@@ -280,7 +281,16 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                             </xs:simpleType>
                                         </xs:element>
                                         <!-- FuelPrice is Zero on PreAuth Request but populated in Final Request it reflects the total dollar amount of fuel pumped when the hose is hung up. -->
-                                        <xs:element name="FuelPrice" minOccurs="0" maxOccurs="1">
+                                        <xs:element name="FuelPrice" minOccurs="0" maxOccurs="2">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:decimal">
+                                                    <xs:fractionDigits value="3"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <!-- PricePerUnit is not sent on PreAuth Request but populated in Final Request under the Wex-Product Details in the Capture Request (Completion or Final Auth Request) 
+                                        it reflects the price per gallon or liter of fuel pumped when the hose is hung up. -->
+                                        <xs:element name="PricePerUnit" minOccurs="0" maxOccurs="1">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:decimal">
                                                     <xs:fractionDigits value="3"/>
@@ -290,15 +300,15 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                         <!-- UnitOfMeas value is 1=Gallons, 2=Liters -->
                                         <xs:element name="UnitOfMeas" minOccurs="0" maxOccurs="1">
                                             <xs:simpleType>
-                                                <xs:restriction base="xs:integer">
-                                                    <xs:totalDigits value="1"/>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:length value="1"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
                                         <xs:element name="VehicleId" minOccurs="0" maxOccurs="1"> 
                                             <xs:simpleType>
-                                                <xs:restriction base="xs:integer" >
-                                                    <xs:totalDigits value="9"/>
+                                                <xs:restriction base="xs:string" >
+                                                    <xs:length value="9"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
@@ -358,8 +368,8 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                     <xs:sequence minOccurs="1" maxOccurs="3">
                                         <xs:element name="PlanNumber"> 
                                             <xs:simpleType>
-                                                <xs:restriction base="xs:integer">
-                                                    <xs:totalDigits value="5"/>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:length value="5"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
@@ -421,8 +431,8 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                         <!-- For UnitMeas values are 0=Liters, 1=Gallons -->
                                         <xs:element name="UnitMeas">
                                             <xs:simpleType>
-                                                <xs:restriction base="xs:integer">
-                                                    <xs:totalDigits value="1"/>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:length value="1"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
@@ -468,6 +478,14 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                     <xs:restriction base="xs:string">
                                         <xs:minLength value="6"/>
                                         <xs:maxLength value="8"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <!-- This is the Original RRN used in an Order that will Cancel or a Refund an Authorization -->
+                            <xs:element name="origRRN" minOccurs="0" maxOccurs="6">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:length value="12"/>    
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
@@ -521,11 +539,36 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                             <xs:element name="AddressVerificationService" minOccurs="0" maxOccurs="1">
                                 <xs:complexType>
                                     <xs:sequence>
+                                        <!-- CardHolderName will soon be removed and the breakdown of Last name, First name and Middle Initial will be used. -->
                                         <xs:element name="CardHolderName" minOccurs="0" maxOccurs="1">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
                                                     <xs:minLength value="3"/>
                                                     <xs:maxLength value="40"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="CardHolderLastName" minOccurs="0" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:minLength value="2"/>
+                                                    <xs:maxLength value="40"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="CardHolderFirstName" minOccurs="0" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:minLength value="1"/>
+                                                    <xs:maxLength value="40"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="CardHolderMiddleInitial" minOccurs="0" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:minLength value="1"/>
+                                                    <xs:maxLength value="1"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
@@ -749,8 +792,8 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                 <!-- No need to reply with plan number unless it was unknown, not sent in the request or multiple plan numbers
                                 were sent in the Request. --> 
                                 <xs:simpleType>
-                                    <xs:restriction base="xs:integer">
-                                        <xs:totalDigits value="5"/>
+                                    <xs:restriction base="xs:string">
+                                        <xs:length value="5"/>
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
@@ -771,8 +814,8 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                             </xs:element>
                             <xs:element name="CardReferenceID" minOccurs="0" maxOccurs="1">                
                                 <xs:simpleType>
-                                    <xs:restriction base="xs:integer">
-                                        <xs:totalDigits value="12"/>
+                                    <xs:restriction base="xs:string">
+                                        <xs:length value="12"/>
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
@@ -862,7 +905,7 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:element>
-                            <xs:element name="WEXResponsePayAtPumpData" minOccurs="0" maxOccurs="1">
+                            <xs:element name="WEXResponseData" minOccurs="0" maxOccurs="1">
                                 <xs:complexType>
                                     <xs:sequence minOccurs="1" maxOccurs="1">
                                         <xs:element name="AmtPreAuthorized" minOccurs='0' maxOccurs='1'> 
@@ -882,6 +925,12 @@ Increased the length of termId to max 8 digits a/n. Made Reason Code a variable 
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:element name="CardHolderName" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
+                                        </xs:element>
+                                        <xs:element name="CardHolderLastName" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
+                                        </xs:element>
+                                        <xs:element name="CardHolderFirstName" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
+                                        </xs:element>
+                                        <xs:element name="CardHolderMiddleInital" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
                                         </xs:element>
                                         <xs:element name="BillingAddress1" type="AddressVerificationResponseType" minOccurs="0" maxOccurs="1">
                                         </xs:element>

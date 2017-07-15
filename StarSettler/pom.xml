@@ -208,6 +208,18 @@
                 <artifactId>maven-jaxb2-plugin</artifactId>
                 <version>0.12.0</version>
                 <executions>
+                     <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/creditmessage/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-creditmessage.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-creditmessage</id>
+                    </execution>
                     <execution>
                         <goals>
                             <goal>generate</goal>

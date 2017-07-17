@@ -85,8 +85,8 @@ public class RetailStrategy extends BaseStrategy {
 
             } else {
                 if (gateway != null) {
-                    t = futureVisionGateway.processMessage(t);
-//                    t = gateway.processMessage(t);
+//                    t = futureVisionGateway.processMessage(t);
+                    t = gateway.processMessage(t);
                 }
             }
 

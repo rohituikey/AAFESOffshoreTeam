@@ -143,6 +143,7 @@ public class Authorizer {
                     } else {
                         t = baseStrategy.processRequest(t);
                     }
+                    t = baseStrategy.processRequest(t);
                     mapResponse(t, cm);
                     t.setResponseXmlDateTime(getSystemDateTime());
                     if (t.getReversal() != null
@@ -612,7 +613,7 @@ public class Authorizer {
             response.setMedia(t.getMedia());
             response.setAuthNumber(t.getAuthNumber());
             if (t.getPlanNumber() != null && !t.getPlanNumber().trim().isEmpty() && t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)) {
-                response.setPlanNumber(BigInteger.valueOf(Long.valueOf(t.getPlanNumber())));
+                response.setPlanNumber(String.valueOf(BigInteger.valueOf(Long.valueOf(t.getPlanNumber()))));
             }
             if (t.getMilstarNumber() != null && !t.getMilstarNumber().trim().isEmpty()) {
                 response.setMilstarNumber(t.getMilstarNumber());
@@ -624,7 +625,7 @@ public class Authorizer {
                 }
             }
             if (response.getCardReferenceID() != null) {
-                response.setCardReferenceID(BigInteger.valueOf(Long.valueOf(t.getCardReferenceID())));
+                response.setCardReferenceID(String.valueOf(BigInteger.valueOf(Long.valueOf(t.getCardReferenceID()))));
             }
 //            if (t.getMedia().equalsIgnoreCase(MediaType.MIL_STAR)) {
 //                response.setPartialAmount(BigDecimal.valueOf(t.getPartialAmount()).movePointLeft(2));

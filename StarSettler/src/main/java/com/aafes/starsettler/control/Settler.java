@@ -16,13 +16,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import org.slf4j.LoggerFactory;
 
@@ -43,13 +41,13 @@ public class Settler {
     private SettleMessageRepository settleRepository;
     @EJB
     private TokenEndPointService tokenEndPointService;
-    @Inject
-    private int cutoverdays;
 
     @EJB
     private SettleFactory settleFactory;
 
     public Settlement saveForSettle(Settlement settleMessage) throws JAXBException {
+
+        LOG.info("Entry in saveForSettle method of Settler..");
 
         List<SettleEntity> settleEntityList = new ArrayList<SettleEntity>();
         try {
@@ -86,24 +84,27 @@ public class Settler {
         } catch (JAXBException e) {
             throw new JAXBException(e.getMessage());
         } catch (SettlerException e) {
+            LOG.error(e.getMessage());
             Settlement.Response response = new Settlement.Response();
             response.setDescriptionField(e.getMessage());
             response.setReasonCode(configurator.get(e.getMessage()));
             response.setResponseType(ResponseType.FAILED);
             settleMessage.getResponse().add(response);
         } catch (Exception e) {
+            LOG.error(e.getMessage());
             Settlement.Response response = new Settlement.Response();
             response.setDescriptionField("INTERNAL SERVER ERROR");
             response.setReasonCode(configurator.get("INTERNAL_SERVER_ERROR"));
             response.setResponseType(ResponseType.FAILED);
             settleMessage.getResponse().add(response);
         }
-
+        LOG.info("Exit from saveForSettle method of Settler..");
         return settleMessage;
     }
 
     public String commandSettle(CommandMessage commandMessage) {
 
+        LOG.info("Entry in commandSettle method of Settler..");
         String response = "Success";
         try {
 
@@ -114,31 +115,17 @@ public class Settler {
             baseSettler.run(identityUUID, processDate);
 
         } catch (Exception e) {
+            LOG.error(e.getMessage());
             response = e.getMessage();
         }
 
-        return response;
-    }
-    public String updateSettleStatus(SettleMessage settleMessage) {
-
-        String response = "Success";
-        try {
-
-            String cardType = settleMessage.getCardType();
-            String receivedDate = settleMessage.getReceivedDate();
-            String identityUUID = settleMessage.getIdentityuuid();
-            String settleStatus = settleMessage.getSettleStatus();
-         
-            settleRepository.updateSettleStatus(cardType,receivedDate,identityUUID,settleStatus);
-          
-        } catch (Exception e) {
-            response = e.getMessage();
-        }
-
+        LOG.info("Exit from commandSettle method of Settler..");
         return response;
     }
 
     private String findFacility(String uuid) throws SettlerException {
+
+        LOG.info("Entry in findFacility method of Settler..");
         try {
 
             Facility facility = settleRepository.getFacility(uuid);
@@ -153,10 +140,12 @@ public class Settler {
         } catch (Exception e) {
             throw new SettlerException("INVALID_UUID");
         }
+
     }
 
-    private void findAuthorizationCodes(List<SettleEntity> settleEntityList, String tokenBankname) throws SettlerException, ParseException {
+    private void findAuthorizationCodes(List<SettleEntity> settleEntityList, String tokenBankname) throws SettlerException {
 
+        LOG.info("Entry in findAuthorizationCodes method of Settler..");
         boolean isTokenPresent = false;
         for (SettleEntity settleEntity : settleEntityList) {
             settleEntity.setTokenBankName(tokenBankname);
@@ -164,100 +153,26 @@ public class Settler {
             if (!isTokenPresent) {
                 throw new SettlerException("TOKEN_NOTFOUND");
             }
-            Authorization authorization = settleRepository.findAuthorization(settleEntity);
-            if (authorization == null && TransactionType.Deposit.equalsIgnoreCase(settleEntity.getTransactionType())) {
-                if (cutoverdays != 0) {
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.add(Calendar.DAY_OF_MONTH, -cutoverdays);
-
-                    SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-                    Date cutoverDate = df.parse(df.format(calendar.getTime()));
-                    Date orderDate = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH).parse(settleEntity.getOrderDate());
-                    if (cutoverDate.after(orderDate)) {
-                        throw new SettlerException("AUTHORIZATION_NOT_FOUND");
-                    }
-                } else if (cutoverdays == 0) {
-                    throw new SettlerException("AUTHORIZATION_NOT_FOUND");
-                }
+            String cardType = settleEntity.getCardType();
+            if (cardType.equalsIgnoreCase(CardType.AMEX)
+                    || cardType.equalsIgnoreCase(CardType.VISA)
+                    || cardType.equalsIgnoreCase(CardType.DISCOVER)
+                    || cardType.equalsIgnoreCase(CardType.MASTER)) {
+                AuthorizationCodes ac = settleRepository.findAuthorizationCodes(settleEntity);
+                settleEntity.setResponseReasonCode(ac.getResponseReasonCode());
+                settleEntity.setResponseDate(ac.getResponseDate());
+                settleEntity.setAuthoriztionCode(ac.getAuthoriztionCode());
+                settleEntity.setAvsResponseCode(ac.getAvsResponseCode());
+                settleEntity.setCsvResponseCode(ac.getCsvResponseCode());
             }
 
-            if (authorization != null) {
-                this.validateAuthTransaction(authorization, settleEntity);
-                String cardType = settleEntity.getCardType();
-                if (cardType.equalsIgnoreCase(CardType.AMEX)
-                        || cardType.equalsIgnoreCase(CardType.VISA)
-                        || cardType.equalsIgnoreCase(CardType.DISCOVER)
-                        || cardType.equalsIgnoreCase(CardType.MASTER)) {
-
-                    settleEntity.setResponseReasonCode(authorization.getResponseReasonCode());
-                    settleEntity.setResponseDate(authorization.getResponseDate());
-                    settleEntity.setAuthoriztionCode(authorization.getAuthoriztionCode());
-                    settleEntity.setAvsResponseCode(authorization.getAvsResponseCode());
-                    settleEntity.setCsvResponseCode(authorization.getCsvResponseCode());
-                }
-                
-                
-                if( (settleEntity.getPaymentAmount()!= null 
-                        && (Long.parseLong(settleEntity.getPaymentAmount()) < 0 ))
-                        || (settleEntity.getAppeasementCsc() != null 
-                                && (settleEntity.getAppeasementCsc().equals("true"))) )
-                {
-                  LOG.info("PaymentAmount is negative or AppeasementCscCode is true");
-                }else{    
-                    settleRepository.updateAuthTransaction(authorization);
-                }
-            }
-
-            settleEntity.setInsertdatetime(this.getSystemDateTime());
         }
-    }
-
-    private void validateAuthTransaction(Authorization ac, SettleEntity settleEntity) throws SettlerException {
-
-        try {
-            long totalReceivedAmount = 0;
-            if (ac.getReceivedAmount() != null && !ac.getReceivedAmount().trim().isEmpty()) {
-                totalReceivedAmount = Long.parseLong(ac.getReceivedAmount()) + Long.parseLong(settleEntity.getPaymentAmount());
-            } else {
-                totalReceivedAmount = Long.parseLong(settleEntity.getPaymentAmount());
-            }
-            
-            //Assigning Payment amount to Original amount - Logging
-            settleEntity.setOriginalPaymentAmount(settleEntity.getPaymentAmount());
-            
-            if (totalReceivedAmount > Long.parseLong(ac.getAmount())) {
-                LOG.warn("SETTLE_AMOUNT_EXCEEDS_AUTH_AMOUNT for rrn : "+settleEntity.getRrn()+" "
-                        + "order no :"+settleEntity.getOrderNumber());
-                //throw new SettlerException("SETTLE_AMOUNT_EXCEEDS_AUTH_AMOUNT");
-                
-                //calculating qualified settlement amount 
-                long paymentAmount = (Long.parseLong(ac.getAmount())
-                                        - Long.parseLong(settleEntity.getPaymentAmount()) 
-                                        - Long.parseLong(ac.getReceivedAmount()) ) 
-                                    + Long.parseLong(settleEntity.getPaymentAmount()) ;
-                
-                //New settlement amount
-                settleEntity.setPaymentAmount(String.valueOf(paymentAmount));
-                
-                totalReceivedAmount = Long.parseLong(ac.getReceivedAmount()) + paymentAmount;
-            }
-            
-            // update ReceivedAmoun in auth
-            ac.setReceivedAmount(Long.toString(totalReceivedAmount));
-            
-
-            if ("Reversal".equalsIgnoreCase(ac.getReversal())) {
-                throw new SettlerException("AUTHORIZATION_REVERSED");
-            }
-
-        } catch (NumberFormatException e) {
-            LOG.error("Error while formatting amounts : " + e.getMessage());
-            throw new SettlerException("INVALID_AMOUNT");
-        }
+        LOG.info("Exit from findAuthorizationCodes method of Settler..");
     }
 
     private boolean findToken(SettleEntity se) {
 
+        LOG.info("Entry in findToken method of Settler..");
         try {
             if (tokenEndPointService != null) {
                 String accountNbr = tokenEndPointService.lookupAccount(se);
@@ -267,10 +182,10 @@ public class Settler {
             }
         } catch (Exception e) {
             LOG.info("Error while calling tokenizer for token : " + se.getCardToken());
-            LOG.error(e.toString());
+            LOG.error(e.getMessage());
             return false;
         }
-
+        LOG.info("Exit from findToken method of Settler..");
         return true;
     }
 //         private void validateDuplicateRecords(List<SettleEntity> settleEntityList) {
@@ -300,6 +215,8 @@ public class Settler {
 
     private void mapRequest(Settlement settleMessage, List<SettleEntity> settleEntityList) throws JAXBException, SettlerException {
 
+        LOG.info("Entry in mapRequest method of VaultDao..");
+
         // TODO
         // Map all request fields from settle Message to settle entity bean here
         if (settleMessage.getShipment() != null) {
@@ -313,12 +230,13 @@ public class Settler {
                             settleEntity.setIdentityUUID(settleMessage.getIdentityUUID());
                             this.mapLineHeader(lineItem, settleEntity);
                             this.mapLinePaymentNode(payment, settleEntity);
-                            settleEntity.setReceiveddate(this.getReceivedDate());
+                            settleEntity.setReceiveddate(this.getSystemDateTime());
                             settleEntity.setSettlestatus(SettleStatus.Ready_to_settle);
                             settleEntityList.add(settleEntity);
                         }
                     }
                 } else {
+                    LOG.error("INVALID_REQUEST");
                     throw new SettlerException("INVALID_REQUEST");
                 }
 
@@ -344,10 +262,11 @@ public class Settler {
                                     }
                                 }
                             } catch (ArithmeticException e) {
+                                LOG.error(e.getMessage());
                                 throw new SettlerException("INVALID_AMOUNT");
                             }
                             this.mapShippingPaymentNode(payment, settleEntity);
-                            settleEntity.setReceiveddate(this.getReceivedDate());
+                            settleEntity.setReceiveddate(this.getSystemDateTime());
                             settleEntity.setSettlestatus(SettleStatus.Ready_to_settle);
                             settleEntityList.add(settleEntity);
                         }
@@ -379,39 +298,24 @@ public class Settler {
                     }
                     settleEntity.setAppeasementDescription(appeasement.getDescription());
                     settleEntity.setAppeasementReference(appeasement.getReference());
-                    
-                    
-                    
                     this.mapAppeasementPaymentNode(payment, settleEntity);
-                    settleEntity.setReceiveddate(this.getReceivedDate());
-                    
-                    if(appeasement.isCsc()){
-                        settleEntity.setAppeasementCsc("true");
-                        settleEntity.setSettlestatus(SettleStatus.Not_to_settle);
-                    }else{
-                        settleEntity.setAppeasementCsc("false");
-                        settleEntity.setSettlestatus(SettleStatus.Ready_to_settle);
-                    }
-                    
+                    settleEntity.setReceiveddate(this.getSystemDateTime());
+                    settleEntity.setSettlestatus(SettleStatus.Ready_to_settle);
                     settleEntityList.add(settleEntity);
-                    if (TransactionType.Deposit.equalsIgnoreCase(settleEntity.getTransactionType())) {
-                        settleEntity.setIsAppeasement(true);
-                    } else {
-                        settleEntity.setIsAppeasement(false);
-                    }
-
                 }
             } else {
                 throw new SettlerException("INVALID_REQUEST");
             }
-
         } else {
             throw new SettlerException("INVALID_REQUEST");
         }
 
+        LOG.info("Exit from mapRequest Method of settler class");
     }
 
     private void mapLineHeader(Shipped lineItem, SettleEntity settleEntity) throws SettlerException {
+
+        LOG.info("Entry in mapLineHeader method of Settler..");
         settleEntity.setClientLineId(lineItem.getClientLineId());
         if (lineItem.getLineId() != null) {
             settleEntity.setLineId(lineItem.getLineId().toString());
@@ -445,16 +349,6 @@ public class Settler {
                     throw new SettlerException("INVALID_AMOUNT");
                 }
             }
-            BigDecimal cscDiscount;
-            cscDiscount = lineItem.getCSCDiscount();
-            if (cscDiscount != null) {
-                cscDiscount = cscDiscount.movePointRight(2);
-                if (cscDiscount.longValueExact() <= 9999999 && cscDiscount.longValueExact() >= -9999999) {
-                    settleEntity.setCscDiscount(Long.toString(cscDiscount.longValueExact()));
-                } else {
-                    throw new SettlerException("INVALID_AMOUNT");
-                }
-            }
         } catch (ArithmeticException e) {
             throw new SettlerException("INVALID_AMOUNT");
         }
@@ -465,9 +359,12 @@ public class Settler {
             settleEntity.setUnitTotal(lineItem.getUnitTotal().toString());
         }
         settleEntity.setCouponCode(lineItem.getCouponCode());
+        LOG.info("Exit from mapLineHeader method of Settler..");
     }
 
     private void mapLinePaymentNode(Shipped.Payments.Payment payment, SettleEntity settleEntity) throws JAXBException, SettlerException {
+
+        LOG.info("Entry in mapLinePaymentNode method of Settler..");
         settleEntity.setCardType(payment.getType());
         try {
             BigDecimal amount;
@@ -538,21 +435,15 @@ public class Settler {
         }
         settleEntity.setAuthNum(payment.getAuthNum());
         String settlePlan = "";
-        if (payment.getRequestPlan() != null
-                && payment.getRequestPlan().toString().length() == 5
-                && !payment.getRequestPlan().toString().equalsIgnoreCase("00000")) {
+        if (payment.getRequestPlan() != null) {
             settleEntity.setRequestPlan(payment.getRequestPlan().toString());
             settlePlan = settleEntity.getRequestPlan();
         }
-        if (payment.getResponsePlan() != null
-                && payment.getResponsePlan().toString().length() == 5
-                && !payment.getResponsePlan().toString().equalsIgnoreCase("00000")) {
+        if (payment.getResponsePlan() != null) {
             settleEntity.setResponsePlan(payment.getResponsePlan().toString());
             settlePlan = settleEntity.getResponsePlan();
         }
-        if (payment.getQualifiedPlan() != null
-                && payment.getQualifiedPlan().toString().length() == 5
-                && !payment.getQualifiedPlan().toString().equalsIgnoreCase("00000")) {
+        if (payment.getQualifiedPlan() != null) {
             settleEntity.setQualifiedPlan(payment.getQualifiedPlan().toString());
             settlePlan = settleEntity.getQualifiedPlan();
         }
@@ -607,10 +498,12 @@ public class Settler {
 
             }
         }
+        LOG.info("Exit from mapLinePaymentNode method of Settler..");
     }
 
     private void mapShippingPaymentNode(Shipping.Payments.Payment payment, SettleEntity settleEntity) throws JAXBException, SettlerException {
 
+        LOG.info("Entry in mapShippingPaymentNode method of Settler..");
         settleEntity.setCardType(payment.getType());
         try {
             BigDecimal amount;
@@ -681,21 +574,15 @@ public class Settler {
         }
         settleEntity.setAuthNum(payment.getAuthNum());
         String settlePlan = "";
-        if (payment.getRequestPlan() != null
-                && payment.getRequestPlan().toString().length() == 5
-                && !payment.getRequestPlan().toString().equalsIgnoreCase("00000")) {
+        if (payment.getRequestPlan() != null) {
             settleEntity.setRequestPlan(payment.getRequestPlan().toString());
             settlePlan = settleEntity.getRequestPlan();
         }
-        if (payment.getResponsePlan() != null
-                && payment.getResponsePlan().toString().length() == 5
-                && !payment.getResponsePlan().toString().equalsIgnoreCase("00000")) {
+        if (payment.getResponsePlan() != null) {
             settleEntity.setResponsePlan(payment.getResponsePlan().toString());
             settlePlan = settleEntity.getResponsePlan();
         }
-        if (payment.getQualifiedPlan() != null
-                && payment.getQualifiedPlan().toString().length() == 5
-                && !payment.getQualifiedPlan().toString().equalsIgnoreCase("00000")) {
+        if (payment.getQualifiedPlan() != null) {
             settleEntity.setQualifiedPlan(payment.getQualifiedPlan().toString());
             settlePlan = settleEntity.getQualifiedPlan();
         }
@@ -752,9 +639,12 @@ public class Settler {
 
             }
         }
+        LOG.info("Exit from mapShippingPaymentNode method of Settler..");
     }
 
     private void mapAppeasementPaymentNode(Appeasement.Payments.Payment payment, SettleEntity settleEntity) throws JAXBException, SettlerException {
+
+        LOG.info("Entry in mapAppeasementPaymentNode method of Settler..");
         settleEntity.setCardType(payment.getType());
         try {
             BigDecimal amount;
@@ -825,21 +715,15 @@ public class Settler {
         }
         settleEntity.setAuthNum(payment.getAuthNum());
         String settlePlan = "";
-        if (payment.getRequestPlan() != null
-                && payment.getRequestPlan().toString().length() == 5
-                && !payment.getRequestPlan().toString().equalsIgnoreCase("00000")) {
+        if (payment.getRequestPlan() != null) {
             settleEntity.setRequestPlan(payment.getRequestPlan().toString());
             settlePlan = settleEntity.getRequestPlan();
         }
-        if (payment.getResponsePlan() != null
-                && payment.getResponsePlan().toString().length() == 5
-                && !payment.getResponsePlan().toString().equalsIgnoreCase("00000")) {
+        if (payment.getResponsePlan() != null) {
             settleEntity.setResponsePlan(payment.getResponsePlan().toString());
             settlePlan = settleEntity.getResponsePlan();
         }
-        if (payment.getQualifiedPlan() != null
-                && payment.getQualifiedPlan().toString().length() == 5
-                && !payment.getQualifiedPlan().toString().equalsIgnoreCase("00000")) {
+        if (payment.getQualifiedPlan() != null) {
             settleEntity.setQualifiedPlan(payment.getQualifiedPlan().toString());
             settlePlan = settleEntity.getQualifiedPlan();
         }
@@ -895,9 +779,12 @@ public class Settler {
 
             }
         }
+        LOG.info("Exit from mapAppeasementPaymentNode method of Settler..");
     }
 
     private void validateSettleList(List<SettleEntity> settleEntityList) throws SettlerException {
+
+        LOG.info("Entry in validateSettleList method of Setler..");
 
         boolean lookForTotal = false;
         long total = 0;
@@ -920,10 +807,6 @@ public class Settler {
                 if ((settleEntity.getRequestPlan() == null || settleEntity.getRequestPlan().trim().isEmpty())
                         && (settleEntity.getResponsePlan() == null || settleEntity.getResponsePlan().trim().isEmpty())
                         && (settleEntity.getQualifiedPlan() == null || settleEntity.getQualifiedPlan().trim().isEmpty())) {
-                    throw new SettlerException("PLAN_NUMBER_REQUIRED");
-                }
-                if (settleEntity.getSettlePlan() == null || settleEntity.getSettlePlan().trim().isEmpty()
-                        || settleEntity.getSettlePlan().length() != 5) {
                     throw new SettlerException("PLAN_NUMBER_REQUIRED");
                 }
                 if (settleEntity.getOrderNumber() != null && settleEntity.getOrderNumber().trim().length() > 10) {
@@ -967,19 +850,11 @@ public class Settler {
             if (settleEntityList.get(0).getUnitCost() != null && !settleEntityList.get(0).getUnitCost().trim().isEmpty()) {
                 long unitCost = Long.parseLong(settleEntityList.get(0).getUnitCost());
                 long unitDiscount = 0;
-                long cscDiscount = 0;
                 if (settleEntityList.get(0).getUnitDiscount() != null
                         && !settleEntityList.get(0).getUnitDiscount().trim().isEmpty()) {
                     unitDiscount = Long.parseLong(settleEntityList.get(0).getUnitDiscount());
                 }
-                if (settleEntityList.get(0).getCscDiscount()!= null
-                        && !settleEntityList.get(0).getCscDiscount().trim().isEmpty()) {
-                    cscDiscount = Long.parseLong(settleEntityList.get(0).getCscDiscount());
-                }
-                LOG.info("Value of unitCost is : " + unitCost);
-                LOG.info("Value of unitDiscount is : " + unitDiscount);
-                LOG.info("Value of total is : " + total);
-               if ((unitCost - unitDiscount - cscDiscount) != total) {
+                if ((unitCost - unitDiscount) != total) {
                     throw new SettlerException("INVALID_UNIT_COST");
                 }
             } else if (settleEntityList.get(0).getShippingAmount() != null && !settleEntityList.get(0).getShippingAmount().trim().isEmpty()) {
@@ -1004,26 +879,23 @@ public class Settler {
 
         }
 
+        LOG.info("Exit from validateSettleList method of Setler..");
     }
 
     private void validateMessage(Settlement requestMessage) throws JAXBException {
+
+        LOG.info("Entry in validateMessage method of Settler..");
         if (requestMessage.getShipment() != null) {
             if (requestMessage.getShipment().getLines() != null
                     && requestMessage.getShipment().getShipping() != null) {
+                LOG.error("Invalid XML");
                 throw new JAXBException("Invalid XML");
             }
         }
     }
 
-    private String getReceivedDate() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date();
-        String ts = dateFormat.format(date);
-        return ts;
-    }
-
     private String getSystemDateTime() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         String ts = dateFormat.format(date);
         return ts;
@@ -1056,10 +928,6 @@ public class Settler {
 
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
-    }
-
-    public void setCutoverdays(int cutoverdays) {
-        this.cutoverdays = cutoverdays;
     }
 
 }

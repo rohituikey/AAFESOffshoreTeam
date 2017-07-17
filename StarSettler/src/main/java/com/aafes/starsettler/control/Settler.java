@@ -1,6 +1,5 @@
 package com.aafes.starsettler.control;
 
-import com.aafes.starsettler.dao.FacilityDAO;
 import com.aafes.starsettler.entity.CommandMessage;
 import com.aafes.starsettler.entity.*;
 import com.aafes.starsettler.tokenizer.TokenEndPointService;
@@ -8,8 +7,6 @@ import com.aafes.starsettler.util.CardType;
 import com.aafes.starsettler.util.ResponseType;
 import com.aafes.starsettler.util.SettleStatus;
 import com.aafes.starsettler.util.TransactionType;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import generated.Settlement;
 import generated.Settlement.Appeasements.Appeasement;
 import generated.Settlement.Shipment.Lines.Shipped;

@@ -66,12 +66,13 @@ public class SettleMessageResource {
             // Unmarshal against XSD
             // Send the settle message to Setler
             String ValidatedXML = FilterRequestXML(requestXML);
-            if (requestXML.contains("DOCTYPE")
-                    || requestXML.contains("CDATA")) {
+              if(requestXML.contains("DOCTYPE")
+                    ||requestXML.contains("CDATA")){
                 LOG.error("Invalid Request");
                 responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
                         + "</ErrorInformation>";
-            } else if (ValidatedXML != null) {
+            }
+            else if (ValidatedXML != null) {
                 Settlement requestMessage = unmarshalWithValidation(requestXML);
 
                 Settlement responseMessage = settler.saveForSettle(requestMessage);
@@ -87,7 +88,7 @@ public class SettleMessageResource {
 
             responseXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ErrorInformation><Error>Invalid XML</Error>"
                     + "</ErrorInformation>";
-            LOG.error(e.getMessage());
+            LOG.error(e.toString());
         } catch (Exception ex) {
             Logger.getLogger(SettleMessageResource.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -155,7 +156,7 @@ public class SettleMessageResource {
             retString = getStringFromDocument(document);
             LOG.info("Validated XML");
         } catch (Exception ex) {
-            LOG.error(ex.getMessage());
+            LOG.error(ex.toString());
             retString = null;
         }
         LOG.info("Exit from FilterRequestXML method of SettleMessageResource");

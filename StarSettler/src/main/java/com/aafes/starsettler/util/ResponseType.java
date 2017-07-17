@@ -8,5 +8,6 @@ final public class ResponseType {
     public static final String SUCCESS = "SUCCESS";
     public static final String FAILED = "FAILED";
     public static final String TIMEOUT = "TIMEOUT";
+    public static final String APPROVED = "Approved";
 
 }

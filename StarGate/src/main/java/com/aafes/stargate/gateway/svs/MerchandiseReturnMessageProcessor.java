@@ -12,6 +12,7 @@ import com.svs.svsxml.beans.MerchandiseReturnResponse;
 import com.svs.svsxml.beans.Merchant;
 import com.svs.svsxml.service.SVSXMLWay;
 import javax.ejb.Stateless;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -21,21 +22,22 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class MerchandiseReturnMessageProcessor extends Processor {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PreAuthorizationProcessor.class.getSimpleName());
-    String sMethodName = "";
-    final String CLASS_NAME = MerchandiseReturnMessageProcessor.this.getClass().getSimpleName();
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(MerchandiseReturnMessageProcessor.class.getSimpleName());
 
     @Override
     public void processRequest(Transaction transaction) {
         try {
-            sMethodName = "merchandiseReturnMessageProcessor";
-            LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
 
+            LOGGER.info("MerchandiseReturn.process method start...");
+            
             MerchandiseReturnRequest request = new MerchandiseReturnRequest();
-
+            LOGGER.debug("Created Merchandise Return Service ...");
             double amt = transaction.getAmount();
             amt = amt/100;
-            
+            if(amt < 0)
+            {
+                amt = amt*-1;
+            }
             Amount amount = new Amount();
             amount.setAmount(amt);
             amount.setCurrency(StarGateConstants.CURRENCY);
@@ -62,8 +64,9 @@ public class MerchandiseReturnMessageProcessor extends Processor {
             request.setTransactionID(transaction.getRrn() + "0000");
             // request.setStan(transaction.getSTAN());
             SVSXMLWay svsXMLWay = SvsUtil.setUserNamePassword();
+            LOGGER.debug("Sending Merchandise Return Request ...");
             MerchandiseReturnResponse response = svsXMLWay.merchandiseReturn(request);
-
+            LOGGER.debug("Received Merchandise Return Response ...");
             if (response != null) {
                 transaction.setReasonCode(response.getReturnCode().getReturnCode());
                 transaction.setDescriptionField(response.getReturnCode().getReturnDescription());
@@ -81,10 +84,12 @@ public class MerchandiseReturnMessageProcessor extends Processor {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Exception occured in " + sMethodName + ".responce is null Exception  : " + e.getMessage());
+            
+            LOGGER.error("Exception  while processing the Merchandise Return for RRN : " + transaction.getRrn());
+            LOGGER.error(e.toString());
             throw new GatewayException("INTERNAL_SERVER_ERROR");
         }
-        LOGGER.debug("rrn number in "+CLASS_NAME+"."+sMethodName+" is : "+transaction.getRrn());
-        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+        
+        LOGGER.info("MerchandiseReturn.process method exit...");
     }
 }

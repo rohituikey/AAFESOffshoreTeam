@@ -82,20 +82,32 @@ public class RetailStrategy extends BaseStrategy {
                     this.buildErrorResponse(t, "NO_SETTLEMENT_FOUND_FOR_REVERSAL", "NO_SETTLEMENT_FOUND_FOR_REVERSAL");
                     return t;
                 }
-
-            } else {
+            }
+            /* CODE ADDED FOR Deca Reversal Sale - START */
+            else if (t.getReversal() != null && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
+                settleEntity = findSettleEntity(t);
+                if (settleEntity != null && settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Ready_to_settle)) {
+                    updateSettle(settleEntity);
+                } else if (settleEntity == null) {
+                    this.buildErrorResponse(t, "NO_SETTLEMENT_FOUND_FOR_REVERSAL", "NO_SETTLEMENT_FOUND_FOR_REVERSAL");
+                    return t;
+                }
+            }
+            /* CODE ADDED FOR Deca Reversal Sale - END */
+            else {
                 if (gateway != null) {
 //                    t = futureVisionGateway.processMessage(t);
                     t = gateway.processMessage(t);
                 }
             }
-
+            /* CODE MODIFIED FOR Deca Reversal Sale - END */
             //if Authorized, save in settle message repository to settle
-            if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
+            if (t.getReversal() != null && !t.getReversal().equalsIgnoreCase(RequestType.REVERSAL) 
+                    && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                 getToken(t);
                 saveToSettle(t);
             }
-
+            /* CODE MODIFIED FOR Deca Reversal Sale - END */
         } catch (AuthorizerException e) {
             buildErrorResponse(t, "", e.getMessage());
             return t;

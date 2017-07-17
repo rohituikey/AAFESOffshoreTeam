@@ -135,14 +135,15 @@ public class Authorizer {
                 BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
                 if (baseStrategy != null) {
                     Transaction authTran = checkReversalTransaction(t);
-                    if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
-                            || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
-                            && (t.getReversal() != null
-                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL))) {
-                        LOG.info("Don't call Vision / SVS for MilStar / GiftCard Reversals." +t.getRrn());
-                    } else {
-                        t = baseStrategy.processRequest(t);
-                    }
+//                    if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
+//                            || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
+//                            && (t.getReversal() != null
+//                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL))) {
+//                        LOG.info("Don't call Vision / SVS for MilStar / GiftCard Reversals." +t.getRrn());
+//                    } else {
+//                        t = baseStrategy.processRequest(t);
+//                    }
+                    t = baseStrategy.processRequest(t);
                     mapResponse(t, cm);
                     t.setResponseXmlDateTime(getSystemDateTime());
                     if (t.getReversal() != null

@@ -143,7 +143,6 @@ public class Authorizer {
                     } else {
                         t = baseStrategy.processRequest(t);
                     }
-                    t = baseStrategy.processRequest(t);
                     mapResponse(t, cm);
                     t.setResponseXmlDateTime(getSystemDateTime());
                     if (t.getReversal() != null

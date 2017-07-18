@@ -9,6 +9,7 @@ import com.aafes.starsettler.imported.SettleEntity;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.control.TranRepository;
 import com.aafes.stargate.gateway.Gateway;
 import com.aafes.stargate.gateway.vision.FutureVisionGateway;
 import com.aafes.stargate.timeout.TimeoutProcessor;
@@ -40,7 +41,6 @@ public class RetailStrategy extends BaseStrategy {
 
     @EJB
     private SettleMessageDAO settleMessageDAO;
-
     @EJB
     private Configurator configurator;
     @EJB
@@ -51,6 +51,7 @@ public class RetailStrategy extends BaseStrategy {
     private FutureVisionGateway futureVisionGateway;
 
     SettleEntity settleEntity;
+    Transaction storedTran = null;
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(RetailStrategy.class.getSimpleName());
 
@@ -83,15 +84,26 @@ public class RetailStrategy extends BaseStrategy {
                     return t;
                 }
             }
-            /* CODE ADDED FOR Deca Reversal Sale - START */
+            /* ADDED/MODIFIED TO CHECK IF TRANSACTION ALREADY SETTLED - START */
             else if (t.getReversal() != null && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
                 settleEntity = findSettleEntity(t);
-                if (settleEntity != null && settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Ready_to_settle)) {
-                    updateSettle(settleEntity);
-                } else if (settleEntity == null) {
-                    this.buildErrorResponse(t, "NO_SETTLEMENT_FOUND_FOR_REVERSAL", "NO_SETTLEMENT_FOUND_FOR_REVERSAL");
-                    return t;
-                }
+                if(settleEntity != null){
+                    if (settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Ready_to_settle)) {
+                        updateSettle(settleEntity);
+                    } else if (settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Done)) {
+                        this.buildErrorResponse(t, "TRANSACTION_ALREADY_SETTLED", "TRANSACTION_ALREADY_SETTLED");
+                        return t;
+                    }
+		}else{
+			this.buildErrorResponse(t, "NO_SETTLEMENT_FOUND_FOR_REVERSAL", "NO_SETTLEMENT_FOUND_FOR_REVERSAL");
+			return t;
+		}
+//                if (settleEntity != null && settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Ready_to_settle)) {
+//                    updateSettle(settleEntity);
+//                } else if (settleEntity == null) {
+//                    this.buildErrorResponse(t, "NO_SETTLEMENT_FOUND_FOR_REVERSAL", "NO_SETTLEMENT_FOUND_FOR_REVERSAL");
+//                    return t;
+//                }
             }
             /* CODE ADDED FOR Deca Reversal Sale - END */
             else {
@@ -100,8 +112,9 @@ public class RetailStrategy extends BaseStrategy {
                     t = gateway.processMessage(t);
                 }
             }
-            /* CODE MODIFIED FOR Deca Reversal Sale - END */
+            /* ADDED/MODIFIED TO CHECK IF TRANSACTION ALREADY SETTLED - END */
             //if Authorized, save in settle message repository to settle
+            
             if (t.getReversal() != null && !t.getReversal().equalsIgnoreCase(RequestType.REVERSAL) 
                     && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                 getToken(t);

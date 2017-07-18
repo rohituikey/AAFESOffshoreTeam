@@ -135,6 +135,10 @@ public class Authorizer {
                 BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
                 if (baseStrategy != null) {
                     Transaction authTran = checkReversalTransaction(t);
+                    /* CHECK IF TRANSACTION ALREADY REVERSED */
+                    boolean transactioReversed = false;
+                    transactioReversed = checkIfTransactionReversed(t, RequestType.SALE);
+
 //                    if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
 //                            || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
 //                            && (t.getReversal() != null
@@ -143,19 +147,29 @@ public class Authorizer {
 //                    } else {
 //                        t = baseStrategy.processRequest(t);
 //                    }
-                    t = baseStrategy.processRequest(t);
-                    mapResponse(t, cm);
-                    t.setResponseXmlDateTime(getSystemDateTime());
-                    if (t.getReversal() != null
-                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
-                        LOG.info("Saving and updating transaction.....");
-                        authTran.setReversal(RequestType.REVERSAL);
-                        tranRepository.saveAndUpdate(t, authTran);
-                    } else {
-                        LOG.info("Saving transaction....."+t.getRrn());
-                        encryptValues(t);
-                        tranRepository.save(t);
+                    if(!transactioReversed){
+                        t = baseStrategy.processRequest(t);
+                        mapResponse(t, cm);
+                        t.setResponseXmlDateTime(getSystemDateTime());
+                        if (t.getReversal() != null
+                                && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
+                            LOG.info("Saving and updating transaction.....");
+                            authTran.setReversal(RequestType.REVERSAL);
+                            tranRepository.saveAndUpdate(t, authTran);
+                        } else {
+                            LOG.info("Saving transaction....."+t.getRrn());
+                            encryptValues(t);
+                            tranRepository.save(t);
+                        }
+                    }else{
+                        LOG.info("Reversal Transaction found for same combinations. So replying from the cache..." +  t.getRrn());
+                        isDuplicateTransaction = true;
+                        t.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
+                        t.setResponseType(ResponseType.DECLINED);
+                        t.setDescriptionField("TRANSACTION_ALREADY_REVERSED");
+                        mapResponse(t, cm);
                     }
+                     /* CHECK IF TRANSACTION ALREADY REVERSED */
                 } else {
                     // TODO: Confirm response description
                     t.setReasonCode(configurator.get("INVALID_UUID"));
@@ -726,4 +740,19 @@ public class Authorizer {
         this.transactionDAO = transactionDAO;
     }
 
+    
+    /* CODE TO CHECKS IF THE TRANSACTION WAS ALREADY REVERSED */
+    private boolean checkIfTransactionReversed(Transaction t, String requestType){
+        boolean transactionRevesed = false;
+        Transaction storedTran = null;
+
+                storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), requestType);
+                if(storedTran != null){
+                    if(storedTran.getReversal().equalsIgnoreCase(RequestType.REVERSAL)){
+                        transactionRevesed = true;
+                    }
+                }
+        return transactionRevesed;
+    }
+    /* CODE TO CHECKS IF THE TRANSACTION WAS ALREADY REVERSED */    
 }

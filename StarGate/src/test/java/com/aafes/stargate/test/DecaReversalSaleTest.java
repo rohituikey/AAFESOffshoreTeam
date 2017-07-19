@@ -94,6 +94,7 @@ public class DecaReversalSaleTest {
         assertEquals("NO_AUTHORIZATION_FOUND_FOR_REVERSAL", result.getResponse().get(0).getDescriptionField());
     }
 
+    @Ignore
     @Test
     public void testProcessRequest() {
         sMethodName = "testProcessRequest";

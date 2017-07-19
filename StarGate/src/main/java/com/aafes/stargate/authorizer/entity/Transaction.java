@@ -1118,8 +1118,8 @@ final public class Transaction {
         return origRRN;
     }
 
-    public void setOrigRRN(List<String> origRRN) {
-        this.origRRN = origRRN.get(0);
+    public void setOrigRRN(String origRRN) {
+        this.origRRN = origRRN;
     }
     
 }

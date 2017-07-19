@@ -104,42 +104,15 @@ public class Authorizer {
                 LOG.info("Reversal........");
                 storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.REVERSAL);
 
-//                if (storedTran != null && storedTran.getReasonCode() != null) {
-//                    if (MediaType.MIL_STAR.equalsIgnoreCase(storedTran.getMedia()) && (!storedTran.getReasonCode().equals("000"))) {
-//                        storedTran = null;
-//                    }
-//
-//                    if (MediaType.GIFT_CARD.equalsIgnoreCase(storedTran.getMedia()) && (!storedTran.getReasonCode().equals("100"))) {
-//                        storedTran = null;
-//                    }
-//                }
-//                if (storedTran != null) {
-//                    //storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getReversal());
-//
-//                    if (storedTran.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
-//                        LOG.info("Reversal Transaction found for same combinations. So replying from the cache..." + t.getRrn());
-//                        isDuplicateTransaction = true;
-//                        storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
-//                        storedTran.setResponseType(ResponseType.DECLINED);
-//                        storedTran.setDescriptionField("TRANSACTION_ALREADY_REVERSED");
-//                    } else {
-//                        storedTran = null;
-//                    }
-//                
 		if(storedTran!=null && storedTran.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
-              
                    storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
                    storedTran.setResponseType(ResponseType.DECLINED);
                    storedTran.setDescriptionField("TRANSACTION_ALREADY_REVERSED");
-                
                 }else{
                     storedTran=null;
                 }
-
-            } else {
-                storedTran = tranRepository.find(t.getIdentityUuid(),
-                        t.getRrn(), t.getRequestType());
-            }
+            } else  storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getRequestType());
+            
             if (storedTran == null) {
 
                 isDuplicateTransaction = false;
@@ -165,15 +138,15 @@ public class Authorizer {
                 if (baseStrategy != null) {
                     Transaction authTran = checkReversalTransaction(t);
                     List<Transaction> authTranList = checkTransactionCancel(t,cm);
-                    if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
-                            || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
-                            && (t.getReversal() != null
-                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL))) {
-                        LOG.info("Don't call Vision / SVS for MilStar / GiftCard Reversals." + t.getRrn());
-                    } else {
-                        t = baseStrategy.processRequest(t);
-                    }
-// //                   t = baseStrategy.processRequest(t);
+//                    if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
+//                            || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
+//                            && (t.getReversal() != null
+//                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL))) {
+//                        LOG.info("Don't call Vision / SVS for MilStar / GiftCard Reversals." + t.getRrn());
+//                    } else {
+//                        t = baseStrategy.processRequest(t);
+//                    }
+                    t = baseStrategy.processRequest(t);
                     mapResponse(t, cm);
                     t.setResponseXmlDateTime(getSystemDateTime());
                     if (t.getReversal() != null

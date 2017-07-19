@@ -56,18 +56,19 @@ public class RetailStrategy extends BaseStrategy {
 
     @Override
     public Transaction processRequest(Transaction t) {
-        LOG.info("REtailStrategy.processRequest Entry ... "+t.getRrn());
+        LOG.info("REtailStrategy.processRequest Entry ... " + t.getRrn());
         try {
 
             boolean retailFieldsValid = this.validateRetailFields(t);
-            LOG.info("retailFieldsValid "+ retailFieldsValid +"..."+t.getRrn());
-            
+            LOG.info("retailFieldsValid " + retailFieldsValid + "..." + t.getRrn());
+
             if (!retailFieldsValid) {
                 LOG.info("Invalid fields");
                 return t;
             }
 
             // Send transaction to Gateway. 
+            /* ADDED/MODIFIED TO CHECK IF TRANSACTION ALREADY SETTLED - START */
             Gateway gateway = super.pickGateway(t);
             if (t.getReversal() != null && t.getReversal().equalsIgnoreCase(RequestType.SALE)) {
                 t.setRequestType(RequestType.REFUND);
@@ -82,64 +83,27 @@ public class RetailStrategy extends BaseStrategy {
                     this.buildErrorResponse(t, "NO_SETTLEMENT_FOUND_FOR_REVERSAL", "NO_SETTLEMENT_FOUND_FOR_REVERSAL");
                     return t;
                 }
-            }
-             else if (t.getRequestType()!= null && RequestType.TRNCANCEL.equalsIgnoreCase(t.getRequestType())) {
-                 Transaction trns=t;
-                 trns.setOrderNumber(t.getOrderNumber());
-                 trns.setRrn(t.getOrigRRN());
-                 trns.setRequestType(t.getDescriptionField());
-                 settleEntity = findSettleEntity(trns);
-                 if(settleEntity==null){
-                     LOG.error("NO_ENTITY_FOUND_FOR_SETTELMENT");
-                    throw new AuthorizerException("NO_ENTITY_FOUND_FOR_SETTELMENT");
-                 }
-                 else if (settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Done)) {
-                        this.buildErrorResponse(t, "TRANSACTION_ALREADY_SETTLED", "TRANSACTION_ALREADY_SETTLED");
-                        return t;
-                    }
-                   t = gateway.processMessage(t);  //calling refund 
-                    if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
-                        settleEntity.setSettlestatus("Not to Settel");
-                        updateSettle(settleEntity); 
-                    }
-             }
-            /* ADDED/MODIFIED TO CHECK IF TRANSACTION ALREADY SETTLED - START */
-            else if (t.getReversal() != null && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
-                settleEntity = findSettleEntity(t);
-                if(settleEntity==null){
-                     LOG.error("NO_ENTITY_FOUND_FOR_SETTELMENT");
-                    throw new AuthorizerException("NO_ENTITY_FOUND_FOR_SETTELMENT");
-                 }
-                else if (settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Done)) {
-                      this.buildErrorResponse(t, "TRANSACTION_ALREADY_SETTLED", "TRANSACTION_ALREADY_SETTLED");
-                        return t;
-                        //updateSettle(settleEntity);
-                    } 
-                      
-                     t = gateway.processMessage(t);  //calling refund 
-                    if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
-                        settleEntity.setSettlestatus("Not to Settel");
-                        updateSettle(settleEntity); 
-                    }
-		}
-//                if (settleEntity != null && settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Ready_to_settle)) {
-//                    updateSettle(settleEntity);
-//                } else if (settleEntity == null) {
-//                    this.buildErrorResponse(t, "NO_SETTLEMENT_FOUND_FOR_REVERSAL", "NO_SETTLEMENT_FOUND_FOR_REVERSAL");
-//                    return t;
-//                }
-            
-            /* CODE ADDED FOR Deca Reversal Sale - END */
-            else {
+            } else if (t.getRequestType() != null && RequestType.TRNCANCEL.equalsIgnoreCase(t.getRequestType())) {
+                Transaction trns = t;
+                trns.setOrderNumber(t.getOrderNumber());
+                trns.setRrn(t.getOrigRRN());
+                trns.setRequestType(t.getDescriptionField());
+                t = checkTransactionSettlementStatus(trns, gateway);
+                return t;
+            } else if (t.getReversal() != null && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
+                t = checkTransactionSettlementStatus(t, gateway);
+                return t;
+            } else if (t.getReversal() != null && t.getReversal().equalsIgnoreCase(RequestType.REFUND)) {
+                t = checkTransactionSettlementStatus(t, gateway);
+                return t;
+            } else {
                 if (gateway != null) {
-//                    t = futureVisionGateway.processMessage(t);
                     t = gateway.processMessage(t);
                 }
             }
             /* ADDED/MODIFIED TO CHECK IF TRANSACTION ALREADY SETTLED - END */
             //if Authorized, save in settle message repository to settle
-            
-            if (t.getReversal() != null && !t.getReversal().equalsIgnoreCase(RequestType.REVERSAL) 
+            if (t.getReversal() != null && !t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)
                     && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                 getToken(t);
                 saveToSettle(t);
@@ -314,4 +278,22 @@ public class RetailStrategy extends BaseStrategy {
         this.futureVisionGateway = futureVisionGateway;
     }
 
+    /* ADDED COMMON CODE TO CHECK IF SETTLEMENT STATUS - START */
+    public Transaction checkTransactionSettlementStatus(Transaction t, Gateway gateway) {
+        settleEntity = findSettleEntity(t);
+        if (settleEntity == null) {
+            LOG.error("NO_ENTITY_FOUND_FOR_SETTELMENT");
+            throw new AuthorizerException("NO_ENTITY_FOUND_FOR_SETTELMENT");
+        } else if (settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Done)) {
+            this.buildErrorResponse(t, "TRANSACTION_ALREADY_SETTLED", "TRANSACTION_ALREADY_SETTLED");
+            return t;
+        }
+        t = gateway.processMessage(t);  //calling refund 
+        if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
+            settleEntity.setSettlestatus("Not to Settel");
+            updateSettle(settleEntity);
+        }
+        return t;
+    }
+    /* ADDED COMMON CODE TO CHECK IF SETTLEMENT STATUS - START */
 }

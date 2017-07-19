@@ -126,7 +126,7 @@ public class Authorizer {
 //                        storedTran = null;
 //                    }
 //                
-		if (storedTran!=null && storedTran.setResponseType().equalsIgnoreCase(RequestType.APPROVE)) {
+		if(storedTran!=null && storedTran.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
               
                    storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
                    storedTran.setResponseType(ResponseType.DECLINED);
@@ -164,7 +164,7 @@ public class Authorizer {
                 BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
                 if (baseStrategy != null) {
                     Transaction authTran = checkReversalTransaction(t);
-                    List<Transaction> authTranList = checkTransactionCancel(t);
+                    List<Transaction> authTranList = checkTransactionCancel(t,cm);
                     if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
                             || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
                             && (t.getReversal() != null
@@ -610,10 +610,10 @@ public class Authorizer {
             transaction.setOriginalOrder(request.getOriginalOrder());
         }
 
-        if (request.getOrigRRN() != null && !request.getOrigRRN().isEmpty()) {
-
-            transaction.setOrigRRN(request.getOrigRRN());
-        }
+//        if (request.getOrigRRN() != null && !request.getOrigRRN().isEmpty()) {
+//
+//            transaction.setOrigRRN(request.getOrigRRN());
+//        }
 
         if (request.getOrigTransId() != null && !request.getOrigTransId().isEmpty()) {
 
@@ -782,23 +782,32 @@ public class Authorizer {
         this.transactionDAO = transactionDAO;
     }
 
-    private List checkTransactionCancel(Transaction t) {
+    private List checkTransactionCancel(Transaction t,Message cm) {
 
         List authTrans = new ArrayList();;
 
         if (t.getRequestType() != null & t.getRequestType().equalsIgnoreCase(RequestType.TRNCANCEL)) {
-
-            List<String> rrnNumbers = t.getOrigRRN();
+             
+          //Request request = requestMessage.getRequest().get(0);
+           // cm.getRequest().
+            //if (request.getOrigRRN() != null && !request.getOrigRRN().isEmpty()) {
+//
+//            transaction.setOrigRRN(request.getOrigRRN());
+//        }
+        
+          List<String> rrnNumbers =new ArrayList<>();
+             rrnNumbers.add(t.getOrigRRN());
+            
+        //    List<String> rrnNumbers = cm.getOrigRRN();
 
             for (String rrn : rrnNumbers) {
 			Transaction authTran = tranRepository.find(t.getIdentityUuid(),
                         rrn, t.getDescriptionField());
-
-				if (authTrans != null && authTran.getOrderNumber() != null
+                        if (authTrans != null && authTran.getOrderNumber() != null
                         && t.getOrderNumber() != null
                         && (authTran.getOrderNumber().equals(t.getOrderNumber()))
-						&& authTrans.getRequestType().equalsIgnoreCase("Approve")) {
-                    LOG.info("Order Number is matching"+t.getOrderNumber);
+						&& authTran.getResponseType().equalsIgnoreCase("Approve")) {
+                    LOG.info("Order Number is matching"+t.getOrderNumber());
                     authTrans.add(authTran);
                 }
             }

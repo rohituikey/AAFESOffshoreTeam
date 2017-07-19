@@ -121,7 +121,7 @@ final public class Transaction {
     private String originalOrder = "";
     private String origTransId = "";
     private String origAuthCode = "";
-     private List<String> origRRN= null;
+     private String origRRN= null;
     private long amtPreAuthorized = 0L;
     private String prodDetailCount = "";
     private String serviceCode = "";
@@ -1114,12 +1114,12 @@ final public class Transaction {
         this.tokenBankName = tokenBankName;
     }
     
-    public List<String> getOrigRRN() {
+    public String getOrigRRN() {
         return origRRN;
     }
 
     public void setOrigRRN(List<String> origRRN) {
-        this.origRRN = origRRN;
+        this.origRRN = origRRN.get(0);
     }
     
 }

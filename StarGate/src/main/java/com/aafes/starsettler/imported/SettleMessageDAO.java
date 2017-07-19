@@ -24,6 +24,13 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class SettleMessageDAO {
 
+    /**
+     * @param mapper the mapper to set
+     */
+    public void setMapper(Mapper mapper) {
+        this.mapper = mapper;
+    }
+
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(SettleMessageDAO.class.getSimpleName());
 
     private Mapper mapper;
@@ -32,7 +39,7 @@ public class SettleMessageDAO {
     @PostConstruct
     public void postConstruct() {
         Session session = factory.getSession();
-        mapper = new MappingManager(session).mapper(SettleEntity.class);
+        setMapper(new MappingManager(session).mapper(SettleEntity.class));
     }
 
     public void save(List<SettleEntity> settleEntityList) {

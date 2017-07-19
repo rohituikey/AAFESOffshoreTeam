@@ -41,7 +41,10 @@ public class BaseStrategyFactory {
             default:
                 return retailStrategy;
         }
-
     }
     
+    public void setRetailStrategy(RetailStrategy retailStrategy) {
+        this.retailStrategy = retailStrategy;
+        
+    }
 }

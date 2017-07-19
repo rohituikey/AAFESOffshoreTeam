@@ -9,7 +9,6 @@ import com.aafes.starsettler.imported.SettleEntity;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.Configurator;
-import com.aafes.stargate.control.TranRepository;
 import com.aafes.stargate.gateway.Gateway;
 import com.aafes.stargate.gateway.vision.FutureVisionGateway;
 import com.aafes.stargate.timeout.TimeoutProcessor;
@@ -84,19 +83,44 @@ public class RetailStrategy extends BaseStrategy {
                     return t;
                 }
             }
-            /* ADDED/MODIFIED TO CHECK IF TRANSACTION ALREADY SETTLED - START */
-            else if (t.getReversal() != null && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
-                settleEntity = findSettleEntity(t);
-                if(settleEntity != null){
-                    if (settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Ready_to_settle)) {
-                        updateSettle(settleEntity);
-                    } else if (settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Done)) {
+             else if (t.getRequestType()!= null && RequestType.TRNCANCEL.equalsIgnoreCase(t.getRequestType())) {
+                 Transaction trns=t;
+                 trns.setOrderNumber(t.getOrderNumber());
+                 trns.setRrn(t.getOrigRRN());
+                 trns.setRequestType(t.getDescriptionField());
+                 settleEntity = findSettleEntity(trns);
+                 if(settleEntity==null){
+                     LOG.error("NO_ENTITY_FOUND_FOR_SETTELMENT");
+                    throw new AuthorizerException("NO_ENTITY_FOUND_FOR_SETTELMENT");
+                 }
+                 else if (settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Done)) {
                         this.buildErrorResponse(t, "TRANSACTION_ALREADY_SETTLED", "TRANSACTION_ALREADY_SETTLED");
                         return t;
                     }
-		}else{
-			this.buildErrorResponse(t, "NO_SETTLEMENT_FOUND_FOR_REVERSAL", "NO_SETTLEMENT_FOUND_FOR_REVERSAL");
-			return t;
+                   t = gateway.processMessage(t);  //calling refund 
+                    if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
+                        settleEntity.setSettlestatus("Not to Settel");
+                        updateSettle(settleEntity); 
+                    }
+             }
+            /* ADDED/MODIFIED TO CHECK IF TRANSACTION ALREADY SETTLED - START */
+            else if (t.getReversal() != null && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
+                settleEntity = findSettleEntity(t);
+                if(settleEntity==null){
+                     LOG.error("NO_ENTITY_FOUND_FOR_SETTELMENT");
+                    throw new AuthorizerException("NO_ENTITY_FOUND_FOR_SETTELMENT");
+                 }
+                else if (settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Done)) {
+                      this.buildErrorResponse(t, "TRANSACTION_ALREADY_SETTLED", "TRANSACTION_ALREADY_SETTLED");
+                        return t;
+                        //updateSettle(settleEntity);
+                    } 
+                      
+                     t = gateway.processMessage(t);  //calling refund 
+                    if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
+                        settleEntity.setSettlestatus("Not to Settel");
+                        updateSettle(settleEntity); 
+                    }
 		}
 //                if (settleEntity != null && settleEntity.getSettlestatus().equalsIgnoreCase(SettleStatus.Ready_to_settle)) {
 //                    updateSettle(settleEntity);
@@ -104,7 +128,7 @@ public class RetailStrategy extends BaseStrategy {
 //                    this.buildErrorResponse(t, "NO_SETTLEMENT_FOUND_FOR_REVERSAL", "NO_SETTLEMENT_FOUND_FOR_REVERSAL");
 //                    return t;
 //                }
-            }
+            
             /* CODE ADDED FOR Deca Reversal Sale - END */
             else {
                 if (gateway != null) {

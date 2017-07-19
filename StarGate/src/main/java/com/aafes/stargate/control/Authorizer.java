@@ -126,7 +126,7 @@ public class Authorizer {
 //                        storedTran = null;
 //                    }
 //                
-		if (storedTran!=null && storedTran.setResponseType().equalsIgnoreCase(RequestType.APPROVE)) {
+		if(storedTran!=null && storedTran.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
               
                    storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
                    storedTran.setResponseType(ResponseType.DECLINED);
@@ -164,7 +164,7 @@ public class Authorizer {
                 BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
                 if (baseStrategy != null) {
                     Transaction authTran = checkReversalTransaction(t);
-                    List<Transaction> authTranList = checkTransactionCancel(t);
+                    List<Transaction> authTranList = checkTransactionCancel(t,cm);
                     if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
                             || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
                             && (t.getReversal() != null
@@ -610,10 +610,10 @@ public class Authorizer {
             transaction.setOriginalOrder(request.getOriginalOrder());
         }
 
-        if (request.getOrigRRN() != null && !request.getOrigRRN().isEmpty()) {
-
-            transaction.setOrigRRN(request.getOrigRRN());
-        }
+//        if (request.getOrigRRN() != null && !request.getOrigRRN().isEmpty()) {
+//
+//            transaction.setOrigRRN(request.getOrigRRN());
+//        }
 
         if (request.getOrigTransId() != null && !request.getOrigTransId().isEmpty()) {
 
@@ -782,38 +782,40 @@ public class Authorizer {
         this.transactionDAO = transactionDAO;
     }
 
-    private List checkTransactionCancel(Transaction t) {
+    private List checkTransactionCancel(Transaction t,Message cm) {
 
-        Transaction authTran = null;
-        List authTrans = null;
+        List authTrans = new ArrayList();;
 
-        if (t.getRequestType() != null
-                && t.getRequestType().equalsIgnoreCase(RequestType.TRNCANCEL)) {
-
-            List<String> rrnNumbers = t.getOrigRRN();
+        if (t.getRequestType() != null & t.getRequestType().equalsIgnoreCase(RequestType.TRNCANCEL)) {
+             
+          //Request request = requestMessage.getRequest().get(0);
+           // cm.getRequest().
+            //if (request.getOrigRRN() != null && !request.getOrigRRN().isEmpty()) {
+//
+//            transaction.setOrigRRN(request.getOrigRRN());
+//        }
+        
+          List<String> rrnNumbers =new ArrayList<>();
+             rrnNumbers.add(t.getOrigRRN());
+            
+        //    List<String> rrnNumbers = cm.getOrigRRN();
 
             for (String rrn : rrnNumbers) {
-                authTran = tranRepository.find(t.getIdentityUuid(),
+			Transaction authTran = tranRepository.find(t.getIdentityUuid(),
                         rrn, t.getDescriptionField());
-                //OrderNumber, CardNumber, Mop, Amount
-                if (authTrans != null && authTran.getOrderNumber() != null
+                        if (authTrans != null && authTran.getOrderNumber() != null
                         && t.getOrderNumber() != null
-                        && (!authTran.getOrderNumber().equals(t.getOrderNumber()))) {
-                    LOG.info("Order Number is not matching.......");
-                    throw new AuthorizerException("Exception occured while authorizing reversal");
-                } else {
-                    authTrans = new ArrayList();
+                        && (authTran.getOrderNumber().equals(t.getOrderNumber()))
+						&& authTran.getResponseType().equalsIgnoreCase("Approve")) {
+                    LOG.info("Order Number is matching"+t.getOrderNumber());
                     authTrans.add(authTran);
                 }
             }
-            if (authTrans == null) {
-                throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_REVERSAL");
+            if (authTrans.isEmpty()) {
+                throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_CANCELATION");
             }
-            if (authTran.getAmount() != t.getAmount()) {
-                LOG.info("Amount is not matching.......");
-                throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_REVERSAL");
-            }
-            t.setRequestType(RequestType.TRNCANCEL);
+          
+            
         }
         return authTrans;
     }

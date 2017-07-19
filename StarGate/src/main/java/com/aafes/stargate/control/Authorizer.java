@@ -784,36 +784,29 @@ public class Authorizer {
 
     private List checkTransactionCancel(Transaction t) {
 
-        Transaction authTran = null;
-        List authTrans = null;
+        List authTrans = new ArrayList();;
 
-        if (t.getRequestType() != null
-                && t.getRequestType().equalsIgnoreCase(RequestType.TRNCANCEL)) {
+        if (t.getRequestType() != null & t.getRequestType().equalsIgnoreCase(RequestType.TRNCANCEL)) {
 
             List<String> rrnNumbers = t.getOrigRRN();
 
             for (String rrn : rrnNumbers) {
-                authTran = tranRepository.find(t.getIdentityUuid(),
+			Transaction authTran = tranRepository.find(t.getIdentityUuid(),
                         rrn, t.getDescriptionField());
-                //OrderNumber, CardNumber, Mop, Amount
-                if (authTrans != null && authTran.getOrderNumber() != null
+
+				if (authTrans != null && authTran.getOrderNumber() != null
                         && t.getOrderNumber() != null
-                        && (!authTran.getOrderNumber().equals(t.getOrderNumber()))) {
-                    LOG.info("Order Number is not matching.......");
-                    throw new AuthorizerException("Exception occured while authorizing reversal");
-                } else {
-                    authTrans = new ArrayList();
+                        && (authTran.getOrderNumber().equals(t.getOrderNumber()))
+						&& authTrans.getRequestType().equalsIgnoreCase("Approve")) {
+                    LOG.info("Order Number is matching"+t.getOrderNumber);
                     authTrans.add(authTran);
                 }
             }
-            if (authTrans == null) {
-                throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_REVERSAL");
+            if (authTrans.isEmpty()) {
+                throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_CANCELATION");
             }
-            if (authTran.getAmount() != t.getAmount()) {
-                LOG.info("Amount is not matching.......");
-                throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_REVERSAL");
-            }
-            t.setRequestType(RequestType.TRNCANCEL);
+          
+            
         }
         return authTrans;
     }

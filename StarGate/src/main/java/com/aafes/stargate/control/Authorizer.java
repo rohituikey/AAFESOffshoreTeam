@@ -104,28 +104,38 @@ public class Authorizer {
                 LOG.info("Reversal........");
                 storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.REVERSAL);
 
-                if (storedTran != null && storedTran.getReasonCode() != null) {
-                    if (MediaType.MIL_STAR.equalsIgnoreCase(storedTran.getMedia()) && (!storedTran.getReasonCode().equals("000"))) {
-                        storedTran = null;
-                    }
-
-                    if (MediaType.GIFT_CARD.equalsIgnoreCase(storedTran.getMedia()) && (!storedTran.getReasonCode().equals("100"))) {
-                        storedTran = null;
-                    }
+//                if (storedTran != null && storedTran.getReasonCode() != null) {
+//                    if (MediaType.MIL_STAR.equalsIgnoreCase(storedTran.getMedia()) && (!storedTran.getReasonCode().equals("000"))) {
+//                        storedTran = null;
+//                    }
+//
+//                    if (MediaType.GIFT_CARD.equalsIgnoreCase(storedTran.getMedia()) && (!storedTran.getReasonCode().equals("100"))) {
+//                        storedTran = null;
+//                    }
+//                }
+//                if (storedTran != null) {
+//                    //storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getReversal());
+//
+//                    if (storedTran.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
+//                        LOG.info("Reversal Transaction found for same combinations. So replying from the cache..." + t.getRrn());
+//                        isDuplicateTransaction = true;
+//                        storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
+//                        storedTran.setResponseType(ResponseType.DECLINED);
+//                        storedTran.setDescriptionField("TRANSACTION_ALREADY_REVERSED");
+//                    } else {
+//                        storedTran = null;
+//                    }
+//                
+		if (storedTran!=null && storedTran.setResponseType().equalsIgnoreCase(RequestType.APPROVE)) {
+              
+                   storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
+                   storedTran.setResponseType(ResponseType.DECLINED);
+                   storedTran.setDescriptionField("TRANSACTION_ALREADY_REVERSED");
+                
+                }else{
+                    storedTran=null;
                 }
-                if (storedTran != null) {
-                    //storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getReversal());
 
-                    if (storedTran.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
-                        LOG.info("Reversal Transaction found for same combinations. So replying from the cache..." + t.getRrn());
-                        isDuplicateTransaction = true;
-                        storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
-                        storedTran.setResponseType(ResponseType.DECLINED);
-                        storedTran.setDescriptionField("TRANSACTION_ALREADY_REVERSED");
-                    } else {
-                        storedTran = null;
-                    }
-                }
             } else {
                 storedTran = tranRepository.find(t.getIdentityUuid(),
                         t.getRrn(), t.getRequestType());

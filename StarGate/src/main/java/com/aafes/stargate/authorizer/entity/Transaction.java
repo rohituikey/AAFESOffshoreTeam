@@ -3,6 +3,7 @@ package com.aafes.stargate.authorizer.entity;
 import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.Table;
 import com.datastax.driver.mapping.annotations.Transient;
+import java.util.List;
 
 @Table(keyspace = "stargate", name = "transactions")
 final public class Transaction {
@@ -120,6 +121,7 @@ final public class Transaction {
     private String originalOrder = "";
     private String origTransId = "";
     private String origAuthCode = "";
+     private List<String> origRRN= null;
     private long amtPreAuthorized = 0L;
     private String prodDetailCount = "";
     private String serviceCode = "";
@@ -1111,4 +1113,13 @@ final public class Transaction {
     public void setTokenBankName(String tokenBankName) {
         this.tokenBankName = tokenBankName;
     }
+    
+    public List<String> getOrigRRN() {
+        return origRRN;
+    }
+
+    public void setOrigRRN(List<String> origRRN) {
+        this.origRRN = origRRN;
+    }
+    
 }

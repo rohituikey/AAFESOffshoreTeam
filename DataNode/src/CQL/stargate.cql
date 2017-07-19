@@ -215,3 +215,4 @@ password text,
 primary key (identityuuid, userid, password)
 );
 
+alter TABLE stargate.transactions ADD origrrn text;

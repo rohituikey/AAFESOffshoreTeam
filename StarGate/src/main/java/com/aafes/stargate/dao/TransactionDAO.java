@@ -2,12 +2,14 @@ package com.aafes.stargate.dao;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.CassandraSessionFactory;
+import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import static org.jboss.resteasy.util.HttpClient4xUtils.updateQuery;
 import org.slf4j.LoggerFactory;
 
 @Stateless
@@ -18,7 +20,8 @@ public class TransactionDAO {
 
     private Mapper mapper;
     private CassandraSessionFactory factory;
-
+    private Session session = null;
+    private  ResultSet resultSet = null;
     @PostConstruct
     public void postConstruct() {
         Session session = factory.getSession();
@@ -32,7 +35,7 @@ public class TransactionDAO {
     public Transaction find(String identityuuid, String rrn, String requesttype) {
         return (Transaction) mapper.get(identityuuid, rrn, requesttype);
     }
-
+  
     public Mapper getMapper() {
         return mapper;
     }
@@ -44,6 +47,7 @@ public class TransactionDAO {
 //    public void delete(Transaction transaction) {
 //        mapper.delete(transaction);
 //    }
+
     @EJB
     public void setCassandraSessionFactory(CassandraSessionFactory factory) {
         this.factory = factory;

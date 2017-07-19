@@ -296,4 +296,10 @@ public class RetailStrategy extends BaseStrategy {
         return t;
     }
     /* ADDED COMMON CODE TO CHECK IF SETTLEMENT STATUS - START */
+    //added settler for testing purpose
+   
+    public void setSettleMessageDAO(SettleMessageDAO settleMessageDAO) {
+        this.settleMessageDAO = settleMessageDAO;
+    }
+    
 }

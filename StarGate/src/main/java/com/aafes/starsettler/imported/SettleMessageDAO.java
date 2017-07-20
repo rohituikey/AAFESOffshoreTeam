@@ -127,9 +127,5 @@ public class SettleMessageDAO {
     public void setCassandraSessionFactory(CassandraSessionFactory factory) {
         this.factory = factory;
     }
-
-    public void setMapper(Mapper mapper) {
-        this.mapper = mapper;
-    }
     
 }

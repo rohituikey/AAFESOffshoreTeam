@@ -47,4 +47,8 @@ public class BaseStrategyFactory {
         this.retailStrategy = retailStrategy;
         
     }
+
+    public BaseStrategy findStrategy(RetailStrategy retailStrategy) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

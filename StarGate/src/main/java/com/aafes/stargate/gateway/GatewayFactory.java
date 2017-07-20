@@ -92,10 +92,8 @@ public class GatewayFactory {
     public void setEnableStub(String enableStub) {
         this.enableStub = enableStub;
     }
-
     public void setVisionGatewayStub( VisionGatewayStub  visionGatewaySimulator)
     {
         this.visionGatewaySimulator = visionGatewaySimulator;
     }
-    
 }

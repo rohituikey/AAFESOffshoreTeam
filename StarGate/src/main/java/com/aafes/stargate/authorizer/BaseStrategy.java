@@ -28,5 +28,4 @@ public abstract class BaseStrategy {
     public void setGatewayFactory(GatewayFactory gatewayFactory) {
         this.gatewayFactory = gatewayFactory;
     }
-
 }

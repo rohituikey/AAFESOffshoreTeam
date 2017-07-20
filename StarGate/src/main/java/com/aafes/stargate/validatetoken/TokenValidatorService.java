@@ -49,7 +49,7 @@ public class TokenValidatorService {
     public boolean validateToken(String tokenStr, String identityUuid) {
         sMethodName = "validateToken";
         boolean tokenValidateFlg = false, tokenUpdateFlg = false;
-        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME );
         CrosssiteRequestTokenTable tokenObjLocal;
         try {
             if (null != tokenStr) {

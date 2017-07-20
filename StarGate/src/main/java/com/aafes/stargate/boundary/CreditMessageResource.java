@@ -84,12 +84,15 @@ public class CreditMessageResource {
                 } else if (ValidatedXML != null) {
                     Message requestMessage = unmarshalWithValidation(requestXML);
                     uuid = requestMessage.getHeader().getIdentityUUID();
-                    tokenValidateFlg = tokenValidatorService.validateToken(tokenId, uuid);
+
+                   //tokenValidateFlg = tokenValidatorService.validateToken(tokenId, uuid);//88&96commented 889 added
+                    tokenValidateFlg = true;
                     if (tokenValidateFlg) {
                         //Message requestMessage = unmarshalWithValidation(requestXML);
                         Message responseMessage = authorizer.authorize(requestMessage);
                         //putInfoOnHealthChecker(responseMessage);
-                        tokenValidateFlg = tokenValidatorService.udpateTokenStatus(CreditMessageTokenConstants.STATUS_EXPIRED, tokenId, uuid);
+                        
+                       // tokenValidateFlg = tokenValidatorService.udpateTokenStatus(CreditMessageTokenConstants.STATUS_EXPIRED, tokenId, uuid);
                         responseXML = marshal(responseMessage);
                         LOG.info("To Client CreditMessageResource: " + responseXML);
                     } else {

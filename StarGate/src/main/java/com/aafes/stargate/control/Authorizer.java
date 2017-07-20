@@ -104,15 +104,17 @@ public class Authorizer {
                 LOG.info("Reversal........");
                 storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.REVERSAL);
 
-		if(storedTran!=null && storedTran.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
-                   storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
-                   storedTran.setResponseType(ResponseType.DECLINED);
-                   storedTran.setDescriptionField("TRANSACTION_ALREADY_REVERSED");
-                }else{
-                    storedTran=null;
+                if (storedTran != null && storedTran.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
+                    storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
+                    storedTran.setResponseType(ResponseType.DECLINED);
+                    storedTran.setDescriptionField("TRANSACTION_ALREADY_REVERSED");
+                } else {
+                    storedTran = null;
                 }
-            } else  storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getRequestType());
-            
+            } else {
+                storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getRequestType());
+            }
+
             if (storedTran == null) {
 
                 isDuplicateTransaction = false;
@@ -137,7 +139,7 @@ public class Authorizer {
                 BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
                 if (baseStrategy != null) {
                     Transaction authTran = checkReversalTransaction(t);
-                     authTran = checkTransactionCancel(t);
+                    authTran = checkTransactionCancel(t);
 //                    if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
 //                            || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
 //                            && (t.getReversal() != null
@@ -150,17 +152,17 @@ public class Authorizer {
                     mapResponse(t, cm);
                     t.setResponseXmlDateTime(getSystemDateTime());
                     if (t.getReversal() != null
-                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL) 
+                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)
                             && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                         LOG.info("Saving and updating transaction.....");
                         authTran.setReversal(RequestType.REVERSAL);
                         tranRepository.saveAndUpdate(t, authTran);
                     } else if (t.getReversal() != null
                             && t.getRequestType().equals(RequestType.TRNCANCEL)
-                            && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())){
+                            && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                         LOG.info("Saving and updating transaction.....");
-                         tranRepository.saveAndUpdate(t, authTran);
-                    }else {
+                        tranRepository.saveAndUpdate(t, authTran);
+                    } else {
                         LOG.info("Saving transaction....." + t.getRrn());
                         encryptValues(t);
                         tranRepository.save(t);
@@ -756,31 +758,24 @@ public class Authorizer {
     }
 
     /**
-     * 
+     *
      * @param t
-     * @return 
+     * @return
      */
     private Transaction checkTransactionCancel(Transaction t) {
 
-       
-         Transaction authTran=null;
+        Transaction authTran = null;
         if (t.getRequestType() != null & t.getRequestType().equalsIgnoreCase(RequestType.TRNCANCEL)) {
-             
-            authTran = tranRepository.find(t.getIdentityUuid(),t.getOrigRRN(), t.getDescriptionField());
-            
-              if(authTran==null || !(authTran.getOrderNumber().equals(t.getOrderNumber())))
-//              if (authTran != null && authTran.getOrderNumber() != null
-//                        && t.getOrderNumber() != null
-//                        && (authTran.getOrderNumber().equals(t.getOrderNumber()))
-//						&& authTran.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
-//               
-//                
-//            }else{
+
+            authTran = tranRepository.find(t.getIdentityUuid(), t.getOrigRRN(), t.getDescriptionField());
+
+            if (authTran == null || !(authTran.getOrderNumber().equals(t.getOriginalOrder()))) {
+
                 throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_CANCELATION");
-            //}
-          
-        }  
-        
+            }
+
+        }
+
         return authTran;
     }
 }

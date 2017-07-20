@@ -87,9 +87,9 @@ public class RetailStrategy extends BaseStrategy {
                 }
             } else if (t.getRequestType() != null && RequestType.TRNCANCEL.equalsIgnoreCase(t.getRequestType())) {
                 Transaction trns = t;
-                trns.setOrderNumber(t.getOrderNumber());
+                trns.setOrderNumber(t.getOriginalOrder());
                 trns.setRrn(t.getOrigRRN());
-                trns.setRequestType(t.getDescriptionField());
+                trns.setDescriptionField(t.getDescriptionField());
                 t = checkTransactionSettlementStatus(trns, gateway);
                 return t;
             } else if (t.getReversal() != null && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {

@@ -24,9 +24,4 @@ public abstract class BaseStrategy {
     public Gateway pickGateway(Transaction t) {
         return gatewayFactory.pickGateway(t);
     }
-
-    public void setGatewayFactory(GatewayFactory gatewayFactory) {
-        this.gatewayFactory = gatewayFactory;
-    }
-
 }

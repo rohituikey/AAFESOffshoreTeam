@@ -56,12 +56,14 @@ public class ReversalRefundDecaTest {
     private Authorizer authorizer;
 
     private String requestXML;
+    String uuid;
 
     @Before
     public void setUp() {
         tokenValidatorService = new TokenValidatorService();
         cmr = new CreditMessageResource();
         transaction = new Transaction();
+        uuid = "0ee1c509-2c70-4bcd-b261-f94f1fe6c43b";
         requestXML
                 = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                 + " <cm:Message\n"
@@ -78,31 +80,6 @@ public class ReversalRefundDecaTest {
                 + "<cm:termId>12</cm:termId>\n"
                 + "<cm:Comment>Approved</cm:Comment>\n"
                 + "</cm:Header>\n"
-                //              + "<cm:Request RRN=\"200000000001\">\n"
-                //                + "<cm:Media>Milstar</cm:Media>\n"
-                //                + "<cm:RequestType>Refund</cm:RequestType>\n"
-                //                + "<cm:InputType>Keyed</cm:InputType>\n"
-                //                + "<cm:Pan>Pan</cm:Pan>/n"
-                //                + "<cm:Account>6006496628299904508</cm:Account>\n"
-                //                + "<cm:Expiration>2103</cm:Expiration>\n"
-                //                + "<cm:CardVerificationValue>837</cm:CardVerificationValue>\n"
-                //                + "<cm:TrackData1>%B6019450000289697^MILSTARRET0001^2009000000000000100000000000000?</cm:TrackData1>\n"
-                //                + "<cm:AmountField>2500</cm:AmountField>\n"
-                //                + "<cm:PlanNumbers>\n"
-                //                + "<cm:PlanNumber>10001</cm:PlanNumber>\n"
-                //                + "</cm:PlanNumbers>\n"
-                //                + "<cm:DescriptionField>SALE</cm:DescriptionField>\n"
-                //                + "<cm:AddressVerificationService>\n"
-                //                + "<cm:CardHolderName>John Doe</cm:CardHolderName>\n"
-                //                + "<cm:BillingAddress1>1222</cm:BillingAddress1>\n"
-                //                + "<cm:BillingCountryCode>US</cm:BillingCountryCode>\n"
-                //                + "<cm:BillingZipCode>12345</cm:BillingZipCode>\n"
-                //                + "<cm:Email>johndoe@kk.com</cm:Email>\n"
-                //                + "<cm:BillingPhone>1122334455</cm:BillingPhone>\n"
-                //                + "<cm:ShippingPhone>1122334455</cm:ShippingPhone>\n"
-                //                + "</cm:AddressVerificationService>\n"
-                //              + "</cm:Request>"
-                //            + "</cm:Message>";
                 + "<cm:Request RRN=\"200000000001\">\n"
                 + "<cm:Media>Milstar</cm:Media>\n"
                 + "<cm:Reversal>Refund</cm:Reversal>\n"
@@ -130,56 +107,44 @@ public class ReversalRefundDecaTest {
                 + "</cm:Message>";
 
     }
-   @Ignore
+
+    @Ignore
     @Test
-    public void testForNoPriorTransaction()
-    {
-        String uuid = "0ee1c509-2c70-4bcd-b261-f94f1fe6c43b";
+    public void testForNoPriorTransaction() {
         Message creditMessage = this.unmarshalCreditMessage(requestXML);
-        Authorizer authorizer = new Authorizer();
-        Configurator configurator = new Configurator();
-        authorizer.setConfigurator(configurator);
-
-        FacilityDAO facilityDAO = mock(FacilityDAO.class);
-        Facility facility = new Facility();
-        facility.setDeviceType("RPOS");
-        facility.setFacility("3740152100");
-        facility.setStrategy("Deca");
-        facility.setTokenBankName("Deca006");
-
-        when(facilityDAO.get(uuid)).thenReturn(facility);
-        authorizer.setFacilityDAO(facilityDAO);
-
-        TranRepository tr = new TranRepository();
-        TransactionDAO td = new TransactionDAO();
-        Mapper mapper;
-        CassandraSessionFactory factory = new CassandraSessionFactory();
-        factory.setSeedHost("localhost");
-        factory.connect();
-        Session session = null;
-        ResultSet resultSet = null;
-        session = factory.getSession();
-        mapper = new MappingManager(session).mapper(Transaction.class);
-        td.setMapper(mapper);
-        tr.setTransactionDAO(td);
-        authorizer.setTranRepository(tr);
-
-        RetailStrategy retailStrategy = new RetailStrategy();
-        BaseStrategyFactory bsf = new BaseStrategyFactory();
-        bsf.setRetailStrategy(retailStrategy);
-
-        authorizer.setBaseStrategyFactory(bsf);
-
+        this.setAllDependencies();
         Message result = authorizer.authorize(creditMessage);
         assertEquals("NO_AUTHORIZATION_FOUND_FOR_REVERSAL", result.getResponse().get(0).getDescriptionField());
     }
-   @Ignore
+
+    @Ignore
     @Test
     public void testProcessRequest() {
-        //String tokenID = "879498";
-        String uuid = "0ee1c509-2c70-4bcd-b261-f94f1fe6c43b";
+
         Message creditMessage = this.unmarshalCreditMessage(requestXML);
-         Authorizer authorizer = new Authorizer();
+        this.setAllDependencies();
+        Message result = authorizer.authorize(creditMessage);
+        assertEquals("REFUND", result.getResponse().get(0).getDescriptionField());
+    }
+//    @Ignore
+    @Test
+    public void testForReversal() {
+        Message creditMessage = this.unmarshalCreditMessage(requestXML);
+        this.setAllDependencies();
+        Message result = authorizer.authorize(creditMessage);
+        assertEquals("TRANSACTION_ALREADY_REVERSED", result.getResponse().get(0).getDescriptionField());
+    }
+    @Ignore
+    @Test
+    public void testForAlreadySettled() {
+        Message creditMessage = this.unmarshalCreditMessage(requestXML);
+        this.setAllDependencies();
+        Message result = authorizer.authorize(creditMessage);
+        assertEquals("TRANSACTION_ALREADY_SETTLED", result.getResponse().get(0).getDescriptionField());
+    }
+
+    private void setAllDependencies() {
+        authorizer = new Authorizer();
         Configurator configurator = new Configurator();
         authorizer.setConfigurator(configurator);
 
@@ -206,15 +171,16 @@ public class ReversalRefundDecaTest {
         td.setMapper(mapper);
         tr.setTransactionDAO(td);
         authorizer.setTranRepository(tr);
-
+        
+        Mapper mapper2;
         RetailStrategy retailStrategy = new RetailStrategy();
         VisionGatewayStub vgs = new VisionGatewayStub();
         GatewayFactory gatewayFactory = new GatewayFactory();
-        mapper = new MappingManager(session).mapper(Transaction.class);
+        mapper2 = new MappingManager(session).mapper(Transaction.class);
         SettleMessageDAO settleMessageDAO = new SettleMessageDAO();
         settleMessageDAO.setCassandraSessionFactory(factory);
-        mapper = new MappingManager(session).mapper(SettleEntity.class);
-        settleMessageDAO.setMapper(mapper);
+        mapper2 = new MappingManager(session).mapper(SettleEntity.class);
+        settleMessageDAO.setMapper(mapper2);
         retailStrategy.setSettleMessageDAO(settleMessageDAO);
         gatewayFactory.setVisionGatewayStub(vgs);
         gatewayFactory.setEnableStub("true");
@@ -222,50 +188,8 @@ public class ReversalRefundDecaTest {
         BaseStrategy baseStrategy = retailStrategy;
         baseStrategyFactory.setRetailStrategy(retailStrategy);
         baseStrategy.setGatewayFactory(gatewayFactory);
-
         authorizer.setBaseStrategyFactory(baseStrategyFactory);
-
-        Message result = authorizer.authorize(creditMessage); 
-
-        assertEquals("REFUND", result.getResponse().get(0).getDescriptionField());
     }
-//    @Ignore
-    @Test
-    public void testForReversal() {
-         String uuid = "0ee1c509-2c70-4bcd-b261-f94f1fe6c43b";
-        Message creditMessage = this.unmarshalCreditMessage(requestXML);
-        Authorizer authorizer = new Authorizer();
-        Configurator configurator = new Configurator();
-        authorizer.setConfigurator(configurator);
-
-        FacilityDAO facilityDAO = mock(FacilityDAO.class);
-        Facility facility = new Facility();
-        facility.setDeviceType("RPOS");
-        facility.setFacility("3740152100");
-        facility.setStrategy("Deca");
-        facility.setTokenBankName("Deca006");
-
-        when(facilityDAO.get(uuid)).thenReturn(facility);
-        authorizer.setFacilityDAO(facilityDAO);
-
-        TranRepository tr = new TranRepository();
-        TransactionDAO td = new TransactionDAO();
-        Mapper mapper;
-        CassandraSessionFactory factory = new CassandraSessionFactory();
-        factory.setSeedHost("localhost");
-        factory.connect();
-        Session session = null;
-        ResultSet resultSet = null;
-        session = factory.getSession();
-        mapper = new MappingManager(session).mapper(Transaction.class);
-        td.setMapper(mapper);
-        tr.setTransactionDAO(td);
-        authorizer.setTranRepository(tr);
-        Message result = authorizer.authorize(creditMessage);
-        assertEquals("TRANSACTION_ALREADY_REVERSED", result.getResponse().get(0).getDescriptionField());
-    }
-
-
 
     private Message unmarshalCreditMessage(String content) {
         Message request = new Message();

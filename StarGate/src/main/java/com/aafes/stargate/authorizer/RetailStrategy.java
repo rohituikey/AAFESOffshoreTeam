@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class RetailStrategy extends BaseStrategy {
 
+    
+
     @EJB
     private SettleMessageDAO settleMessageDAO;
     @EJB
@@ -290,16 +292,21 @@ public class RetailStrategy extends BaseStrategy {
         }
         t = gateway.processMessage(t);  //calling refund 
         if (ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
-            settleEntity.setSettlestatus("Not to Settel");
+            settleEntity.setSettlestatus(SettleConstant.Not_to_settle);
             updateSettle(settleEntity);
         }
         return t;
     }
     /* ADDED COMMON CODE TO CHECK IF SETTLEMENT STATUS - START */
-    //added settler for testing purpose
-   
+    
     public void setSettleMessageDAO(SettleMessageDAO settleMessageDAO) {
         this.settleMessageDAO = settleMessageDAO;
-    }
+    } 
     
+    /**
+     * @param configurator the configurator to set
+     */
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
 }

@@ -3,7 +3,6 @@ package com.aafes.stargate.authorizer.entity;
 import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.Table;
 import com.datastax.driver.mapping.annotations.Transient;
-import java.util.List;
 
 @Table(keyspace = "stargate", name = "transactions")
 final public class Transaction {

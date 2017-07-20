@@ -96,5 +96,4 @@ public class GatewayFactory {
     {
         this.visionGatewaySimulator = visionGatewaySimulator;
     }
-
 }

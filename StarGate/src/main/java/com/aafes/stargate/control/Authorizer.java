@@ -150,11 +150,14 @@ public class Authorizer {
                     mapResponse(t, cm);
                     t.setResponseXmlDateTime(getSystemDateTime());
                     if (t.getReversal() != null
-                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)) {
+                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL) 
+                            && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                         LOG.info("Saving and updating transaction.....");
                         authTran.setReversal(RequestType.REVERSAL);
                         tranRepository.saveAndUpdate(t, authTran);
-                    } else if (t.getRequestType().equals(RequestType.TRNCANCEL)){
+                    } else if (t.getReversal() != null
+                            && t.getRequestType().equals(RequestType.TRNCANCEL)
+                            && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())){
                         LOG.info("Saving and updating transaction.....");
                         for(Transaction tran :authTranList){
                           tranRepository.saveAndUpdate(t, tran);
@@ -583,10 +586,9 @@ public class Authorizer {
             transaction.setOriginalOrder(request.getOriginalOrder());
         }
 
-//        if (request.getOrigRRN() != null && !request.getOrigRRN().isEmpty()) {
-//
-//            transaction.setOrigRRN(request.getOrigRRN());
-//        }
+        if (request.getOrigRRN() != null && !request.getOrigRRN().isEmpty()) {
+            transaction.setOrigRRN(request.getOrigRRN().get(0));
+        }
 
         if (request.getOrigTransId() != null && !request.getOrigTransId().isEmpty()) {
 

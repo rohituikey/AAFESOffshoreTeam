@@ -126,7 +126,7 @@ public class ReversalRefundDecaTest {
         Message result = authorizer.authorize(creditMessage);
         assertEquals("REFUND", result.getResponse().get(0).getDescriptionField());
     }
-//    @Ignore
+    @Ignore
     @Test
     public void testForReversal() {
         Message creditMessage = this.unmarshalCreditMessage(requestXML);
@@ -134,7 +134,7 @@ public class ReversalRefundDecaTest {
         Message result = authorizer.authorize(creditMessage);
         assertEquals("TRANSACTION_ALREADY_REVERSED", result.getResponse().get(0).getDescriptionField());
     }
-    @Ignore
+//    @Ignore
     @Test
     public void testForAlreadySettled() {
         Message creditMessage = this.unmarshalCreditMessage(requestXML);
@@ -182,6 +182,7 @@ public class ReversalRefundDecaTest {
         mapper2 = new MappingManager(session).mapper(SettleEntity.class);
         settleMessageDAO.setMapper(mapper2);
         retailStrategy.setSettleMessageDAO(settleMessageDAO);
+        retailStrategy.setConfigurator(configurator);
         gatewayFactory.setVisionGatewayStub(vgs);
         gatewayFactory.setEnableStub("true");
         BaseStrategyFactory baseStrategyFactory = new BaseStrategyFactory();

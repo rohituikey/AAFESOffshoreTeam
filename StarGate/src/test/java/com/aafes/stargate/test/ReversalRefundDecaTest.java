@@ -116,7 +116,7 @@ public class ReversalRefundDecaTest {
                 + "<cm:PlanNumbers>\n"
                 + "<cm:PlanNumber>10001</cm:PlanNumber>\n"
                 + "</cm:PlanNumbers> \n"
-                + "<cm:DescriptionField>SALE</cm:DescriptionField>\n"
+                + "<cm:DescriptionField>REFUND</cm:DescriptionField>\n"
                 + "<cm:AddressVerificationService>\n"
                 + "<cm:CardHolderName>John Doe</cm:CardHolderName>\n"
                 + "<cm:BillingAddress1>1222</cm:BillingAddress1>\n"
@@ -130,7 +130,7 @@ public class ReversalRefundDecaTest {
                 + "</cm:Message>";
 
     }
-
+   @Ignore
     @Test
     public void testForNoPriorTransaction()
     {
@@ -173,7 +173,7 @@ public class ReversalRefundDecaTest {
         Message result = authorizer.authorize(creditMessage);
         assertEquals("NO_AUTHORIZATION_FOUND_FOR_REVERSAL", result.getResponse().get(0).getDescriptionField());
     }
-    @Ignore
+   @Ignore
     @Test
     public void testProcessRequest() {
         //String tokenID = "879498";
@@ -227,9 +227,9 @@ public class ReversalRefundDecaTest {
 
         Message result = authorizer.authorize(creditMessage); 
 
-        assertEquals("Refund", result.getResponse().get(0).getDescriptionField());
+        assertEquals("REFUND", result.getResponse().get(0).getDescriptionField());
     }
-    @Ignore
+//    @Ignore
     @Test
     public void testForReversal() {
          String uuid = "0ee1c509-2c70-4bcd-b261-f94f1fe6c43b";

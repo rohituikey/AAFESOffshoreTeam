@@ -21,9 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -139,7 +137,7 @@ public class Authorizer {
                 BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
                 if (baseStrategy != null) {
                     Transaction authTran = checkReversalTransaction(t);
-                    authTran = checkTransactionCancel(t);
+                    Transaction authTranCancel = checkTransactionCancel(t);
 //                    if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
 //                            || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
 //                            && (t.getReversal() != null
@@ -161,7 +159,7 @@ public class Authorizer {
                             && t.getRequestType().equals(RequestType.TRNCANCEL)
                             && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                         LOG.info("Saving and updating transaction.....");
-                        tranRepository.saveAndUpdate(t, authTran);
+                        tranRepository.saveAndUpdate(t, authTranCancel);
                     } else {
                         LOG.info("Saving transaction....." + t.getRrn());
                         encryptValues(t);

@@ -5,7 +5,6 @@
  */
 package com.aafes.stargate.test;
 
-import com.aafes.credit.Message;
 import com.aafes.stargate.authorizer.BaseStrategy;
 import com.aafes.stargate.authorizer.BaseStrategyFactory;
 import com.aafes.stargate.authorizer.RetailStrategy;
@@ -40,8 +39,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.slf4j.LoggerFactory;
 import com.aafes.credit.Message;
-import com.aafes.credit.Message.Header;
-import com.aafes.credit.Message.Request;
 
 /**
  *

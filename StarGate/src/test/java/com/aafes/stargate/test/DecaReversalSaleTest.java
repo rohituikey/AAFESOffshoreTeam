@@ -169,7 +169,7 @@ public class DecaReversalSaleTest {
     
     /* BEFORE EXECUTING THIS TEST CASE CHANGE settlestatus IN starsettler.settlemessages TO DONE */
     /* FOR THE COMBINATION OF DATA */
-    @Ignore
+   // @Ignore
     @Test
     public void testForTransactionAlreadySettled() {
         sMethodName = "testForTransactionAlreadySettled";

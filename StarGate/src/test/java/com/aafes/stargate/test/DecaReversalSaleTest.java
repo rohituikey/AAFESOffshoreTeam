@@ -125,7 +125,7 @@ public class DecaReversalSaleTest {
         authorizer.setBaseStrategyFactory(bsf);
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testNoPreAuthorizationForReversal() {
         sMethodName = "testNoPreAuthorizationForReversal";
@@ -149,7 +149,7 @@ public class DecaReversalSaleTest {
         assertEquals(ResponseType.APPROVED, result.getResponse().get(0).getResponseType());
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testForReversal() {
         sMethodName = "testForReversal";
@@ -202,7 +202,7 @@ public class DecaReversalSaleTest {
         }
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testForALreadyReversed() {
         sMethodName = "testForALreadyReversed";

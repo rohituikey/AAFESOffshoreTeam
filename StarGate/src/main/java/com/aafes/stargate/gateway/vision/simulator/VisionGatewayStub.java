@@ -7,7 +7,6 @@ package com.aafes.stargate.gateway.vision.simulator;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.Gateway;
-import com.aafes.stargate.gateway.svs.NetworkMessageProcessor;
 import com.aafes.stargate.util.ResponseType;
 import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;

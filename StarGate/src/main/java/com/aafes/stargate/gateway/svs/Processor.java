@@ -6,8 +6,6 @@
 package com.aafes.stargate.gateway.svs;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.stargate.gateway.Gateway;
-import com.aafes.stargate.gateway.GatewayFactory;
 import javax.ejb.EJB;
 
 /**

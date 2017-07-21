@@ -6,7 +6,6 @@
 package com.aafes.stargate.dao;
 
 import com.aafes.stargate.authorizer.entity.GiftCard;
-import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.CassandraSessionFactory;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
@@ -22,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 @Stateless
 public class SVSDAO {
-    
+
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(TransactionDAO.class.getSimpleName());
 
@@ -35,7 +34,6 @@ public class SVSDAO {
         mapper = new MappingManager(session).mapper(GiftCard.class);
     }
 
-
     public void save(GiftCard giftCard) {
         mapper.save(giftCard);
     }
@@ -44,10 +42,9 @@ public class SVSDAO {
         LOG.info("Finding gift card");
         return (GiftCard) mapper.get(cardNumber, pin);
     }
-    
-    
+
     @EJB
     public void setCassandraSessionFactory(CassandraSessionFactory factory) {
         this.factory = factory;
-}
+    }
 }

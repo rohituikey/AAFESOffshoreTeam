@@ -5,7 +5,6 @@
  */
 package com.aafes.stargate.test;
 
-import com.aafes.credit.Message;
 import com.aafes.stargate.authorizer.BaseStrategy;
 import com.aafes.stargate.authorizer.BaseStrategyFactory;
 import com.aafes.stargate.authorizer.RetailStrategy;
@@ -40,8 +39,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.slf4j.LoggerFactory;
 import com.aafes.credit.Message;
-import com.aafes.credit.Message.Header;
-import com.aafes.credit.Message.Request;
+import com.aafes.stargate.util.ResponseType;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -136,7 +137,7 @@ public class DecaReversalSaleTest {
         assertEquals("NO_AUTHORIZATION_FOUND_FOR_REVERSAL", result.getResponse().get(0).getDescriptionField());
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testProcessRequest() {
         sMethodName = "testProcessRequest";
@@ -145,7 +146,7 @@ public class DecaReversalSaleTest {
         Message result = authorizer.authorize(creditMessage);
         clearGlobalVariables();
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        assertEquals("SALE", result.getResponse().get(0).getDescriptionField());
+        assertEquals(ResponseType.APPROVED, result.getResponse().get(0).getResponseType());
     }
 
     @Ignore
@@ -173,7 +174,7 @@ public class DecaReversalSaleTest {
         Message creditMessage = this.unmarshalCreditMessage(requestXMLSaleLocal);
         Message result = authorizer.authorize(creditMessage);
 
-        if ("SALE".equals(result.getResponse().get(0).getDescriptionField())) {
+        if (ResponseType.APPROVED.equals(result.getResponse().get(0).getResponseType())) {
             requestXMLReversalSale = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><cm:Message TypeCode=\"Request\" "
                     + "MajorVersion=\"3\" MinorVersion=\"1\" FixVersion=\"0\" xmlns:cm=\"http://www.aafes.com/credit\"><cm:Header>"
                     + "<cm:IdentityUUID>0ee1c509-2c70-4bcd-b261-f94f1fe6c43b</cm:IdentityUUID><cm:LocalDateTime>2017-07-14T11:08:00"
@@ -195,7 +196,7 @@ public class DecaReversalSaleTest {
             result = authorizer.authorize(creditMessage);
             clearGlobalVariables();
             LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-            assertEquals("SALE", result.getResponse().get(0).getDescriptionField());
+            assertEquals(ResponseType.APPROVED, result.getResponse().get(0).getResponseType());
         } else {
             Assert.fail("Sale Request failed!!! Reversal request not processed!!!");
         }
@@ -226,7 +227,7 @@ public class DecaReversalSaleTest {
         Message creditMessage = this.unmarshalCreditMessage(requestXMLSaleLocal);
         Message result = authorizer.authorize(creditMessage);
 
-        if ("SALE".equals(result.getResponse().get(0).getDescriptionField())) {
+         if (ResponseType.APPROVED.equals(result.getResponse().get(0).getResponseType())) {
             requestXMLReversalSale = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><cm:Message TypeCode=\"Request\" "
                     + "MajorVersion=\"3\" MinorVersion=\"1\" FixVersion=\"0\" xmlns:cm=\"http://www.aafes.com/credit\"><cm:Header>"
                     + "<cm:IdentityUUID>0ee1c509-2c70-4bcd-b261-f94f1fe6c43b</cm:IdentityUUID><cm:LocalDateTime>2017-07-14T11:08:00"
@@ -247,7 +248,7 @@ public class DecaReversalSaleTest {
             creditMessage = this.unmarshalCreditMessage(requestXMLReversalSale);
             result = authorizer.authorize(creditMessage);
 
-            if ("SALE".equals(result.getResponse().get(0).getDescriptionField())) {
+             if (ResponseType.APPROVED.equals(result.getResponse().get(0).getResponseType())) {
                 creditMessage = this.unmarshalCreditMessage(requestXMLReversalSale);
                 result = authorizer.authorize(creditMessage);
                 clearGlobalVariables();
@@ -261,7 +262,6 @@ public class DecaReversalSaleTest {
         }
     }
 
-    //@Ignore
     @Test
     public void testForTransactionAlreadySettled() {
         sMethodName = "testForTransactionAlreadySettled";
@@ -286,8 +286,8 @@ public class DecaReversalSaleTest {
         Message creditMessage = this.unmarshalCreditMessage(requestXMLSaleLocal);
         Message result = authorizer.authorize(creditMessage);
 
-        if ("SALE".equals(result.getResponse().get(0).getDescriptionField())) {
-            boolean test =  udpateSettleStatus("DONE", "2017-07-20", "1000003", "2017-07-20", "Milstar", "DP", "40000003", "40000003");
+         if (ResponseType.APPROVED.equals(result.getResponse().get(0).getResponseType())) {
+            boolean test =  udpateSettleStatus("DONE", this.getSystemDate(), "1000003", this.getSystemDate(), "Milstar", "DP", "40000003", "40000003");
             
             if(test){
                 requestXMLReversalSale = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><cm:Message TypeCode=\"Request\" "
@@ -387,6 +387,12 @@ public class DecaReversalSaleTest {
         }
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         return tokenValidateFlg;
+    }
+    private String getSystemDate() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        String ts = dateFormat.format(date);
+        return ts;
     }
 
 //    private void setInitialData(){

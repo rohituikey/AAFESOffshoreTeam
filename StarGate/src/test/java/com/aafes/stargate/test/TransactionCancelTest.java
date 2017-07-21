@@ -158,7 +158,7 @@ public class TransactionCancelTest {
         assertEquals("NO_AUTHORIZATION_FOUND_FOR_CANCELATION", result.getResponse().get(0).getDescriptionField());
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void testForTransactionExist() {
         session.execute("TRUNCATE STARGATE.TRANSACTIONS");
@@ -176,6 +176,26 @@ public class TransactionCancelTest {
         assertEquals(ResponseType.APPROVED, result.getResponse().get(0).getResponseType());
     }
 
+    @Ignore
+    @Test
+    public void testForTransactionExistRefund()
+    {
+        session.execute("TRUNCATE STARGATE.TRANSACTIONS");
+        session.execute("TRUNCATE STARSETTLER.SETTLEMESSAGES");
+        settleMessageDAO.save(SettleEntityList);
+        udpateSettleStatus(SettleConstant.Not_to_settle, this.getSystemDate(), "9876567", this.getSystemDate(), "Milstar", "DP", "20000001", "10000001");
+        t.setResponseType(ResponseType.APPROVED);
+        t.setComment(ResponseType.APPROVED);
+        t.setRequestType(RequestType.REFUND);// need to modify in xmlrequest as well
+        td.save(t);
+        this.setAllDependencies();
+        Message result = authorizer.authorize(creditMessage);
+        session.execute("TRUNCATE STARGATE.TRANSACTIONS");
+        session.execute("TRUNCATE STARSETTLER.SETTLEMESSAGES");
+        assertEquals(ResponseType.APPROVED, result.getResponse().get(0).getResponseType());
+        
+    }
+    
     private void setAllDependencies() {
         authorizer = new Authorizer();
         configurator = new Configurator();

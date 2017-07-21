@@ -26,20 +26,20 @@ import org.slf4j.LoggerFactory;
  */
 @Stateless
 public class TokenEndPointService {
-    
+
     @Inject
     private String tokenEndpoint;
-    
-     private static final org.slf4j.Logger log = LoggerFactory.getLogger(TokenEndPointService.class.getSimpleName());
-    
+
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(TokenEndPointService.class.getSimpleName());
+
     public String lookupAccount(Transaction t) throws ProcessingException{
-       log.info("TokenServicer#lookupAccount#Start.......");
+        log.info("TokenServicer#lookupAccount#Start.......");
         // REMOVE
         //if(tokenEndpoint == null) tokenEndpoint = "http://localhost:8080/tokenizer/1/tokenmessage";
         Client client = ClientBuilder.newBuilder().build();
         WebTarget target = client.target(tokenEndpoint);
         log.info("TokenServicer#lookupAccount#Done WebTarget.........");
-                
+
         TokenMessage tm = new TokenMessage();
         TokenMessage.Request request = new TokenMessage.Request();
         request.setAccount(t.getAccount());
@@ -48,28 +48,30 @@ public class TokenEndPointService {
         request.setRequestType(RequestTypeType.LOOKUP);
         request.setTokenBankName(t.getTokenBankName());
         tm.setRequest(request);
-      //  request.set
+        //  request.set
         Entity entity = Entity.entity(tm, MediaType.APPLICATION_XML);
         Response response = target.request(MediaType.APPLICATION_XML).post(entity);
-         
-        tm = response.readEntity(TokenMessage.class);    
+
+        tm = response.readEntity(TokenMessage.class);
         log.info("TokenServicer#lookupAccount#Got response.........");
-        if(tm.getResponse() != null) {
+        if (tm.getResponse() != null) {
             return tm.getResponse().getAccount();
         }
-        log.info("rrn number in TokenServicer#lookupAccount is : "+t.getRrn());
+        log.info("rrn number in TokenServicer#lookupAccount is : " + t.getRrn());
         return "";
     }
-    
-    public String issueToken(Transaction t) throws ProcessingException{
+
+    public String issueToken(Transaction t) throws ProcessingException {
         log.info("TokenServicer#issueToken#Start.......");
-        
+
         // REMOVE
-        if(tokenEndpoint == null) tokenEndpoint = "http://localhost:8080/tokenizer/1/tokenmessage";
+        if (tokenEndpoint == null) {
+            tokenEndpoint = "http://localhost:8686/tokenizer/1/tokenmessage";
+        }
         Client client = ClientBuilder.newBuilder().build();
         WebTarget target = client.target(tokenEndpoint);
         log.info("TokenServicer#issueToken#Done WebTarget.........");
-                
+
         TokenMessage tm = new TokenMessage();
         TokenMessage.Request request = new TokenMessage.Request();
         request.setAccount(t.getAccount());
@@ -79,23 +81,26 @@ public class TokenEndPointService {
         request.setTokenBankName(t.getTokenBankName());
         tm.setRequest(request);
         Entity entity = Entity.entity(tm, MediaType.APPLICATION_XML);
-        Response response = target.request(MediaType.APPLICATION_XML).post(entity);
-         
-        tm = response.readEntity(TokenMessage.class);       
-        if(tm.getResponse() != null) {
+        Response response = null;
+
+        response = target.request(MediaType.APPLICATION_XML).post(entity);
+
+        try {
+            tm = response.readEntity(TokenMessage.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (tm.getResponse() != null) {
             return tm.getResponse().getAccount();
         }
-        log.info("rrn number in TokenServicer#issueToken is : "+t.getRrn());  
+        log.info("rrn number in TokenServicer#issueToken is : " + t.getRrn());
         log.info("TokenServicer#issueToken#END.......");
         return "";
-       
+
     }
 
     public void setTokenEndpoint(String tokenEndpoint) {
         this.tokenEndpoint = tokenEndpoint;
     }
 
-    
-    
-    
 }

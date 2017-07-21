@@ -767,7 +767,7 @@ public class Authorizer {
 
             authTran = tranRepository.find(t.getIdentityUuid(), t.getOrigRRN(), t.getDescriptionField());
 
-            if (authTran == null || !(authTran.getOrderNumber().equals(t.getOriginalOrder()))) {
+            if (authTran == null || !(authTran.getOriginalOrder().equals(t.getOriginalOrder()))) {
 
                 throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_CANCELATION");
             }

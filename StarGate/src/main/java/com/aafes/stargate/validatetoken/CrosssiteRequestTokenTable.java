@@ -7,7 +7,6 @@ package com.aafes.stargate.validatetoken;
 
 import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.Table;
-import javax.ejb.Stateless;
 
 /**
  * MAPPING CLASS FOR TABLE STARGATE.CROSSSITEREQUESTTOKENTABLE

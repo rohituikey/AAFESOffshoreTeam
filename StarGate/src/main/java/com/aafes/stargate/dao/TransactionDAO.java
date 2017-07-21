@@ -9,7 +9,6 @@ import com.datastax.driver.mapping.MappingManager;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import static org.jboss.resteasy.util.HttpClient4xUtils.updateQuery;
 import org.slf4j.LoggerFactory;
 
 @Stateless

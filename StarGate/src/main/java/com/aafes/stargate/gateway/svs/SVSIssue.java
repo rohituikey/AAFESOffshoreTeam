@@ -14,9 +14,6 @@ import com.svs.svsxml.beans.IssueVirtualGiftCardRequest;
 import com.svs.svsxml.beans.IssueVirtualGiftCardResponse;
 import com.svs.svsxml.beans.Merchant;
 import com.svs.svsxml.service.SVSXMLWay;
-import com.svs.svsxml.service.SVSXMLWayService;
-import java.util.Map;
-import javax.xml.ws.BindingProvider;
 import org.slf4j.LoggerFactory;
 
 /**

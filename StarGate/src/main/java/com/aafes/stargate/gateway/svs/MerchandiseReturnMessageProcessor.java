@@ -12,7 +12,6 @@ import com.svs.svsxml.beans.MerchandiseReturnResponse;
 import com.svs.svsxml.beans.Merchant;
 import com.svs.svsxml.service.SVSXMLWay;
 import javax.ejb.Stateless;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**

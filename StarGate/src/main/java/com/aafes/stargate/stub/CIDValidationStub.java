@@ -7,7 +7,6 @@ package com.aafes.stargate.stub;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.util.StarGateConstants;
-import java.util.regex.Pattern;
 
 /**
  *

@@ -21,9 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -104,15 +102,17 @@ public class Authorizer {
                 LOG.info("Reversal........");
                 storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.REVERSAL);
 
-		if(storedTran!=null && storedTran.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
-                   storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
-                   storedTran.setResponseType(ResponseType.DECLINED);
-                   storedTran.setDescriptionField("TRANSACTION_ALREADY_REVERSED");
-                }else{
-                    storedTran=null;
+                if (storedTran != null && storedTran.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
+                    storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REVERSED"));
+                    storedTran.setResponseType(ResponseType.DECLINED);
+                    storedTran.setDescriptionField("TRANSACTION_ALREADY_REVERSED");
+                } else {
+                    storedTran = null;
                 }
-            } else  storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getRequestType());
-            
+            } else {
+                storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getRequestType());
+            }
+
             if (storedTran == null) {
 
                 isDuplicateTransaction = false;
@@ -137,7 +137,7 @@ public class Authorizer {
                 BaseStrategy baseStrategy = baseStrategyFactory.findStrategy(t.getStrategy());
                 if (baseStrategy != null) {
                     Transaction authTran = checkReversalTransaction(t);
-                    List<Transaction> authTranList = checkTransactionCancel(t,cm);
+                    Transaction authTranCancel = checkTransactionCancel(t);
 //                    if ((MediaType.MIL_STAR.equalsIgnoreCase(t.getMedia())
 //                            || MediaType.GIFT_CARD.equalsIgnoreCase(t.getMedia()))
 //                            && (t.getReversal() != null
@@ -150,19 +150,17 @@ public class Authorizer {
                     mapResponse(t, cm);
                     t.setResponseXmlDateTime(getSystemDateTime());
                     if (t.getReversal() != null
-                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL) 
+                            && t.getReversal().equalsIgnoreCase(RequestType.REVERSAL)
                             && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                         LOG.info("Saving and updating transaction.....");
                         authTran.setReversal(RequestType.REVERSAL);
                         tranRepository.saveAndUpdate(t, authTran);
                     } else if (t.getReversal() != null
                             && t.getRequestType().equals(RequestType.TRNCANCEL)
-                            && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())){
+                            && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                         LOG.info("Saving and updating transaction.....");
-                        for(Transaction tran :authTranList){
-                          tranRepository.saveAndUpdate(t, tran);
-                        }
-                    }else {
+                        tranRepository.saveAndUpdate(t, authTranCancel);
+                    } else {
                         LOG.info("Saving transaction....." + t.getRrn());
                         encryptValues(t);
                         tranRepository.save(t);
@@ -757,41 +755,25 @@ public class Authorizer {
         this.transactionDAO = transactionDAO;
     }
 
-    private List checkTransactionCancel(Transaction t,Message cm) {
+    /**
+     *
+     * @param t
+     * @return
+     */
+    private Transaction checkTransactionCancel(Transaction t) {
 
-        List authTrans = new ArrayList();;
-
+        Transaction authTran = null;
         if (t.getRequestType() != null & t.getRequestType().equalsIgnoreCase(RequestType.TRNCANCEL)) {
-             
-          //Request request = requestMessage.getRequest().get(0);
-           // cm.getRequest().
-            //if (request.getOrigRRN() != null && !request.getOrigRRN().isEmpty()) {
-//
-//            transaction.setOrigRRN(request.getOrigRRN());
-//        }
-        
-          List<String> rrnNumbers =new ArrayList<>();
-             rrnNumbers.add(t.getOrigRRN());
-            
-        //    List<String> rrnNumbers = cm.getOrigRRN();
 
-            for (String rrn : rrnNumbers) {
-			Transaction authTran = tranRepository.find(t.getIdentityUuid(),
-                        rrn, t.getDescriptionField());
-                        if (authTrans != null && authTran.getOrderNumber() != null
-                        && t.getOrderNumber() != null
-                        && (authTran.getOrderNumber().equals(t.getOrderNumber()))
-						&& authTran.getResponseType().equalsIgnoreCase("Approve")) {
-                    LOG.info("Order Number is matching"+t.getOrderNumber());
-                    authTrans.add(authTran);
-                }
-            }
-            if (authTrans.isEmpty()) {
+            authTran = tranRepository.find(t.getIdentityUuid(), t.getOrigRRN(), t.getDescriptionField());
+
+            if (authTran == null || !(authTran.getOrderNumber().equals(t.getOriginalOrder()))) {
+
                 throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_CANCELATION");
             }
-          
-            
+
         }
-        return authTrans;
+
+        return authTran;
     }
 }

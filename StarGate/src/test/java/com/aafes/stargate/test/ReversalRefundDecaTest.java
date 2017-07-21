@@ -11,7 +11,6 @@ import com.aafes.stargate.authorizer.BaseStrategyFactory;
 import com.aafes.stargate.authorizer.RetailStrategy;
 import com.aafes.stargate.authorizer.entity.Facility;
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.stargate.boundary.CreditMessageResource;
 import com.aafes.stargate.control.Authorizer;
 import com.aafes.stargate.control.CassandraSessionFactory;
 import com.aafes.stargate.control.Configurator;
@@ -22,6 +21,7 @@ import com.aafes.stargate.gateway.GatewayFactory;
 import com.aafes.stargate.gateway.vision.simulator.VisionGatewayStub;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import com.aafes.stargate.util.StrategyType;
 import com.aafes.stargate.util.TransactionType;
 import com.aafes.starsettler.imported.SettleEntity;
 import com.aafes.starsettler.imported.SettleMessageDAO;
@@ -43,7 +43,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,22 +52,30 @@ import static org.mockito.Mockito.when;
  * @author alugumetlas
  */
 public class ReversalRefundDecaTest {
-    
-    private CreditMessageResource cmr;
-    private Authorizer authorizer;
-    private Mapper mapper;
-    private String requestXML;
-    private SettleMessageDAO settleMessageDAO;
-    private TransactionDAO td;
+
+    Authorizer authorizer;
+    Configurator configurator;
+    FacilityDAO facilityDAO;
+    Facility facility;
+    TranRepository tr;
+    TransactionDAO td;
+    Mapper mapper;
+    Mapper mapper1;
+    CassandraSessionFactory factory;
+    Session session;
+    ResultSet resultSet;
+    RetailStrategy retailStrategy;
+    BaseStrategyFactory bsf;
+    GatewayFactory gatewayFactory;
+    BaseStrategy bs;
+    VisionGatewayStub visionGatewaySimulator;
+    SettleMessageDAO settleMessageDAO;
+    Transaction t;
     String uuid;
-    private TranRepository tr;
-    private Transaction t;
-    private List<SettleEntity> settleEntityList;
-    private SettleEntity settleEntity;
-    private VisionGatewayStub vgs;
-    private Message creditMessage;
-    private Session session;
-    
+    String requestXML;
+    Message creditMessage;
+    List<SettleEntity> SettleEntityList;
+
     @Before
     public void setUp() {
         t = new Transaction();
@@ -116,23 +123,26 @@ public class ReversalRefundDecaTest {
                 + "</cm:Message>";
         creditMessage = this.unmarshalCreditMessage(requestXML);
         t = mapRequest(creditMessage);
-        settleEntityList = mapToSettle(t);
-        CassandraSessionFactory factory = new CassandraSessionFactory();
+        SettleEntityList = mapToSettle(t);
+        factory = new CassandraSessionFactory();
         factory.setSeedHost("localhost");
         factory.connect();
-        
+
         session = factory.getSession();
         mapper = new MappingManager(session).mapper(Transaction.class);
         tr = new TranRepository();
         td = new TransactionDAO();
         td.setMapper(mapper);
         tr.setTransactionDAO(td);
+        td.setCassandraSessionFactory(factory);
+        tr.setTransactionDAO(td);
         settleMessageDAO = new SettleMessageDAO();
         Mapper mapper2 = new MappingManager(session).mapper(SettleEntity.class);
+        settleMessageDAO.setCassandraSessionFactory(factory);
         settleMessageDAO.setMapper(mapper2);
-        
+
     }
-    
+
     @Test
     public void testForNoPriorTransaction() {
         //  Message creditMessage = this.unmarshalCreditMessage(requestXML);
@@ -140,11 +150,11 @@ public class ReversalRefundDecaTest {
         Message result = authorizer.authorize(creditMessage);
         assertEquals("NO_AUTHORIZATION_FOUND_FOR_REVERSAL", result.getResponse().get(0).getDescriptionField());
     }
-    
+
     @Test
     public void testProcessRequest() {
         this.setAllDependencies();
-        settleMessageDAO.save(settleEntityList);
+        settleMessageDAO.save(SettleEntityList);
         t.setResponseType("APPROVED");
         t.setComment("APPROVED");
         t.setRequestType("Refund");
@@ -155,16 +165,16 @@ public class ReversalRefundDecaTest {
         session.execute("TRUNCATE STARGATE.TRANSACTIONS");
         session.execute("TRUNCATE STARGATE.TRANSACTIONS");
         assertEquals(ResponseType.APPROVED, result.getResponse().get(0).getResponseType());
-        
+
     }
-    
+
     @Test
     public void testForAlreadySettled() {
+        SettleEntityList.get(0).setSettlestatus("Done");
+        settleMessageDAO.save(SettleEntityList);
         t.setRequestType(RequestType.REFUND);
         t.setResponseType("APPROVED");
-        td.save(t); 
-        settleEntityList.get(0).setSettlestatus("Done");
-        settleMessageDAO.save(settleEntityList);
+        td.save(t);
         this.setAllDependencies();
         Message result = authorizer.authorize(creditMessage);
         session.execute("TRUNCATE STARGATE.TRANSACTIONS");
@@ -179,40 +189,60 @@ public class ReversalRefundDecaTest {
         td.save(t);
         this.setAllDependencies();
         Message result = authorizer.authorize(creditMessage);
-        assertEquals("TRANSACTION_ALREADY_REVERSED", result.getResponse().get(0).getDescriptionField());
         session.execute("TRUNCATE STARGATE.TRANSACTIONS");
+        session.execute("TRUNCATE STARGATE.TRANSACTIONS");
+        assertEquals("TRANSACTION_ALREADY_REVERSED", result.getResponse().get(0).getDescriptionField());
+
     }
-    
+
     private void setAllDependencies() {
         authorizer = new Authorizer();
-        Configurator configurator = new Configurator();
+        configurator = new Configurator();
         authorizer.setConfigurator(configurator);
-        
-        FacilityDAO facilityDAO = mock(FacilityDAO.class);
-        Facility facility = new Facility();
+
+        facilityDAO = mock(FacilityDAO.class);
+        facility = new Facility();
         facility.setDeviceType("RPOS");
         facility.setFacility("3740152100");
         facility.setStrategy("Deca");
         facility.setTokenBankName("Deca006");
-        
+
         when(facilityDAO.get(uuid)).thenReturn(facility);
         authorizer.setFacilityDAO(facilityDAO);
+
+        tr = new TranRepository();
+        td = new TransactionDAO();
+
+        factory = new CassandraSessionFactory();
+        factory.setSeedHost("localhost");
+        factory.connect();
+
+        session = factory.getSession();
+        mapper = new MappingManager(session).mapper(Transaction.class);
+        td.setMapper(mapper);
+        tr.setTransactionDAO(td);
         authorizer.setTranRepository(tr);
-        
-        RetailStrategy retailStrategy = new RetailStrategy();
-        vgs = new VisionGatewayStub();
-        GatewayFactory gatewayFactory = new GatewayFactory();
+
+        retailStrategy = new RetailStrategy();
+        settleMessageDAO = new SettleMessageDAO();
+        mapper1 = new MappingManager(session).mapper(SettleEntity.class);
+        settleMessageDAO.setMapper(mapper1);
+        settleMessageDAO.setCassandraSessionFactory(factory);
         retailStrategy.setSettleMessageDAO(settleMessageDAO);
         retailStrategy.setConfigurator(configurator);
-        gatewayFactory.setVisionGatewayStub(vgs);
+        bsf = new BaseStrategyFactory();
+        gatewayFactory = new GatewayFactory();
         gatewayFactory.setEnableStub("true");
-        BaseStrategyFactory baseStrategyFactory = new BaseStrategyFactory();
-        BaseStrategy baseStrategy = retailStrategy;
-        baseStrategyFactory.setRetailStrategy(retailStrategy);
-        baseStrategy.setGatewayFactory(gatewayFactory);
-        authorizer.setBaseStrategyFactory(baseStrategyFactory);
+        visionGatewaySimulator = new VisionGatewayStub();
+        gatewayFactory.setVisionGatewayStub(visionGatewaySimulator);
+        bsf.setRetailStrategy(retailStrategy);
+        bs = bsf.findStrategy(StrategyType.DECA);
+        //bsf.setRetailStrategy(retailStrategy);
+        bs.setGatewayFactory(gatewayFactory);
+
+        authorizer.setBaseStrategyFactory(bsf);
     }
-    
+
     private Message unmarshalCreditMessage(String content) {
         Message request = new Message();
         try {
@@ -227,14 +257,14 @@ public class ReversalRefundDecaTest {
         }
         return request;
     }
-    
+
     private Transaction mapRequest(Message requestMessage) {
         Transaction transaction = new Transaction();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Date date = new Date();
         String ts = dateFormat.format(date);
         transaction.setRequestXmlDateTime(ts);
-        
+
         Message.Header header = requestMessage.getHeader();
 
         // Mapping Header Fields
@@ -256,7 +286,7 @@ public class ReversalRefundDecaTest {
         }
         transaction.setComment(header.getComment());
         transaction.setCustomerId(header.getCustomerID());
-        
+
         Message.Request request = requestMessage.getRequest().get(0);
         transaction.setRrn(request.getRRN());
         transaction.setMedia(request.getMedia());
@@ -267,10 +297,10 @@ public class ReversalRefundDecaTest {
             transaction.setReversal(request.getReversal().value());
         }
         if (request.getVoid() != null && !request.getVoid().value().isEmpty()) {
-            
+
             transaction.setVoidFlag(request.getVoid().value());
         }
-        
+
         transaction.setAccount(request.getAccount());
         if (request.getPan() != null) {
             if (request.getPan().value().equalsIgnoreCase("PAN")) {
@@ -308,7 +338,7 @@ public class ReversalRefundDecaTest {
                 if (transaction.getRequestType() != null
                         && !transaction.getRequestType().trim().isEmpty()
                         && !transaction.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
-                    
+
                 }
                 transaction.setAmount(amt.longValueExact());
             }
@@ -324,7 +354,7 @@ public class ReversalRefundDecaTest {
                 && request.getPlanNumbers().getPlanNumber().get(0) != null) {
             transaction.setPlanNumber(request.getPlanNumbers().getPlanNumber().get(0).toString());
         }
-        
+
         Message.Request.AddressVerificationService addressVerServc = request.getAddressVerificationService();
         if (addressVerServc != null) {
             transaction.setCardHolderName(addressVerServc.getCardHolderName());
@@ -344,7 +374,7 @@ public class ReversalRefundDecaTest {
                     transaction.setShippingPhone(addressVerServc.getShippingPhone().toString());
                 }
             } catch (NumberFormatException e) {
-                
+
             }
             transaction.setEmail(addressVerServc.getEmail());
         }
@@ -366,24 +396,24 @@ public class ReversalRefundDecaTest {
         transaction.setPaymentType(request.getPymntType());
         // Adding origininal rrn, ordernuber etc
         if (request.getOriginalOrder() != null && !request.getOriginalOrder().isEmpty()) {
-            
+
             transaction.setOriginalOrder(request.getOriginalOrder());
         }
         if (request.getOrigRRN() != null && !request.getOrigRRN().isEmpty()) {
             transaction.setOrigRRN(request.getOrigRRN().get(0));
         }
         if (request.getOrigTransId() != null && !request.getOrigTransId().isEmpty()) {
-            
+
             transaction.setOrigTransId(request.getOrigTransId());
         }
-        
+
         if (request.getOrigAuthCode() != null && !request.getOrigAuthCode().isEmpty()) {
-            
+
             transaction.setOrigAuthCode(request.getOrigAuthCode());
         }
         return transaction;
     }
-    
+
     private String formatLocalDateTime(XMLGregorianCalendar in) {
         String ts = in.toString();      //2016-11-07T08:54:06
         String out = ts.substring(2, 4)
@@ -394,12 +424,12 @@ public class ReversalRefundDecaTest {
                 + ts.substring(17, 19);
         return out;                     //161107085406
     }
-    
+
     private List<SettleEntity> mapToSettle(Transaction t) {
-        
+
         List<SettleEntity> settleEntityList = new ArrayList<SettleEntity>();
         SettleEntity settleEntity = new SettleEntity();
-        
+
         settleEntity.setTransactionId(t.getTransactionId());
         settleEntity.setReceiveddate(getSystemDate());
         settleEntity.setOrderNumber(t.getOrderNumber());
@@ -419,7 +449,7 @@ public class ReversalRefundDecaTest {
         settleEntity.setCardType(t.getMedia());
         settleEntity.setSettlePlan(t.getPlanNumber());
         settleEntity.setAuthNum(t.getAuthNumber());
-        
+
         if (t.getAmount() < 0) {
             settleEntity.setTransactionType(TransactionType.Refund);
         } else if (t.getAmount() >= 0) {
@@ -432,12 +462,11 @@ public class ReversalRefundDecaTest {
         settleEntityList.add(settleEntity);
         return settleEntityList;
     }
-    
+
     private String getSystemDate() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         String ts = dateFormat.format(date);
         return ts;
     }
-    
 }

@@ -9,7 +9,6 @@ import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 
 /**
  *

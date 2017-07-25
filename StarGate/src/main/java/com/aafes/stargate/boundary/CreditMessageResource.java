@@ -51,7 +51,7 @@ public class CreditMessageResource {
             = LoggerFactory.getLogger(CreditMessageResource.class.getSimpleName());
 
     //TODO
-    private String SCHEMA_PATH = "src/main/resources/jaxb/creditmessage/CreditMessage12S1.xsd";
+    private String SCHEMA_PATH = "src/main/resources/jaxb/creditmessage/CreditMessageGSA.xsd";
 
     /**
      * @param tokenValidatorService the tokenValidatorService to set
@@ -173,7 +173,7 @@ public class CreditMessageResource {
             schema = sf.newSchema(new File(SCHEMA_PATH));
         } catch (Exception e) {
             LOG.info("Schema file taking from server location");
-            SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/CreditMessage12S1.xsd";
+            SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/CreditMessageGSA.xsd";
             schema = sf.newSchema(new File(SCHEMA_PATH));
         }
         jaxbUnmarshaller.setSchema(schema);

@@ -6,11 +6,13 @@
 package com.aafes.stargate.gateway.wex;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import javax.ejb.Stateless;
 
 /**
  *
  * @author alugumetlas
  */
+@Stateless
 public class WEXProcessor {
     Transaction t;
  
@@ -22,4 +24,10 @@ public class WEXProcessor {
     {
         return t;
     }
+    
+    public Transaction processSaleRequest(Transaction t)
+    {
+        return  t;
+    }
+    
 }

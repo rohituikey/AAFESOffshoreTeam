@@ -7,12 +7,9 @@ package com.aafes.stargate.gateway.wex;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.Gateway;
-import com.aafes.stargate.gateway.GatewayException;
-import com.aafes.stargate.gateway.vision.Validator;
-import com.aafes.stargate.gateway.vision.VisionGateway;
-import com.aafes.stargate.util.InputType;
-import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
+import com.aafes.stargate.util.ResponseType;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
 
@@ -25,16 +22,40 @@ public class WexGateway extends Gateway {
 
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(WexGateway.class.getSimpleName());
+
     private Transaction t;
+
+    @EJB
+    private WEXProcessor wEXProcessor;
 
     @Override
     public Transaction processMessage(Transaction transaction) {
+
         t = transaction;
-        
+        String requestType = t.getRequestType();
+
         LOG.info("inside procesMessage() method of wexGateway class");
-        
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        try {
+            if (null != wEXProcessor) {
+                switch (requestType) {
+                    case RequestType.PREAUTH:
+                        t = wEXProcessor.preAuthProcess(t);
+                    case RequestType.FINAL_AUTH:
+                        t = wEXProcessor.finalAuthProcess(t);
+                    case RequestType.SALE:
+                        t = wEXProcessor.processSaleRequest(t);
+                }
+            } else {
+                t.setResponseType(ResponseType.DECLINED);
+                t.setDescriptionField("INTERNAL SERVER ERROR");
+                return t;
+            }
+
+        } catch (Exception e) {
+        }
+
+        return t;
     }
-    
-    
+
 }

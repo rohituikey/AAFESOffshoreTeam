@@ -38,6 +38,7 @@ public class NBSClient {
                     = new BufferedReader(new InputStreamReader(NBSSocket.getInputStream()));
 
             while ((responsePerLine = readResponse.readLine()) != null) {
+                if(response == null) response = new StringBuffer();
                 response.append(responsePerLine);
                 LOG.log(Level.INFO, "Response recieved as {0}", response);
             }

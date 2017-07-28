@@ -35,7 +35,7 @@ public class WEXStrategy extends BaseStrategy {
         LOG.info("WEXStrategy.processRequest Entry ... " + t.getRrn());
         try {
 
-            boolean retailFieldsValid = this.validateRetailFields(t);
+            boolean retailFieldsValid = this.validateTransactions(t);
             LOG.info("WEXFieldsValid " + retailFieldsValid + "..." + t.getRrn());
 
             if (!retailFieldsValid) {
@@ -58,16 +58,21 @@ public class WEXStrategy extends BaseStrategy {
         return t;
     }
 
-    private boolean validateRetailFields(Transaction t) {
+    private boolean validateTransactions(Transaction t) {
 
         LOG.info("Validating fields in WEXtrategy");
 
         //this will handle the validations for PreAuth and Final_Auth
         if ((!t.getRequestType().trim().isEmpty() || t.getRequestType() != null)
-                && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH) || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))) {
+                && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH) || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH) || t.getRequestType().equalsIgnoreCase(RequestType.SALE))) {
             LOG.info("Validating fields in WEXtrategy for Pre_Auth & Final_Auth");
-            if (!t.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
+            if (!t.getInputType().equalsIgnoreCase(InputType.SWIPED) && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH) || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))) {
                 this.buildErrorResponse(t, "INVALID_INPUT_TYPE", "INVALID_INPUT_TYPE");
+                return false;
+            }
+
+            if (t.getRequestType().equalsIgnoreCase(RequestType.SALE) && Integer.parseInt(t.getProdDetailCount()) > 5 && Integer.parseInt(t.getFuelProdCode()) > 2) {
+                this.buildErrorResponse(t, "MORE_THAN_TWO_FUEL_PRODUCT", "MORE_THAN_TWO_FUEL_PRODUCT");
                 return false;
             }
 

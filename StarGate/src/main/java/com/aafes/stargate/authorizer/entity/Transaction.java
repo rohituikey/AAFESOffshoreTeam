@@ -3,6 +3,7 @@ package com.aafes.stargate.authorizer.entity;
 import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.Table;
 import com.datastax.driver.mapping.annotations.Transient;
+import java.math.BigDecimal;
 
 @Table(keyspace = "stargate", name = "transactions")
 final public class Transaction {
@@ -182,6 +183,14 @@ final public class Transaction {
     private String avsResponseCode = "";
     private String csvResponseCode = "";
 
+    /* FIELDS ADDED FOR WEX USE CASE - start */
+    private String nonFuelProdCode;
+    private BigDecimal nonFuelAmount;
+    private BigDecimal fuelDollerAmount;
+    private BigDecimal pricePerUnit;
+    private String catFlag;
+    /* FIELDS ADDED FOR WEX USE CASE - end */
+    
     public Transaction() {
 
     }
@@ -1120,5 +1129,81 @@ final public class Transaction {
     public void setOrigRRN(String origRRN) {
         this.origRRN = origRRN;
     }
+
+    /* FIELDS ADDED FOR WEX USE CASE - start */
     
+    /**
+     * @return the nonFuelProdCode
+     */
+    public String getNonFuelProdCode() {
+        return nonFuelProdCode;
+    }
+
+    /**
+     * @param nonFuelProdCode the nonFuelProdCode to set
+     */
+    public void setNonFuelProdCode(String nonFuelProdCode) {
+        this.nonFuelProdCode = nonFuelProdCode;
+    }
+
+    /**
+     * @return the nonFuelAmount
+     */
+    public BigDecimal getNonFuelAmount() {
+        return nonFuelAmount;
+    }
+
+    /**
+     * @return the fuelDollerAmount
+     */
+    public BigDecimal getFuelDollerAmount() {
+        return fuelDollerAmount;
+    }
+
+    /**
+     * @param fuelDollerAmount the fuelDollerAmount to set
+     */
+    public void setFuelDollerAmount(BigDecimal fuelDollerAmount) {
+        this.fuelDollerAmount = fuelDollerAmount;
+    }
+
+    /**
+     * @param nonFuelAmount the nonFuelAmount to set
+     */
+    public void setNonFuelAmount(BigDecimal nonFuelAmount) {
+        this.nonFuelAmount = nonFuelAmount;
+    }
+
+   
+
+    /**
+     * @return the pricePerUnit
+     */
+    public BigDecimal getPricePerUnit() {
+        return pricePerUnit;
+    }
+
+    /**
+     * @param pricePerUnit the pricePerUnit to set
+     */
+    public void setPricePerUnit(BigDecimal pricePerUnit) {
+        this.pricePerUnit = pricePerUnit;
+    }
+
+   
+    /* FIELDS ADDED FOR WEX USE CASE - start */
+
+    /**
+     * @return the catFlag
+     */
+    public String getCatFlag() {
+        return catFlag;
+    }
+
+    /**
+     * @param catFlag the catFlag to set
+     */
+    public void setCatFlag(String catFlag) {
+        this.catFlag = catFlag;
+    }
 }

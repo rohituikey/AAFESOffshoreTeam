@@ -24,23 +24,32 @@ public class WEXProcessor {
     {
         if(Integer.parseInt(t.getProdDetailCount()) > 5)
         {
+            //if(t.getNonFuelProdCode.size() > 2)
             this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_EXCEEDED", "SELECTED PRODUCT COUNT EXCEEDED");
+            return t;
         }
-//       tr
-     if(t.getTrack2() !=null || !t.getTrack2().isEmpty())
-     {
-         String Track2 = t.getTrack2();
-     }
+        
+//     if(t.getTrack2() !=null || !t.getTrack2().isEmpty())
+//     {
+//         String Track2 = t.getTrack2();
+//     }
+//     String TransCode = "08";
         return t;
     }
     public Transaction finalAuthProcess(Transaction t)
     {
         return t;
     }
-        private void buildErrorResponse(Transaction t, String reasonCode, String description) {
+    
+    public Transaction processSaleRequest(Transaction t)
+    {
+        return  t;
+    }
+     private void buildErrorResponse(Transaction t, String reasonCode, String description) {
         t.setReasonCode(configurator.get(reasonCode));
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
         //LOG.error("Exception/Error occured. reasonCode:" + reasonCode + " .description" + description);
     }
+    
 }

@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://credit.aafes.com/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="Authorizer" targetNamespace="http://credit.aafes.com/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://credit.aafes.com/" elementFormDefault="unqualified" targetNamespace="http://credit.aafes.com/" version="1.0">
+<xs:element name="authorize" type="tns:authorize"/>
+<xs:element name="authorizeResponse" type="tns:authorizeResponse"/>
+<xs:element name="setSchema" type="tns:setSchema"/>
+<xs:element name="setSchemaResponse" type="tns:setSchemaResponse"/>
+<xs:element name="settle" type="tns:settle"/>
+<xs:element name="settleResponse" type="tns:settleResponse"/>
+<xs:complexType name="settle">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="settleResponse">
+    <xs:sequence/>
+  </xs:complexType>
+<xs:complexType name="authorize">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="authorizeResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="setSchema">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="setSchemaResponse">
+    <xs:sequence/>
+  </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="setSchemaResponse">
+    <wsdl:part element="tns:setSchemaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="settleResponse">
+    <wsdl:part element="tns:settleResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="settle">
+    <wsdl:part element="tns:settle" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="authorizeResponse">
+    <wsdl:part element="tns:authorizeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="authorize">
+    <wsdl:part element="tns:authorize" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="setSchema">
+    <wsdl:part element="tns:setSchema" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Authorizer">
+    <wsdl:operation name="settle">
+      <wsdl:input message="tns:settle" name="settle">
+    </wsdl:input>
+      <wsdl:output message="tns:settleResponse" name="settleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="authorize">
+      <wsdl:input message="tns:authorize" name="authorize">
+    </wsdl:input>
+      <wsdl:output message="tns:authorizeResponse" name="authorizeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setSchema">
+      <wsdl:input message="tns:setSchema" name="setSchema">
+    </wsdl:input>
+      <wsdl:output message="tns:setSchemaResponse" name="setSchemaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="AuthorizerSoapBinding" type="tns:Authorizer">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="authorize">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="authorize">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="authorizeResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="settle">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="settle">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="settleResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setSchema">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="setSchema">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="setSchemaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Authorizer">
+    <wsdl:port binding="tns:AuthorizerSoapBinding" name="AuthorizerPort">
+      <soap:address location="http://ipcrdtt.aafes.com:8080/creditserver_copps/ws/Authorizer"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

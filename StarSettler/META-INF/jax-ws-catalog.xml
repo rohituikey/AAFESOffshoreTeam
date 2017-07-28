@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="file:/home/ghadiyamp/NetBeansProjects/stargate/StarSettler/main/resources/order.wsdl" uri="wsdl/order.wsdl"/>
+    <system systemId="file:/home/ghadiyamp/NetBeansProjects/stargate/StarSettler/main/resources/CompassXML2.11/services/order.wsdl" uri="wsdl/order.wsdl"/>
+    <system systemId="file:/home/ghadiyamp/NetBeansProjects/stargate/StarSettler/main/resources/CompassXML2.11/schemas/cmpmsg.xsd" uri="schemas/cmpmsg.xsd"/>
+    <system systemId="file:/home/ghadiyamp/NetBeansProjects/stargate/StarSettler/src/wsdl/172.18.184.48_8082/CreditServer/CreditServerWS.wsdl" uri="wsdl/CreditServerWS.wsdl"/>
+</catalog>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TokenMessage xmlns='http://www.aafes.com/token'  >
+	<Request>
+		<RequestType>Lookup</RequestType>
+		<Media>Visa</Media>
+		<AccountType>Token</AccountType>
+		<Account>92xxxxxxxxxxxxx1234</Account>
+		<TokenBankName>ECOMM001</TokenBankName>
+	</Request>
+</TokenMessage>

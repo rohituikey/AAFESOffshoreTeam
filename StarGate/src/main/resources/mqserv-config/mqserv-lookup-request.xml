@@ -1,0 +1,12 @@
+<InMakeCall>
+    <Header>
+        <TranType></TranType>
+        <TranCPU></TranCPU>
+        <Transaction></Transaction>
+        <TranID></TranID>
+        <TimeLimit></TimeLimit>
+        <UserId/>
+        <Password/>
+    </Header>
+    <PayLoad></PayLoad>
+</InMakeCall>

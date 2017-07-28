@@ -1,0 +1,90 @@
+<Settlement>
+
+    <IdentityUUID>c47e4366-fe72-473b-b114-523e8de5641f</IdentityUUID>
+
+    <Shipment>
+
+        <Shipping amount="14.9600" client_line_id="2487">
+
+            <Payments>
+
+                <Payment>
+
+                    <Type>Visa</Type>
+
+                    <Amount>14.96</Amount>
+
+                    <TransactionId>2522</TransactionId>
+
+                    <OrderNumber>8000010025</OrderNumber>
+
+                    <OrderDate>20170517</OrderDate>
+
+                    <ShipDate>20170523</ShipDate>
+
+                    <SettleDate>20170522</SettleDate>
+
+                    <CardReference>1111</CardReference>
+
+                    <CardToken>0000000000003737137</CardToken>
+
+                    <ExpirationDate>2001</ExpirationDate>
+
+                    <AuthNum>000000</AuthNum>
+
+                    <RRN>000000000000</RRN>
+
+                    <Customer>
+
+                        <Contact>
+
+                            <FirstName>Sean</FirstName>
+
+                            <LastName>Kelleher</LastName>
+
+                            <HomePhone>6178729240</HomePhone>
+
+                            <Email>kellehers@aafes.com</Email>
+
+                        </Contact>
+
+                        <Address>
+
+                            <Line sequence="1">1 Main Street</Line>
+
+                            <City>Cambridge</City>
+
+                            <ProvinceCode>MA</ProvinceCode>
+
+                            <PostalCode>02142</PostalCode>
+
+                            <CountryCode>US</CountryCode>
+
+                        </Address>
+
+                    </Customer>
+
+                </Payment>
+
+            </Payments>
+
+        </Shipping>
+
+    </Shipment>
+
+
+</Settlement>
+
+
+
+
+
+
+// Command Settle
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<commandMessage>
+	<processdate>2017-06-13</processdate>
+	<identityuuid>0ee1c509-2c70-4bcd-b261-f94f1fe6c43b</identityuuid>
+	<settlerType>deca</settlerType>
+</commandMessage>

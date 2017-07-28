@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.ibm</groupId>
+  <artifactId>dhbcore</artifactId>
+  <version>7.5.02</version>
+  <versioning>
+    <versions>
+      <version>7.5.02</version>
+    </versions>
+    <lastUpdated>20160919174702</lastUpdated>
+  </versioning>
+</metadata>

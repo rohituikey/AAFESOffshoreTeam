@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--  Example WEX Final Auth Swiped for Fuel Only - Pay at the Pump Request  --> 
+<cm:Message 
+    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
+    xmlns:cm='http://www.aafes.com/credit'
+    xsi:schemaLocation='http://www.aafes.com/credit file:///D:/Users/burangir/Downloads/wildfly-10.1.0.Final/wildfly-10.1.0.Final/standalone/configuration/CreditMessageGSA.xsd'
+    TypeCode="Request" MajorVersion="3" MinorVersion="1" FixVersion="0">
+    <cm:Header>
+        <cm:IdentityUUID>eacbc625-6fef-479e-8738-92adcfed7c65</cm:IdentityUUID> 
+        <cm:LocalDateTime>2017-07-02T09:04:01</cm:LocalDateTime>
+        <cm:SettleIndicator>true</cm:SettleIndicator>
+        <cm:OrderNumber>54163254</cm:OrderNumber>
+        <cm:transactionId>66324154</cm:transactionId>
+        <cm:termId>23</cm:termId>
+    </cm:Header>
+    <cm:Request RRN="TkFwxJKiaTwf">
+        <cm:Media>WEX</cm:Media> 
+        <cm:RequestType>FinalAuth</cm:RequestType> 
+        <cm:InputType>Swiped</cm:InputType>
+        <cm:Pan>Pan</cm:Pan>
+        <cm:Account>6900460000000000001</cm:Account> 
+        <cm:TrackData2>6900460000000000001=20095004100210123</cm:TrackData2>
+        <cm:AmountField>50.62</cm:AmountField>
+        <cm:WEXRequestData>
+            <cm:CardSeqNumber>12345</cm:CardSeqNumber>
+            <cm:ServiceCode>S</cm:ServiceCode>
+            <cm:CATFlag>1</cm:CATFlag>
+            <cm:DriverId>12365</cm:DriverId>
+            <cm:Odometer>36079</cm:Odometer>
+            <cm:VehicleId></cm:VehicleId>
+            <cm:RestrictCode>01</cm:RestrictCode>
+            <cm:ProdDetailCount>1</cm:ProdDetailCount>
+            <cm:FuelProdCode>001</cm:FuelProdCode>
+            <cm:QtyPumped>24.118</cm:QtyPumped>
+            <cm:FuelPrice></cm:FuelPrice>
+            <cm:PricePerUnit>2.099</cm:PricePerUnit>
+            <cm:Quantity>24.118</cm:Quantity>
+            <cm:FuelDollarAmount>50.62</cm:FuelDollarAmount>
+            <cm:NonFuelQty></cm:NonFuelQty>
+            <cm:NonFuelProdCode></cm:NonFuelProdCode>
+            <cm:NonFuelAmount></cm:NonFuelAmount>
+            <cm:LicenseNumber></cm:LicenseNumber>
+            <cm:DeptNumber></cm:DeptNumber>
+            <cm:JobValueNumber></cm:JobValueNumber>
+            <cm:DataNumber></cm:DataNumber>
+            <cm:UserId></cm:UserId>
+        </cm:WEXRequestData>
+        <cm:pumpNmbr>23</cm:pumpNmbr> 
+        <cm:DescriptionField>FinalAuth</cm:DescriptionField>
+        <cm:origAuthCode>130362</cm:origAuthCode>
+        <cm:AmtPreAuthorized>75.00</cm:AmtPreAuthorized> 
+    </cm:Request>
+</cm:Message>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Settlement>
+  <IdentityUUID>c47e4366-fe72-473b-b114-523e8de5641f</IdentityUUID>
+  <Appeasements>
+    <Appeasement code="C13" date="20170225" description="CR Price Challenge Adjustment" 
+                 reference="hello" client_line_id="ci14009000055-1">
+      <Payments>
+        <Payment>
+            <Type>Milstar</Type>
+            <Amount>100.00</Amount>
+            <TransactionId>23073526</TransactionId>
+            <OrderNumber>1234</OrderNumber>
+            <OrderDate>20170403</OrderDate>
+            <ShipDate>20170403</ShipDate>
+            <SettleDate>20170403</SettleDate>
+            <CardReference>1765</CardReference>
+            <CardToken>1234-1234-1234-1234</CardToken>
+            <ExpirationDate>2009</ExpirationDate>
+            <AuthNum>070251</AuthNum>
+            <RequestPlan>10001</RequestPlan>
+            <ResponsePlan>10001</ResponsePlan>
+            <QualifiedPlan>30001</QualifiedPlan>
+            <RRN>774fea4dc630</RRN>
+            <Customer>
+              <Contact>
+                <FirstName>Fname</FirstName>
+                <LastName>Lname</LastName>
+                <HomePhone>2143126953</HomePhone>
+                <Email>mtest@aafes.com</Email>
+              </Contact>
+              <Address>
+                <Line sequence="1">3911 S Walton Walker Blvd</Line>
+                <City>Dallas</City>
+                <ProvinceCode>TX</ProvinceCode>
+                <PostalCode>75236</PostalCode>
+                <CountryCode>US</CountryCode>
+              </Address>
+            </Customer>
+          </Payment>
+      </Payments>
+    </Appeasement>
+  </Appeasements>
+</Settlement>

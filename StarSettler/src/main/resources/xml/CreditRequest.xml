@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmp:BatchTransRequest xmlns:cmp="http://firstdata.com/cmpwsapi/schemas/cmpapi" xmlns:cmpmsg="http://firstdata.com/cmpwsapi/schemas/cmpmsg">
+   <cmp:PID>000170</cmp:PID>
+   <cmp:SID>000170</cmp:SID>
+   <cmp:BatchId></cmp:BatchId>
+   <cmp:BatchTotals>
+      <cmpmsg:AmountTotals>100</cmpmsg:AmountTotals>
+      <cmpmsg:AmountSales>50</cmpmsg:AmountSales>
+      <cmpmsg:AmountRefunds>50</cmpmsg:AmountRefunds>
+   </cmp:BatchTotals>
+   <cmp:PID>000170</cmp:PID>
+   <cmp:SID>000170</cmp:SID>
+</cmp:BatchTransRequest>
+ 

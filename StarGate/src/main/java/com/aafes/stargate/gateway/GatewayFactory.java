@@ -73,7 +73,7 @@ public class GatewayFactory {
                 case MediaType.GIFT_CARD:
                     gateway = sVSGateway;
                     return gateway;
-                // Add more gateways
+               
             }
         }
         LOG.info("Gatewayfacory.pickGateway exit : "+t.getRrn());

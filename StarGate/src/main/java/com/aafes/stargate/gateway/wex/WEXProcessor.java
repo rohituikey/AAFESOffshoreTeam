@@ -7,7 +7,6 @@ package com.aafes.stargate.gateway.wex;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.wex.simulator.NBSClient;
-import static com.ibm.disthub2.impl.formats.Envelop_1_1.Constants.client;
 import javax.ejb.Stateless;
 
 /**
@@ -24,15 +23,24 @@ public class WEXProcessor {
         NBSClient clientObj = new NBSClient();
         responseStr = clientObj.generateResponse("APPROVED");
         t.setResponseType(responseStr);
+        
         return t;
     }
     public Transaction finalAuthProcess(Transaction t)
     {
+        String responseStr = "";
+        NBSClient clientObj = new NBSClient();
+        responseStr = clientObj.generateResponse("APPROVED");
+        t.setResponseType(responseStr);
         return t;
     }
     
     public Transaction processSaleRequest(Transaction t)
     {
+        String responseStr = "";
+        NBSClient clientObj = new NBSClient();
+        responseStr = clientObj.generateResponse("APPROVED");
+        t.setResponseType(responseStr);
         return  t;
     }
     

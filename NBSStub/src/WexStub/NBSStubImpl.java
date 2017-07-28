@@ -19,6 +19,8 @@ public class NBSStubImpl implements NBSStub{
     public String getResponse(String request) {
         if(request.contains("APPROVED"))
             return "APPROVED";
+        else if(request.contains("TIMEOUT"))
+            return "TIMEOUT";
         else
             return "DECLINED";
     }

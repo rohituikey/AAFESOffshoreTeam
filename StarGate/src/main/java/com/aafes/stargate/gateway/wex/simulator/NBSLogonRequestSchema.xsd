@@ -1,0 +1,189 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="root">
+        <xs:annotation>
+            <xs:documentation>This XSD is for NBS first logon packet and request creation</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="TermId">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:minLength value="15"/>
+                            <xs:maxLength value="15"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="AppName">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:minLength value="0"/>
+                            <xs:maxLength value="7"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="AppVersion">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:integer">
+                            <xs:totalDigits value="4"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="TimeZone">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:integer">
+                            <xs:pattern value="[0-2][0-3][1-5][0-9][0-1]"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="HeaderRecord">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="A">
+                                <xs:annotation>
+                                    <xs:documentation>the following field "A" refers to record type.</xs:documentation>
+                                </xs:annotation>
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="PreAuth"/>
+                                        <xs:enumeration value="FinalAuth"/>
+                                        <xs:enumeration value="Sale"/>
+                                        <xs:enumeration value="Refund"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="Key">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:integer">
+                                        <xs:totalDigits value="4"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="TransType">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:integer">
+                                        <xs:totalDigits value="2"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="CardType">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="2"/>
+                                        <xs:maxLength value="2"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="CATFlag">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:integer">
+                                        <xs:totalDigits value="1"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="PumpNo">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="0"/>
+                                        <xs:maxLength value="2"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="ServiceType" fixed="S">
+                        
+                            </xs:element>
+                            <xs:element name="Track">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:integer">
+                                        <xs:totalDigits value="1"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="CardSpecificData">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="AcctInfo">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:minLength value="0"/>
+                                                    <xs:maxLength value="79"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="Amount">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:decimal">
+                                                    <xs:fractionDigits value="2" />
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="WexPromptDetails">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="PromptDetailCount">
+                                                        <xs:complexType>
+                                                            <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                                <xs:element name="PromptType">
+                                                                    <xs:simpleType>
+                                                                        <xs:restriction base="xs:string">
+                                                                            <xs:minLength value="0"/>
+                                                                            <xs:maxLength value="1"/>
+                                                                        </xs:restriction>
+                                                                    </xs:simpleType>
+                                                                </xs:element>
+                                                                <xs:element type="xs:string" name="PromptValue"/>
+                                                            </xs:choice>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="WexProductDetails">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="ProdDetailCount">
+                                                        <xs:complexType>
+                                                            <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                                <xs:element name="Price">
+                                                                    <xs:simpleType>
+                                                                        <xs:restriction base="xs:decimal">
+                                                                            <xs:fractionDigits value="3" />
+                                                                        </xs:restriction>
+                                                                    </xs:simpleType>
+                                                                </xs:element>
+                                                                <xs:element name="Quantity">
+                                                                    <xs:simpleType>
+                                                                        <xs:restriction base="xs:decimal">
+                                                                            <xs:fractionDigits value="5" />
+                                                                        </xs:restriction>
+                                                                    </xs:simpleType>
+                                                                </xs:element>
+                                                                <xs:element name="productCode">
+                                                                    <xs:simpleType>
+                                                                        <xs:restriction base="xs:integer">
+                                                                            <xs:totalDigits value="3"/>
+                                                                        </xs:restriction>
+                                                                    </xs:simpleType>
+                                                                </xs:element>
+                                                                <xs:element name="Amount">
+                                                                    <xs:simpleType>
+                                                                        <xs:restriction base="xs:decimal">
+                                                                            <xs:fractionDigits value="5" />
+                                                                        </xs:restriction>
+                                                                    </xs:simpleType>
+                                                                </xs:element>
+                                                            </xs:choice>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

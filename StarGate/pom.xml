@@ -354,12 +354,11 @@
                         </goals>
                         <configuration>
                             <schemaIncludes>
-                                <include>jaxb/nbsRequest/*.xsd</include>
+                                <include>jaxb/NBSLogonRequestSchema/*.xsd</include>
                             </schemaIncludes>
-                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-nbsRequest.episode</episodeFile>
-                            <generatePackage>com.nbs</generatePackage>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-NBSLogonRequestSchema.episode</episodeFile>
                         </configuration>
-                        <id>jaxb-generate-nbsRequest</id>
+                        <id>jaxb-generate-NBSLogonRequestSchema</id>
                     </execution>
                     <execution>
                         <goals>
@@ -367,12 +366,11 @@
                         </goals>
                         <configuration>
                             <schemaIncludes>
-                                <include>jaxb/nbsResponseAcknowledgmentSchema/*.xsd</include>
+                                <include>jaxb/NBSResponseAcknowledgmentSchema/*.xsd</include>
                             </schemaIncludes>
-                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-nbsResponseAcknowledgmentSchema.episode</episodeFile>
-                            <generatePackage>com.nbs</generatePackage>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-NBSResponseAcknowledgmentSchema.episode</episodeFile>
                         </configuration>
-                        <id>jaxb-generate-nbsResponseAcknowledgmentSchema</id>
+                        <id>jaxb-generate-NBSResponseAcknowledgmentSchema</id>
                     </execution>
                 </executions>
                 <configuration>

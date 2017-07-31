@@ -348,6 +348,19 @@
                         </configuration>
                         <id>jaxb-generate-tokenvalidator</id>
                     </execution>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/nbsRequest/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-nbsRequest.episode</episodeFile>
+                            <generatePackage>com.nbs</generatePackage>
+                        </configuration>
+                        <id>jaxb-generate-nbsRequest</id>
+                    </execution>
                 </executions>
                 <configuration>
                     <catalog>src/main/resources/jaxb/catalog.xml</catalog>

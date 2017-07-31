@@ -21,8 +21,8 @@ public class WEXProcessor {
 
     @EJB
     private Configurator configurator;
-    @EJB
-    private Root root;
+//    @EJB
+//    private Root root;
 
     public Transaction preAuthProcess(Transaction t) {
         if (Integer.parseInt(t.getProdDetailCount()) > 5) {
@@ -34,7 +34,7 @@ public class WEXProcessor {
         //root.setAppName(value);
         //root.setAppVersion();
         //root.setHeaderRecord();
-        root.setTermId(t.getTermId());
+        //root.setTermId(t.getTermId());
         //root.setTimeZone();
         
         String responseStr = "";

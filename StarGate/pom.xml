@@ -336,7 +336,7 @@
                         </configuration>
                         <id>jaxb-generate-tokenmessage</id>
                     </execution>
-                     <execution>
+                    <execution>
                         <goals>
                             <goal>generate</goal>
                         </goals>

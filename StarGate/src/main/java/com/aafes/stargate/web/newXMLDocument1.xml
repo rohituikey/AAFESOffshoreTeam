@@ -9,7 +9,7 @@ and open the template in the editor.
 <ns1:Message
     xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
     xmlns:ns1='http://www.aafes.com/credit'
-    xsi:schemaLocation='http://www.aafes.com/credit ../../../../../resources/jaxb/creditmessage/CreditMessage12S1.xsd'>
+    xsi:schemaLocation='http://www.aafes.com/credit ../../../../../resources/jaxb/creditmessage/CreditMessageGSA.xsd'>
     <ns1:Header>
         <ns1:IdentityUUID></ns1:IdentityUUID>
         <ns1:LocalDateTime></ns1:LocalDateTime>

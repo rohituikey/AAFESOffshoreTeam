@@ -27,6 +27,7 @@ public class WEXProcessor {
     private Configurator configurator;
     @EJB
     private TransactionDAO transactionDAO;
+    private NbsLogonRequest nbsLogOnRequest;
 
     public Transaction preAuthProcess(Transaction t) {
         //logon pocket fields 
@@ -38,6 +39,19 @@ public class WEXProcessor {
 //        BigInteger dtf = createDateFormat(t.getLocalDateTime());
 //        root.setTimeZone(dtf);
 
+        if (Integer.parseInt(t.getProdDetailCount()) > 5) {
+            //if(t.getNonFuelProdCode.size() > 2)
+            this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_EXCEEDED", "SELECTED PRODUCT COUNT EXCEEDED");
+            return t;
+        }
+        if(null == nbsLogOnRequest) nbsLogOnRequest = new NbsLogonRequest();
+        //logon pocket fields setting
+        //nbsLogOnRequest.setAppName(value);
+        //nbsLogOnRequest.setAppVersion();
+        //nbsLogOnRequest.setHeaderRecord();
+        nbsLogOnRequest.setTermId(t.getTermId());
+        //nbsLogOnRequest.setTimeZone();
+        
         String responseStr = "";
         NBSClient clientObj = new NBSClient();
         responseStr = clientObj.generateResponse("APPROVED");

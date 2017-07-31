@@ -189,6 +189,9 @@ final public class Transaction {
     private BigDecimal fuelDollerAmount;
     private BigDecimal pricePerUnit;
     private String catFlag;
+    private String cardSeqNumber;
+    private BigDecimal quantity;
+    private BigDecimal nonFuelqty;
     /* FIELDS ADDED FOR WEX USE CASE - end */
     
     public Transaction() {
@@ -1206,4 +1209,47 @@ final public class Transaction {
     public void setCatFlag(String catFlag) {
         this.catFlag = catFlag;
     }
+
+    /**
+     * @return the cardSeqNumber
+     */
+    public String getCardSeqNumber() {
+        return cardSeqNumber;
+    }
+
+    /**
+     * @param cardSeqNumber the cardSeqNumber to set
+     */
+    public void setCardSeqNumber(String cardSeqNumber) {
+        this.cardSeqNumber = cardSeqNumber;
+    }
+
+    /**
+     * @return the quantity
+     */
+    public BigDecimal getQuantity() {
+        return quantity;
+    }
+
+    /**
+     * @param quantity the quantity to set
+     */
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity;
+    }
+
+    /**
+     * @return the nonFuelqty
+     */
+    public BigDecimal getNonFuelqty() {
+        return nonFuelqty;
+    }
+
+    /**
+     * @param nonFuelqty the nonFuelqty to set
+     */
+    public void setNonFuelqty(BigDecimal nonFuelqty) {
+        this.nonFuelqty = nonFuelqty;
+    }
+  
 }

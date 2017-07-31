@@ -8,9 +8,13 @@ package com.aafes.stargate.gateway.wex;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.wex.simulator.NBSClient;
 import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.dao.TransactionDAO;
+import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+
+import java.math.BigInteger;
 
 /**
  *
@@ -21,22 +25,19 @@ public class WEXProcessor {
 
     @EJB
     private Configurator configurator;
-//    @EJB
-//    private Root root;
+    @EJB
+    private TransactionDAO transactionDAO;
 
     public Transaction preAuthProcess(Transaction t) {
-        if (Integer.parseInt(t.getProdDetailCount()) > 5) {
-            //if(t.getNonFuelProdCode.size() > 2)
-            this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_EXCEEDED", "SELECTED PRODUCT COUNT EXCEEDED");
-            return t;
-        }
-        //logon pocket fields setting
-        //root.setAppName(value);
-        //root.setAppVersion();
-        //root.setHeaderRecord();
-        //root.setTermId(t.getTermId());
-        //root.setTimeZone();
-        
+        //logon pocket fields 
+
+//        root.setAppName("abcdef");
+//        root.setAppVersion(BigInteger.valueOf(11));
+////        root.setHeaderRecord();
+//        root.setTermId(t.getTermId());
+//        BigInteger dtf = createDateFormat(t.getLocalDateTime());
+//        root.setTimeZone(dtf);
+
         String responseStr = "";
         NBSClient clientObj = new NBSClient();
         responseStr = clientObj.generateResponse("APPROVED");
@@ -46,6 +47,12 @@ public class WEXProcessor {
     }
 
     public Transaction finalAuthProcess(Transaction t) {
+        Transaction authTran = transactionDAO.find(t.getIdentityUuid(),t.getRrn(),RequestType.PREAUTH);
+        if(authTran == null)
+        {
+            this.buildErrorResponse(t, "NO_PRIOR_TRANSACTION", "NO_PRIOR_TRANSACTION_FOUND_FOR_FINALAUTH");
+            return t;
+        }
         String responseStr = "";
         NBSClient clientObj = new NBSClient();
         responseStr = clientObj.generateResponse("APPROVED");

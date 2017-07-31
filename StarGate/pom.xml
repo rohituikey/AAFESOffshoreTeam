@@ -348,6 +348,18 @@
                         </configuration>
                         <id>jaxb-generate-tokenvalidator</id>
                     </execution>
+                     <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/LogonBinding/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-LogonBinding.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-LogonBinding</id>
+                    </execution>
                 </executions>
                 <configuration>
                     <catalog>src/main/resources/jaxb/catalog.xml</catalog>

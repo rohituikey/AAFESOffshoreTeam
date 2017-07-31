@@ -5,6 +5,7 @@
  */
 package com.aafes.stargate.gateway.wex;
 
+import com.aafes.nbslogonrequest.NbsLogonRequest;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.wex.simulator.NBSClient;
 import com.aafes.stargate.control.Configurator;
@@ -14,7 +15,6 @@ import com.aafes.stargate.util.ResponseType;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import java.math.BigInteger;
 
 /**
  *

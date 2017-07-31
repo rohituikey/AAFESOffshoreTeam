@@ -503,7 +503,7 @@ public class Authorizer {
                 long n = 0L;
                 qtyPumped = (BigDecimal) wexReqPayAtPump.getQtyPumped().get(0);
                 strQtyPumped = String.valueOf(qtyPumped);
-                if(null != strQtyPumped && strQtyPumped.contains("0")){
+                if(null != strQtyPumped && strQtyPumped.contains(".")){
                     decimalPart = strQtyPumped.split("\\.");
                     if(decimalPart[1] != null && decimalPart[1].length() > 0)
                         qtyPumped = qtyPumped.movePointRight(decimalPart[1].length());
@@ -526,12 +526,14 @@ public class Authorizer {
                 transaction.setFuelPrice(n);
             }
             if (wexReqPayAtPump.getFuelProdCode() != null) {
-                transaction.setFuelProdCode(wexReqPayAtPump.getFuelProdCode().toString());
+                if(wexReqPayAtPump.getFuelProdCode().get(0) != null)
+                    transaction.setFuelProdCode(wexReqPayAtPump.getFuelProdCode().get(0).toString());
             }
 
             //added lines for new fields mapping starts here
             if (wexReqPayAtPump.getNonFuelProdCode() != null) {
-                transaction.setNonFuelProdCode(wexReqPayAtPump.getNonFuelProdCode().toString());
+                if(wexReqPayAtPump.getNonFuelProdCode().get(0) != null)
+                    transaction.setNonFuelProdCode(wexReqPayAtPump.getNonFuelProdCode().get(0).toString());
             }
             if (wexReqPayAtPump.getCATFlag() != null) {
                 transaction.setCatFlag(wexReqPayAtPump.getCATFlag().get(0));
@@ -579,6 +581,46 @@ public class Authorizer {
                     n = nonFuelPrice.longValueExact();
                 }
                 transaction.setNonFuelAmount(nonFuelPrice);
+            }
+            
+            if(wexReqPayAtPump.getOdometer() != null){
+                transaction.setOdoMeter(wexReqPayAtPump.getOdometer());
+            }
+            
+             if(wexReqPayAtPump.getCardSeqNumber()!= null){
+                transaction.setCardSeqNumber(wexReqPayAtPump.getCardSeqNumber());
+            }
+            
+            if (wexReqPayAtPump.getQuantity() != null) {
+              BigDecimal quantity;
+              String strQuantity;
+              long n = 0L;
+              quantity = (BigDecimal) wexReqPayAtPump.getQuantity().get(0);
+              strQuantity = String.valueOf(quantity);
+              if(null != strQuantity && strQuantity.contains(".")){
+                  decimalPart = String.valueOf(quantity).split("\\.");
+                  if (decimalPart[1] != null && decimalPart[1].length() > 0) {
+                      quantity = quantity.movePointRight(decimalPart[1].length());
+                  }
+                  n = quantity.longValueExact();
+              }
+              transaction.setQuantity(quantity);
+            }
+             
+            if (wexReqPayAtPump.getNonFuelQty() != null) {
+              BigDecimal nonFuelQty;
+              String strNonFuelQty;
+              long n = 0L;
+              nonFuelQty = (BigDecimal) wexReqPayAtPump.getNonFuelQty().get(0);
+              strNonFuelQty = String.valueOf(nonFuelQty);
+              if(null != strNonFuelQty && strNonFuelQty.contains(".")){
+                  decimalPart = String.valueOf(nonFuelQty).split("\\.");
+                  if (decimalPart[1] != null && decimalPart[1].length() > 0) {
+                      nonFuelQty = nonFuelQty.movePointRight(decimalPart[1].length());
+                  }
+                  n = nonFuelQty.longValueExact();
+              }
+              transaction.setNonFuelqty(nonFuelQty);
             }
         }
         //*Uncommented from 502 to 551 and modified some code

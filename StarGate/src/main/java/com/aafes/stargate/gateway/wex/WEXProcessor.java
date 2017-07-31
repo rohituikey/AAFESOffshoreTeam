@@ -5,6 +5,7 @@
  */
 package com.aafes.stargate.gateway.wex;
 
+import com.aafes.nbslogonrequestschema.NbsLogonRequest;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.wex.simulator.NBSClient;
 import com.aafes.stargate.control.Configurator;
@@ -21,8 +22,7 @@ public class WEXProcessor {
 
     @EJB
     private Configurator configurator;
-//    @EJB
-//    private Root root;
+    private NbsLogonRequest nbsLogOnRequest;
 
     public Transaction preAuthProcess(Transaction t) {
         if (Integer.parseInt(t.getProdDetailCount()) > 5) {
@@ -30,12 +30,13 @@ public class WEXProcessor {
             this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_EXCEEDED", "SELECTED PRODUCT COUNT EXCEEDED");
             return t;
         }
+        if(null == nbsLogOnRequest) nbsLogOnRequest = new NbsLogonRequest();
         //logon pocket fields setting
-        //root.setAppName(value);
-        //root.setAppVersion();
-        //root.setHeaderRecord();
-        //root.setTermId(t.getTermId());
-        //root.setTimeZone();
+        //nbsLogOnRequest.setAppName(value);
+        //nbsLogOnRequest.setAppVersion();
+        //nbsLogOnRequest.setHeaderRecord();
+        nbsLogOnRequest.setTermId(t.getTermId());
+        //nbsLogOnRequest.setTimeZone();
         
         String responseStr = "";
         NBSClient clientObj = new NBSClient();

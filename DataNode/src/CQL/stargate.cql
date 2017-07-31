@@ -222,3 +222,6 @@ alter TABLE stargate.transactions ADD nonfuelamount decimal;
 alter TABLE stargate.transactions ADD fueldolleramount decimal;
 alter TABLE stargate.transactions ADD priceperunit decimal;
 alter TABLE stargate.transactions ADD catflag text;
+alter TABLE stargate.transactions ADD cardseqnumber text;
+alter TABLE stargate.transactions ADD quantity decimal;
+alter TABLE stargate.transactions ADD nonfuelqty decimal;

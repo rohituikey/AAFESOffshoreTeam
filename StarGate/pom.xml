@@ -348,17 +348,18 @@
                         </configuration>
                         <id>jaxb-generate-tokenvalidator</id>
                     </execution>
-                     <execution>
+                    <execution>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
                             <schemaIncludes>
-                                <include>jaxb/LogonBinding/*.xsd</include>
+                                <include>jaxb/nbsRequest/*.xsd</include>
                             </schemaIncludes>
-                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-LogonBinding.episode</episodeFile>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-nbsRequest.episode</episodeFile>
+                            <generatePackage>com.nbs</generatePackage>
                         </configuration>
-                        <id>jaxb-generate-LogonBinding</id>
+                        <id>jaxb-generate-nbsRequest</id>
                     </execution>
                 </executions>
                 <configuration>

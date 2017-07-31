@@ -6,6 +6,7 @@
 package com.aafes.stargate.authorizer;
 
 
+import com.aafes.stargate.gateway.wex.WEXStrategy;
 import com.aafes.stargate.util.StrategyType;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -23,6 +24,8 @@ public class BaseStrategyFactory {
     private EcommStrategy ecommStrategy;
     @EJB
     private RetailStrategy retailStrategy;
+    @EJB
+    private WEXStrategy wEXStrategy;
     
     public BaseStrategy findStrategy(String strategy) {
 
@@ -36,6 +39,8 @@ public class BaseStrategyFactory {
             case StrategyType.DECA:
                 return retailStrategy;
 
+             case StrategyType.WEX:
+                return wEXStrategy;
                 
             // Add more strategies
             default:

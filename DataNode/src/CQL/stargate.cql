@@ -216,3 +216,9 @@ primary key (identityuuid, userid, password)
 );
 
 alter TABLE stargate.transactions ADD origrrn text;
+
+alter TABLE stargate.transactions ADD nonfuelprodcode text;
+alter TABLE stargate.transactions ADD nonfuelamount decimal;
+alter TABLE stargate.transactions ADD fueldolleramount decimal;
+alter TABLE stargate.transactions ADD priceperunit decimal;
+alter TABLE stargate.transactions ADD catflag text;

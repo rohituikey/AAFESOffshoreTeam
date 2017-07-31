@@ -10,6 +10,7 @@ import com.aafes.stargate.gateway.fdms.CompassGateway;
 import com.aafes.stargate.gateway.svs.SVSGateway;
 import com.aafes.stargate.gateway.vision.VisionGateway;
 import com.aafes.stargate.gateway.vision.simulator.VisionGatewayStub;
+import com.aafes.stargate.gateway.wex.WexGateway;
 import com.aafes.stargate.util.GetMediaTypeByAccountNbr;
 import com.aafes.stargate.util.MediaType;
 import javax.ejb.EJB;
@@ -32,6 +33,9 @@ public class GatewayFactory {
 
     @EJB
     private SVSGateway sVSGateway;
+    
+    @EJB
+    private WexGateway wexGateway;
 
     @Inject
     private String enableStub;
@@ -73,7 +77,11 @@ public class GatewayFactory {
                 case MediaType.GIFT_CARD:
                     gateway = sVSGateway;
                     return gateway;
-               
+                    
+                 case MediaType.WEX:
+                     gateway = wexGateway;
+                     return  gateway;
+                // Add more gateways
             }
         }
         LOG.info("Gatewayfacory.pickGateway exit : "+t.getRrn());

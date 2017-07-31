@@ -354,11 +354,11 @@
                         </goals>
                         <configuration>
                             <schemaIncludes>
-                                <include>jaxb/NBSLogonRequestSchema/*.xsd</include>
+                                <include>jaxb/nbslogonrequestschema/*.xsd</include>
                             </schemaIncludes>
-                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-NBSLogonRequestSchema.episode</episodeFile>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-nbslogonrequestschema.episode</episodeFile>
                         </configuration>
-                        <id>jaxb-generate-NBSLogonRequestSchema</id>
+                        <id>jaxb-generate-nbslogonrequestschema</id>
                     </execution>
                     <execution>
                         <goals>
@@ -366,11 +366,11 @@
                         </goals>
                         <configuration>
                             <schemaIncludes>
-                                <include>jaxb/NBSResponseAcknowledgmentSchema/*.xsd</include>
+                                <include>jaxb/nbsresponseacknowledgmentschema/*.xsd</include>
                             </schemaIncludes>
-                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-NBSResponseAcknowledgmentSchema.episode</episodeFile>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-nbsresponseacknowledgmentschema.episode</episodeFile>
                         </configuration>
-                        <id>jaxb-generate-NBSResponseAcknowledgmentSchema</id>
+                        <id>jaxb-generate-nbsresponseacknowledgmentschema</id>
                     </execution>
                 </executions>
                 <configuration>

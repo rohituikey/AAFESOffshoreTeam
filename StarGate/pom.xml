@@ -372,6 +372,18 @@
                         </configuration>
                         <id>jaxb-generate-nbsresponseacknowledgmentschema</id>
                     </execution>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/nbsresponse/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-nbsresponse.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-nbsresponse</id>
+                    </execution>
                 </executions>
                 <configuration>
                     <catalog>src/main/resources/jaxb/catalog.xml</catalog>

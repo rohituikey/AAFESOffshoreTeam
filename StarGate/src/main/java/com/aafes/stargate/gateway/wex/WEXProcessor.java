@@ -12,6 +12,7 @@ import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import java.math.BigInteger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
@@ -27,17 +28,10 @@ public class WEXProcessor {
     private Configurator configurator;
     @EJB
     private TransactionDAO transactionDAO;
+    
     private NbsLogonRequest nbsLogOnRequest;
 
     public Transaction preAuthProcess(Transaction t) {
-        //logon pocket fields 
-
-//        root.setAppName("abcdef");
-//        root.setAppVersion(BigInteger.valueOf(11));
-////        root.setHeaderRecord();
-//        root.setTermId(t.getTermId());
-//        BigInteger dtf = createDateFormat(t.getLocalDateTime());
-//        root.setTimeZone(dtf);
 
         if (Integer.parseInt(t.getProdDetailCount()) > 5) {
             //if(t.getNonFuelProdCode.size() > 2)
@@ -50,7 +44,8 @@ public class WEXProcessor {
         //nbsLogOnRequest.setAppVersion();
         //nbsLogOnRequest.setHeaderRecord();
         nbsLogOnRequest.setTermId(t.getTermId());
-        //nbsLogOnRequest.setTimeZone();
+//        BigInteger dtf = createDateFormat(t.getLocalDateTime());
+//        nbsLogOnRequest.setTimeZone(dtf);
         
         String responseStr = "";
         NBSClient clientObj = new NBSClient();
@@ -87,6 +82,14 @@ public class WEXProcessor {
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
         //LOG.error("Exception/Error occured. reasonCode:" + reasonCode + " .description" + description);
+    }
+    private BigInteger createDateFormat(String df) {
+
+        char[] dfc = df.toCharArray();
+        df = "dfc[6]" + "dfc[7]" + "dfc[8]" + "dfc[9]";// need to add + daylight_savings_time_at_site.ONE;
+        BigInteger rs = new BigInteger(df);
+        return rs;
+        //ex  17 05 31 13 31 33
     }
 
 }

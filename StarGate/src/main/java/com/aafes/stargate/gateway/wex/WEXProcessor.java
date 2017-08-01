@@ -9,7 +9,10 @@ import com.aafes.nbslogonrequestschema.NbsLogonRequest;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.wex.simulator.NBSClient;
 import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.dao.TransactionDAO;
+import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import java.math.BigInteger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
@@ -27,9 +30,13 @@ public class WEXProcessor {
     
     @EJB
     private Configurator configurator;
+    @EJB
+    private TransactionDAO transactionDAO;
+    
     private NbsLogonRequest nbsLogOnRequest;
 
     public Transaction preAuthProcess(Transaction t) {
+
         if (Integer.parseInt(t.getProdDetailCount()) > 5) {
             //if(t.getNonFuelProdCode.size() > 2)
             this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_EXCEEDED", "SELECTED PRODUCT COUNT EXCEEDED");
@@ -41,7 +48,8 @@ public class WEXProcessor {
         //nbsLogOnRequest.setAppVersion();
         //nbsLogOnRequest.setHeaderRecord();
         nbsLogOnRequest.setTermId(t.getTermId());
-        //nbsLogOnRequest.setTimeZone();
+//        BigInteger dtf = createDateFormat(t.getLocalDateTime());
+//        nbsLogOnRequest.setTimeZone(dtf);
         
         String responseStr = "";
         NBSClient clientObj = new NBSClient();
@@ -52,6 +60,12 @@ public class WEXProcessor {
     }
 
     public Transaction finalAuthProcess(Transaction t) {
+        Transaction authTran = transactionDAO.find(t.getIdentityUuid(),t.getRrn(),RequestType.PREAUTH);
+        if(authTran == null)
+        {
+            this.buildErrorResponse(t, "NO_PRIOR_TRANSACTION", "NO_PRIOR_TRANSACTION_FOUND_FOR_FINALAUTH");
+            return t;
+        }
         String responseStr = "";
         NBSClient clientObj = new NBSClient();
         responseStr = clientObj.generateResponse("APPROVED");
@@ -83,6 +97,14 @@ public class WEXProcessor {
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
         //LOG.error("Exception/Error occured. reasonCode:" + reasonCode + " .description" + description);
+    }
+    private BigInteger createDateFormat(String df) {
+
+        char[] dfc = df.toCharArray();
+        df = "dfc[6]" + "dfc[7]" + "dfc[8]" + "dfc[9]";// need to add + daylight_savings_time_at_site.ONE;
+        BigInteger rs = new BigInteger(df);
+        return rs;
+        //ex  17 05 31 13 31 33
     }
 
 }

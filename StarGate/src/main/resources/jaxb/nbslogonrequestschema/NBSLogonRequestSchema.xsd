@@ -1,6 +1,6 @@
-<xs:schema xmlns="http://www.aafes.com/nbslogonrequestschema" 
-           targetNamespace="http://www.aafes.com/nbslogonrequestschema" 
-           xmlns:tokenvalidator="http://www.aafes.com/nbslogonrequestschema" 
+<xs:schema xmlns="http://www.aafes.com/nbslogonrequest" 
+           targetNamespace="http://www.aafes.com/nbslogonrequest" 
+           xmlns:tokenvalidator="http://www.aafes.com/nbslogonrequest" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            elementFormDefault="qualified" > 
     <xs:element name="NbsLogonRequest">

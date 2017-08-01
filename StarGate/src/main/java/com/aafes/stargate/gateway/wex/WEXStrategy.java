@@ -26,12 +26,15 @@ public class WEXStrategy extends BaseStrategy {
 
     @EJB
     private Configurator configurator;
+    @EJB
+    private WEXValidator wEXValidator;
+    
     Transaction storedTran = null;
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(WEXStrategy.class.getSimpleName());
 
     @Override
-    public Transaction processRequest(Transaction t) {
+    public Transaction processRequest(Transaction t) throws AuthorizerException {
         LOG.info("WEXStrategy.processRequest Entry ... " + t.getRrn());
         try {
 
@@ -48,41 +51,61 @@ public class WEXStrategy extends BaseStrategy {
             }
         } catch (AuthorizerException e) {
             buildErrorResponse(t, "", e.getMessage());
-            return t;
+            throw e;
+            //return t;
         } catch (Exception e) {
             buildErrorResponse(t, "", e.getMessage());
-            return t;
+            throw e;
+            //return t;
         }
         LOG.debug("rrn number in WEXStrategy.processRequest is :  " + t.getRrn());
         LOG.info("WEXStrategy.processRequest is ended");
         return t;
     }
 
-    private boolean validateTransactions(Transaction t) {
-
-        WEXValidator wEXValidator = new WEXValidator();
-
+    private boolean validateTransactions(Transaction t) throws AuthorizerException{
         LOG.info("Validating fields in WEXtrategy");
-        String accountNumber = t.getAccount().substring(0, 5);
-        if ((t.getAccount() == null || t.getAccount().trim().isEmpty())
-                && (accountNumber.equals("690046") || accountNumber.equals("707138"))) {
-            this.buildErrorResponse(t, "INVALID_ACCOUNT_NUMBER", "INVALID CARD NUMBER FOR WEX");
-            return false;
-        }
-        if ((!t.getRequestType().trim().isEmpty() || t.getRequestType() != null)
-                && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH) 
-                || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))) {
+        String accountNumber = "";
+        boolean errFlg = false;
+        try{
+            if (t.getAccount() == null || t.getAccount().trim().isEmpty()){
+                errFlg = true;
+            }
 
-            return wEXValidator.validateForPreAuthAndFinalAuth(t);
+            if(!errFlg){ 
+                accountNumber = t.getAccount().substring(0, 5);
+                if(accountNumber.equals("690046") || accountNumber.equals("707138")) {
+                    errFlg = true;
+                }
+            }
 
-        }
-        //sale request validation
-        if (!t.getRequestType().trim().isEmpty() || t.getRequestType() != null || t.getRequestType().equalsIgnoreCase(RequestType.SALE)) {
-            return wEXValidator.validateSale(t);
-        }
-        LOG.info("validation ended in WEXStrategy ");
+            if(errFlg){
+                this.buildErrorResponse(t, "INVALID_ACCOUNT_NUMBER", "INVALID CARD NUMBER FOR WEX");
+                return false;
+            }
 
-        return true;
+            //PREAUTH/FINAL_AUTH request validation - start
+            if (t.getRequestType() != null && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH) 
+                    || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))) 
+                return wEXValidator.validateForPreAuthAndFinalAuth(t);
+            //PREAUTH/FINAL_AUTH request validation - end
+            //sale request validation - start
+            else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.SALE))
+                return wEXValidator.validateSale(t);
+            //sale request validation - end
+            // ADDED FOR REFUND REQUEST VALIDATION - START
+            else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.REFUND))
+                return wEXValidator.validateRefundRequest(t);
+            // ADDED FOR REFUND REQUEST VALIDATION - END
+            else{
+                LOG.error("RequestType value is null");
+                this.buildErrorResponse(t, "INVALID_REQUEST_TYPE", "INVALID_REQUEST_TYPE");
+            }
+            LOG.info("validation ended in WEXStrategy ");
+            return true;
+        }catch(Exception e){
+            throw e;
+        }
     }
 
     private void buildErrorResponse(Transaction t, String reasonCode, String description) {

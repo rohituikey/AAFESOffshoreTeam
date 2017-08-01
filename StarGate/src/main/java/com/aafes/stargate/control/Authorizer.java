@@ -282,13 +282,15 @@ public class Authorizer {
                 t.setReasonCode("100");
                 t.setResponseType(ResponseType.APPROVED);
             }
-
-        } else {
-
-            LOG.info("Auth request.......");
-        }
+        } 
+        /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - start */
+        else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.REFUND)){
+            LOG.info(RequestType.REFUND + " request : " + t.getRrn());
+            authTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.FINAL_AUTH);
+            if (authTran == null) throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_REFUND");
+       }
+        /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - end */
         return authTran;
-
     }
 
     private void encryptValues(Transaction t) {

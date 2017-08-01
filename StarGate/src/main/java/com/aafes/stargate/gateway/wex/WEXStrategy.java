@@ -10,11 +10,21 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.Gateway;
-import com.aafes.stargate.util.InputType;
+import com.aafes.stargate.tokenizer.TokenBusinessService;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import com.aafes.stargate.util.TransactionType;
+import com.aafes.starsettler.imported.SettleEntity;
+import com.aafes.starsettler.imported.SettleMessageDAO;
+import com.aafes.starsettler.imported.SettleStatus;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ws.rs.ProcessingException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -29,6 +39,11 @@ public class WEXStrategy extends BaseStrategy {
     @EJB
     private WEXValidator wEXValidator;
     
+    private SettleEntity settleEntity;
+    @EJB
+    private SettleMessageDAO settleMessageDAO;
+    @EJB
+    private TokenBusinessService tokenBusinessService;
     Transaction storedTran = null;
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(WEXStrategy.class.getSimpleName());
@@ -49,6 +64,13 @@ public class WEXStrategy extends BaseStrategy {
             if (gateway != null) {
                 t = gateway.processMessage(t);
             }
+            //added code to settle the final auth transactions
+             if (t.getRequestType() != null && !t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
+                    && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
+                getToken(t);
+                saveToSettle(t);
+            }
+             //ends  here
         } catch (AuthorizerException e) {
             buildErrorResponse(t, "", e.getMessage());
             return t;
@@ -107,6 +129,64 @@ public class WEXStrategy extends BaseStrategy {
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
         LOG.error("Exception/Error occured. reasonCode:" + reasonCode + " .description" + description);
+    }
+        private void getToken(Transaction t) {
+        if ("Pan".equalsIgnoreCase(t.getPan())) {
+
+            if (tokenBusinessService != null
+                    && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
+                try {
+                    tokenBusinessService.issueToken(t);
+                } catch (ProcessingException e) {
+                    LOG.error("Cannot generate token. Token Service Error");
+                }
+
+            }
+        }
+    }
+        private void saveToSettle(Transaction t) {
+        LOG.info("WexStrategy.saveTOSettle method is started");
+        List<SettleEntity> settleEntityList = new ArrayList<SettleEntity>();
+        settleEntity = new SettleEntity();
+
+        settleEntity.setTransactionId(t.getTransactionId());
+        settleEntity.setReceiveddate(this.getSystemDate());
+        settleEntity.setOrderNumber(t.getOrderNumber());
+        settleEntity.setSettleDate(this.getSystemDate());
+        settleEntity.setOrderDate(this.getSystemDate());
+        settleEntity.setTransactionType(t.getTransactiontype());
+        settleEntity.setClientLineId(t.getTransactionId());
+        settleEntity.setIdentityUUID(t.getIdentityUuid());
+        settleEntity.setRrn(t.getRrn());
+        settleEntity.setPaymentAmount(Long.toString(t.getAmount()));
+
+        settleEntity.setSettlestatus(SettleStatus.Ready_to_settle);
+        settleEntity.setCardType(t.getMedia());
+        settleEntity.setSettlePlan(t.getPlanNumber());
+        settleEntity.setAuthNum(t.getAuthNumber());
+
+        if (t.getAmount() < 0) {
+            settleEntity.setTransactionType(TransactionType.Refund);
+        } else if (t.getAmount() >= 0) {
+            settleEntity.setTransactionType(TransactionType.Deposit);
+        }
+
+        if (t.getTokenId() != null && !t.getTokenId().trim().isEmpty()) {
+            settleEntity.setCardToken(t.getTokenId());
+            settleEntity.setTokenBankName(t.getTokenBankName());
+        }
+
+        settleEntityList.add(settleEntity);
+        settleMessageDAO.save(settleEntityList);
+        LOG.debug("rrn number in WexStrategy.saveTOSettle is: " + t.getRrn());
+        LOG.info("WexStrategy.saveTOSettle method is ended");
+
+    }
+        private String getSystemDate() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        String ts = dateFormat.format(date);
+        return ts;
     }
 
 }

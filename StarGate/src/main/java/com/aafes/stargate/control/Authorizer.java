@@ -17,6 +17,7 @@ import com.aafes.stargate.tokenizer.TokenBusinessService;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import com.aafes.stargate.util.StrategyType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -160,6 +161,13 @@ public class Authorizer {
                             && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                         LOG.info("Saving and updating transaction.....");
                         tranRepository.saveAndUpdate(t, authTranCancel);
+                    } else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia())
+                            && ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())){
+                            LOG.error("Transaction " + t.getResponseType());
+//                            t.setReasonCode(configurator.get(t.getReasonCode()));
+//                            t.setDescriptionField(t.getDescriptionField());
+//                            t.setResponseType(ResponseType.DECLINED);
+                            mapResponse(t, cm);
                     } else {
                         LOG.info("Saving transaction....." + t.getRrn());
                         encryptValues(t);

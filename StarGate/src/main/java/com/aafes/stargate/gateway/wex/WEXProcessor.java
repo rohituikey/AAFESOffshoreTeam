@@ -15,7 +15,7 @@ import com.aafes.stargate.util.ResponseType;
 import java.math.BigInteger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -24,6 +24,10 @@ import javax.ejb.Stateless;
 @Stateless
 public class WEXProcessor {
 
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(WEXProcessor.class.getSimpleName());
+    private String sMethodName = "";
+    private final String CLASS_NAME = WEXProcessor.this.getClass().getSimpleName();
+    
     @EJB
     private Configurator configurator;
     @EJB
@@ -77,6 +81,17 @@ public class WEXProcessor {
         return t;
     }
 
+    public Transaction processRefundRequest(Transaction t) {
+        sMethodName = "processRefundRequest";
+        LOG.info("Method " + sMethodName + " started." + "in  Class Name " + CLASS_NAME);
+        String responseStr = "";
+        NBSClient clientObj = new NBSClient();
+        responseStr = clientObj.generateResponse("APPROVED");
+        t.setResponseType(responseStr);
+        LOG.info("Method " + sMethodName + " ended." + "in  Class Name " + CLASS_NAME);
+        return t;
+    }
+    
     private void buildErrorResponse(Transaction t, String reasonCode, String description) {
         t.setReasonCode(configurator.get(reasonCode));
         t.setResponseType(ResponseType.DECLINED);

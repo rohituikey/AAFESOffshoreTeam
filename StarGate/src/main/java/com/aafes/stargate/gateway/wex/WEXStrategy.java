@@ -68,7 +68,7 @@ public class WEXStrategy extends BaseStrategy {
                 getToken(t);
                 saveToSettle(t);
             }
-             //ends here
+             //ends  here
         } catch (AuthorizerException e) {
             buildErrorResponse(t, "", e.getMessage());
             return t;

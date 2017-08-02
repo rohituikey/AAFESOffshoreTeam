@@ -69,7 +69,9 @@ public class WEXStrategy extends BaseStrategy {
             }
             //added code to settle the final auth transactions
             if (t.getRequestType() != null
-                    && (t.getRequestType().equalsIgnoreCase(RequestType.SALE) || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))
+                    && (t.getRequestType().equalsIgnoreCase(RequestType.SALE) 
+                    || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
+                    ||RequestType.REFUND.equals(t.getRequestType()))
                     && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                 LOG.info("WEXStrategy.processRequest settlements process");
                 getToken(t);
@@ -133,8 +135,6 @@ public class WEXStrategy extends BaseStrategy {
             }
             LOG.info("validation ended in WEXStrategy ");
             return true;
-        } catch (Exception e) {
-            throw e;
         }
 
         if (errFlg) {

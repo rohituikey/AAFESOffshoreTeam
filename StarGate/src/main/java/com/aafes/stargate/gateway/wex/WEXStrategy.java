@@ -49,7 +49,7 @@ public class WEXStrategy extends BaseStrategy {
             = LoggerFactory.getLogger(WEXStrategy.class.getSimpleName());
 
     @Override
-    public Transaction processRequest(Transaction t) throws AuthorizerException {
+    public Transaction processRequest(Transaction t) {
         LOG.info("WEXStrategy.processRequest Entry ... " + t.getRrn());
         try {
 
@@ -127,6 +127,31 @@ public class WEXStrategy extends BaseStrategy {
         } catch (Exception e) {
             throw e;
         }
+
+        if(errFlg){
+            this.buildErrorResponse(t, "INVALID_ACCOUNT_NUMBER", "INVALID CARD NUMBER FOR WEX");
+            return false;
+        }
+
+        //PREAUTH/FINAL_AUTH request validation - start
+        if (t.getRequestType() != null && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH) 
+                || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))) 
+            return wEXValidator.validateForPreAuthAndFinalAuth(t);
+        //PREAUTH/FINAL_AUTH request validation - end
+        //sale request validation - start
+        else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.SALE))
+            return wEXValidator.validateSale(t);
+        //sale request validation - end
+        // ADDED FOR REFUND REQUEST VALIDATION - START
+        else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.REFUND))
+            return wEXValidator.validateRefundRequest(t);
+        // ADDED FOR REFUND REQUEST VALIDATION - END
+        else{
+            LOG.error("RequestType value is null");
+            this.buildErrorResponse(t, "INVALID_REQUEST_TYPE", "INVALID_REQUEST_TYPE");
+        }
+        LOG.info("validation ended in WEXStrategy ");
+        return true;
     }
 
     private void buildErrorResponse(Transaction t, String reasonCode, String description) {

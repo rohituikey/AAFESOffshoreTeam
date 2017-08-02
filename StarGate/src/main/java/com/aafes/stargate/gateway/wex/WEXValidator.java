@@ -6,7 +6,6 @@
 package com.aafes.stargate.gateway.wex;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.ResponseType;
@@ -63,18 +62,19 @@ public class WEXValidator {
     public boolean validateRefundRequest(Transaction t) {
         sMethodName = "validateRefundRequest";
         LOG.info("Method " + sMethodName + " started." + "in  Class Name " + CLASS_NAME);
+        boolean localBoolVar = false;
         if(t.getFuelProdCode() != null || 
                 Long.valueOf(String.valueOf(t.getQtyPumped())) != null ||
                 Long.valueOf(String.valueOf(t.getPricePerUnit())) != null ||
                 Long.valueOf(String.valueOf(t.getFuelPrice())) != null || 
                 Long.valueOf(String.valueOf(t.getFuelDollerAmount())) != null){
-            //this.buildErrorResponse(t, "REFUND_REQUEST_CONTAINS_FUEL_CODES", "REFUND_REQUEST_CONTAINS_FUEL_CODES");
-            throw new AuthorizerException("REFUND_REQUEST_CONTAINS_FUEL_CODES");
-            //return false;
-        }else{
+            this.buildErrorResponse(t, "REFUND_REQUEST_CONTAINS_FUEL_CODES", "REFUND_REQUEST_CONTAINS_FUEL_CODES");
+            localBoolVar = false;
+        } else{
             LOG.info("Method " + sMethodName + " ended." + "in  Class Name " + CLASS_NAME);
-            return  true;
+            localBoolVar =  true;
         }
+        return localBoolVar; 
     }
      
     private void buildErrorResponse(Transaction t, String reasonCode, String description) {

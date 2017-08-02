@@ -17,6 +17,7 @@ public class NBSClient {
 
     private static final Logger LOG = Logger.getLogger(NBSClient.class.getName());
     private StringBuffer response;
+private Socket nbsSocket;
 
     public String generateResponse(String request) {
 
@@ -24,24 +25,27 @@ public class NBSClient {
         try {
 
             //creating connections
-            Socket NBSSocket = new Socket("localhost", 2000);
+            if(null==nbsSocket || nbsSocket.isClosed()){
+            nbsSocket = new Socket("localhost", 2000);
             LOG.info("Connection Established with NBS socket server");
-            LOG.info(NBSSocket.getClass() + "-----------" + NBSSocket.getLocalAddress() + "---------------" + NBSSocket.getLocalPort());
+            LOG.info(nbsSocket.getClass() + "-----------" + nbsSocket.getLocalAddress() + "---------------" + nbsSocket.getLocalPort());
+            } 
 
             BufferedWriter writeRequest
-                    = new BufferedWriter(new OutputStreamWriter(NBSSocket.getOutputStream()));
+                    = new BufferedWriter(new OutputStreamWriter(nbsSocket.getOutputStream()));
 
             writeRequest.write(request + "\n");
             writeRequest.flush();
 
             BufferedReader readResponse
-                    = new BufferedReader(new InputStreamReader(NBSSocket.getInputStream()));
+                    = new BufferedReader(new InputStreamReader(nbsSocket.getInputStream()));
 
             while ((responsePerLine = readResponse.readLine()) != null) {
                 if(response == null) response = new StringBuffer();
                 response.append(responsePerLine);
                 LOG.log(Level.INFO, "Response recieved as {0}", response);
             }
+            nbsSocket.close();
             return response.toString();
         } catch (IOException ex) {
             Logger.getLogger(NBSClient.class.getName()).log(Level.SEVERE, null, ex);

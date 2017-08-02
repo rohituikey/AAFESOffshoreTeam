@@ -47,27 +47,29 @@ public class WEXStrategy extends BaseStrategy {
     Transaction storedTran = null;
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(WEXStrategy.class.getSimpleName());
+     private Transaction t;
+    
 
     @Override
-    public Transaction processRequest(Transaction t) {
+    public Transaction processRequest(Transaction transaction) {
         LOG.info("WEXStrategy.processRequest Entry ... " + t.getRrn());
+        t=transaction;
         try {
 
-            boolean retailFieldsValid = this.validateTransactions(t);
-            LOG.info("WEXFieldsValid " + retailFieldsValid + "..." + t.getRrn());
+            boolean retailFieldsValid = this.validateTransactions(transaction);
+            LOG.info("WEXFieldsValid " + retailFieldsValid + "..." + transaction.getRrn());
 
             if (!retailFieldsValid) {
                 LOG.info("Invalid fields");
                 return t;
             }
-            Gateway gateway = super.pickGateway(t);
+            Gateway gateway = super.pickGateway(transaction);
             if (gateway != null) {
-                t = gateway.processMessage(t);
+                t = gateway.processMessage(transaction);
             }
             //added code to settle the final auth transactions
             if (t.getRequestType() != null
-                    && (t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
-                    && t.getRequestType().equalsIgnoreCase(RequestType.SALE))
+                    && (t.getRequestType().equalsIgnoreCase(RequestType.SALE) || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))
                     && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                 getToken(t);
                 saveToSettle(t);

@@ -15,7 +15,7 @@ import javax.ejb.Stateless;
  * @author singha
  */
 @Stateless
-public class MapSaleRequest {
+public class WexRequestResponseMapping {
 
     public Transaction saleRequestMap(Transaction transaction, NbsLogonRequest logonRequest) {
         Transaction t = new Transaction();

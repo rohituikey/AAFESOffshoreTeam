@@ -42,14 +42,6 @@ public class WEXProcessor {
             if (null == nbsLogOnRequest) {
                 nbsLogOnRequest = new NbsLogonRequest();
             }
-            //logon pocket fields setting
-            //nbsLogOnRequest.setAppName(value);
-            //nbsLogOnRequest.setAppVersion();
-            //nbsLogOnRequest.setHeaderRecord();
-            nbsLogOnRequest.setTermId(t.getTermId());
-//        BigInteger dtf = createDateFormat(t.getLocalDateTime());
-//        nbsLogOnRequest.setTimeZone(dtf);
-
             String responseStr = "";
             NBSClient clientObj = new NBSClient();
             responseStr = clientObj.generateResponse("APPROVED");

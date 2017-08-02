@@ -27,50 +27,69 @@ public class WEXProcessor {
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(WEXProcessor.class.getSimpleName());
     private String sMethodName = "";
     private final String CLASS_NAME = WEXProcessor.this.getClass().getSimpleName();
-    
+
     @EJB
     private Configurator configurator;
     @EJB
     private TransactionDAO transactionDAO;
-    
+
     private NbsLogonRequest nbsLogOnRequest;
 
     public Transaction preAuthProcess(Transaction t) {
+        LOG.info("WEXProcessor.preAuthProcess mothod started");
 
-        if (Integer.parseInt(t.getProdDetailCount()) > 5) {
-            //if(t.getNonFuelProdCode.size() > 2)
-            this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_EXCEEDED", "SELECTED PRODUCT COUNT EXCEEDED");
-            return t;
-        }
-        if(null == nbsLogOnRequest) nbsLogOnRequest = new NbsLogonRequest();
-        //logon pocket fields setting
-        //nbsLogOnRequest.setAppName(value);
-        //nbsLogOnRequest.setAppVersion();
-        //nbsLogOnRequest.setHeaderRecord();
-        nbsLogOnRequest.setTermId(t.getTermId());
+        try {
+            if (null == nbsLogOnRequest) {
+                nbsLogOnRequest = new NbsLogonRequest();
+            }
+            //logon pocket fields setting
+            //nbsLogOnRequest.setAppName(value);
+            //nbsLogOnRequest.setAppVersion();
+            //nbsLogOnRequest.setHeaderRecord();
+            nbsLogOnRequest.setTermId(t.getTermId());
 //        BigInteger dtf = createDateFormat(t.getLocalDateTime());
 //        nbsLogOnRequest.setTimeZone(dtf);
-        
-        String responseStr = "";
-        NBSClient clientObj = new NBSClient();
-        responseStr = clientObj.generateResponse("APPROVED");
-        t.setResponseType(responseStr);
 
-        return t;
-    }
-
-    public Transaction finalAuthProcess(Transaction t) {
-        Transaction authTran = transactionDAO.find(t.getIdentityUuid(),t.getRrn(),RequestType.PREAUTH);
-        if(authTran == null)
-        {
-            this.buildErrorResponse(t, "NO_PRIOR_TRANSACTION", "NO_PRIOR_TRANSACTION_FOUND_FOR_FINALAUTH");
+            String responseStr = "";
+            NBSClient clientObj = new NBSClient();
+            responseStr = clientObj.generateResponse("APPROVED");
+            t.setResponseType(responseStr);
+            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
+                t.setReasonCode("100");
+                t.setDescriptionField(ResponseType.APPROVED);
+            }
+            else
+            {
+ 
+            t.setDescriptionField(ResponseType.DECLINED);
+            }
+            LOG.info("WEXProcessor.preAuthProcess mothod ended");
             return t;
+        } catch (Exception e) {
+            throw e;
         }
-        String responseStr = "";
-        NBSClient clientObj = new NBSClient();
-        responseStr = clientObj.generateResponse("APPROVED");
-        t.setResponseType(responseStr);
-        return t;
+    }
+    public Transaction finalAuthProcess(Transaction t) {
+        LOG.info("WEXProcessor.finalAuthProcess mothod started");
+        try {
+            Transaction authTran = transactionDAO.find(t.getIdentityUuid(), t.getRrn(), RequestType.PREAUTH);
+            if (authTran == null) {
+                this.buildErrorResponse(t, "NO_PRIOR_TRANSACTION", "NO_PRIOR_TRANSACTION_FOUND_FOR_FINALAUTH");
+                return t;
+            }
+            String responseStr = "";
+            NBSClient clientObj = new NBSClient();
+            responseStr = clientObj.generateResponse("APPROVED");
+            t.setResponseType(responseStr);
+            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
+                t.setReasonCode("100");
+                t.setDescriptionField(ResponseType.APPROVED);
+            }
+            LOG.info("WEXProcessor.finalAuthProcess mothod ended");
+            return t;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     public Transaction processSaleRequest(Transaction t) {
@@ -91,13 +110,14 @@ public class WEXProcessor {
         LOG.info("Method " + sMethodName + " ended." + "in  Class Name " + CLASS_NAME);
         return t;
     }
-    
+
     private void buildErrorResponse(Transaction t, String reasonCode, String description) {
         t.setReasonCode(configurator.get(reasonCode));
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
         //LOG.error("Exception/Error occured. reasonCode:" + reasonCode + " .description" + description);
     }
+
     private BigInteger createDateFormat(String df) {
 
         char[] dfc = df.toCharArray();

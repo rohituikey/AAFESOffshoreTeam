@@ -38,7 +38,7 @@ public class WEXStrategy extends BaseStrategy {
     private Configurator configurator;
     @EJB
     private WEXValidator wEXValidator;
-    
+
     private SettleEntity settleEntity;
     @EJB
     private SettleMessageDAO settleMessageDAO;
@@ -65,67 +65,66 @@ public class WEXStrategy extends BaseStrategy {
                 t = gateway.processMessage(t);
             }
             //added code to settle the final auth transactions
-             if (t.getRequestType() != null && !t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
+            if (t.getRequestType() != null && !t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
+                LOG.info("WEXStrategy.processRequest settlements process");
                 getToken(t);
                 saveToSettle(t);
             }
-             //ends  here
+            //ends  here
         } catch (AuthorizerException e) {
             buildErrorResponse(t, "", e.getMessage());
             throw e;
-            //return t;
         } catch (Exception e) {
             buildErrorResponse(t, "", e.getMessage());
             throw e;
-            //return t;
         }
         LOG.debug("rrn number in WEXStrategy.processRequest is :  " + t.getRrn());
         LOG.info("WEXStrategy.processRequest is ended");
         return t;
     }
 
-    private boolean validateTransactions(Transaction t) throws AuthorizerException{
+    private boolean validateTransactions(Transaction t) throws AuthorizerException {
         LOG.info("Validating fields in WEXtrategy");
         String accountNumber = "";
         boolean errFlg = false;
-        try{
-            if (t.getAccount() == null || t.getAccount().trim().isEmpty()){
+        try {
+            if (t.getAccount() == null || t.getAccount().trim().isEmpty()) {
                 errFlg = true;
             }
 
-            if(!errFlg){ 
+            if (!errFlg) {
                 accountNumber = t.getAccount().substring(0, 5);
-                if(accountNumber.equals("690046") || accountNumber.equals("707138")) {
+                if (accountNumber.equals("690046") || accountNumber.equals("707138")) {
                     errFlg = true;
                 }
             }
 
-            if(errFlg){
+            if (errFlg) {
                 this.buildErrorResponse(t, "INVALID_ACCOUNT_NUMBER", "INVALID CARD NUMBER FOR WEX");
                 return false;
             }
 
             //PREAUTH/FINAL_AUTH request validation - start
-            if (t.getRequestType() != null && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH) 
-                    || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))) 
+            if (t.getRequestType() != null && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)
+                    || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))) {
                 return wEXValidator.validateForPreAuthAndFinalAuth(t);
-            //PREAUTH/FINAL_AUTH request validation - end
+            } //PREAUTH/FINAL_AUTH request validation - end
             //sale request validation - start
-            else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.SALE))
+            else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.SALE)) {
                 return wEXValidator.validateSale(t);
-            //sale request validation - end
+            } //sale request validation - end
             // ADDED FOR REFUND REQUEST VALIDATION - START
-            else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.REFUND))
+            else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
                 return wEXValidator.validateRefundRequest(t);
-            // ADDED FOR REFUND REQUEST VALIDATION - END
-            else{
+            } // ADDED FOR REFUND REQUEST VALIDATION - END
+            else {
                 LOG.error("RequestType value is null");
                 this.buildErrorResponse(t, "INVALID_REQUEST_TYPE", "INVALID_REQUEST_TYPE");
             }
             LOG.info("validation ended in WEXStrategy ");
             return true;
-        }catch(Exception e){
+        } catch (Exception e) {
             throw e;
         }
     }
@@ -136,7 +135,8 @@ public class WEXStrategy extends BaseStrategy {
         t.setDescriptionField(description);
         LOG.error("Exception/Error occured. reasonCode:" + reasonCode + " .description" + description);
     }
-        private void getToken(Transaction t) {
+
+    private void getToken(Transaction t) {
         if ("Pan".equalsIgnoreCase(t.getPan())) {
 
             if (tokenBusinessService != null
@@ -150,7 +150,8 @@ public class WEXStrategy extends BaseStrategy {
             }
         }
     }
-        private void saveToSettle(Transaction t) {
+
+    private void saveToSettle(Transaction t) {
         LOG.info("WexStrategy.saveTOSettle method is started");
         List<SettleEntity> settleEntityList = new ArrayList<SettleEntity>();
         settleEntity = new SettleEntity();
@@ -188,7 +189,8 @@ public class WEXStrategy extends BaseStrategy {
         LOG.info("WexStrategy.saveTOSettle method is ended");
 
     }
-        private String getSystemDate() {
+
+    private String getSystemDate() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         String ts = dateFormat.format(date);

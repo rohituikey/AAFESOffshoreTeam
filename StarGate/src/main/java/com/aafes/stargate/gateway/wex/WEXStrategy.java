@@ -52,27 +52,27 @@ public class WEXStrategy extends BaseStrategy {
 
     @Override
     public Transaction processRequest(Transaction transaction) {
-        LOG.info("WEXStrategy.processRequest Entry ... " + t.getRrn());
+        LOG.info("WEXStrategy.processRequest Entry ... " + transaction.getRrn());
         t=transaction;
         try {
 
-            boolean retailFieldsValid = this.validateTransactions(transaction);
-            LOG.info("WEXFieldsValid " + retailFieldsValid + "..." + transaction.getRrn());
+            boolean retailFieldsValid = this.validateTransactions(t);
+            LOG.info("WEXFieldsValid " + retailFieldsValid + "..." + t.getRrn());
 
             if (!retailFieldsValid) {
                 LOG.info("Invalid fields");
                 return t;
             }
-            Gateway gateway = super.pickGateway(transaction);
+            Gateway gateway = super.pickGateway(t);
             if (gateway != null) {
-                t = gateway.processMessage(transaction);
+                t = gateway.processMessage(t);
             }
             //added code to settle the final auth transactions
             if (t.getRequestType() != null
                     && (t.getRequestType().equalsIgnoreCase(RequestType.SALE) 
                     || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     ||RequestType.REFUND.equals(t.getRequestType()))
-                    && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
+                    && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType().trim())) {
                 LOG.info("WEXStrategy.processRequest settlements process");
                 getToken(t);
                 saveToSettle(t);

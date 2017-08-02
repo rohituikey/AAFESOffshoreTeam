@@ -110,7 +110,17 @@ public class Authorizer {
                 } else {
                     storedTran = null;
                 }
-            } else {
+            }else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia()) && RequestType.REFUND.equalsIgnoreCase(t.getRequestType())){
+                LOG.info("Wex Refund........");
+                storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.REFUND);
+
+                if (storedTran != null && storedTran.getResponseType() != null 
+                        && storedTran.getResponseType().trim().equalsIgnoreCase(ResponseType.APPROVED)) {
+                    storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REFUNDED"));
+                    storedTran.setResponseType(ResponseType.DECLINED);
+                    storedTran.setDescriptionField("TRANSACTION_ALREADY_REFUNDED");
+                } else  storedTran = null;
+            }else {
                 storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getRequestType());
             }
 
@@ -511,47 +521,51 @@ public class Authorizer {
                 BigDecimal qtyPumped;
                 String strQtyPumped;
                 long n = 0L;
-                qtyPumped = (BigDecimal) wexReqPayAtPump.getQtyPumped().get(0);
-                strQtyPumped = String.valueOf(qtyPumped);
-                if(null != strQtyPumped && strQtyPumped.contains(".")){
-                    decimalPart = strQtyPumped.split("\\.");
-                    if(decimalPart[1] != null && decimalPart[1].length() > 0)
-                        qtyPumped = qtyPumped.movePointRight(decimalPart[1].length());
+                if(wexReqPayAtPump.getQtyPumped().size() > 0){
+                    qtyPumped = (BigDecimal) wexReqPayAtPump.getQtyPumped().get(0);
+                    strQtyPumped = String.valueOf(qtyPumped);
+                    if(null != strQtyPumped && strQtyPumped.contains(".")){
+                        decimalPart = strQtyPumped.split("\\.");
+                        if(decimalPart[1] != null && decimalPart[1].length() > 0)
+                            qtyPumped = qtyPumped.movePointRight(decimalPart[1].length());
+                    }
+                    n = qtyPumped.longValueExact();
                 }
-                n = qtyPumped.longValueExact();
                 transaction.setQtyPumped(n);
             }
             if (wexReqPayAtPump.getFuelPrice() != null) {
                 BigDecimal fuelPrice;
                 String strFuelPrice;
                 long n = 0L;
-                fuelPrice = (BigDecimal) wexReqPayAtPump.getFuelPrice().get(0);
-                strFuelPrice = String.valueOf(fuelPrice);
-                if(null != strFuelPrice && strFuelPrice.contains(".")){
-                    decimalPart = strFuelPrice.split("\\.");
-                    if(decimalPart[1].length() > 0)
-                        fuelPrice = fuelPrice.movePointRight(decimalPart[1].length());
+                if(wexReqPayAtPump.getFuelPrice().size() > 0){
+                    fuelPrice = (BigDecimal) wexReqPayAtPump.getFuelPrice().get(0);
+                    strFuelPrice = String.valueOf(fuelPrice);
+                    if(null != strFuelPrice && strFuelPrice.contains(".")){
+                        decimalPart = strFuelPrice.split("\\.");
+                        if(decimalPart[1].length() > 0)
+                            fuelPrice = fuelPrice.movePointRight(decimalPart[1].length());
+                    }
+                    n = fuelPrice.longValueExact();
                 }
-                n = fuelPrice.longValueExact();
                 transaction.setFuelPrice(n);
             }
-            if (wexReqPayAtPump.getFuelProdCode() != null) {
-                if(wexReqPayAtPump.getFuelProdCode().get(0) != null)
+            if (wexReqPayAtPump.getFuelProdCode() != null && 
+                    wexReqPayAtPump.getFuelProdCode().size() > 0 && wexReqPayAtPump.getFuelProdCode().get(0) != null){
                     transaction.setFuelProdCode(wexReqPayAtPump.getFuelProdCode().get(0).toString());
             }
 
             //added lines for new fields mapping starts here
-            if (wexReqPayAtPump.getNonFuelProdCode() != null) {
-                if(wexReqPayAtPump.getNonFuelProdCode().get(0) != null)
+            if (wexReqPayAtPump.getNonFuelProdCode() != null && wexReqPayAtPump.getNonFuelProdCode().size() > 0 
+                    && wexReqPayAtPump.getNonFuelProdCode().get(0) != null){
                     transaction.setNonFuelProdCode(wexReqPayAtPump.getNonFuelProdCode().get(0).toString());
             }
-            if (wexReqPayAtPump.getCATFlag() != null) {
+            if (wexReqPayAtPump.getCATFlag() != null && wexReqPayAtPump.getCATFlag().size() > 0) {
                 transaction.setCatFlag(wexReqPayAtPump.getCATFlag().get(0));
             }
             if (wexReqPayAtPump.getPricePerUnit() != null) {
                 transaction.setPricePerUnit(wexReqPayAtPump.getPricePerUnit());
             }
-            if (wexReqPayAtPump.getFuelDollarAmount() != null) {
+            if (wexReqPayAtPump.getFuelDollarAmount() != null && wexReqPayAtPump.getFuelDollarAmount().size() > 0) {
                 transaction.setFuelDollerAmount(wexReqPayAtPump.getFuelDollarAmount().get(0));
             }
             //added lines for new fields mapping ends here
@@ -575,20 +589,24 @@ public class Authorizer {
             if (wexReqPayAtPump.getProdDetailCount() != null) {
                 transaction.setProdDetailCount(wexReqPayAtPump.getProdDetailCount().toString());
             }
-            transaction.setServiceCode(wexReqPayAtPump.getServiceCode().get(0));
+            
+            if(wexReqPayAtPump.getServiceCode() != null && wexReqPayAtPump.getServiceCode().size() > 0)
+                transaction.setServiceCode(wexReqPayAtPump.getServiceCode().get(0));
 
             if (wexReqPayAtPump.getNonFuelAmount() != null) {
-                BigDecimal nonFuelPrice;
+                BigDecimal nonFuelPrice = new BigDecimal("0");
                 String strNonFuelPrice;
                 long n = 0L;
-                nonFuelPrice = (BigDecimal) wexReqPayAtPump.getNonFuelAmount().get(0);
-                strNonFuelPrice = String.valueOf(nonFuelPrice);
-                if(null != strNonFuelPrice && strNonFuelPrice.contains(".")){
-                    decimalPart = String.valueOf(nonFuelPrice).split("\\.");
-                    if (decimalPart[1] != null && decimalPart[1].length() > 0) {
-                        nonFuelPrice = nonFuelPrice.movePointRight(decimalPart[1].length());
+                if(wexReqPayAtPump.getNonFuelAmount().size() > 0){
+                    nonFuelPrice = (BigDecimal) wexReqPayAtPump.getNonFuelAmount().get(0);
+                    strNonFuelPrice = String.valueOf(nonFuelPrice);
+                    if(null != strNonFuelPrice && strNonFuelPrice.contains(".")){
+                        decimalPart = String.valueOf(nonFuelPrice).split("\\.");
+                        if (decimalPart[1] != null && decimalPart[1].length() > 0) {
+                            nonFuelPrice = nonFuelPrice.movePointRight(decimalPart[1].length());
+                        }
+                        n = nonFuelPrice.longValueExact();
                     }
-                    n = nonFuelPrice.longValueExact();
                 }
                 transaction.setNonFuelAmount(nonFuelPrice);
             }
@@ -602,33 +620,37 @@ public class Authorizer {
             }
             
             if (wexReqPayAtPump.getQuantity() != null) {
-              BigDecimal quantity;
+              BigDecimal quantity = new BigDecimal("0");
               String strQuantity;
               long n = 0L;
-              quantity = (BigDecimal) wexReqPayAtPump.getQuantity().get(0);
-              strQuantity = String.valueOf(quantity);
-              if(null != strQuantity && strQuantity.contains(".")){
-                  decimalPart = String.valueOf(quantity).split("\\.");
-                  if (decimalPart[1] != null && decimalPart[1].length() > 0) {
-                      quantity = quantity.movePointRight(decimalPart[1].length());
-                  }
-                  n = quantity.longValueExact();
+              if(wexReqPayAtPump.getQuantity().size() > 0){
+                quantity = (BigDecimal) wexReqPayAtPump.getQuantity().get(0);
+                strQuantity = String.valueOf(quantity);
+                if(null != strQuantity && strQuantity.contains(".")){
+                    decimalPart = String.valueOf(quantity).split("\\.");
+                    if (decimalPart[1] != null && decimalPart[1].length() > 0) {
+                        quantity = quantity.movePointRight(decimalPart[1].length());
+                    }
+                    n = quantity.longValueExact();
+                }
               }
               transaction.setQuantity(quantity);
             }
              
             if (wexReqPayAtPump.getNonFuelQty() != null) {
-              BigDecimal nonFuelQty;
+              BigDecimal nonFuelQty = new BigDecimal("0");
               String strNonFuelQty;
               long n = 0L;
-              nonFuelQty = (BigDecimal) wexReqPayAtPump.getNonFuelQty().get(0);
-              strNonFuelQty = String.valueOf(nonFuelQty);
-              if(null != strNonFuelQty && strNonFuelQty.contains(".")){
-                  decimalPart = String.valueOf(nonFuelQty).split("\\.");
-                  if (decimalPart[1] != null && decimalPart[1].length() > 0) {
-                      nonFuelQty = nonFuelQty.movePointRight(decimalPart[1].length());
-                  }
-                  n = nonFuelQty.longValueExact();
+              if(wexReqPayAtPump.getNonFuelQty().size() > 0){
+                nonFuelQty = (BigDecimal) wexReqPayAtPump.getNonFuelQty().get(0);
+                strNonFuelQty = String.valueOf(nonFuelQty);
+                if(null != strNonFuelQty && strNonFuelQty.contains(".")){
+                    decimalPart = String.valueOf(nonFuelQty).split("\\.");
+                    if (decimalPart[1] != null && decimalPart[1].length() > 0) {
+                        nonFuelQty = nonFuelQty.movePointRight(decimalPart[1].length());
+                    }
+                    n = nonFuelQty.longValueExact();
+                }
               }
               transaction.setNonFuelqty(nonFuelQty);
             }

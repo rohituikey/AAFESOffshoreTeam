@@ -87,7 +87,7 @@ public class WEXProcessor {
         String responseStr = "";
         NBSClient clientObj = new NBSClient();
         responseStr = clientObj.generateResponse("APPROVED");
-        t.setResponseType(responseStr);
+        if(responseStr != null) t.setResponseType(responseStr.trim());
         LOG.info("Method " + sMethodName + " ended." + "in  Class Name " + CLASS_NAME);
         return t;
     }

@@ -62,15 +62,27 @@ public class WEXValidator {
     public boolean validateRefundRequest(Transaction t) {
         sMethodName = "validateRefundRequest";
         LOG.info("Method " + sMethodName + " started." + "in  Class Name " + CLASS_NAME);
-        boolean localBoolVar = false;
-        if(t.getFuelProdCode() != null || 
-                Long.valueOf(String.valueOf(t.getQtyPumped())) != null ||
-                Long.valueOf(String.valueOf(t.getPricePerUnit())) != null ||
-                Long.valueOf(String.valueOf(t.getFuelPrice())) != null || 
-                Long.valueOf(String.valueOf(t.getFuelDollerAmount())) != null){
-            this.buildErrorResponse(t, "REFUND_REQUEST_CONTAINS_FUEL_CODES", "REFUND_REQUEST_CONTAINS_FUEL_CODES");
+        boolean localBoolVar = true;
+        
+        if(t.getFuelProdCode() != null && t.getFuelProdCode().trim().length() > 0){
+            LOG.error("FuelProdCode( should not present in WEX refund request");
             localBoolVar = false;
-        } else{
+        } else if(localBoolVar && Long.valueOf(String.valueOf(t.getQtyPumped())) != null && t.getQtyPumped() > 0){
+            LOG.error("QtyPumped should not present in WEX refund request");
+            localBoolVar = false;
+        } else if(localBoolVar && t.getPricePerUnit() != null && Long.valueOf(String.valueOf(t.getPricePerUnit())) != null){
+            LOG.error("PricePerUnit should not present in WEX refund request");
+            localBoolVar = false;
+        } else if(localBoolVar && Long.valueOf(String.valueOf(t.getFuelPrice())) != null && t.getFuelPrice() > 0){
+            LOG.error("FuelPrice should not present in WEX refund request");
+            localBoolVar = false;
+        } else if(localBoolVar && t.getFuelDollerAmount() != null && Long.valueOf(String.valueOf(t.getFuelDollerAmount())) != null){
+            LOG.error("FuelDollerAmount should not present in WEX refund request");
+            localBoolVar = false;
+        }
+        
+        if(!localBoolVar) this.buildErrorResponse(t, "REFUND_REQUEST_CONTAINS_FUEL_CODES", "REFUND_REQUEST_CONTAINS_FUEL_CODES");
+         else{
             LOG.info("Method " + sMethodName + " ended." + "in  Class Name " + CLASS_NAME);
             localBoolVar =  true;
         }

@@ -48,6 +48,9 @@ public class WexGateway extends Gateway {
                     case RequestType.SALE:
                         t = wEXProcessor.processSaleRequest(t);
                         break;
+                    case RequestType.REFUND:
+                        t = wEXProcessor.processRefundRequest(t);
+                        break;    
                 }
             } else {
                 t.setResponseType(ResponseType.DECLINED);

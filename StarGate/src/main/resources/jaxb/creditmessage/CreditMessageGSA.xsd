@@ -228,172 +228,181 @@ in Transaction Cancels and/or Refunds. 28-June-2017.-->
                             </xs:element>
                             <xs:element name="WEXRequestData" minOccurs="0" maxOccurs="1">
                                 <xs:complexType>
-                                    <xs:sequence minOccurs="1" maxOccurs="1">
-                                        <xs:element name="CardSeqNumber" minOccurs="0" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:length value="5"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="ServiceCode" minOccurs="1" maxOccurs="2">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:enumeration value="S"/>
-                                                    <xs:enumeration value="F"/>
-                                                    <xs:enumeration value="O"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="CATFlag" minOccurs="1" maxOccurs="2">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:enumeration value="0"/>
-                                                    <xs:enumeration value="1"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="DriverId" minOccurs="1" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:minLength value="1"/>
-                                                    <xs:maxLength value="10"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="Odometer" minOccurs="1" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:minLength value="1"/>
-                                                    <xs:maxLength value="9"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="VehicleId" minOccurs="0" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:minLength value="1"/>
-                                                    <xs:maxLength value="9"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="RestrictCode" minOccurs="0" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:length value="2"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="ProdDetailCount" minOccurs="1" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:integer">
-                                                    <xs:totalDigits value="1"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="FuelProdCode" minOccurs="0" maxOccurs="2"> 
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:integer">
-                                                    <xs:totalDigits value="3"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="QtyPumped" minOccurs="0" maxOccurs="2">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:decimal" >
-                                                    <xs:fractionDigits value="3"/>    
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="FuelPrice" minOccurs="0" maxOccurs="2">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:decimal">
-                                                    <xs:fractionDigits value="3"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="PricePerUnit" minOccurs="0" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:decimal">
-                                                    <xs:fractionDigits value="3"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="Quantity" minOccurs="0" maxOccurs="2">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:decimal">
-                                                    <xs:fractionDigits value="3"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="FuelDollarAmount" minOccurs="0" maxOccurs="2">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:decimal">
-                                                    <xs:fractionDigits value="3"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="NonFuelQty" minOccurs="0" maxOccurs="5">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:decimal">
-                                                    <xs:fractionDigits value="2"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="NonFuelProdCode" minOccurs="0" maxOccurs="5">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:integer">
-                                                    <xs:totalDigits value="3"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="NonFuelAmount" minOccurs="0" maxOccurs="5">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:decimal">
-                                                    <xs:fractionDigits value="2"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="LicenseNumber" minOccurs="0" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:minLength value="0"/>
-                                                    <xs:maxLength value="9"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="DeptNumber" minOccurs="0" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:integer">
-                                                    <xs:totalDigits value="12"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="JobValueNumber" minOccurs="0" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:minLength value="0"/>
-                                                    <xs:maxLength value="12"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="DataNumber" minOccurs="0" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:minLength value="0"/>
-                                                    <xs:maxLength value="12"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                        <xs:element name="UserId" minOccurs="0" maxOccurs="1">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:minLength value="0"/>
-                                                    <xs:maxLength value="12"/>
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:element>
-                                    </xs:sequence>
+                                    <!--xs:choice minOccurs="1" maxOccurs="1"-->
+                                        <xs:sequence minOccurs="1" maxOccurs="1">
+                                            <xs:element name="CardSeqNumber" minOccurs="0" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:string">
+                                                        <xs:length value="5"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="ServiceCode" minOccurs="1" maxOccurs="2">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:string">
+                                                        <xs:enumeration value="S"/>
+                                                        <xs:enumeration value="F"/>
+                                                        <xs:enumeration value="O"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="CATFlag" minOccurs="1" maxOccurs="2">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:string">
+                                                        <xs:enumeration value="0"/>
+                                                        <xs:enumeration value="1"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="DriverId" minOccurs="1" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:string">
+                                                        <xs:minLength value="1"/>
+                                                        <xs:maxLength value="10"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="Odometer" minOccurs="1" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:string">
+                                                        <xs:minLength value="1"/>
+                                                        <xs:maxLength value="9"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="VehicleId" minOccurs="0" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:string">
+                                                        <xs:minLength value="1"/>
+                                                        <xs:maxLength value="9"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="RestrictCode" minOccurs="0" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:string">
+                                                        <xs:length value="2"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="ProdDetailCount" minOccurs="1" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:integer">
+                                                        <xs:totalDigits value="1"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="FuelProdCode" minOccurs="0" maxOccurs="2"> 
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:integer">
+                                                        <xs:totalDigits value="3"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="QtyPumped" minOccurs="0" maxOccurs="2">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:decimal" >
+                                                        <xs:fractionDigits value="3"/>    
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="FuelPrice" minOccurs="0" maxOccurs="2">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:decimal">
+                                                        <xs:fractionDigits value="3"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="PricePerUnit" minOccurs="0" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:decimal">
+                                                        <xs:fractionDigits value="3"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="Quantity" minOccurs="0" maxOccurs="2">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:decimal">
+                                                        <xs:fractionDigits value="3"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="FuelDollarAmount" minOccurs="0" maxOccurs="2">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:decimal">
+                                                        <xs:fractionDigits value="3"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="NonFuelPricePerUnit" minOccurs="0" maxOccurs="5">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:decimal">
+                                                        <xs:fractionDigits value="2"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="NonFuelQty" minOccurs="0" maxOccurs="5">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:decimal">
+                                                        <xs:fractionDigits value="2"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="NonFuelProdCode" minOccurs="0" maxOccurs="5">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:integer">
+                                                        <xs:totalDigits value="3"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="NonFuelAmount" minOccurs="0" maxOccurs="5">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:decimal">
+                                                        <xs:fractionDigits value="2"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="LicenseNumber" minOccurs="0" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:string">
+                                                        <xs:minLength value="0"/>
+                                                        <xs:maxLength value="9"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="DeptNumber" minOccurs="0" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:integer">
+                                                        <xs:totalDigits value="12"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="JobValueNumber" minOccurs="0" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:string">
+                                                        <xs:minLength value="0"/>
+                                                        <xs:maxLength value="12"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="DataNumber" minOccurs="0" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:string">
+                                                        <xs:minLength value="0"/>
+                                                        <xs:maxLength value="12"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="UserId" minOccurs="0" maxOccurs="1">
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:string">
+                                                        <xs:minLength value="0"/>
+                                                        <xs:maxLength value="12"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:element>
+                                        </xs:sequence>
+                                    <!--/xs:choice-->
                                 </xs:complexType>
                             </xs:element>
                             <xs:element name="EssoLoadAmt" minOccurs="0" maxOccurs="1">

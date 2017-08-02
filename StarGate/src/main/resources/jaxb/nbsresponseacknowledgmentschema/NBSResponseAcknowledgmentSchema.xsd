@@ -1,6 +1,6 @@
-<xs:schema xmlns="http://www.aafes.com/nbsresponse" 
-           targetNamespace="http://www.aafes.com/nbsresponse" 
-           xmlns:tokenvalidator="http://www.aafes.com/nbsresponse" 
+<xs:schema xmlns="http://www.aafes.com/nbsresponseacknowledgmentschema" 
+           targetNamespace="http://www.aafes.com/nbsresponseacknowledgmentschema" 
+           xmlns:tokenvalidator="http://www.aafes.com/nbsresponseacknowledgmentschema" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            elementFormDefault="qualified" > 
   <xs:element name="ResponseAcknowlegment">

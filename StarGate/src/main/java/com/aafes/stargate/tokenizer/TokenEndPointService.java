@@ -66,7 +66,7 @@ public class TokenEndPointService {
 
         // REMOVE
         if (tokenEndpoint == null) {
-            tokenEndpoint = "http://localhost:8686/tokenizer/1/tokenmessage";
+            tokenEndpoint = "http://localhost:8080/tokenizer/1/tokenmessage";
         }
         Client client = ClientBuilder.newBuilder().build();
         WebTarget target = client.target(tokenEndpoint);

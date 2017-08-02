@@ -53,15 +53,13 @@ public class WEXProcessor {
             String responseStr = "";
             NBSClient clientObj = new NBSClient();
             responseStr = clientObj.generateResponse("APPROVED");
-            t.setResponseType(responseStr);
-            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
-                t.setReasonCode("100");
+            t.setResponseType(responseStr.trim());
+            if (t.getResponseType().equalsIgnoreCase("APPROVED")) {
+                t.setReasonCode(configurator.get("SUCCESS"));
                 t.setDescriptionField(ResponseType.APPROVED);
-            }
-            else
-            {
- 
-            t.setDescriptionField(ResponseType.DECLINED);
+            } else {
+
+                t.setDescriptionField(ResponseType.DECLINED);
             }
             LOG.info("WEXProcessor.preAuthProcess mothod ended");
             return t;
@@ -69,6 +67,7 @@ public class WEXProcessor {
             throw e;
         }
     }
+
     public Transaction finalAuthProcess(Transaction t) {
         LOG.info("WEXProcessor.finalAuthProcess mothod started");
         try {
@@ -80,10 +79,13 @@ public class WEXProcessor {
             String responseStr = "";
             NBSClient clientObj = new NBSClient();
             responseStr = clientObj.generateResponse("APPROVED");
-            t.setResponseType(responseStr);
-            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
-                t.setReasonCode("100");
+            t.setResponseType(responseStr.trim());
+            if (t.getResponseType().equalsIgnoreCase("APPROVED")) {
+                t.setReasonCode(configurator.get("SUCCESS"));
                 t.setDescriptionField(ResponseType.APPROVED);
+            } else {
+
+                t.setDescriptionField(ResponseType.DECLINED);
             }
             LOG.info("WEXProcessor.finalAuthProcess mothod ended");
             return t;

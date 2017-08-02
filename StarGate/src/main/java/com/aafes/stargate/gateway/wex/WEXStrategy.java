@@ -47,25 +47,29 @@ public class WEXStrategy extends BaseStrategy {
     Transaction storedTran = null;
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(WEXStrategy.class.getSimpleName());
+     private Transaction t;
+    
 
     @Override
-    public Transaction processRequest(Transaction t) {
+    public Transaction processRequest(Transaction transaction) {
         LOG.info("WEXStrategy.processRequest Entry ... " + t.getRrn());
+        t=transaction;
         try {
 
-            boolean retailFieldsValid = this.validateTransactions(t);
-            LOG.info("WEXFieldsValid " + retailFieldsValid + "..." + t.getRrn());
+            boolean retailFieldsValid = this.validateTransactions(transaction);
+            LOG.info("WEXFieldsValid " + retailFieldsValid + "..." + transaction.getRrn());
 
             if (!retailFieldsValid) {
                 LOG.info("Invalid fields");
                 return t;
             }
-            Gateway gateway = super.pickGateway(t);
+            Gateway gateway = super.pickGateway(transaction);
             if (gateway != null) {
-                t = gateway.processMessage(t);
+                t = gateway.processMessage(transaction);
             }
             //added code to settle the final auth transactions
-            if (t.getRequestType() != null && !t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
+            if (t.getRequestType() != null
+                    && (t.getRequestType().equalsIgnoreCase(RequestType.SALE) || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))
                     && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                 LOG.info("WEXStrategy.processRequest settlements process");
                 getToken(t);
@@ -84,12 +88,17 @@ public class WEXStrategy extends BaseStrategy {
         return t;
     }
 
-    private boolean validateTransactions(Transaction t) throws AuthorizerException {
+    private boolean validateTransactions(Transaction t) {
         LOG.info("Validating fields in WEXtrategy");
         String accountNumber = "";
         boolean errFlg = false;
-        try {
-            if (t.getAccount() == null || t.getAccount().trim().isEmpty()) {
+        if (t.getAccount() == null || t.getAccount().trim().isEmpty()) {
+            errFlg = true;
+        }
+
+        if (!errFlg) {
+            accountNumber = t.getAccount().substring(0, 5);
+            if (accountNumber.equals("690046") || accountNumber.equals("707138")) {
                 errFlg = true;
             }
 
@@ -128,25 +137,25 @@ public class WEXStrategy extends BaseStrategy {
             throw e;
         }
 
-        if(errFlg){
+        if (errFlg) {
             this.buildErrorResponse(t, "INVALID_ACCOUNT_NUMBER", "INVALID CARD NUMBER FOR WEX");
             return false;
         }
 
         //PREAUTH/FINAL_AUTH request validation - start
-        if (t.getRequestType() != null && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH) 
-                || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))) 
+        if (t.getRequestType() != null && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)
+                || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))) {
             return wEXValidator.validateForPreAuthAndFinalAuth(t);
-        //PREAUTH/FINAL_AUTH request validation - end
+        } //PREAUTH/FINAL_AUTH request validation - end
         //sale request validation - start
-        else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.SALE))
+        else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.SALE)) {
             return wEXValidator.validateSale(t);
-        //sale request validation - end
+        } //sale request validation - end
         // ADDED FOR REFUND REQUEST VALIDATION - START
-        else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.REFUND))
+        else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
             return wEXValidator.validateRefundRequest(t);
-        // ADDED FOR REFUND REQUEST VALIDATION - END
-        else{
+        } // ADDED FOR REFUND REQUEST VALIDATION - END
+        else {
             LOG.error("RequestType value is null");
             this.buildErrorResponse(t, "INVALID_REQUEST_TYPE", "INVALID_REQUEST_TYPE");
         }

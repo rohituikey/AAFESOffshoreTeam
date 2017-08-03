@@ -6,6 +6,7 @@
 package com.aafes.stargate.gateway.wex;
 
 import com.aafes.nbslogonrequestschema.NbsLogonRequest;
+import com.aafes.nbsresponse.NBSResponse;
 import com.aafes.nbsresponseacknowledgmentschema.ResponseAcknowlegment;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.wex.simulator.NBSClient;
@@ -119,7 +120,8 @@ public class WEXProcessor {
         LOG.info("Method " + sMethodName + " started." + "in  Class Name " + CLASS_NAME);
         String requestStr = "", responseStr = "", logOffRequest = "";
         String[] seperatedResponseArr;
-        ResponseAcknowlegment responseAcknowlegmentObj1, responseAcknowlegmentObj2;
+        ResponseAcknowlegment responseAcknowlegmentObj1;
+        NBSResponse nBSResponse;
         
         requestStr = nbsRequestGeneratorObj.generateLogOnPacketRequest(wexRequestResponseMappingObj.RequestMap(t));
         
@@ -129,11 +131,11 @@ public class WEXProcessor {
             seperatedResponseArr = nbsRequestGeneratorObj.seperateResponse(responseStr);
             if(seperatedResponseArr != null && seperatedResponseArr.length > 0){
                 responseAcknowlegmentObj1 = nbsRequestGeneratorObj.unmarshalAcknowledgment(seperatedResponseArr[0]);
-                responseAcknowlegmentObj2 = nbsRequestGeneratorObj.unmarshalAcknowledgment(seperatedResponseArr[1]);
+                nBSResponse = nbsRequestGeneratorObj.unmarshalNbsResponse(seperatedResponseArr[1]);
                 
-                if(responseAcknowlegmentObj2 != null){
-                    t.setResponseType(responseAcknowlegmentObj2.getResponseType());
-                    t.setReasonCode(responseAcknowlegmentObj2.getReasonCode());
+                if(nBSResponse != null){
+                    t.setResponseType(nBSResponse.getAuthResponse().getMessage());
+                    t.setReasonCode(nBSResponse.getAuthCode().toString());
                 }
             }
             

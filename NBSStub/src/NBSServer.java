@@ -51,7 +51,9 @@ public class NBSServer {
             LOG.log(Level.INFO, "sending response as {0}", response);
             writeResponse.write(response+ " \r");
             writeResponse.flush();
-            connectionSocket.close();
+            
+                connectionSocket.close();
+            
         } catch (IOException ex) {
             Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
         }

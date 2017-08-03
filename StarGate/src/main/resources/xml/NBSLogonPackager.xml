@@ -86,6 +86,11 @@ and open the template in the editor.
         length="25"
         name="CardSpecificDataAmount"
         class="org.jpos.iso.IFA_LLLCHAR"/>
+    <isofield
+        id="115"
+        length="25"
+        name="CardSpecificDataRecieptNumber"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
 </isopackager>
   
   

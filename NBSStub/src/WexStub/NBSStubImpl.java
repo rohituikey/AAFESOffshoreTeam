@@ -83,8 +83,8 @@ public class NBSStubImpl implements NBSStub {
 
         isoMsg.set(12, "01");
         isoMsg.set(13, "100");
-        isoMsg.set(14, "25");
-        isoMsg.set(15, "Message");
+        isoMsg.set(14, "00");
+        isoMsg.set(15, "Approved");
         isoMsg.set(16, "cardType");
         isoMsg.set(17, "01");
         isoMsg.set(18, "4host");

@@ -152,35 +152,34 @@
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
-                                        <xs:element name="ProductDetails">
-                                            <xs:complexType>
-                                                <xs:sequence>
-                                                    <xs:element name="maxQuantity">
-                                                        <xs:simpleType>
-                                                            <xs:restriction base="xs:decimal">
-                                                                <xs:fractionDigits value="5" />
-                                                            </xs:restriction>
-                                                        </xs:simpleType>
-                                                    </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="ProductDetails">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="maxQuantity">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:decimal">
+                                                    <xs:fractionDigits value="5" />
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
 													
-                                                    <xs:element name="productCode">
-                                                        <xs:simpleType>
-                                                            <xs:restriction base="xs:integer">
-                                                                <xs:totalDigits value="3"/>
-                                                            </xs:restriction>
-                                                        </xs:simpleType>
-                                                    </xs:element>
+                                        <xs:element name="productCode">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:integer">
+                                                    <xs:totalDigits value="3"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
 													
-                                                    <xs:element name="maxAmount">
-                                                        <xs:simpleType>
-                                                            <xs:restriction base="xs:decimal">
-                                                                <xs:fractionDigits value="2" />
-                                                            </xs:restriction>
-                                                        </xs:simpleType>
-                                                    </xs:element>
-													
-                                                </xs:sequence>
-                                            </xs:complexType>
+                                        <xs:element name="maxAmount">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:decimal">
+                                                    <xs:fractionDigits value="2" />
+                                                </xs:restriction>
+                                            </xs:simpleType>
                                         </xs:element>
                                     </xs:sequence>
                                 </xs:complexType>

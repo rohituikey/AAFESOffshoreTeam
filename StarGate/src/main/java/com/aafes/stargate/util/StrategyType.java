@@ -19,7 +19,7 @@ public final class StrategyType {
     public static final String ECOMM = "Ecomm";
     public static final String MPG = "mpg";
     public static final String DECA = "Deca";
-    public static final String WEX = "Wex";
+    public static final String WEX = "WEX";
     
     
 }

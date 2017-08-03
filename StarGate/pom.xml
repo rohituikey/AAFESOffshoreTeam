@@ -42,6 +42,11 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>org.jpos</groupId>
+            <artifactId>jpos</artifactId>
+            <version>1.9.8</version>
+        </dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
@@ -51,6 +56,11 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.21</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sleepycat</groupId>
+            <artifactId>je</artifactId>
+            <version>4.0.92</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -141,7 +151,7 @@
             <version>7.0</version>
             <scope>provided</scope>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.9</version>
@@ -157,13 +167,12 @@
             <artifactId>resteasy-jackson-provider</artifactId>
             <version>2.3.4.Final</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>com.offbytwo.keyczar</groupId>
             <artifactId>keyczar</artifactId>
             <version>0.71g</version>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -225,8 +234,8 @@
                         <exclude>com/firstdata/cmpwsapi/schemas/cmpmsg/**/*</exclude>
                         <exclude>com/aafes/stargate/tokenizer/**/*</exclude>
                         <exclude>com/svs/svsxml/beans/**/*</exclude>
-                         <exclude>com/svs/svsxml/service/**/*</exclude>
-                          <exclude>com/aafes/stargate/gateway/svs/SVSGatewayProcessor.*</exclude>
+                        <exclude>com/svs/svsxml/service/**/*</exclude>
+                        <exclude>com/aafes/stargate/gateway/svs/SVSGatewayProcessor.*</exclude>
                     </excludes><!--
                    -->
                 </configuration>
@@ -336,7 +345,7 @@
                         </configuration>
                         <id>jaxb-generate-tokenmessage</id>
                     </execution>
-                     <execution>
+                    <execution>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -347,6 +356,42 @@
                             <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-tokenvalidator.episode</episodeFile>
                         </configuration>
                         <id>jaxb-generate-tokenvalidator</id>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/nbslogonrequestschema/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-nbslogonrequestschema.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-nbslogonrequestschema</id>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/nbsresponseacknowledgmentschema/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-nbsresponseacknowledgmentschema.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-nbsresponseacknowledgmentschema</id>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/nbsresponse/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-nbsresponse.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-nbsresponse</id>
                     </execution>
                 </executions>
                 <configuration>
@@ -394,7 +439,7 @@
                         <id>wsimport-generate-clsCustInfo.asmx</id>
                         <phase>generate-sources</phase>
                     </execution>
-                       <execution>
+                    <execution>
                         <goals>
                             <goal>wsimport</goal>
                         </goals>
@@ -403,14 +448,14 @@
                                 <wsdlFile>order.wsdl</wsdlFile>
                             </wsdlFiles>
                             <packageName></packageName>
-<!--                            <wsdlLocation>file:${project.basedir}/src/wsdl/order.wsdl</wsdlLocation>-->
-                        <wsdlLocation>https://merchanttest.ctexmloma.compass-xml.com/cmpwsapi/services/order.wsdl</wsdlLocation>
+                            <!--                            <wsdlLocation>file:${project.basedir}/src/wsdl/order.wsdl</wsdlLocation>-->
+                            <wsdlLocation>https://merchanttest.ctexmloma.compass-xml.com/cmpwsapi/services/order.wsdl</wsdlLocation>
                             <staleFile>${project.build.directory}/jaxws/stale/order.stale</staleFile>
                         </configuration>
                         <id>wsimport-generate-order</id>
                         <phase>generate-sources</phase>
                     </execution>
-                      <execution>
+                    <execution>
                         <goals>
                             <goal>wsimport</goal>
                         </goals>
@@ -419,8 +464,8 @@
                                 <wsdlFile>SVSXMLWay.wsdl</wsdlFile>
                             </wsdlFiles>
                             <packageName></packageName>
-<!--                            <wsdlLocation>file:${project.basedir}/src/wsdl/SVSXMLWay.wsdl</wsdlLocation>-->
-                        <wsdlLocation>https://webservices-cert.storedvalue.com/svsxml/v1/services/SVSXMLWay/wsdl/SVSXMLWay.wsdl</wsdlLocation>
+                            <!--                            <wsdlLocation>file:${project.basedir}/src/wsdl/SVSXMLWay.wsdl</wsdlLocation>-->
+                            <wsdlLocation>https://webservices-cert.storedvalue.com/svsxml/v1/services/SVSXMLWay/wsdl/SVSXMLWay.wsdl</wsdlLocation>
                             <staleFile>${project.build.directory}/jaxws/stale/SVSXMLWay.stale</staleFile>
                         </configuration>
                         <id>wsimport-generate-SVSXMLWay</id>

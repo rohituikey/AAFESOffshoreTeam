@@ -79,7 +79,7 @@ public class GatewayFactory {
                     return gateway;
                     
                  case MediaType.WEX:
-                     gateway=wexGateway;
+                     gateway = wexGateway;
                      return  gateway;
                 // Add more gateways
             }

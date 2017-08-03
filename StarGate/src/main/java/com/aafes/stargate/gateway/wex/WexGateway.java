@@ -41,10 +41,16 @@ public class WexGateway extends Gateway {
                 switch (requestType) {
                     case RequestType.PREAUTH:
                         t = wEXProcessor.preAuthProcess(t);
+                        break;
                     case RequestType.FINAL_AUTH:
                         t = wEXProcessor.finalAuthProcess(t);
+                        break;
                     case RequestType.SALE:
                         t = wEXProcessor.processSaleRequest(t);
+                        break;
+                    case RequestType.REFUND:
+                        t = wEXProcessor.processRefundRequest(t);
+                        break;    
                 }
             } else {
                 t.setResponseType(ResponseType.DECLINED);

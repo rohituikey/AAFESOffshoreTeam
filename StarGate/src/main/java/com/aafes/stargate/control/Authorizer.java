@@ -14,10 +14,10 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.fdms.FDMSStub;
 import com.aafes.stargate.tokenizer.TokenBusinessService;
-import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import com.aafes.stargate.util.StrategyType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -81,7 +81,7 @@ public class Authorizer {
             /**
              * Remove if condition after Junit test case modified for Authorizer
              */
-            
+
             if (tokenBusinessService != null
                     && t.getAccountTypeType() != null
                     && t.getAccountTypeType().equalsIgnoreCase(AccountTypeType.TOKEN.value())
@@ -110,7 +110,17 @@ public class Authorizer {
                 } else {
                     storedTran = null;
                 }
-            } else {
+            }else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia()) && RequestType.REFUND.equalsIgnoreCase(t.getRequestType())){
+                LOG.info("Wex Refund........");
+                storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.REFUND);
+
+                if (storedTran != null && storedTran.getResponseType() != null 
+                        && storedTran.getResponseType().trim().equalsIgnoreCase(ResponseType.APPROVED)) {
+                    storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REFUNDED"));
+                    storedTran.setResponseType(ResponseType.DECLINED);
+                    storedTran.setDescriptionField("TRANSACTION_ALREADY_REFUNDED");
+                } else  storedTran = null;
+            }else {
                 storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getRequestType());
             }
 
@@ -161,6 +171,13 @@ public class Authorizer {
                             && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                         LOG.info("Saving and updating transaction.....");
                         tranRepository.saveAndUpdate(t, authTranCancel);
+                    } else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia())
+                            && ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())){
+                            LOG.error("Transaction " + t.getResponseType());
+//                            t.setReasonCode(configurator.get(t.getReasonCode()));
+//                            t.setDescriptionField(t.getDescriptionField());
+//                            t.setResponseType(ResponseType.DECLINED);
+                            mapResponse(t, cm);
                     } else {
                         LOG.info("Saving transaction....." + t.getRrn());
                         encryptValues(t);
@@ -283,13 +300,15 @@ public class Authorizer {
                 t.setReasonCode("100");
                 t.setResponseType(ResponseType.APPROVED);
             }
-
-        } else {
-
-            LOG.info("Auth request.......");
-        }
+        } 
+        /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - start */
+        else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.REFUND)){
+            LOG.info(RequestType.REFUND + " request : " + t.getRrn());
+            authTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.FINAL_AUTH);
+            if (authTran == null) throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_REFUND");
+       }
+        /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - end */
         return authTran;
-
     }
 
     private void encryptValues(Transaction t) {
@@ -334,10 +353,11 @@ public class Authorizer {
     // Map the inbound Message to a Transaction.
     private Transaction mapRequest(Transaction transaction, Message requestMessage) {
         LOG.info("Authorizer.mapRequest method started");
+        String[] decimalPart;
         transaction.setRequestXmlDateTime(this.getSystemDateTime());
 
         Header header = requestMessage.getHeader();
-        
+
         // Mapping Header Fields
         if (header.getIdentityUUID() != null) {
             transaction.setIdentityUuid(header.getIdentityUUID());
@@ -485,7 +505,7 @@ public class Authorizer {
 //            long n = essoAmt.longValueExact();
 //            transaction.setEssoLoadAmount(n);
 //        }
-//Uncommented from 502 to 551 and modified some code
+//Uncommented from 502 to 551 and modified some code for wex
         if (request.getPumpNmbr() != null) {
             transaction.setPumpNmbr(request.getPumpNmbr().toString());
         }
@@ -499,24 +519,60 @@ public class Authorizer {
             }
             if (wexReqPayAtPump.getQtyPumped() != null) {
                 BigDecimal qtyPumped;
-                qtyPumped = (BigDecimal) wexReqPayAtPump.getQtyPumped();
-                qtyPumped = qtyPumped.movePointRight(2);
-                long n = qtyPumped.longValueExact();
+                String strQtyPumped;
+                long n = 0L;
+                if(wexReqPayAtPump.getQtyPumped().size() > 0){
+                    qtyPumped = (BigDecimal) wexReqPayAtPump.getQtyPumped().get(0);
+                    strQtyPumped = String.valueOf(qtyPumped);
+                    if(null != strQtyPumped && strQtyPumped.contains(".")){
+                        decimalPart = strQtyPumped.split("\\.");
+                        if(decimalPart[1] != null && decimalPart[1].length() > 0)
+                            qtyPumped = qtyPumped.movePointRight(decimalPart[1].length());
+                    }
+                    n = qtyPumped.longValueExact();
+                }
                 transaction.setQtyPumped(n);
             }
             if (wexReqPayAtPump.getFuelPrice() != null) {
                 BigDecimal fuelPrice;
-                fuelPrice = (BigDecimal) wexReqPayAtPump.getFuelPrice();
-                fuelPrice = fuelPrice.movePointRight(2);
-                long n = fuelPrice.longValueExact();
+                String strFuelPrice;
+                long n = 0L;
+                if(wexReqPayAtPump.getFuelPrice().size() > 0){
+                    fuelPrice = (BigDecimal) wexReqPayAtPump.getFuelPrice().get(0);
+                    strFuelPrice = String.valueOf(fuelPrice);
+                    if(null != strFuelPrice && strFuelPrice.contains(".")){
+                        decimalPart = strFuelPrice.split("\\.");
+                        if(decimalPart[1].length() > 0)
+                            fuelPrice = fuelPrice.movePointRight(decimalPart[1].length());
+                    }
+                    n = fuelPrice.longValueExact();
+                }
                 transaction.setFuelPrice(n);
             }
-            if (wexReqPayAtPump.getFuelProdCode() != null) {
-                transaction.setFuelProdCode(wexReqPayAtPump.getFuelProdCode().toString());
+            if (wexReqPayAtPump.getFuelProdCode() != null && 
+                    wexReqPayAtPump.getFuelProdCode().size() > 0 && wexReqPayAtPump.getFuelProdCode().get(0) != null){
+                    transaction.setFuelProdCode(wexReqPayAtPump.getFuelProdCode().get(0).toString());
             }
+
+            //added lines for new fields mapping starts here
+            if (wexReqPayAtPump.getNonFuelProdCode() != null && wexReqPayAtPump.getNonFuelProdCode().size() > 0 
+                    && wexReqPayAtPump.getNonFuelProdCode().get(0) != null){
+                    transaction.setNonFuelProdCode(wexReqPayAtPump.getNonFuelProdCode().get(0).toString());
+            }
+            if (wexReqPayAtPump.getCATFlag() != null && wexReqPayAtPump.getCATFlag().size() > 0) {
+                transaction.setCatFlag(wexReqPayAtPump.getCATFlag().get(0));
+            }
+            if (wexReqPayAtPump.getPricePerUnit() != null) {
+                transaction.setPricePerUnit(wexReqPayAtPump.getPricePerUnit());
+            }
+            if (wexReqPayAtPump.getFuelDollarAmount() != null && wexReqPayAtPump.getFuelDollarAmount().size() > 0) {
+                transaction.setFuelDollerAmount(wexReqPayAtPump.getFuelDollarAmount().get(0));
+            }
+            //added lines for new fields mapping ends here
+
 //            if (wexReqPayAtPump.getUnitOfMeas() != null) {
-//                transaction.setUnitOfMeas(wexReqPayAtPump.getUnitOfMeas().toString());
-//            }
+            //                transaction.setUnitOfMeas(wexReqPayAtPump.getUnitOfMeas().toString());
+            //            }
             if (wexReqPayAtPump.getVehicleId() != null) {
                 transaction.setVehicleId(wexReqPayAtPump.getVehicleId().toString());
             }
@@ -533,7 +589,71 @@ public class Authorizer {
             if (wexReqPayAtPump.getProdDetailCount() != null) {
                 transaction.setProdDetailCount(wexReqPayAtPump.getProdDetailCount().toString());
             }
-            transaction.setServiceCode(wexReqPayAtPump.getServiceCode().get(0));
+            
+            if(wexReqPayAtPump.getServiceCode() != null && wexReqPayAtPump.getServiceCode().size() > 0)
+                transaction.setServiceCode(wexReqPayAtPump.getServiceCode().get(0));
+
+            if (wexReqPayAtPump.getNonFuelAmount() != null) {
+                BigDecimal nonFuelPrice = new BigDecimal("0");
+                String strNonFuelPrice;
+                long n = 0L;
+                if(wexReqPayAtPump.getNonFuelAmount().size() > 0){
+                    nonFuelPrice = (BigDecimal) wexReqPayAtPump.getNonFuelAmount().get(0);
+                    strNonFuelPrice = String.valueOf(nonFuelPrice);
+                    if(null != strNonFuelPrice && strNonFuelPrice.contains(".")){
+                        decimalPart = String.valueOf(nonFuelPrice).split("\\.");
+                        if (decimalPart[1] != null && decimalPart[1].length() > 0) {
+                            nonFuelPrice = nonFuelPrice.movePointRight(decimalPart[1].length());
+                        }
+                        n = nonFuelPrice.longValueExact();
+                    }
+                }
+                transaction.setNonFuelAmount(nonFuelPrice);
+            }
+            
+            if(wexReqPayAtPump.getOdometer() != null){
+                transaction.setOdoMeter(wexReqPayAtPump.getOdometer());
+            }
+            
+             if(wexReqPayAtPump.getCardSeqNumber()!= null){
+                transaction.setCardSeqNumber(wexReqPayAtPump.getCardSeqNumber());
+            }
+            
+            if (wexReqPayAtPump.getQuantity() != null) {
+              BigDecimal quantity = new BigDecimal("0");
+              String strQuantity;
+              long n = 0L;
+              if(wexReqPayAtPump.getQuantity().size() > 0){
+                quantity = (BigDecimal) wexReqPayAtPump.getQuantity().get(0);
+                strQuantity = String.valueOf(quantity);
+                if(null != strQuantity && strQuantity.contains(".")){
+                    decimalPart = String.valueOf(quantity).split("\\.");
+                    if (decimalPart[1] != null && decimalPart[1].length() > 0) {
+                        quantity = quantity.movePointRight(decimalPart[1].length());
+                    }
+                    n = quantity.longValueExact();
+                }
+              }
+              transaction.setQuantity(quantity);
+            }
+             
+            if (wexReqPayAtPump.getNonFuelQty() != null) {
+              BigDecimal nonFuelQty = new BigDecimal("0");
+              String strNonFuelQty;
+              long n = 0L;
+              if(wexReqPayAtPump.getNonFuelQty().size() > 0){
+                nonFuelQty = (BigDecimal) wexReqPayAtPump.getNonFuelQty().get(0);
+                strNonFuelQty = String.valueOf(nonFuelQty);
+                if(null != strNonFuelQty && strNonFuelQty.contains(".")){
+                    decimalPart = String.valueOf(nonFuelQty).split("\\.");
+                    if (decimalPart[1] != null && decimalPart[1].length() > 0) {
+                        nonFuelQty = nonFuelQty.movePointRight(decimalPart[1].length());
+                    }
+                    n = nonFuelQty.longValueExact();
+                }
+              }
+              transaction.setNonFuelqty(nonFuelQty);
+            }
         }
         //*Uncommented from 502 to 551 and modified some code
         Request.AddressVerificationService addressVerServc = request.getAddressVerificationService();
@@ -698,11 +818,63 @@ public class Authorizer {
                 avr.setBillingZipCode(AddressVerificationResponseType.fromValue(t.getAvsResponseCode()));
                 response.setAddressVerificationResponse(avr);
             }
+
+//            if (request.getWEXRequestData() != null) {
+//                Request.WEXRequestData wexReqPayAtPump = request.getWEXRequestData();
+//                if (transaction.getDriverId() != null) {
+//                    transaction.setDriverId(wexReqPayAtPump.getDriverId().toString());
+//                }
+//                if (wexReqPayAtPump.getRestrictCode() != null) {
+//                    transaction.setRestrictCode(wexReqPayAtPump.getRestrictCode().toString());
+//                }
+//                if (wexReqPayAtPump.getQtyPumped() != null) {
+//                    BigDecimal qtyPumped;
+//                    qtyPumped = (BigDecimal) wexReqPayAtPump.getQtyPumped().get(0);
+//                    decimalPart = String.valueOf(qtyPumped).split("\\.");
+//                    qtyPumped = qtyPumped.movePointRight(decimalPart[1].length());
+//                    long n = qtyPumped.longValueExact();
+//                    transaction.setQtyPumped(n);
+//                }
+//                if (wexReqPayAtPump.getFuelPrice() != null) {
+//                    BigDecimal fuelPrice;
+//                    fuelPrice = (BigDecimal) wexReqPayAtPump.getFuelPrice().get(0);
+//                    decimalPart = String.valueOf(fuelPrice).split("\\.");
+//                    fuelPrice = fuelPrice.movePointRight(decimalPart[1].length());
+//                    long n = fuelPrice.longValueExact();
+//                    transaction.setFuelPrice(n);
+//                }
+//                if (wexReqPayAtPump.getFuelProdCode() != null) {
+//                    transaction.setFuelProdCode(wexReqPayAtPump.getFuelProdCode().toString());
+//                }
+//    //            if (wexReqPayAtPump.getUnitOfMeas() != null) {
+//    //                transaction.setUnitOfMeas(wexReqPayAtPump.getUnitOfMeas().toString());
+//    //            }
+//                if (wexReqPayAtPump.getVehicleId() != null) {
+//                    transaction.setVehicleId(wexReqPayAtPump.getVehicleId().toString());
+//                }
+//                if (wexReqPayAtPump.getLicenseNumber() != null) {
+//                    transaction.setLicenceNumber(wexReqPayAtPump.getLicenseNumber());
+//                }
+//                if (wexReqPayAtPump.getDeptNumber() != null) {
+//                    transaction.setDeptNumber(wexReqPayAtPump.getDeptNumber().toString());
+//                }
+//                transaction.setJobValueNumber(wexReqPayAtPump.getJobValueNumber());
+//                transaction.setDataNumber(wexReqPayAtPump.getDataNumber());
+//                transaction.setUserId(wexReqPayAtPump.getUserId());
+//    //          TODO:  transaction.setContact(request);
+//                if (wexReqPayAtPump.getProdDetailCount() != null) {
+//                    transaction.setProdDetailCount(wexReqPayAtPump.getProdDetailCount().toString());
+//                }
+//                transaction.setServiceCode(wexReqPayAtPump.getServiceCode().get(0));
+//            }
         }
 
         //TODO ::
 //        Response.WEXResponsePayAtPumpData wexRespData = new Response.WEXResponsePayAtPumpData();
 //        wexRespData.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()));
+        //added response maping
+        Response.WEXResponseData wexRespData = new Response.WEXResponseData();
+        wexRespData.setAmtPreAuthorized(BigDecimal.valueOf(t.getAmtPreAuthorized()));
         cm.getResponse().add(response);
         LOG.debug("RRN number in Authorizer.mapResponse method is :" + t.getRrn());
         LOG.info("Authorizer.mapResponse method ended ");

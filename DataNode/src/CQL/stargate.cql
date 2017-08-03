@@ -208,7 +208,7 @@ identityuuid text,
 primary key (tokenid, identityuuid)
 )  with default_time_to_live = 3600;
 
-create table stargate.crosssiterequestusertable(
+create table select * from (
 identityuuid text,
 userid text,
 password text,
@@ -216,3 +216,12 @@ primary key (identityuuid, userid, password)
 );
 
 alter TABLE stargate.transactions ADD origrrn text;
+
+alter TABLE stargate.transactions ADD nonfuelprodcode text;
+alter TABLE stargate.transactions ADD nonfuelamount decimal;
+alter TABLE stargate.transactions ADD fueldolleramount decimal;
+alter TABLE stargate.transactions ADD priceperunit decimal;
+alter TABLE stargate.transactions ADD catflag text;
+alter TABLE stargate.transactions ADD cardseqnumber text;
+alter TABLE stargate.transactions ADD quantity decimal;
+alter TABLE stargate.transactions ADD nonfuelqty decimal;

@@ -87,11 +87,26 @@ public class WEXProcessor {
     }
 
     public Transaction processSaleRequest(Transaction t) {
-        String responseStr = "";
-        NBSClient clientObj = new NBSClient();
-        responseStr = clientObj.generateResponse("APPROVED");
-        t.setResponseType(responseStr);
-        return t;
+
+        LOG.info("WEXProcessor.ProcessSaleRequest mothod started");
+
+        try {
+            String responseStr = "";
+            NBSClient clientObj = new NBSClient();
+            responseStr = clientObj.generateResponse("APPROVED");
+            t.setResponseType(responseStr.trim());
+            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
+                t.setReasonCode(configurator.get("SUCCESS"));
+                t.setDescriptionField(ResponseType.APPROVED);
+            } else {
+                t.setDescriptionField(ResponseType.DECLINED);
+            }
+            t.setResponseType(responseStr);
+            LOG.info("WEXProcessor.ProcessSaleRequest mothod ended");
+            return t;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     public Transaction processRefundRequest(Transaction t) {
@@ -100,7 +115,9 @@ public class WEXProcessor {
         String responseStr = "";
         NBSClient clientObj = new NBSClient();
         responseStr = clientObj.generateResponse("APPROVED");
-        if(responseStr != null) t.setResponseType(responseStr.trim());
+        if (responseStr != null) {
+            t.setResponseType(responseStr.trim());
+        }
         LOG.info("Method " + sMethodName + " ended." + "in  Class Name " + CLASS_NAME);
         return t;
     }

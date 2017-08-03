@@ -72,7 +72,7 @@ public class WEXStrategy extends BaseStrategy {
                     && (t.getRequestType().equalsIgnoreCase(RequestType.SALE) 
                     || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     ||RequestType.REFUND.equals(t.getRequestType()))
-                    && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType().trim())) {
+                    && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                 LOG.info("WEXStrategy.processRequest settlements process");
                 getToken(t);
                 saveToSettle(t);

@@ -11,11 +11,7 @@ import com.aafes.stargate.gateway.wex.simulator.NBSClient;
 import com.aafes.stargate.util.ResponseType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOMsg;
-import org.jpos.iso.packager.GenericPackager;
 import org.junit.Assert;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -83,13 +79,18 @@ public class NBSRequestGeneratorTest {
             try {
                 ResponseAcknowlegment result = new ResponseAcknowlegment();
                 subjectUnderTest.setResponseAcknowlegment(result);
-                result = subjectUnderTest.unmarshalResponseAcknowledgment("02310060000000000000002c$003100");
+                result = subjectUnderTest.unmarshalAcknowledgment("02310060000000000000002c$003100");
                 //String response = nBSClient.generateResponse(result);
                 Assert.assertEquals(ResponseType.APPROVED, result.getResponseType());
             } catch (Exception ex) {
                 fail(ex.getMessage());
             }
-
         }
-
+        
+        @Test
+        public void seperateResponse(){
+            String[] result=subjectUnderTest.seperateResponse("02310060000000000000002c$0031000231007FFFF800000000011AuthRequest0064659870020100310000225007Message008cardType002010054host00847596587008458745690057856900478960045896005753910067896450027900478960059856300578965");
+            Assert.assertEquals("02310060000000000000002c$0031000",result[0]);
+            Assert.assertEquals("231007FFFF800000000011AuthRequest0064659870020100310000225007Message008cardType002010054host00847596587008458745690057856900478960045896005753910067896450027900478960059856300578965", result[1]);
+        }
     }

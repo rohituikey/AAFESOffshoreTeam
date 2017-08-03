@@ -6,6 +6,7 @@
 package com.aafes.stargate.gateway.wex;
 
 import com.aafes.nbslogonrequestschema.NbsLogonRequest;
+import com.aafes.nbsresponse.NBSResponse;
 import com.aafes.nbsresponseacknowledgmentschema.ResponseAcknowlegment;
 import com.aafes.stargate.util.ResponseType;
 import java.util.logging.Level;
@@ -65,8 +66,16 @@ public class NBSRequestGenerator {
         }
         return iso8583Format;
     }
+    
+    public String[] seperateResponse(String response){
+        String[] result = {"",""};
+        String mTI = response.substring(0,4);
+        result[0] = response.substring(0,response.substring(4).indexOf(mTI)+4);
+        result[1] = response.substring(result[0].length());
+        return result;
+    }
 
-    public ResponseAcknowlegment unmarshalResponseAcknowledgment(String response) {
+    public ResponseAcknowlegment unmarshalAcknowledgment(String response) {
 
         try {
             isoMsg = new ISOMsg();
@@ -85,6 +94,11 @@ public class NBSRequestGenerator {
             Logger.getLogger(NBSRequestGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
         return responseAcknowlegment;
+    }
+    
+    public NBSResponse unmarshalNbsResponse(String response){
+        
+        return null;
     }
 
     public String getIso8583Format() {

@@ -6,6 +6,7 @@
 package com.aafes.stargate.gateway.wex;
 
 import com.aafes.nbslogonrequestschema.NbsLogonRequest;
+import com.aafes.nbsresponseacknowledgmentschema.ResponseAcknowlegment;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.wex.simulator.NBSClient;
 import com.aafes.stargate.control.Configurator;
@@ -32,6 +33,10 @@ public class WEXProcessor {
     private Configurator configurator;
     @EJB
     private TransactionDAO transactionDAO;
+    @EJB
+    private WexRequestResponseMapping wexRequestResponseMappingObj;
+    @EJB
+    private NBSRequestGenerator nbsRequestGeneratorObj;
 
     private NbsLogonRequest nbsLogOnRequest;
 
@@ -112,11 +117,24 @@ public class WEXProcessor {
     public Transaction processRefundRequest(Transaction t) {
         sMethodName = "processRefundRequest";
         LOG.info("Method " + sMethodName + " started." + "in  Class Name " + CLASS_NAME);
-        String responseStr = "";
+        String requestStr = "", responseStr = "";
+        String[] seperatedResponseArr;
+        ResponseAcknowlegment responseAcknowlegmentObj1, responseAcknowlegmentObj2;
+        
+        requestStr = nbsRequestGeneratorObj.generateLogOnPacketRequest(wexRequestResponseMappingObj.RequestMap(t));
+        
         NBSClient clientObj = new NBSClient();
-        responseStr = clientObj.generateResponse("APPROVED");
+        responseStr = clientObj.generateResponse(requestStr);
         if (responseStr != null) {
-            t.setResponseType(responseStr.trim());
+            seperatedResponseArr = nbsRequestGeneratorObj.seperateResponse(responseStr);
+            if(seperatedResponseArr != null && seperatedResponseArr.length > 0){
+                responseAcknowlegmentObj1 = nbsRequestGeneratorObj.unmarshalAcknowledgment(seperatedResponseArr[0]);
+                responseAcknowlegmentObj2 = nbsRequestGeneratorObj.unmarshalAcknowledgment(seperatedResponseArr[1]);
+                
+                t.setResponseType(responseAcknowlegmentObj1.getResponseType());
+                t.setReasonCode(responseAcknowlegmentObj1.getReasonCode());
+            }
+            
         }
         LOG.info("Method " + sMethodName + " ended." + "in  Class Name " + CLASS_NAME);
         return t;

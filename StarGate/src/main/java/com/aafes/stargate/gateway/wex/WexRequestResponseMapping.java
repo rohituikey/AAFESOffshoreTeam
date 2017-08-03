@@ -19,7 +19,6 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -30,8 +29,8 @@ import javax.inject.Inject;
 @Stateless
 public class WexRequestResponseMapping {
 
-    @EJB
-    Transaction t;
+    //@EJB
+    Transaction t = new Transaction();
     @Inject
     String daylight_savings_time_at_site_one;
 

@@ -91,6 +91,9 @@ public class WexRequestResponseMapping {
 //        prodDetailCount.setPriceOrQuantityOrProductCode();//(4 fields## set quantity for nonfuel 0.00 & fuel 0.00000 and codes and price-->t.getPricePerunit amount--> t.getFuelDolleramount)
         wexProductDetails.setProdDetailCount(prodDetailCount);
         cardSpecificData.setWexProductDetails(wexProductDetails);
+        if(RequestType.SALE.equalsIgnoreCase(t.getRequestType()) || RequestType.REFUND.equalsIgnoreCase(t.getRequestType())){
+            cardSpecificData.setRecieptNumber(BigInteger.valueOf(Long.valueOf(t.getTransactionId()+t.getTermId())));
+        }
         
         headerRecord.setCardSpecificData(cardSpecificData);
         headerRecord.setServiceType("s");

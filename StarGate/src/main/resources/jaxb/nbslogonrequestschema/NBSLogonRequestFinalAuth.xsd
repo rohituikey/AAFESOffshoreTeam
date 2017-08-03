@@ -105,13 +105,6 @@
                             <xs:element name="TransNumber">
                                 <xs:simpleType>
                                     <xs:restriction base="xs:integer">
-                                        <xs:totalDigits value="1"/>
-                                    </xs:restriction>
-                                </xs:simpleType>
-                            </xs:element>
-                            <xs:element name="TransNumber">
-                                <xs:simpleType>
-                                    <xs:restriction base="xs:integer">
                                         <xs:totalDigits value="4"/>
                                     </xs:restriction>
                                 </xs:simpleType>

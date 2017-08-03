@@ -117,7 +117,7 @@ public class WEXProcessor {
     public Transaction processRefundRequest(Transaction t) {
         sMethodName = "processRefundRequest";
         LOG.info("Method " + sMethodName + " started." + "in  Class Name " + CLASS_NAME);
-        String requestStr = "", responseStr = "";
+        String requestStr = "", responseStr = "", logOffRequest = "";
         String[] seperatedResponseArr;
         ResponseAcknowlegment responseAcknowlegmentObj1, responseAcknowlegmentObj2;
         
@@ -131,10 +131,15 @@ public class WEXProcessor {
                 responseAcknowlegmentObj1 = nbsRequestGeneratorObj.unmarshalAcknowledgment(seperatedResponseArr[0]);
                 responseAcknowlegmentObj2 = nbsRequestGeneratorObj.unmarshalAcknowledgment(seperatedResponseArr[1]);
                 
-                t.setResponseType(responseAcknowlegmentObj1.getResponseType());
-                t.setReasonCode(responseAcknowlegmentObj1.getReasonCode());
+                if(responseAcknowlegmentObj2 != null){
+                    t.setResponseType(responseAcknowlegmentObj2.getResponseType());
+                    t.setReasonCode(responseAcknowlegmentObj2.getReasonCode());
+                }
             }
             
+            logOffRequest = nbsRequestGeneratorObj.logOffRequest();
+            
+            //clientObj.generateResponse(seperatedResponseArr[0]+logOffRequest);
         }
         LOG.info("Method " + sMethodName + " ended." + "in  Class Name " + CLASS_NAME);
         return t;

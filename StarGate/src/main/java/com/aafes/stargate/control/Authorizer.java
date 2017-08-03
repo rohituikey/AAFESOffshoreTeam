@@ -171,14 +171,16 @@ public class Authorizer {
                             && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                         LOG.info("Saving and updating transaction.....");
                         tranRepository.saveAndUpdate(t, authTranCancel);
-                    } else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia())
-                            && ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())){
-                            LOG.error("Transaction " + t.getResponseType());
+                    } 
+//                    else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia())
+//                            && ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())){
+//                            LOG.error("Transaction " + t.getResponseType());
 //                            t.setReasonCode(configurator.get(t.getReasonCode()));
 //                            t.setDescriptionField(t.getDescriptionField());
 //                            t.setResponseType(ResponseType.DECLINED);
-                            mapResponse(t, cm);
-                    } else {
+//                            mapResponse(t, cm);
+//                    } 
+                    else {
                         LOG.info("Saving transaction....." + t.getRrn());
                         encryptValues(t);
                         tranRepository.save(t);

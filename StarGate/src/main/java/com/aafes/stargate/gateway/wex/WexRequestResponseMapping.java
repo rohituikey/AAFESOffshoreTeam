@@ -19,7 +19,6 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -30,8 +29,8 @@ import javax.inject.Inject;
 @Stateless
 public class WexRequestResponseMapping {
 
-    @EJB
-    Transaction t;
+    //@EJB
+    Transaction t = new Transaction();
     @Inject
     String daylight_savings_time_at_site_one;
 
@@ -92,6 +91,9 @@ public class WexRequestResponseMapping {
 //        prodDetailCount.setPriceOrQuantityOrProductCode();//(4 fields## set quantity for nonfuel 0.00 & fuel 0.00000 and codes and price-->t.getPricePerunit amount--> t.getFuelDolleramount)
         wexProductDetails.setProdDetailCount(prodDetailCount);
         cardSpecificData.setWexProductDetails(wexProductDetails);
+        if(RequestType.SALE.equalsIgnoreCase(t.getRequestType()) || RequestType.REFUND.equalsIgnoreCase(t.getRequestType())){
+            cardSpecificData.setRecieptNumber(BigInteger.valueOf(Long.valueOf(t.getTransactionId()+t.getTermId())));
+        }
         
         headerRecord.setCardSpecificData(cardSpecificData);
         headerRecord.setServiceType("s");
@@ -129,7 +131,7 @@ public class WexRequestResponseMapping {
         Date date = new Date();
         String ts = dateFormat.format(date);
         //2017-08-03 09:31:54.316
-        ts = ts.substring(11, 13) + ts.substring(14, 16) + daylight_savings_time_at_site_one;
+        ts = ts.substring(11, 13) + ts.substring(14, 16) + "0";
         return ts;
     }
     private String CreateDF_forTransaction(String df)

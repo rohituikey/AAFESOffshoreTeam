@@ -52,7 +52,7 @@ public class NBSRequestGenerator {
             isoMsg.set(113, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getAcctInfo());
             isoMsg.set(114, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getAmount().toString());
 
-            if (nbsLogonRequest.getHeaderRecord().getTransType().equals(10) || nbsLogonRequest.getHeaderRecord().getTransType().equals(30)) {
+            if ((nbsLogonRequest.getHeaderRecord().getTransType().toString().equals("10")) || (nbsLogonRequest.getHeaderRecord().getTransType().toString().equals("10"))) {
                 isoMsg.set(115, (nbsLogonRequest.getHeaderRecord().getCardSpecificData().getRecieptNumber().toString()));
             }
 

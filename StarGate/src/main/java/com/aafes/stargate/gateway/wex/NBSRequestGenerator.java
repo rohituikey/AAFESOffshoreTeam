@@ -9,7 +9,6 @@ import com.aafes.nbslogonrequestschema.NbsLogonRequest;
 import com.aafes.nbsresponse.NBSResponse;
 import com.aafes.nbsresponseacknowledgmentschema.ResponseAcknowlegment;
 import com.aafes.stargate.util.ResponseType;
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.logging.Level;
@@ -28,7 +27,7 @@ public class NBSRequestGenerator {
     private int promptCountIndex;
     private ISOMsg isoMsg;
     private GenericPackager packager;
-    private ResponseAcknowlegment responseAcknowlegment;
+    private ResponseAcknowlegment responseAcknowlegment = new ResponseAcknowlegment();
     private NBSResponse nBSResponse;
 
     public String generateLogOnPacketRequest(NbsLogonRequest nbsLogonRequest) {
@@ -115,14 +114,24 @@ public class NBSRequestGenerator {
     }
 
     public NBSResponse unmarshalNbsResponse(String response) {
+        
+        String SCHEMA_PATH = "src/main/resources/xml/NBSResponse.xml";
+        GenericPackager genericPackager;
+        
         try {
             isoMsg = new ISOMsg();
             nBSResponse = new NBSResponse();
             NBSResponse.AuthResponse authResponse = new NBSResponse.AuthResponse();
             NBSResponse.AuthResponse.PromptTypeDetails promptType = new NBSResponse.AuthResponse.PromptTypeDetails();
             NBSResponse.AuthResponse.ProductDetails productDetails = new NBSResponse.AuthResponse.ProductDetails();
-
-            GenericPackager genericPackager = new GenericPackager("src/main/resources/xml/NBSResponse.xml");
+            
+            try {
+                genericPackager = new GenericPackager(SCHEMA_PATH);
+            } catch (Exception e) {
+                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSResponse.xml";
+                genericPackager = new GenericPackager(SCHEMA_PATH);
+            }
+            
             isoMsg.setPackager(genericPackager);
             isoMsg.unpack(response.getBytes());
 

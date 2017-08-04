@@ -5,14 +5,18 @@
  */
 package com.aafes.stargate.gateway.wex;
 
-import com.aafes.nbslogonrequestschema.NbsLogonRequest;
 import com.aafes.nbsresponse.NBSResponse;
 import com.aafes.nbsresponseacknowledgmentschema.ResponseAcknowlegment;
+import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.util.InputType;
+import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.packager.GenericPackager;
@@ -27,37 +31,80 @@ public class NBSRequestGenerator {
     private int promptCountIndex;
     private ISOMsg isoMsg;
     private GenericPackager packager;
-    private ResponseAcknowlegment responseAcknowlegment = new ResponseAcknowlegment();
+    private ResponseAcknowlegment responseAcknowlegment;
     private NBSResponse nBSResponse;
+    Transaction transaction = new Transaction();
+    @Inject
+    private String APPLICATION_NAME;
+    @Inject
+    private String APPLICATION_VERSION;
+    @Inject
+    private String DAYLIGHT_SAVINGS_TIME_AT_SITE_ONE;
+    @Inject
+    private String CAPTURE_ONLY_REQUEST;
+    @Inject
+    private String TRANS_TYPE_PRE_AUTH;
+    @Inject
+    private String TRANS_TYPE_FINAL_AND_SALE;
+    @Inject
+    private String TRANS_TYPE_REFUND;
+    @Inject
+    private String CARD_TYPE_WEX;
+    @Inject
+    private String SERVICE_TYPE;
+    @Inject
+    private String SESSION_TYPE_AUTH;
 
-    public String generateLogOnPacketRequest(NbsLogonRequest nbsLogonRequest) {
-
+    public String generateLogOnPacketRequest(Transaction t) {
+        transaction = t;
         try {
             packager = new GenericPackager("src/main/resources/xml/NBSLogonPackager.xml");
             isoMsg = new ISOMsg();
             isoMsg.setPackager(packager);
             isoMsg.setMTI("0231");
-            isoMsg.set(10, nbsLogonRequest.getTermId());
-            isoMsg.set(12, nbsLogonRequest.getAppName());
-            isoMsg.set(13, nbsLogonRequest.getAppVersion().toString());
-            isoMsg.set(14, nbsLogonRequest.getTimeZone().toString());
-            isoMsg.set(15, nbsLogonRequest.getHeaderRecord().getA());
-            isoMsg.set(16, nbsLogonRequest.getHeaderRecord().getKey().toString());
-            isoMsg.set(17, nbsLogonRequest.getHeaderRecord().getTransType().toString());
-            isoMsg.set(18, nbsLogonRequest.getHeaderRecord().getCardType());
-            isoMsg.set(19, nbsLogonRequest.getHeaderRecord().getCATFlag().toString());
-            isoMsg.set(110, nbsLogonRequest.getHeaderRecord().getPumpNo());
-            isoMsg.set(111, nbsLogonRequest.getHeaderRecord().getServiceType().toString());
-            if(nbsLogonRequest.getHeaderRecord().getTrack() != null)
-                isoMsg.set(112, nbsLogonRequest.getHeaderRecord().getTrack().toString());
-            if(nbsLogonRequest.getHeaderRecord().getCardSpecificData() != null){
-                isoMsg.set(113, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getAcctInfo());
-                if(nbsLogonRequest.getHeaderRecord().getCardSpecificData().getAmount() != null)
-                    isoMsg.set(114, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getAmount().toString());
+            isoMsg.set(10, transaction.getTermId());
+            isoMsg.set(12, APPLICATION_NAME);
+            isoMsg.set(13, APPLICATION_VERSION);
+            isoMsg.set(14, createDateFormat());
+            isoMsg.set(15, SESSION_TYPE_AUTH);
+            isoMsg.set(16, transaction.getTransactionId().substring(0, 4));
+            if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) {
+                isoMsg.set(17, TRANS_TYPE_PRE_AUTH);
+            }
+            if (transaction.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
+                    || transaction.getRequestType().equalsIgnoreCase(RequestType.SALE)) {
+                isoMsg.set(17, TRANS_TYPE_FINAL_AND_SALE);
+            }
+            if (transaction.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
+                isoMsg.set(17, TRANS_TYPE_REFUND);
+            }
+            isoMsg.set(18, CARD_TYPE_WEX);
+            isoMsg.set(19, transaction.getCatFlag());
+            isoMsg.set(110, transaction.getPumpNmbr());
+            isoMsg.set(111, SERVICE_TYPE);
+
+            if (transaction.getRequestType().equals(RequestType.FINAL_AUTH)) {
+                isoMsg.set(15, CAPTURE_ONLY_REQUEST);
+                isoMsg.set(112, Long.toString(transaction.getAmount()));
+                isoMsg.set(113, Long.toString(transaction.getAmtPreAuthorized()));
+                isoMsg.set(114, transaction.getTransactionId());
+                isoMsg.set(115, createDateAndTime(transaction.getLocalDateTime()));
+                isoMsg.set(120, transaction.getAuthNumber());
+            }
+            isoMsg.set(116, "2");
+            if (transaction.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
+                isoMsg.set(117, transaction.getTrack2());
+            }
+            if (transaction.getInputType().equalsIgnoreCase(InputType.KEYED)) {
+                //isoMsg.set(113, transaction.getTrack2());//Track0 formatt
             }
 
-            if ((nbsLogonRequest.getHeaderRecord().getTransType().toString().equals("10")) || (nbsLogonRequest.getHeaderRecord().getTransType().toString().equals("10"))) {
-                isoMsg.set(115, (nbsLogonRequest.getHeaderRecord().getCardSpecificData().getRecieptNumber().toString()));
+            if (!(transaction.getRequestType().equals(RequestType.FINAL_AUTH))) {
+                isoMsg.set(118, Long.toString(t.getAmount()));
+            }
+
+            if (TRANS_TYPE_FINAL_AND_SALE.equals(10) || TRANS_TYPE_REFUND.equals(30)) {
+                isoMsg.set(119, (t.getTransactionId() + t.getTermId()));
             }
 
 //            isoMsg.set(15, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getWexPromptDetails().getPromptDetailCount().toString());
@@ -78,6 +125,14 @@ public class NBSRequestGenerator {
         return iso8583Format;
     }
 
+    public String createDateAndTime(String dt) {
+    //        YYMMDDhhmmss
+    //2017-08-03 09:31:54.316
+        dt = dt.substring(2, 4) + dt.substring(5, 7) + dt.substring(8, 10) + dt.substring(11, 13) + dt.substring(14, 16) + dt.substring(17, 19  );
+
+        return dt;
+    }
+
     public String[] seperateResponse(String response) {
         String[] result = {"", ""};
         String mTI = response.substring(0, 4);
@@ -86,108 +141,78 @@ public class NBSRequestGenerator {
         return result;
     }
 
-    public ResponseAcknowlegment unmarshalAcknowledgment(String response) {
-
+    public Transaction unmarshalAcknowledgment(String response) {
         try {
             isoMsg = new ISOMsg();
-            GenericPackager genericPackager;
-            String SCHEMA_PATH = "src/main/resources/xml/ResponseAcknowledgment.xml";
-            
-            try {
-                genericPackager = new GenericPackager(SCHEMA_PATH);
-            } catch (Exception e) {
-                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/ResponseAcknowledgment.xml";
-                genericPackager = new GenericPackager(SCHEMA_PATH);
-            }
-            
+            GenericPackager genericPackager = new GenericPackager("src/main/resources/xml/ResponseAcknowledgment.xml");
             isoMsg.setPackager(genericPackager);
             isoMsg.unpack(response.getBytes());
             if (isoMsg.getString(10).trim().equalsIgnoreCase("c$")) {
-                responseAcknowlegment.setResponseType(ResponseType.APPROVED);
+                transaction.setResponseType(ResponseType.APPROVED);
             } else if (isoMsg.getString(10).trim().equalsIgnoreCase("c?")) {
-                responseAcknowlegment.setResponseType(ResponseType.DECLINED);
+                transaction.setResponseType(ResponseType.DECLINED);
             }
-            responseAcknowlegment.setReasonCode(isoMsg.getString(11));
-            return responseAcknowlegment;
+            transaction.setReasonCode(isoMsg.getString(11));
+            return transaction;
         } catch (ISOException ex) {
             Logger.getLogger(NBSRequestGenerator.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
             Logger.getLogger(NBSRequestGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return responseAcknowlegment;
+        return transaction;
     }
 
-    public NBSResponse unmarshalNbsResponse(String response) {
-        
-        String SCHEMA_PATH = "src/main/resources/xml/NBSResponse.xml";
-        GenericPackager genericPackager;
-        
+    public Transaction unmarshalNbsResponse(String response) {
         try {
             isoMsg = new ISOMsg();
-            nBSResponse = new NBSResponse();
-            NBSResponse.AuthResponse authResponse = new NBSResponse.AuthResponse();
-            NBSResponse.AuthResponse.PromptTypeDetails promptType = new NBSResponse.AuthResponse.PromptTypeDetails();
-            NBSResponse.AuthResponse.ProductDetails productDetails = new NBSResponse.AuthResponse.ProductDetails();
-            
-            try {
-                genericPackager = new GenericPackager(SCHEMA_PATH);
-            } catch (Exception e) {
-                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSResponse.xml";
-                genericPackager = new GenericPackager(SCHEMA_PATH);
-            }
-            
+//            NBSResponse.AuthResponse authResponse = new NBSResponse.AuthResponse();
+//            NBSResponse.AuthResponse.PromptTypeDetails promptType = new NBSResponse.AuthResponse.PromptTypeDetails();
+//            NBSResponse.AuthResponse.ProductDetails productDetails = new NBSResponse.AuthResponse.ProductDetails();
+
+            GenericPackager genericPackager = new GenericPackager("src/main/resources/xml/NBSResponse.xml");
             isoMsg.setPackager(genericPackager);
             isoMsg.unpack(response.getBytes());
 
-            promptType.setPromptType(isoMsg.getString(23));
-            promptType.setAuthRef(isoMsg.getString(24));
-            promptType.setMaxAmount(new BigDecimal(isoMsg.getString(25)));
-            promptType.setProductAuthCount(new BigInteger(isoMsg.getString(26)));
+            //promptType.setPromptType(isoMsg.getString(23));
+            transaction.setAuthNumber(isoMsg.getString(24));
+            //promptType.setMaxAmount(new BigDecimal(isoMsg.getString(25)));
+            //promptType.setProductAuthCount(new BigInteger(isoMsg.getString(26)));
 
-            productDetails.setMaxQuantity(new BigDecimal(isoMsg.getString(27)));
-            productDetails.setProductCode(new BigInteger(isoMsg.getString(28)));
-            productDetails.setMaxAmount(new BigDecimal(isoMsg.getString(29)));
+            transaction.setProdDetailCount(isoMsg.getString(27));
+            transaction.setProductCode(isoMsg.getString(28));
+            //productDetails.setMaxAmount(new BigDecimal(isoMsg.getString(29)));
 
-            authResponse.setMessage(isoMsg.getString(15));
-            authResponse.setCardType(isoMsg.getString(16));
-            authResponse.setIdentity(isoMsg.getString(17));
-            authResponse.setHostNumber(isoMsg.getString(18));
-            authResponse.setCardNumber(isoMsg.getString(19));
-            authResponse.setVehicleNumber(new BigInteger(isoMsg.getString(20)));
-            authResponse.setServiceOption(new BigInteger(isoMsg.getString(21)));
-            authResponse.setPromptCount(new BigInteger(isoMsg.getString(22)));
-            authResponse.setProductDetails(productDetails);
-            authResponse.setPromptTypeDetails(promptType);
+            transaction.setResponseType(isoMsg.getString(15));
+            transaction.setMedia(isoMsg.getString(16));
+            transaction.setLocalDateTime(createDateFormat());
+//            authResponse.setIdentity(isoMsg.getString(17));
+  //          authResponse.setHostNumber(isoMsg.getString(18));
+//            authResponse.setCardNumber(isoMsg.getString(19));
+//            authResponse.setVehicleNumber(new BigInteger(isoMsg.getString(20)));
+//            authResponse.setServiceOption(new BigInteger(isoMsg.getString(21)));
+//            authResponse.setPromptCount(new BigInteger(isoMsg.getString(22)));
+//            authResponse.setProductDetails(productDetails);
+//            authResponse.setPromptTypeDetails(promptType);
+//
+//            nBSResponse.setA(isoMsg.getString(10));
+//            nBSResponse.setKey(new BigInteger(isoMsg.getString(11)));
+//            nBSResponse.setApplicationUpdateNeeded(isoMsg.getString(12));
+//            nBSResponse.setAuthCode(new BigInteger(isoMsg.getString(13)));
+//            nBSResponse.setA(isoMsg.getString(14));
+//            nBSResponse.setAuthResponse(authResponse);
 
-            nBSResponse.setA(isoMsg.getString(10));
-            nBSResponse.setKey(new BigInteger(isoMsg.getString(11)));
-            nBSResponse.setApplicationUpdateNeeded(isoMsg.getString(12));
-            nBSResponse.setAuthCode(new BigInteger(isoMsg.getString(13)));
-            nBSResponse.setA(isoMsg.getString(14));
-            nBSResponse.setAuthResponse(authResponse);
-
-            return nBSResponse;
+            return transaction;
         } catch (ISOException ex) {
             Logger.getLogger(NBSRequestGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return nBSResponse;
+        return transaction;
     }
 
     public String logOffRequest() {
         String result = "";
-        String SCHEMA_PATH = "src/main/resources/xml/NBSLogOff.xml";
-        GenericPackager packager;
-        
         try {
             isoMsg = new ISOMsg();
-            
-            try {
-                packager = new GenericPackager(SCHEMA_PATH);
-            } catch (Exception e) {
-                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSLogOff.xml";
-                packager = new GenericPackager(SCHEMA_PATH);
-            }
-            
+            GenericPackager packager = new GenericPackager("src/main/resources/xml/NBSLogOff.xml");
             isoMsg.setPackager(packager);
             isoMsg.setMTI("0231");
             isoMsg.set(10, "O");
@@ -198,6 +223,27 @@ public class NBSRequestGenerator {
             Logger.getLogger(NBSRequestGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
+    }
+
+    private String createDateFormat() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date date = new Date();
+        String ts = dateFormat.format(date);
+        //2017-08-03 09:31:54.316
+        ts = ts.substring(11, 13) + ts.substring(14, 16) + DAYLIGHT_SAVINGS_TIME_AT_SITE_ONE;
+        return ts;
+    }
+    
+    private String CreateDF_forTransaction(String df)
+    {
+        //yyyy-MM-dd HH:mm:ss.SSS
+        //2017-08-03 09:31:54.316
+        
+       // WYYMMDDhhmmss
+       // 3170621071655
+      df = "20"+df.substring(1, 3)+"-"+df.substring(3, 5)+"-"
+              +df.substring(5, 7)+" "+df.substring(7, 9)+":"+df.substring(9, 11)+":"+df.substring(11, 13)+".000";
+        return df;
     }
 
     public NBSResponse getnBSResponse() {

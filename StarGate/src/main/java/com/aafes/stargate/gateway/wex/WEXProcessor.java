@@ -5,7 +5,7 @@
  */
 package com.aafes.stargate.gateway.wex;
 
-import com.aafes.nbslogonrequest.NbsLogonRequest;
+import com.aafes.nbslogonrequestschema.NbsLogonRequest;
 import com.aafes.nbsresponse.NBSResponse;
 import com.aafes.nbsresponseacknowledgmentschema.ResponseAcknowlegment;
 import com.aafes.stargate.authorizer.entity.Transaction;

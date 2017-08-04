@@ -5,7 +5,7 @@
  */
 package com.aafes.stargate.gateway.wex;
 
-import com.aafes.nbslogonrequestschema.NbsLogonRequest;
+import com.aafes.nbslogonrequest.NbsLogonRequest;
 import com.aafes.nbsresponse.NBSResponse;
 import com.aafes.nbsresponseacknowledgmentschema.ResponseAcknowlegment;
 import com.aafes.stargate.authorizer.entity.Transaction;
@@ -34,9 +34,6 @@ public class WEXProcessor {
     private Configurator configurator;
     @EJB
     private TransactionDAO transactionDAO;
-    //@EJB
-    private WexRequestResponseMapping wexRequestResponseMappingObj;
-    //@EJB
     private NBSRequestGenerator nbsRequestGeneratorObj;
 
     private NbsLogonRequest nbsLogOnRequest;
@@ -45,20 +42,19 @@ public class WEXProcessor {
         LOG.info("WEXProcessor.preAuthProcess mothod started");
 
         try {
-            if (null == nbsLogOnRequest) {
-                nbsLogOnRequest = new NbsLogonRequest();
-            }
-            String responseStr = "";
-            NBSClient clientObj = new NBSClient();
-            responseStr = clientObj.generateResponse("APPROVED");
-            t.setResponseType(responseStr.trim());
-            if (t.getResponseType().equalsIgnoreCase("APPROVED")) {
-                t.setReasonCode(configurator.get("SUCCESS"));
-                t.setDescriptionField(ResponseType.APPROVED);
-            } else {
+            nbsLogOnRequest = new NbsLogonRequest();
 
-                t.setDescriptionField(ResponseType.DECLINED);
+            String requestStr = nbsRequestGeneratorObj.generateLogOnPacketRequest(t);
+            NBSClient clientObj = new NBSClient();
+            String responseStr = clientObj.generateResponse(requestStr);
+            String[] result = nbsRequestGeneratorObj.seperateResponse(responseStr);
+            t = nbsRequestGeneratorObj.unmarshalAcknowledgment(result[0]);
+            if (t.getResponseType().equals(ResponseType.APPROVED)) {
+                LOG.info("LOGON successfull");
+            } else {
+                LOG.info("LOGON failed");
             }
+            t = nbsRequestGeneratorObj.unmarshalNbsResponse(result[1]);
             LOG.info("WEXProcessor.preAuthProcess mothod ended");
             return t;
         } catch (Exception e) {
@@ -74,17 +70,20 @@ public class WEXProcessor {
                 this.buildErrorResponse(t, "NO_PRIOR_TRANSACTION", "NO_PRIOR_TRANSACTION_FOUND_FOR_FINALAUTH");
                 return t;
             }
-            String responseStr = "";
-            NBSClient clientObj = new NBSClient();
-            responseStr = clientObj.generateResponse("APPROVED");
-            t.setResponseType(responseStr.trim());
-            if (t.getResponseType().equalsIgnoreCase("APPROVED")) {
-                t.setReasonCode(configurator.get("SUCCESS"));
-                t.setDescriptionField(ResponseType.APPROVED);
-            } else {
-
-                t.setDescriptionField(ResponseType.DECLINED);
+            if (authTran.getAuthNumber() != null) {
+                t.setAuthNumber(authTran.getAuthNumber());
             }
+            String requestStr = nbsRequestGeneratorObj.generateLogOnPacketRequest(t);
+            NBSClient clientObj = new NBSClient();
+            String responseStr = clientObj.generateResponse(requestStr);
+            String[] result = nbsRequestGeneratorObj.seperateResponse(responseStr);
+            t = nbsRequestGeneratorObj.unmarshalAcknowledgment(result[0]);
+            if (t.getResponseType().equals(ResponseType.APPROVED)) {
+                LOG.info("LOGON successfull");
+            } else {
+                LOG.info("LOGON failed");
+            }
+            t = nbsRequestGeneratorObj.unmarshalNbsResponse(result[1]);
             LOG.info("WEXProcessor.finalAuthProcess mothod ended");
             return t;
         } catch (Exception e) {
@@ -122,28 +121,28 @@ public class WEXProcessor {
         String[] seperatedResponseArr;
         ResponseAcknowlegment responseAcknowlegmentObj1;
         NBSResponse nBSResponse;
-        
+
         nbsRequestGeneratorObj = new NBSRequestGenerator();
-        wexRequestResponseMappingObj = new WexRequestResponseMapping();
-        
-        requestStr = nbsRequestGeneratorObj.generateLogOnPacketRequest(wexRequestResponseMappingObj.RequestMap(t));
-        
+//        wexRequestResponseMappingObj = new WexRequestResponseMapping();
+
+//        requestStr = nbsRequestGeneratorObj.generateLogOnPacketRequest(wexRequestResponseMappingObj.RequestMap(t));
+
         NBSClient clientObj = new NBSClient();
         responseStr = clientObj.generateResponse(requestStr);
         if (responseStr != null) {
             seperatedResponseArr = nbsRequestGeneratorObj.seperateResponse(responseStr);
-            if(seperatedResponseArr != null && seperatedResponseArr.length > 0){
-                responseAcknowlegmentObj1 = nbsRequestGeneratorObj.unmarshalAcknowledgment(seperatedResponseArr[0]);
-                nBSResponse = nbsRequestGeneratorObj.unmarshalNbsResponse(seperatedResponseArr[1]);
-                
-                if(nBSResponse != null){
-                    t.setResponseType(nBSResponse.getAuthResponse().getMessage());
-                    t.setReasonCode(nBSResponse.getAuthCode().toString());
-                }
-            }
-            
+//            if (seperatedResponseArr != null && seperatedResponseArr.length > 0) {
+//                responseAcknowlegmentObj1 = nbsRequestGeneratorObj.unmarshalAcknowledgment(seperatedResponseArr[0]);
+//                nBSResponse = nbsRequestGeneratorObj.unmarshalNbsResponse(seperatedResponseArr[1]);
+//
+//                if (nBSResponse != null) {
+//                    t.setResponseType(nBSResponse.getAuthResponse().getMessage());
+//                    t.setReasonCode(nBSResponse.getAuthCode().toString());
+//                }
+            //}
+
             logOffRequest = nbsRequestGeneratorObj.logOffRequest();
-            
+
             //clientObj.generateResponse(seperatedResponseArr[0]+logOffRequest);
         }
         LOG.info("Method " + sMethodName + " ended." + "in  Class Name " + CLASS_NAME);

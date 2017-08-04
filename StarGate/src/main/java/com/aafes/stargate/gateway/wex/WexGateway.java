@@ -64,4 +64,10 @@ public class WexGateway extends Gateway {
         return t;
     }
 
+    /**
+     * @param wEXProcessor the wEXProcessor to set
+     */
+    public void setwEXProcessor(WEXProcessor wEXProcessor) {
+        this.wEXProcessor = wEXProcessor;
+    }
 }

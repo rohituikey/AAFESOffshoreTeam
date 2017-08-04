@@ -231,4 +231,23 @@ public class WEXStrategy extends BaseStrategy {
         return ts;
     }
 
+     /* ADDED COMMON CODE TO CHECK IF SETTLEMENT STATUS - START */
+    
+    public void setSettleMessageDAO(SettleMessageDAO settleMessageDAO) {
+        this.settleMessageDAO = settleMessageDAO;
+    } 
+    
+    /**
+     * @param configurator the configurator to set
+     */
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
+
+    /**
+     * @param wEXValidator the wEXValidator to set
+     */
+    public void setwEXValidator(WEXValidator wEXValidator) {
+        this.wEXValidator = wEXValidator;
+    }
 }

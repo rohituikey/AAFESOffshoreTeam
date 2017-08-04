@@ -48,9 +48,13 @@ public class NBSRequestGenerator {
             isoMsg.set(19, nbsLogonRequest.getHeaderRecord().getCATFlag().toString());
             isoMsg.set(110, nbsLogonRequest.getHeaderRecord().getPumpNo());
             isoMsg.set(111, nbsLogonRequest.getHeaderRecord().getServiceType().toString());
-            isoMsg.set(112, nbsLogonRequest.getHeaderRecord().getTrack().toString());
-            isoMsg.set(113, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getAcctInfo());
-            isoMsg.set(114, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getAmount().toString());
+            if(nbsLogonRequest.getHeaderRecord().getTrack() != null)
+                isoMsg.set(112, nbsLogonRequest.getHeaderRecord().getTrack().toString());
+            if(nbsLogonRequest.getHeaderRecord().getCardSpecificData() != null){
+                isoMsg.set(113, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getAcctInfo());
+                if(nbsLogonRequest.getHeaderRecord().getCardSpecificData().getAmount() != null)
+                    isoMsg.set(114, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getAmount().toString());
+            }
 
             if ((nbsLogonRequest.getHeaderRecord().getTransType().toString().equals("10")) || (nbsLogonRequest.getHeaderRecord().getTransType().toString().equals("10"))) {
                 isoMsg.set(115, (nbsLogonRequest.getHeaderRecord().getCardSpecificData().getRecieptNumber().toString()));
@@ -171,9 +175,19 @@ public class NBSRequestGenerator {
 
     public String logOffRequest() {
         String result = "";
+        String SCHEMA_PATH = "src/main/resources/xml/NBSLogOff.xml";
+        GenericPackager packager;
+        
         try {
             isoMsg = new ISOMsg();
-            GenericPackager packager = new GenericPackager("src/main/resources/xml/NBSLogOff.xml");
+            
+            try {
+                packager = new GenericPackager(SCHEMA_PATH);
+            } catch (Exception e) {
+                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSLogOff.xml";
+                packager = new GenericPackager(SCHEMA_PATH);
+            }
+            
             isoMsg.setPackager(packager);
             isoMsg.setMTI("0231");
             isoMsg.set(10, "O");

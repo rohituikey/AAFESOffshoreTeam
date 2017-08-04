@@ -52,4 +52,11 @@ public class BaseStrategyFactory {
         this.retailStrategy = retailStrategy;
         
     }
+
+    /**
+     * @param wEXStrategy the wEXStrategy to set
+     */
+    public void setwEXStrategy(WEXStrategy wEXStrategy) {
+        this.wEXStrategy = wEXStrategy;
+    }
 }

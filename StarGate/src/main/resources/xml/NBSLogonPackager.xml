@@ -79,7 +79,7 @@ and open the template in the editor.
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
         id="113"
-        length="25"
+        length="50"
         name="CATamount"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield

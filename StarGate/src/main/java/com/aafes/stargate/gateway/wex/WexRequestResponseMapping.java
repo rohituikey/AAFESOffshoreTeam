@@ -38,6 +38,8 @@ public class WexRequestResponseMapping {
 
     public NbsLogonRequest RequestMap(Transaction transaction) {
 
+        t = transaction;
+        
         NbsLogonRequest logonRequest = new NbsLogonRequest();
         if (null == headerRecord) {
             headerRecord = new HeaderRecord();

@@ -5,6 +5,8 @@
  */
 package WexStub;
 
+import org.jpos.iso.ISOException;
+
 /**
  *
  * @author uikuyr

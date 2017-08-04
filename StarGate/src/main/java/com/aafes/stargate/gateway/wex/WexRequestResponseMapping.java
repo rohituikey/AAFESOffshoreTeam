@@ -131,7 +131,7 @@ public class WexRequestResponseMapping {
         Date date = new Date();
         String ts = dateFormat.format(date);
         //2017-08-03 09:31:54.316
-        ts = ts.substring(11, 13) + ts.substring(14, 16) + daylight_savings_time_at_site_one;
+        ts = ts.substring(11, 13) + ts.substring(14, 16) + "0";
         return ts;
     }
     private String CreateDF_forTransaction(String df)

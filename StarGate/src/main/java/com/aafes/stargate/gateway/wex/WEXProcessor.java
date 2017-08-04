@@ -34,9 +34,9 @@ public class WEXProcessor {
     private Configurator configurator;
     @EJB
     private TransactionDAO transactionDAO;
-    @EJB
+    //@EJB
     private WexRequestResponseMapping wexRequestResponseMappingObj;
-    @EJB
+    //@EJB
     private NBSRequestGenerator nbsRequestGeneratorObj;
 
     private NbsLogonRequest nbsLogOnRequest;
@@ -122,6 +122,9 @@ public class WEXProcessor {
         String[] seperatedResponseArr;
         ResponseAcknowlegment responseAcknowlegmentObj1;
         NBSResponse nBSResponse;
+        
+        nbsRequestGeneratorObj = new NBSRequestGenerator();
+        wexRequestResponseMappingObj = new WexRequestResponseMapping();
         
         requestStr = nbsRequestGeneratorObj.generateLogOnPacketRequest(wexRequestResponseMappingObj.RequestMap(t));
         

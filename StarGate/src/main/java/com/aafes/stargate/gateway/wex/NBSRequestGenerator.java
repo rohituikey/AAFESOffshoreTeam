@@ -9,6 +9,7 @@ import com.aafes.nbslogonrequestschema.NbsLogonRequest;
 import com.aafes.nbsresponse.NBSResponse;
 import com.aafes.nbsresponseacknowledgmentschema.ResponseAcknowlegment;
 import com.aafes.stargate.util.ResponseType;
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.logging.Level;
@@ -86,7 +87,16 @@ public class NBSRequestGenerator {
 
         try {
             isoMsg = new ISOMsg();
-            GenericPackager genericPackager = new GenericPackager("src/main/resources/xml/ResponseAcknowledgment.xml");
+            GenericPackager genericPackager;
+            String SCHEMA_PATH = "src/main/resources/xml/ResponseAcknowledgment.xml";
+            
+            try {
+                genericPackager = new GenericPackager(SCHEMA_PATH);
+            } catch (Exception e) {
+                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/ResponseAcknowledgment.xml";
+                genericPackager = new GenericPackager(SCHEMA_PATH);
+            }
+            
             isoMsg.setPackager(genericPackager);
             isoMsg.unpack(response.getBytes());
             if (isoMsg.getString(10).trim().equalsIgnoreCase("c$")) {

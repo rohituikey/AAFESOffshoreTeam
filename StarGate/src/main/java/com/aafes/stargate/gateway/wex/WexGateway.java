@@ -46,7 +46,7 @@ public class WexGateway extends Gateway {
                         t = wEXProcessor.processWexRequests(t);
                         break;
                     case RequestType.SALE:
-                        t = wEXProcessor.processSaleRequest(t);
+                        t = wEXProcessor.processWexRequests(t);
                         break;
                     case RequestType.REFUND:
                         t = wEXProcessor.processWexRequests(t);

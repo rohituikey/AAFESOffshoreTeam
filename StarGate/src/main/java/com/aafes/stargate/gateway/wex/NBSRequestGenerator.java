@@ -112,7 +112,8 @@ public class NBSRequestGenerator {
             if (transaction.getInputType().equalsIgnoreCase(InputType.SWIPED)) isoMsg.set(117, transaction.getTrack2());
             else if (transaction.getInputType().equalsIgnoreCase(InputType.KEYED))//isoMsg.set(113, transaction.getTrack2());//Track0 formatt
             if (!(transaction.getRequestType().equals(RequestType.FINAL_AUTH))) isoMsg.set(118, Long.toString(t.getAmount()));
-            if (transTypeFinalAndSale.equals(10) || transTypeRefund.equals(30)) isoMsg.set(119, (t.getTransactionId() + t.getTermId()));
+            if ("10".equalsIgnoreCase(transTypeFinalAndSale) || "30".equalsIgnoreCase(transTypeRefund)) 
+                    isoMsg.set(119, (t.getTransactionId() + t.getTermId()));
 
 //            isoMsg.set(15, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getWexPromptDetails().getPromptDetailCount().toString());
 //            for (promptCountIndex=16 ; promptCountIndex  <  (nbsLogonRequest.getHeaderRecord().getCardSpecificData().getWexPromptDetails().getPromptDetailCount().getPromptTypeOrPromptValue().size()); promptCountIndex++) {

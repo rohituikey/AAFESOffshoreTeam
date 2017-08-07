@@ -89,7 +89,7 @@ public class NBSRequestGenerator {
             isoMsg.set(14, createDateFormat());
             isoMsg.set(15, sessionTypeAuth);
             isoMsg.set(16, transaction.getTransactionId().substring(0, 4));
-            if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) isoMsg.set(17, sessionTypeAuth);
+            if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) isoMsg.set(17, transTypePreAuth);
             else if (transaction.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     || transaction.getRequestType().equalsIgnoreCase(RequestType.SALE)) {
                 isoMsg.set(17, transTypeFinalAndSale);

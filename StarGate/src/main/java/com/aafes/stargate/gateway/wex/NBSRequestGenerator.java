@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.packager.GenericPackager;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -27,6 +28,7 @@ import org.jpos.iso.packager.GenericPackager;
  */
 public class NBSRequestGenerator {
 
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(NBSRequestGenerator.class.getSimpleName());
     private String iso8583Format;
     private int promptCountIndex;
     private ISOMsg isoMsg;
@@ -54,11 +56,18 @@ public class NBSRequestGenerator {
     private String SERVICE_TYPE;
     @Inject
     private String SESSION_TYPE_AUTH;
+    private String SCHEMA_PATH = "";
 
     public String generateLogOnPacketRequest(Transaction t) {
         transaction = t;
         try {
-            packager = new GenericPackager("src/main/resources/xml/NBSLogonPackager.xml");
+                SCHEMA_PATH = "src/main/resources/xml/NBSLogonPackager.xml";
+                try {
+                    packager = new GenericPackager(SCHEMA_PATH);
+                } catch (Exception e) {
+                    SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSLogonPackager.xml";
+                     packager = new GenericPackager(SCHEMA_PATH);
+                }
             isoMsg = new ISOMsg();
             isoMsg.setPackager(packager);
             isoMsg.setMTI("0231");
@@ -68,16 +77,12 @@ public class NBSRequestGenerator {
             isoMsg.set(14, createDateFormat());
             isoMsg.set(15, SESSION_TYPE_AUTH);
             isoMsg.set(16, transaction.getTransactionId().substring(0, 4));
-            if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) {
-                isoMsg.set(17, TRANS_TYPE_PRE_AUTH);
-            }
-            if (transaction.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
+            if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) isoMsg.set(17, TRANS_TYPE_PRE_AUTH);
+            else if (transaction.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     || transaction.getRequestType().equalsIgnoreCase(RequestType.SALE)) {
                 isoMsg.set(17, TRANS_TYPE_FINAL_AND_SALE);
             }
-            if (transaction.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
-                isoMsg.set(17, TRANS_TYPE_REFUND);
-            }
+            else if (transaction.getRequestType().equalsIgnoreCase(RequestType.REFUND)) isoMsg.set(17, TRANS_TYPE_REFUND);
             isoMsg.set(18, CARD_TYPE_WEX);
             isoMsg.set(19, transaction.getCatFlag());
             isoMsg.set(110, transaction.getPumpNmbr());
@@ -92,20 +97,10 @@ public class NBSRequestGenerator {
                 isoMsg.set(120, transaction.getAuthNumber());
             }
             isoMsg.set(116, "2");
-            if (transaction.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
-                isoMsg.set(117, transaction.getTrack2());
-            }
-            if (transaction.getInputType().equalsIgnoreCase(InputType.KEYED)) {
-                //isoMsg.set(113, transaction.getTrack2());//Track0 formatt
-            }
-
-            if (!(transaction.getRequestType().equals(RequestType.FINAL_AUTH))) {
-                isoMsg.set(118, Long.toString(t.getAmount()));
-            }
-
-            if (TRANS_TYPE_FINAL_AND_SALE.equals(10) || TRANS_TYPE_REFUND.equals(30)) {
-                isoMsg.set(119, (t.getTransactionId() + t.getTermId()));
-            }
+            if (transaction.getInputType().equalsIgnoreCase(InputType.SWIPED)) isoMsg.set(117, transaction.getTrack2());
+            else if (transaction.getInputType().equalsIgnoreCase(InputType.KEYED))//isoMsg.set(113, transaction.getTrack2());//Track0 formatt
+            if (!(transaction.getRequestType().equals(RequestType.FINAL_AUTH))) isoMsg.set(118, Long.toString(t.getAmount()));
+            if (TRANS_TYPE_FINAL_AND_SALE.equals(10) || TRANS_TYPE_REFUND.equals(30)) isoMsg.set(119, (t.getTransactionId() + t.getTermId()));
 
 //            isoMsg.set(15, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getWexPromptDetails().getPromptDetailCount().toString());
 //            for (promptCountIndex=16 ; promptCountIndex  <  (nbsLogonRequest.getHeaderRecord().getCardSpecificData().getWexPromptDetails().getPromptDetailCount().getPromptTypeOrPromptValue().size()); promptCountIndex++) {
@@ -117,7 +112,7 @@ public class NBSRequestGenerator {
 //            }
             byte[] data = isoMsg.pack();
             iso8583Format = new String(data);
-            System.out.println("output for NBS Iso 8583 format= " + iso8583Format);
+            LOG.info("output for NBS Iso 8583 format= " + iso8583Format);
             return iso8583Format;
         } catch (ISOException ex) {
             Logger.getLogger(NBSRequestGenerator.class.getName()).log(Level.SEVERE, null, ex);
@@ -144,8 +139,14 @@ public class NBSRequestGenerator {
     public Transaction unmarshalAcknowledgment(String response) {
         try {
             isoMsg = new ISOMsg();
-            GenericPackager genericPackager = new GenericPackager("src/main/resources/xml/ResponseAcknowledgment.xml");
-            isoMsg.setPackager(genericPackager);
+            SCHEMA_PATH = "src/main/resources/xml/ResponseAcknowledgment.xml";
+            try {
+                packager = new GenericPackager(SCHEMA_PATH);
+            } catch (Exception e) {
+                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/ResponseAcknowledgment.xml";
+                 packager = new GenericPackager(SCHEMA_PATH);
+            }
+            isoMsg.setPackager(packager);
             isoMsg.unpack(response.getBytes());
             if (isoMsg.getString(10).trim().equalsIgnoreCase("c$")) {
                 transaction.setResponseType(ResponseType.APPROVED);
@@ -168,9 +169,14 @@ public class NBSRequestGenerator {
 //            NBSResponse.AuthResponse authResponse = new NBSResponse.AuthResponse();
 //            NBSResponse.AuthResponse.PromptTypeDetails promptType = new NBSResponse.AuthResponse.PromptTypeDetails();
 //            NBSResponse.AuthResponse.ProductDetails productDetails = new NBSResponse.AuthResponse.ProductDetails();
-
-            GenericPackager genericPackager = new GenericPackager("src/main/resources/xml/NBSResponse.xml");
-            isoMsg.setPackager(genericPackager);
+            SCHEMA_PATH = "src/main/resources/xml/NBSResponse.xml";
+            try {
+                packager = new GenericPackager(SCHEMA_PATH);
+            } catch (Exception e) {
+                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSResponse.xml";
+                 packager = new GenericPackager(SCHEMA_PATH);
+            }
+            isoMsg.setPackager(packager);
             isoMsg.unpack(response.getBytes());
 
             //promptType.setPromptType(isoMsg.getString(23));
@@ -212,7 +218,13 @@ public class NBSRequestGenerator {
         String result = "";
         try {
             isoMsg = new ISOMsg();
-            GenericPackager packager = new GenericPackager("src/main/resources/xml/NBSLogOff.xml");
+            SCHEMA_PATH = "src/main/resources/xml/NBSLogOff.xml";
+            try {
+                packager = new GenericPackager(SCHEMA_PATH);
+            } catch (Exception e) {
+                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSLogOff.xml";
+                 packager = new GenericPackager(SCHEMA_PATH);
+            }
             isoMsg.setPackager(packager);
             isoMsg.setMTI("0231");
             isoMsg.set(10, "O");
@@ -293,5 +305,4 @@ public class NBSRequestGenerator {
     public void setResponseAcknowlegment(ResponseAcknowlegment responseAcknowlegment) {
         this.responseAcknowlegment = responseAcknowlegment;
     }
-
 }

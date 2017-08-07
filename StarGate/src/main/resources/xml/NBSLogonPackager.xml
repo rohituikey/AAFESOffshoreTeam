@@ -101,7 +101,7 @@ and open the template in the editor.
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
         id="117"
-        length="25"
+        length="50"
         name="CardSpecificDataAccountInfo"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield

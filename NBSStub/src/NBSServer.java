@@ -29,12 +29,13 @@ public class NBSServer {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        Socket connectionSocket = null;
         try {
             NBSStub nBSStub = new NBSStubImpl();
             LOG.info("Logging from NBS Server. Initiating Socket Server");
             ServerSocket NbsSocket = new ServerSocket(2000);
 
-            Socket connectionSocket = NbsSocket.accept();
+            connectionSocket = NbsSocket.accept();
             LOG.info("Connection successfully established");
 
             BufferedReader readRequest
@@ -51,13 +52,14 @@ public class NBSServer {
             LOG.log(Level.INFO, "sending response as {0}", response);
             writeResponse.write(response+ " \r");
             writeResponse.flush();
-            
-                connectionSocket.close();
-            
         } catch (IOException ex) {
             Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
+        }finally{
+            try { 
+                if(connectionSocket != null) connectionSocket.close();
+            } catch (IOException ex) {
+                Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-
     }
-
 }

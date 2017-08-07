@@ -333,4 +333,50 @@ public class NBSRequestGenerator {
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
     }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+    public void setApplicationVersion(String applicationVersion) {
+        this.applicationVersion = applicationVersion;
+    }
+
+    public void setDaylightSavingsTimeAtSiteOne(String daylightSavingsTimeAtSiteOne) {
+        this.daylightSavingsTimeAtSiteOne = daylightSavingsTimeAtSiteOne;
+    }
+
+    public void setCaptureOnlyRequest(String captureOnlyRequest) {
+        this.captureOnlyRequest = captureOnlyRequest;
+    }
+
+    public void setSessionTypeAuth(String sessionTypeAuth) {
+        this.sessionTypeAuth = sessionTypeAuth;
+    }
+
+    public void setTransTypePreAuth(String transTypePreAuth) {
+        this.transTypePreAuth = transTypePreAuth;
+    }
+
+    public void setTransTypeFinalAndSale(String transTypeFinalAndSale) {
+        this.transTypeFinalAndSale = transTypeFinalAndSale;
+    }
+
+    public void setTransTypeRefund(String transTypeRefund) {
+        this.transTypeRefund = transTypeRefund;
+    }
+
+    public void setCardTypeWex(String cardTypeWex) {
+        this.cardTypeWex = cardTypeWex;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
+
+    public void setSCHEMA_PATH(String SCHEMA_PATH) {
+        this.SCHEMA_PATH = SCHEMA_PATH;
+    }
+    
+    
 }

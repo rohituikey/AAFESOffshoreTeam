@@ -32,6 +32,14 @@ public class WEXProcessor {
 //    private TransactionDAO transactionDAO;
     private NBSRequestGenerator nbsRequestGeneratorObj;
 
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
+
+    public void setNbsRequestGeneratorObj(NBSRequestGenerator nbsRequestGeneratorObj) {
+        this.nbsRequestGeneratorObj = nbsRequestGeneratorObj;
+    }
+
     public Transaction processWexRequests(Transaction t){
         LOG.info("WEXProcessor.processWexRequests mothod started");
         try {

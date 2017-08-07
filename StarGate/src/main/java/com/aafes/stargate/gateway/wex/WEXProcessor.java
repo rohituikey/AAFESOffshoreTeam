@@ -111,28 +111,28 @@ public class WEXProcessor {
 //        }
 //    }
 
-    public Transaction processSaleRequest(Transaction t) {
-
-        LOG.info("WEXProcessor.ProcessSaleRequest mothod started");
-
-        try {
-//            String responseStr = "";
-//            NBSClient clientObj = new NBSClient();
-//            responseStr = clientObj.generateResponse("APPROVED");
-//            t.setResponseType(responseStr.trim());
-//            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
-//                t.setReasonCode(configurator.get("SUCCESS"));
-//                t.setDescriptionField(ResponseType.APPROVED);
-//            } else {
-//                t.setDescriptionField(ResponseType.DECLINED);
-//            }
-//            t.setResponseType(responseStr);
-//            LOG.info("WEXProcessor.ProcessSaleRequest mothod ended");
-            return t;
-        } catch (Exception e) {
-            throw e;
-        }
-    }
+//    public Transaction processSaleRequest(Transaction t) {
+//
+//        LOG.info("WEXProcessor.ProcessSaleRequest mothod started");
+//
+//        try {
+////            String responseStr = "";
+////            NBSClient clientObj = new NBSClient();
+////            responseStr = clientObj.generateResponse("APPROVED");
+////            t.setResponseType(responseStr.trim());
+////            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
+////                t.setReasonCode(configurator.get("SUCCESS"));
+////                t.setDescriptionField(ResponseType.APPROVED);
+////            } else {
+////                t.setDescriptionField(ResponseType.DECLINED);
+////            }
+////            t.setResponseType(responseStr);
+////            LOG.info("WEXProcessor.ProcessSaleRequest mothod ended");
+//            return t;
+//        } catch (Exception e) {
+//            throw e;
+//        }
+//    }
 
 //    public Transaction processRefundRequest(Transaction t) {
 //        sMethodName = "processRefundRequest";

@@ -1,5 +1,6 @@
 package WexStub;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jpos.iso.ISOException;
@@ -21,15 +22,19 @@ public class NBSStubImpl implements NBSStub {
     private String responseDetails;
     ISOMsg isoMsg = new ISOMsg();
     boolean correctRequest = true;
+    GenericPackager packager;
+    private String SCHEMA_PATH = "src/XML/NBSLogonPackager.xml";
 
     @Override
     public String getResponse(String request) {
-
         try {
-            
             try {
-                GenericPackager packager = new GenericPackager("src/XML/NBSLogonPackager.xml");
-                
+                try {
+                    packager = new GenericPackager(SCHEMA_PATH);
+                } catch (Exception e) {
+                    SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSLogonPackager.xml";
+                     packager = new GenericPackager(SCHEMA_PATH);
+                }
                 isoMsg.setPackager(packager);
                 isoMsg.unpack(request.getBytes());
                 
@@ -58,7 +63,14 @@ public class NBSStubImpl implements NBSStub {
 
     private String generateResponse() throws ISOException {
         isoMsg = new ISOMsg();
-        GenericPackager packager = new GenericPackager("src/XML/ResponseAcknowledgment.xml");
+        SCHEMA_PATH = "src/XML/ResponseAcknowledgment.xml";
+        try {
+            packager = new GenericPackager(SCHEMA_PATH);
+        } catch (Exception e) {
+            SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/ResponseAcknowledgment.xml";
+             packager = new GenericPackager(SCHEMA_PATH);
+        }
+        
         isoMsg.setPackager(packager);
         isoMsg.setMTI("0231");
         if (correctRequest) {
@@ -75,7 +87,13 @@ public class NBSStubImpl implements NBSStub {
 
     private String generateNBSResponse() throws ISOException {
         isoMsg = new ISOMsg();
-        GenericPackager packager = new GenericPackager("src/XML/NBSResponse.xml");
+        SCHEMA_PATH = "src/XML/NBSResponse.xml";
+        try {
+            packager = new GenericPackager(SCHEMA_PATH);
+        } catch (Exception e) {
+            SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSResponse.xml";
+             packager = new GenericPackager(SCHEMA_PATH);
+        }
         isoMsg.setPackager(packager);
         isoMsg.setMTI("0231");
         isoMsg.set(10, "AuthRequest");

@@ -375,6 +375,18 @@
                         </goals>
                         <configuration>
                             <schemaIncludes>
+                                <include>jaxb/transaction/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-transaction.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-transaction</id>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
                                 <include>jaxb/nbsresponseacknowledgmentschema/*.xsd</include>
                             </schemaIncludes>
                             <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-nbsresponseacknowledgmentschema.episode</episodeFile>

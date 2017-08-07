@@ -36,10 +36,10 @@ public class WEXProcessor {
         LOG.info("WEXProcessor.processWexRequests mothod started");
         try {
             nbsRequestGeneratorObj = new NBSRequestGenerator();
-            String requestStr = nbsRequestGeneratorObj.generateLogOnPacketRequest(t);
+            byte[] iSOMsg = nbsRequestGeneratorObj.generateLogOnPacketRequest(t);
             NBSClient clientObj = new NBSClient();
-            String responseStr = clientObj.generateResponse(requestStr);
-            String[] result = nbsRequestGeneratorObj.seperateResponse(responseStr);
+            byte[] iSOMsgResponse = clientObj.generateResponse(new String(iSOMsg));
+            String[] result = nbsRequestGeneratorObj.seperateResponse(iSOMsgResponse);
             t = nbsRequestGeneratorObj.unmarshalAcknowledgment(result[0]);
             if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) LOG.info("LOGON successfull");
             else LOG.info("LOGON failed");
@@ -108,18 +108,18 @@ public class WEXProcessor {
         LOG.info("WEXProcessor.ProcessSaleRequest mothod started");
 
         try {
-            String responseStr = "";
-            NBSClient clientObj = new NBSClient();
-            responseStr = clientObj.generateResponse("APPROVED");
-            t.setResponseType(responseStr.trim());
-            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
-                t.setReasonCode(configurator.get("SUCCESS"));
-                t.setDescriptionField(ResponseType.APPROVED);
-            } else {
-                t.setDescriptionField(ResponseType.DECLINED);
-            }
-            t.setResponseType(responseStr);
-            LOG.info("WEXProcessor.ProcessSaleRequest mothod ended");
+//            String responseStr = "";
+//            NBSClient clientObj = new NBSClient();
+//            responseStr = clientObj.generateResponse("APPROVED");
+//            t.setResponseType(responseStr.trim());
+//            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
+//                t.setReasonCode(configurator.get("SUCCESS"));
+//                t.setDescriptionField(ResponseType.APPROVED);
+//            } else {
+//                t.setDescriptionField(ResponseType.DECLINED);
+//            }
+//            t.setResponseType(responseStr);
+//            LOG.info("WEXProcessor.ProcessSaleRequest mothod ended");
             return t;
         } catch (Exception e) {
             throw e;

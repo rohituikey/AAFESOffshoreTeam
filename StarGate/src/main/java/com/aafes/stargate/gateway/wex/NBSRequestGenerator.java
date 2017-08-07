@@ -53,7 +53,7 @@ public class NBSRequestGenerator {
     @EJB
     private Configurator configurator;
 
-    public String generateLogOnPacketRequest(Transaction t) {
+    public byte[] generateLogOnPacketRequest(Transaction t) {
         
         if(configurator == null){
             configurator = new Configurator();
@@ -89,7 +89,7 @@ public class NBSRequestGenerator {
             isoMsg.set(14, createDateFormat());
             isoMsg.set(15, sessionTypeAuth);
             isoMsg.set(16, transaction.getTransactionId().substring(0, 4));
-            if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) isoMsg.set(17, sessionTypeAuth);
+            if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) isoMsg.set(17, transTypePreAuth);
             else if (transaction.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     || transaction.getRequestType().equalsIgnoreCase(RequestType.SALE)) {
                 isoMsg.set(17, transTypeFinalAndSale);
@@ -126,11 +126,11 @@ public class NBSRequestGenerator {
             byte[] data = isoMsg.pack();
             iso8583Format = new String(data);
             LOG.info("output for NBS Iso 8583 format= " + iso8583Format);
-            return iso8583Format;
+            return data;
         } catch (ISOException ex) {
             Logger.getLogger(NBSRequestGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return iso8583Format;
+        return null;
     }
 
     public String createDateAndTime(String dt) {
@@ -141,11 +141,12 @@ public class NBSRequestGenerator {
         return dt;
     }
 
-    public String[] seperateResponse(String response) {
+    public String[] seperateResponse(byte[] response) {
+        String responseString = new String(response);
         String[] result = {"", ""};
-        String mTI = response.substring(0, 4);
-        result[0] = response.substring(0, response.substring(4).indexOf(mTI) + 4);
-        result[1] = response.substring(result[0].length());
+        String mTI = responseString.substring(0, 4);
+        result[0] = responseString.substring(0, responseString.substring(4).indexOf(mTI) + 4);
+        result[1] = responseString.substring(result[0].length());
         return result;
     }
 

@@ -5,12 +5,15 @@
  */
 package com.aafes.starsettler.imported;
 
+import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.CassandraSessionFactory;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
+import com.datastax.driver.mapping.Result;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -35,6 +38,9 @@ public class SettleMessageDAO {
 
     private Mapper mapper;
     private CassandraSessionFactory factory;
+    private ResultSet resultSet;
+    private Session session;
+    
 
     @PostConstruct
     public void postConstruct() {
@@ -128,6 +134,18 @@ public class SettleMessageDAO {
         }
         LOG.info("SetteleMessageDAO.find method is ended");
         return settleEntity;
+    }
+    
+    public List<SettleEntity> returnTransactions() {
+        List<SettleEntity> result = new ArrayList<>();
+        String query = "Select * from Stargate.transactions";
+        resultSet = session.execute(query);
+
+        Result<SettleEntity> resultTrans = mapper.map(resultSet);
+        for(SettleEntity t : resultTrans){
+            result.add(t);
+        }
+        return result;
     }
 
     @EJB

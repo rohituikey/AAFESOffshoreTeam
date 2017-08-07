@@ -1,0 +1,66 @@
+<xs:schema xmlns="http://www.aafes.com/transaction" targetNamespace="http://www.aafes.com/transaction" xmlns:credit="http://www.aafes.com/transaction" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="Transactionfile">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="batch" maxOccurs="unbounded" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="trans" maxOccurs="unbounded" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="card">
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:string">
+                                                        <xs:attribute type="xs:byte" name="track" use="optional"/>
+                                                    </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="pump" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element type="xs:float" name="amount"/>
+                                                </xs:sequence>
+                                                <xs:attribute type="xs:string" name="cat" use="optional"/>
+                                                <xs:attribute type="xs:string" name="service" use="optional"/>
+                                                <xs:attribute type="xs:byte" name="nbr" use="optional"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="product" maxOccurs="unbounded" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element type="xs:float" name="amount"/>
+                                                    <xs:element type="xs:float" name="quantity"/>
+                                                    <xs:element type="xs:float" name="price"/>
+                                                </xs:sequence>
+                                                <xs:attribute type="xs:byte" name="code" use="optional"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element type="xs:string" name="odometer" minOccurs="0" maxOccurs="1"/>
+                                        <xs:element type="xs:string" name="amount" minOccurs="0" maxOccurs="1"/>
+                                        <xs:element type="xs:string" name="authref" minOccurs="0" maxOccurs="1"/>
+                                        <xs:element type="xs:string" name="driver" minOccurs="0" maxOccurs="1"/>
+                                        <xs:element type="xs:string" name="vehicle" minOccurs="0" maxOccurs="1"/>
+                                    </xs:sequence>
+                                    <xs:attribute type="xs:string" name="cardCode" use="optional"/>
+                                    <xs:attribute type="xs:byte" name="type" use="optional"/>
+                                    <xs:attribute type="xs:short" name="nbr" use="optional"/>
+                                    <xs:attribute type="xs:int" name="date" use="optional"/>
+                                    <xs:attribute type="xs:int" name="time" use="optional"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute type="xs:string" name="tid" use="optional"/>
+                        <xs:attribute type="xs:short" name="bid" use="optional"/>
+                        <xs:attribute type="xs:string" name="app" use="optional"/>
+                        <xs:attribute type="xs:byte" name="version" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute type="xs:int" name="date"/>
+            <xs:attribute type="xs:short" name="time"/>
+            <xs:attribute type="xs:short" name="sequence"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

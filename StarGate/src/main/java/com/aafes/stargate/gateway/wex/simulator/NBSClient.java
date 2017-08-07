@@ -17,9 +17,10 @@ public class NBSClient {
 
     private static final Logger LOG = Logger.getLogger(NBSClient.class.getName());
     private StringBuffer response;
+    byte[] isoFormat;
 private Socket nbsSocket;
 
-    public String generateResponse(String request) {
+    public byte[] generateResponse(String request) {
 
         String responsePerLine;
         try {
@@ -46,11 +47,12 @@ private Socket nbsSocket;
                 LOG.log(Level.INFO, "Response recieved as {0}", response);
             }
             nbsSocket.close();
-            return response.toString();
+            isoFormat = response.toString().getBytes();
+            return isoFormat;
         } catch (IOException ex) {
             Logger.getLogger(NBSClient.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("nbsclient.NBSClient.main()" + ex);
         }
-        return response.toString();
+        return isoFormat;
     }
 }

@@ -171,14 +171,16 @@ public class Authorizer {
                             && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                         LOG.info("Saving and updating transaction.....");
                         tranRepository.saveAndUpdate(t, authTranCancel);
-                    } else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia())
-                            && ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())){
-                            LOG.error("Transaction " + t.getResponseType());
+                    } 
+//                    else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia())
+//                            && ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())){
+//                            LOG.error("Transaction " + t.getResponseType());
 //                            t.setReasonCode(configurator.get(t.getReasonCode()));
 //                            t.setDescriptionField(t.getDescriptionField());
 //                            t.setResponseType(ResponseType.DECLINED);
-                            mapResponse(t, cm);
-                    } else {
+//                            mapResponse(t, cm);
+//                    } 
+                    else {
                         LOG.info("Saving transaction....." + t.getRrn());
                         encryptValues(t);
                         tranRepository.save(t);
@@ -302,12 +304,23 @@ public class Authorizer {
             }
         } 
         /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - start */
-        else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.REFUND)){
+        else if (MediaType.WEX.equalsIgnoreCase(t.getMedia()) && t.getRequestType() != null 
+                && t.getRequestType().equalsIgnoreCase(RequestType.REFUND)){
             LOG.info(RequestType.REFUND + " request : " + t.getRrn());
             authTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.FINAL_AUTH);
             if (authTran == null) throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_REFUND");
        }
         /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - end */
+        /* CONDITION ADDED TO CHECK APPROVED PRE-AUTH TRANSACTION FOR WEX FINAL AUTH REQUEST - end */
+        else if(MediaType.WEX.equalsIgnoreCase(t.getMedia()) && t.getRequestType() != null 
+                && t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)){
+            authTran = transactionDAO.find(t.getIdentityUuid(), t.getRrn(), RequestType.PREAUTH);
+            if (authTran == null) throw new AuthorizerException("NO_PRIOR_TRANSACTION");
+            if (authTran.getAuthNumber() != null) {
+                t.setAuthNumber(authTran.getAuthNumber());
+            }
+        }
+         /* CONDITION ADDED TO CHECK APPROVED PRE-AUTH TRANSACTION FOR WEX FINAL AUTH REQUEST - end */
         return authTran;
     }
 

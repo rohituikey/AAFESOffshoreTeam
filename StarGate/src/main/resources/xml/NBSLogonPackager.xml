@@ -7,15 +7,15 @@ and open the template in the editor.
 <!DOCTYPE isopackager SYSTEM "NBSLogonPackager.dtd">
 <isopackager>
     <isofield
-      id="0"
-      length="4"
-      name="MESSAGE TYPE INDICATOR"
-      class="org.jpos.iso.IFA_NUMERIC"/>
+        id="0"
+        length="4"
+        name="MESSAGE TYPE INDICATOR"
+        class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield
-      id="1"
-      length="64"
-      name="BIT MAP"
-      class="org.jpos.iso.IFA_BITMAP"/>
+        id="1"
+        length="64"
+        name="BIT MAP"
+        class="org.jpos.iso.IFA_BITMAP"/>
     <isofield
         id="10"
         length="25"
@@ -71,20 +71,53 @@ and open the template in the editor.
         length="25"
         name="ServiceType"
         class="org.jpos.iso.IFA_LLLCHAR"/>
+    
     <isofield
         id="112"
         length="25"
-        name="Track"
+        name="Amount"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
         id="113"
-        length="25"
-        name="CardSpecificDataAccountInfo"
+        length="50"
+        name="CATamount"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
         id="114"
         length="25"
+        name="TransNumber"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+    <isofield
+        id="115"
+        length="25"
+        name="DateTime"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+    
+        
+    <isofield
+        id="116"
+        length="25"
+        name="Track"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+    <isofield
+        id="117"
+        length="25"
+        name="CardSpecificDataAccountInfo"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+    <isofield
+        id="118"
+        length="25"
         name="CardSpecificDataAmount"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+    <isofield
+        id="119"
+        length="25"
+        name="CardSpecificDataRecieptNumber"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+    <isofield
+        id="120"
+        length="25"
+        name="CardSpecificDataAuthReference"
         class="org.jpos.iso.IFA_LLLCHAR"/>
 </isopackager>
   

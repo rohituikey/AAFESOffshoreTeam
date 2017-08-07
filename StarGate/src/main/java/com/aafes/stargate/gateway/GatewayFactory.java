@@ -104,4 +104,11 @@ public class GatewayFactory {
     {
         this.visionGatewaySimulator = visionGatewaySimulator;
     }
+
+    /**
+     * @param wexGateway the wexGateway to set
+     */
+    public void setWexGateway(WexGateway wexGateway) {
+        this.wexGateway = wexGateway;
+    }
 }

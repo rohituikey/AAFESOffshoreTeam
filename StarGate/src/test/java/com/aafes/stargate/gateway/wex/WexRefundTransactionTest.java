@@ -136,7 +136,7 @@ public class WexRefundTransactionTest {
         assertEquals("NO_AUTHORIZATION_FOUND_FOR_REFUND", result.getResponse().get(0).getDescriptionField());
     }
     
-    //@Ignore
+    @Ignore
     @Test
     public void testSuccessRefundRequest() {
         sMethodName = "testSuccessRefundRequest";

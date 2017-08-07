@@ -304,12 +304,23 @@ public class Authorizer {
             }
         } 
         /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - start */
-        else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.REFUND)){
+        else if (MediaType.WEX.equalsIgnoreCase(t.getMedia()) && t.getRequestType() != null 
+                && t.getRequestType().equalsIgnoreCase(RequestType.REFUND)){
             LOG.info(RequestType.REFUND + " request : " + t.getRrn());
             authTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.FINAL_AUTH);
             if (authTran == null) throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_REFUND");
        }
         /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - end */
+        /* CONDITION ADDED TO CHECK APPROVED PRE-AUTH TRANSACTION FOR WEX FINAL AUTH REQUEST - end */
+        else if(MediaType.WEX.equalsIgnoreCase(t.getMedia()) && t.getRequestType() != null 
+                && t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)){
+            authTran = transactionDAO.find(t.getIdentityUuid(), t.getRrn(), RequestType.PREAUTH);
+            if (authTran == null) throw new AuthorizerException("NO_PRIOR_TRANSACTION");
+            if (authTran.getAuthNumber() != null) {
+                t.setAuthNumber(authTran.getAuthNumber());
+            }
+        }
+         /* CONDITION ADDED TO CHECK APPROVED PRE-AUTH TRANSACTION FOR WEX FINAL AUTH REQUEST - end */
         return authTran;
     }
 

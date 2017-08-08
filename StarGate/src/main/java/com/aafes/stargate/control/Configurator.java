@@ -44,6 +44,17 @@ public class Configurator {
             System.setProperties(properties);
         } catch (IOException ex) {
             LOG.error(ex.toString());
+            path = "src/main/resources/stargate.properties";
+            properties = new Properties();
+            input = null;
+            try {
+                input = new FileInputStream(path);
+                properties.load(input);
+                properties.putAll(System.getProperties());
+                System.setProperties(properties);
+            } catch (Exception e) {
+                LOG.error(e.toString());
+            }
         } finally {
             if (input != null) {
                 try {

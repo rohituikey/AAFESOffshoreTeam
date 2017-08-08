@@ -60,16 +60,16 @@ public class NBSRequestGenerator {
             configurator.postConstruct();
         }
         
-        applicationName = configurator.get("APPLICATION_NAME");
-        applicationVersion = configurator.get("APPLICATION_VERSION");
-        daylightSavingsTimeAtSiteOne = configurator.get("DAYLIGHT_SAVINGS_TIME_AT_SITE_ONE");
-        captureOnlyRequest = configurator.get("CAPTURE_ONLY_REQUEST");
-        sessionTypeAuth = configurator.get("SESSION_TYPE_AUTH");
-        transTypePreAuth = configurator.get("TRANS_TYPE_PRE_AUTH");
-        transTypeFinalAndSale = configurator.get("TRANS_TYPE_FINAL_AND_SALE");
-        transTypeRefund = configurator.get("TRANS_TYPE_REFUND");
-        cardTypeWex = configurator.get("CARD_TYPE_WEX");
-        serviceType = configurator.get("SERVICE_TYPE");
+        if(applicationName == null) applicationName = configurator.get("APPLICATION_NAME");
+        if(applicationVersion == null) applicationVersion = configurator.get("APPLICATION_VERSION");
+        if(daylightSavingsTimeAtSiteOne == null) daylightSavingsTimeAtSiteOne = configurator.get("DAYLIGHT_SAVINGS_TIME_AT_SITE_ONE");
+        if(captureOnlyRequest == null) captureOnlyRequest = configurator.get("CAPTURE_ONLY_REQUEST");
+        if(sessionTypeAuth == null) sessionTypeAuth = configurator.get("SESSION_TYPE_AUTH");
+        if(transTypePreAuth == null) transTypePreAuth = configurator.get("TRANS_TYPE_PRE_AUTH");
+        if(transTypeFinalAndSale == null) transTypeFinalAndSale = configurator.get("TRANS_TYPE_FINAL_AND_SALE");
+        if(transTypeRefund == null) transTypeRefund = configurator.get("TRANS_TYPE_REFUND");
+        if(cardTypeWex == null) cardTypeWex = configurator.get("CARD_TYPE_WEX");
+        if(serviceType == null) serviceType = configurator.get("SERVICE_TYPE");
         
         transaction = t;
         try {

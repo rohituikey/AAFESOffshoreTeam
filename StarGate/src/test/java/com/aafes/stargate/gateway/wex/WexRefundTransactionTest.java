@@ -120,6 +120,7 @@ public class WexRefundTransactionTest {
         wexProcessor = new WEXProcessor();
         wexGateway = new WexGateway();
         nbsRequestGeneratorObj = new NBSRequestGenerator();
+        nbsRequestGeneratorObj.setConfigurator(configurator);
         
         wexProcessor.setNbsRequestGeneratorObj(nbsRequestGeneratorObj);
         nbsRequestGeneratorObj.setApplicationName("AUTHREQ");
@@ -153,7 +154,7 @@ public class WexRefundTransactionTest {
         authorizer.setBaseStrategyFactory(bsf);
     }
     
-    //@Ignore
+    @Ignore
     @Test
     public void testNoAuthorizationFoundForRefundRequest() {
         sMethodName = "testNoAuthorizationFoundForRefundRequest";
@@ -174,8 +175,9 @@ public class WexRefundTransactionTest {
         Message creditMessage = this.unmarshalCreditMessage(requestXMLRefund);
         Message result = authorizer.authorize(creditMessage);
         clearGlobalVariables();
-        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         deleteDataForTesting();
+        deleteRefundDataForTesting();
+        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         assertEquals("100", result.getResponse().get(0).getReasonCode());
     }
     

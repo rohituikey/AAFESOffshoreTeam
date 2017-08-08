@@ -43,7 +43,7 @@ public class WEXProcessor {
     public Transaction processWexRequests(Transaction t){
         LOG.info("WEXProcessor.processWexRequests mothod started");
         try {
-            nbsRequestGeneratorObj = new NBSRequestGenerator();
+            if(nbsRequestGeneratorObj == null) nbsRequestGeneratorObj = new NBSRequestGenerator();
             byte[] iSOMsg = nbsRequestGeneratorObj.generateLogOnPacketRequest(t);
             NBSClient clientObj = new NBSClient();
             byte[] iSOMsgResponse = clientObj.generateResponse(new String(iSOMsg));

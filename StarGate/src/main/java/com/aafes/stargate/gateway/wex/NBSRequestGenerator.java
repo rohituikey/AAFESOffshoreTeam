@@ -12,6 +12,7 @@ import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
+import com.aafes.stargate.util.SvsUtil;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -105,7 +106,7 @@ public class NBSRequestGenerator {
                 isoMsg.set(112, Long.toString(transaction.getAmount()));
                 isoMsg.set(113, Long.toString(transaction.getAmtPreAuthorized()));
                 isoMsg.set(114, transaction.getTransactionId());
-                isoMsg.set(115, createDateAndTime(transaction.getLocalDateTime()));
+                isoMsg.set(115, createDateAndTime());
                 isoMsg.set(120, transaction.getAuthNumber());
             }
             isoMsg.set(116, "2");
@@ -133,10 +134,14 @@ public class NBSRequestGenerator {
         return null;
     }
 
-    public String createDateAndTime(String dt) {
-    //        YYMMDDhhmmss
-    //2017-08-03 09:31:54.316
-        dt = dt.substring(2, 4) + dt.substring(5, 7) + dt.substring(8, 10) + dt.substring(11, 13) + dt.substring(14, 16) + dt.substring(17, 19  );
+    
+    public String createDateAndTime() {
+        //        YYMMDDhhmmss
+        //2017-08-03 09:31:54.316
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date date = new Date();
+        String dt = dateFormat.format(date);
+        dt = dt.substring(2, 4) + dt.substring(5, 7) + dt.substring(8, 10) + dt.substring(11, 13) + dt.substring(14, 16) + dt.substring(17, 19);
 
         return dt;
     }
@@ -204,7 +209,7 @@ public class NBSRequestGenerator {
 
             transaction.setResponseType(isoMsg.getString(15));
             transaction.setMedia(isoMsg.getString(16));
-            transaction.setLocalDateTime(createDateFormat());
+            transaction.setLocalDateTime(SvsUtil.formatLocalDateTime());
 //            authResponse.setIdentity(isoMsg.getString(17));
   //          authResponse.setHostNumber(isoMsg.getString(18));
 //            authResponse.setCardNumber(isoMsg.getString(19));
@@ -255,23 +260,22 @@ public class NBSRequestGenerator {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Date date = new Date();
         String ts = dateFormat.format(date);
-        //2017-08-03 09:31:54.316
+        //2017-08-08 08:39:30.967
         ts = ts.substring(11, 13) + ts.substring(14, 16) + daylightSavingsTimeAtSiteOne;
         return ts;
     }
-    
-    private String CreateDF_forTransaction(String df)
-    {
-        //yyyy-MM-dd HH:mm:ss.SSS
-        //2017-08-03 09:31:54.316
-        
-       // WYYMMDDhhmmss
-       // 3170621071655
-      df = "20"+df.substring(1, 3)+"-"+df.substring(3, 5)+"-"
-              +df.substring(5, 7)+" "+df.substring(7, 9)+":"+df.substring(9, 11)+":"+df.substring(11, 13)+".000";
-        return df;
-    }
 
+//    private String CreateDF_forTransaction(String df)
+//    {
+//        //yyyy-MM-dd HH:mm:ss.SSS
+//        //2017-08-03 09:31:54.316
+//        
+//       // WYYMMDDhhmmss
+//       // 3170621071655
+//      df = "20"+df.substring(1, 3)+"-"+df.substring(3, 5)+"-"
+//              +df.substring(5, 7)+" "+df.substring(7, 9)+":"+df.substring(9, 11)+":"+df.substring(11, 13)+".000";
+//        return df;
+//    }
     public NBSResponse getnBSResponse() {
         return nBSResponse;
     }

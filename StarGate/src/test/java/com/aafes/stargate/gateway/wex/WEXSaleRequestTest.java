@@ -145,7 +145,7 @@ public class WEXSaleRequestTest {
         authorizer.setBaseStrategyFactory(bsf);
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void testSuccessSalerRequest() {
         sMethodName = "testSuccessSalerRequest";

@@ -72,6 +72,18 @@ public class NBSRequestGenerator {
         cardTypeWex = configurator.get("CARD_TYPE_WEX");
         serviceType = configurator.get("SERVICE_TYPE");
 
+        
+        if(applicationName == null) applicationName = configurator.get("APPLICATION_NAME");
+        if(applicationVersion == null) applicationVersion = configurator.get("APPLICATION_VERSION");
+        if(daylightSavingsTimeAtSiteOne == null) daylightSavingsTimeAtSiteOne = configurator.get("DAYLIGHT_SAVINGS_TIME_AT_SITE_ONE");
+        if(captureOnlyRequest == null) captureOnlyRequest = configurator.get("CAPTURE_ONLY_REQUEST");
+        if(sessionTypeAuth == null) sessionTypeAuth = configurator.get("SESSION_TYPE_AUTH");
+        if(transTypePreAuth == null) transTypePreAuth = configurator.get("TRANS_TYPE_PRE_AUTH");
+        if(transTypeFinalAndSale == null) transTypeFinalAndSale = configurator.get("TRANS_TYPE_FINAL_AND_SALE");
+        if(transTypeRefund == null) transTypeRefund = configurator.get("TRANS_TYPE_REFUND");
+        if(cardTypeWex == null) cardTypeWex = configurator.get("CARD_TYPE_WEX");
+        if(serviceType == null) serviceType = configurator.get("SERVICE_TYPE");
+        
         transaction = t;
         try {
             SCHEMA_PATH = "src/main/resources/xml/NBSLogonPackager.xml";
@@ -345,4 +357,51 @@ public class NBSRequestGenerator {
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
     }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+    public void setApplicationVersion(String applicationVersion) {
+        this.applicationVersion = applicationVersion;
+    }
+
+    public void setDaylightSavingsTimeAtSiteOne(String daylightSavingsTimeAtSiteOne) {
+        this.daylightSavingsTimeAtSiteOne = daylightSavingsTimeAtSiteOne;
+    }
+
+    public void setCaptureOnlyRequest(String captureOnlyRequest) {
+        this.captureOnlyRequest = captureOnlyRequest;
+    }
+
+    public void setSessionTypeAuth(String sessionTypeAuth) {
+        this.sessionTypeAuth = sessionTypeAuth;
+    }
+
+    public void setTransTypePreAuth(String transTypePreAuth) {
+        this.transTypePreAuth = transTypePreAuth;
+    }
+
+    public void setTransTypeFinalAndSale(String transTypeFinalAndSale) {
+        this.transTypeFinalAndSale = transTypeFinalAndSale;
+    }
+
+    public void setTransTypeRefund(String transTypeRefund) {
+        this.transTypeRefund = transTypeRefund;
+    }
+
+    public void setCardTypeWex(String cardTypeWex) {
+        this.cardTypeWex = cardTypeWex;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
+
+    public void setSCHEMA_PATH(String SCHEMA_PATH) {
+        this.SCHEMA_PATH = SCHEMA_PATH;
+    }
+    
+    
+}
 }

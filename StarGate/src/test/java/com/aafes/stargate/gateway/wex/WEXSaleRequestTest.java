@@ -8,49 +8,44 @@ package com.aafes.stargate.gateway.wex;
 import com.aafes.credit.Message;
 import com.aafes.stargate.authorizer.BaseStrategy;
 import com.aafes.stargate.authorizer.BaseStrategyFactory;
-import com.aafes.stargate.authorizer.RetailStrategy;
 import com.aafes.stargate.authorizer.entity.Facility;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Authorizer;
-import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.CassandraSessionFactory;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.control.TranRepository;
 import com.aafes.stargate.dao.FacilityDAO;
 import com.aafes.stargate.dao.TransactionDAO;
+import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.gateway.GatewayFactory;
-import com.aafes.stargate.gateway.vision.simulator.VisionGatewayStub;
-import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.StrategyType;
-import com.aafes.stargate.util.TransactionType;
 import com.aafes.starsettler.imported.SettleEntity;
 import com.aafes.starsettler.imported.SettleMessageDAO;
-import com.aafes.starsettler.imported.SettleStatus;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
 import java.io.StringReader;
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.XMLGregorianCalendar;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author singha
  */
 public class WEXSaleRequestTest {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(WexRefundTransactionTest.class.getSimpleName());
+    String sMethodName = "";
+    final String CLASS_NAME = WEXSaleRequestTest.this.getClass().getSimpleName();
 
     Authorizer authorizer;
     Configurator configurator;
@@ -64,148 +59,27 @@ public class WEXSaleRequestTest {
     Session session;
     ResultSet resultSet;
     WEXStrategy wexStrategy;
+    WexGateway wexGateway;
+    WEXProcessor wexProcessor;
+    WEXValidator wexValidator;
     BaseStrategyFactory bsf;
     GatewayFactory gatewayFactory;
     BaseStrategy bs;
-    WexGateway wexGateway;
     SettleMessageDAO settleMessageDAO;
-    Transaction t;
-    String uuid;
-    String requestXML;
-    Message creditMessage;
-    List<SettleEntity> SettleEntityList;
+    NBSRequestGenerator nbsRequestGeneratorObj;
+
+    String requestXMLSale = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><cm:Message xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:cm='http://www.aafes.com/credit' xsi:schemaLocation='http://www.aafes.com/credit file:///D:/Users/burangir/Downloads/wildfly-10.1.0.Final/wildfly-10.1.0.Final/standalone/configuration/CreditMessageGSA.xsd' TypeCode=\"Request\" MajorVersion=\"3\" MinorVersion=\"1\" FixVersion=\"0\"><cm:Header><cm:IdentityUUID>eacbc625-6fef-479e-8738-92adcfed7c65</cm:IdentityUUID><cm:LocalDateTime>2017-07-02T09:04:01</cm:LocalDateTime><cm:SettleIndicator>true</cm:SettleIndicator><cm:OrderNumber>54163254</cm:OrderNumber><cm:transactionId>66324154</cm:transactionId><cm:termId>23</cm:termId></cm:Header><cm:Request RRN=\"TkFwxJKiaTwg\"><cm:Media>WEX</cm:Media><cm:RequestType>Sale</cm:RequestType><cm:InputType>Swiped</cm:InputType><cm:Pan>Pan</cm:Pan><cm:Account>6006496628299904508</cm:Account><cm:Expiration>2103</cm:Expiration><cm:CardVerificationValue>837</cm:CardVerificationValue><cm:TrackData2>6900460000000000001=20095004100210123</cm:TrackData2><cm:AmountField>-9.00</cm:AmountField><cm:WEXRequestData><cm:CardSeqNumber>12345</cm:CardSeqNumber><cm:ServiceCode>S</cm:ServiceCode><cm:CATFlag>1</cm:CATFlag><cm:DriverId>12365</cm:DriverId><cm:Odometer>36079</cm:Odometer><cm:VehicleId>9213</cm:VehicleId><cm:RestrictCode>01</cm:RestrictCode><cm:ProdDetailCount>1</cm:ProdDetailCount><cm:NonFuelPricePerUnit>9.00</cm:NonFuelPricePerUnit><cm:NonFuelQty>1.00</cm:NonFuelQty><cm:NonFuelProdCode>102</cm:NonFuelProdCode><cm:NonFuelAmount>-9.00</cm:NonFuelAmount><cm:LicenseNumber>1212</cm:LicenseNumber><cm:DeptNumber>1</cm:DeptNumber><cm:JobValueNumber>1</cm:JobValueNumber><cm:DataNumber>12</cm:DataNumber><cm:UserId>121</cm:UserId></cm:WEXRequestData><cm:pumpNmbr>23</cm:pumpNmbr><cm:DescriptionField>Refund</cm:DescriptionField><cm:origAuthCode>130362</cm:origAuthCode><cm:AmtPreAuthorized>75.00</cm:AmtPreAuthorized></cm:Request></cm:Message>";
+    String requestXMLNoSale = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><cm:Message xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:cm='http://www.aafes.com/credit' xsi:schemaLocation='http://www.aafes.com/credit file:///D:/Users/burangir/Downloads/wildfly-10.1.0.Final/wildfly-10.1.0.Final/standalone/configuration/CreditMessageGSA.xsd' TypeCode=\"Request\" MajorVersion=\"3\" MinorVersion=\"1\" FixVersion=\"0\"><cm:Header><cm:IdentityUUID>eacbc625-6fef-479e-8738-92adcfed7c65</cm:IdentityUUID><cm:LocalDateTime>2017-07-02T09:04:01</cm:LocalDateTime><cm:SettleIndicator>true</cm:SettleIndicator><cm:OrderNumber>54163254</cm:OrderNumber><cm:transactionId>66324154</cm:transactionId><cm:termId>23</cm:termId></cm:Header><cm:Request RRN=\"TkFwxJKiaTpq\"><cm:Media>WEX</cm:Media><cm:RequestType>Sale</cm:RequestType><cm:InputType>Swiped</cm:InputType><cm:Pan>Pan</cm:Pan><cm:Account>6006496628299904508</cm:Account><cm:Expiration>2103</cm:Expiration><cm:CardVerificationValue>837</cm:CardVerificationValue><cm:TrackData2>6900460000000000001=20095004100210123</cm:TrackData2><cm:AmountField>-9.00</cm:AmountField><cm:WEXRequestData><cm:CardSeqNumber>12345</cm:CardSeqNumber><cm:ServiceCode>S</cm:ServiceCode><cm:CATFlag>1</cm:CATFlag><cm:DriverId>12365</cm:DriverId><cm:Odometer>36079</cm:Odometer><cm:VehicleId>9213</cm:VehicleId><cm:RestrictCode>01</cm:RestrictCode><cm:ProdDetailCount>1</cm:ProdDetailCount><cm:NonFuelPricePerUnit>9.00</cm:NonFuelPricePerUnit><cm:NonFuelQty>1.00</cm:NonFuelQty><cm:NonFuelProdCode>102</cm:NonFuelProdCode><cm:NonFuelAmount>-9.00</cm:NonFuelAmount><cm:LicenseNumber>1212</cm:LicenseNumber><cm:DeptNumber>1</cm:DeptNumber><cm:JobValueNumber>1</cm:JobValueNumber><cm:DataNumber>12</cm:DataNumber><cm:UserId>121</cm:UserId></cm:WEXRequestData><cm:pumpNmbr>23</cm:pumpNmbr><cm:DescriptionField>Refund</cm:DescriptionField><cm:origAuthCode>130362</cm:origAuthCode><cm:AmtPreAuthorized>75.00</cm:AmtPreAuthorized></cm:Request></cm:Message>";
+    String uuid = "eacbc625-6fef-479e-8738-92adcfed7c65";
+
+    String insertSale = "INSERT INTO STARGATE.TRANSACTIONS(identityuuid,rrn,requesttype,account,accounttypetype,actioncode,amount,amountsign,amtpreauthorized,authhour,authnumber,authoriztioncode,avsresponsecode,balanceamount,billingaddress1,billingaddress2,billingcountrycode,billingphone,billingzipcode,billpaymentindicator,cardholdername,cardpresence,cardreferenceid,cardseqnumber,cardsequencenumber,catflag,comment,contact,csvresponsecode,currencycode,customerid,datanumber,deptnumber,descriptionfield,divisionnumber,downpayment,driverid,email,encryptalgo,encryptedpayload,encryptmgmt,encrypttrack,essoloadamount,expiration,facility,facility10,facility7,fee,fueldolleramount,fuelprice,fuelprodcode,inputcode,inputtype,jobvaluenumber,ksn,licencenumber,localdatetime,media,merchantorg,milstarnumber,modifiedacctvalue,nonfuelamount,nonfuelprodcode,nonfuelqty,numberofattempts,odometer,ordernumber,origaccttype,origauthcode,originalorder,originalrequesttype,origrrn,origtransid,pan,partialamount,paymenttype,pinblock,plannumber,priceperunit,proddetailcount,productcode,pumpnmbr,pumpprice,qtypumped,quantity,rationamt,reasoncode,requestauthdatetime,requestxmldatetime,responseauthdatetime,responsedate,responsetype,responsexmldatetime,restrictcode,reversal,sequencenumber,servicecode,settleamt,settleindicator,settlerq,settlers,shippingaddress,shippingcountrycode,shippingphone,shippingzipcode,skunumber,stan,telephonetype,termid,tokenid,traceid,track1,track2,transactionid,transactiontype,unitmeas,unitofmeas,upc,userid,vehicleid,voidflag,zipcode)values('eacbc625-6fef-479e-8738-92adcfed7c65','TkFwxJKiaTwg','PreAuth','4508','Pan','',5062,'',7500,'17080715','75391','','',0,'','','','','','','','null','','12345','','1','null','','','','null','12','1','PreAuth','','','12365','','null','','null','null',0,'null','3740152100','','','',50.62,2411,'1','','Swiped','1','null','1212','15031','cardType','','','',12,'12',2111,'null','36079','54163254','','130362','null','','null','null','Pan',0,'null','null','',2.099,'7896','98563','23',0,24118,24118,'','100','','2017-08-0715:02:19.935','','','Approved','2017-08-0715:03:14.550','1','','','S',0,'TRUE','null','','','','','','','','','23','','','null','null','66324154','','','','null','121','9213','','null');";
+    String deleteSaleQuery = "DELETE FROM STARGATE.TRANSACTIONS WHERE identityuuid = 'eacbc625-6fef-479e-8738-92adcfed7c65' and rrn = 'TkFwxJKiaTwg' and requesttype = 'PreAuth';";
+
+    String insertSaleSettlemessages = "INSERT INTO STARSETTLER.SETTLEMESSAGES(receiveddate,ordernumber,settledate,cardtype,transactiontype,clientlineid,transactionid,addressline1,addressline2,addressline3,appeasementcode,appeasementdate,appeasementdescription,appeasementreference,authnum,authoriztioncode,avsresponsecode,batchid,cardreferene,cardtoken,city,countrycode,couponcode,crc,csvresponsecode,descriptionfield,email,expirationdate,firstname,homephone,identityuuid,lastname,lineid,middlename,orderdate,paymentamount,postalcode,provincecode,qualifiedplan,quantity,reasoncode,requestplan,responsedate,responseplan,responsereasoncode,responsetype,rrn,sequenceid,settleid,settleplan,settlestatus,shipdate,shipid,shippingamount,tokenbankname,unit,unitcost,unitdiscount,unittotal) VALUES('2017-08-07','54163254','2017-08-07','cardType','RF','66324154','66324154','','','null','','','','','75391','','','','','','','','','','','','','','','','eacbc625-6fef-479e-8738-92adcfed7c65','','','','2017-08-07','-900','','','','','','','','','','','TkFwxJKiaTwg','','','','READY','','','','','','','','');";
+    String deleteSaleSettleMessagesQuery = "DELETE FROM STARSETTLER.SETTLEMESSAGES WHERE receiveddate = '2017-08-07' AND ordernumber= '54163254' AND settledate= '2017-08-07' AND cardtype= 'cardtype' AND transactiontype= 'DP' AND clientlineid = '66324154' AND transactionid = '66324154';";
 
     @Before
-    public void setUp() {
-        t = new Transaction();
-        uuid = "0ee1c509-2c70-4bcd-b261-f94f1fe6c43b";
-        requestXML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
-                + " <cm:Message\n"
-                + "TypeCode=\"Request\"\n "
-                + "MajorVersion=\"3\"\n"
-                + "MinorVersion=\"1\" FixVersion=\"0\"\n"
-                + "xmlns:cm='http://www.aafes.com/credit'>\n"
-                + "<cm:Header>\n"
-                + "<cm:IdentityUUID>0ee1c509-2c70-4bcd-b261-f94f1fe6c43b</cm:IdentityUUID>\n"
-                + " <cm:LocalDateTime>2017-05-31T13:31:33</cm:LocalDateTime>\n"
-                + " <cm:SettleIndicator>true</cm:SettleIndicator>\n"
-                + " <cm:OrderNumber>9876567</cm:OrderNumber>\n"
-                + " <cm:transactionId>10000001</cm:transactionId>\n"
-                + " <cm:termId>12</cm:termId>\n"
-                + "<cm:Comment>Approved</cm:Comment>\n"
-                + "</cm:Header>\n"
-                + "<cm:Request RRN=\"200000000001\">\n"
-                // + "<cm:Request RRN="gbailendra03">\n"
-                + "  <cm:Media>Milstar</cm:Media>\n"
-                + "  <cm:RequestType>TrnCancel</cm:RequestType>\n"
-                + "<cm:InputType>Keyed</cm:InputType>\n"
-                + "<cm:Pan>Pan</cm:Pan>\n"
-                + "<cm:Account>0006019447240006428</cm:Account>\n"
-                + "                <cm:Expiration>2203</cm:Expiration>\n"
-                + "     <cm:CardVerificationValue>837</cm:CardVerificationValue>\n"
-                + "     <cm:TrackData1>%B6019450000289697^MILSTAR RET0001^2009000000000000100000000000000?</cm:TrackData1>\n"
-                + "     <cm:AmountField>0.1</cm:AmountField>\n"
-                + "     <cm:PlanNumbers>\n"
-                + "         <cm:PlanNumber>10001</cm:PlanNumber>\n"
-                + "     </cm:PlanNumbers>\n"
-                + "<cm:OriginalOrder>9876567</cm:OriginalOrder>\n"
-                + "     <cm:DescriptionField>Sale</cm:DescriptionField>\n"
-                + "     <cm:origRRN>200000000001</cm:origRRN>\n"
-                + "     <cm:AddressVerificationService>\n"
-                + "         <cm:CardHolderName>John Doe</cm:CardHolderName>\n"
-                + "         <cm:BillingAddress1>1222</cm:BillingAddress1>\n"
-                + "      <cm:BillingCountryCode>US</cm:BillingCountryCode>\n"
-                + "      <cm:BillingZipCode>12345</cm:BillingZipCode>\n"
-                + "      <cm:Email>johndoe@kk.com</cm:Email>\n"
-                + "      <cm:BillingPhone>1122334455</cm:BillingPhone>\n"
-                + "      <cm:ShippingPhone>1122334455</cm:ShippingPhone>\n"
-                + "  </cm:AddressVerificationService>\n"
-                + "</cm:Request>\n"
-                + "</cm:Message>";
-        creditMessage = this.unmarshalCreditMessage(requestXML);
-        t = mapRequest(creditMessage);
-        SettleEntityList = mapToSettle(t);
-        factory = new CassandraSessionFactory();
-        factory.setSeedHost("localhost");
-        factory.connect();
-
-        session = factory.getSession();
-        mapper = new MappingManager(session).mapper(Transaction.class);
-        tr = new TranRepository();
-        td = new TransactionDAO();
-        td.setMapper(mapper);
-        tr.setTransactionDAO(td);
-        td.setCassandraSessionFactory(factory);
-        tr.setTransactionDAO(td);
-        settleMessageDAO = new SettleMessageDAO();
-        Mapper mapper2 = new MappingManager(session).mapper(SettleEntity.class);
-        settleMessageDAO.setCassandraSessionFactory(factory);
-        settleMessageDAO.setMapper(mapper2);
-
-//        transaction.setMedia("WEX");
-//        transaction.setRequestType("Sale");
-//        transaction.setInputType("Swiped");
-//        transaction.setPan("Pan");
-//        transaction.setIdentityUuid("eacbc625-6fef-479e-8738-92adcfed7c65");
-//        transaction.setLocalDateTime("2017-07-02T09:04:01");
-//        transaction.setSettleIndicator("true");
-//        transaction.setOrderNumber("54163254");
-//        transaction.setTransactionId("66324154");
-//        transaction.setTermId("23");
-//        transaction.setAccount("6006496628299904508");
-//        transaction.setExpiration("2103");
-//        transaction.setCvv("837");
-//        transaction.setTrack2("6900460000000000001=20095004100210123");
-//        transaction.setAmount((long)50.62);
-//        transaction.setCardSeqNumber("12345");
-//        transaction.setServiceCode("S");
-//        transaction.setCatFlag("1");
-//        transaction.setDriverId("12365");
-//        transaction.setOdoMeter("36079");
-//        transaction.setVehicleId("9213");
-//        transaction.setRestrictCode("01");
-//        transaction.setProdDetailCount("1");
-//        transaction.setFuelProdCode("001");
-//        transaction.setQuantity(BigDecimal.valueOf(24.118));
-//        transaction.setFuelPrice((long)24.11);
-//        transaction.setPricePerUnit(BigDecimal.valueOf(2.099));
-//        transaction.setFuelDollerAmount(BigDecimal.valueOf(50.62));
-//        transaction.setNonFuelqty(BigDecimal.valueOf(21.11));
-//        transaction.setNonFuelProdCode("12");
-//        transaction.setNonFuelAmount(BigDecimal.valueOf(12));
-//        transaction.setLicenceNumber("1212");
-//        transaction.setDeptNumber("1");
-//        transaction.setJobValueNumber("1");
-//        transaction.setDataNumber("12");
-//        transaction.setUserId("121");
-//        transaction.setPumpNmbr("23");
-//        transaction.setDescriptionField("Sale");
-//        transaction.setOrigAuthCode("130362");
-//        transaction.setAmtPreAuthorized((long)75.00);
-//        
-    }
-
-    @Test
-    public void testSaleApproved() {
-
-    }
-
-    private Message unmarshalCreditMessage(String content) {
-        Message request = new Message();
-        try {
-            StringReader reader = new StringReader(content);
-            JAXBContext jc = JAXBContext.newInstance(Message.class);
-            Unmarshaller unmarshaller = jc.createUnmarshaller();
-            JAXBContext jaxbContext = JAXBContext.newInstance(Message.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            request = (Message) jaxbUnmarshaller.unmarshal(reader);
-        } catch (JAXBException ex) {
-            System.out.println(ex.toString());
-        }
-        return request;
-    }
-
-    private void setAllDependencies() {
+    public void setDataForTesting() {
         authorizer = new Authorizer();
         configurator = new Configurator();
         authorizer.setConfigurator(configurator);
@@ -234,415 +108,135 @@ public class WEXSaleRequestTest {
         authorizer.setTranRepository(tr);
 
         wexStrategy = new WEXStrategy();
+        wexValidator = new WEXValidator();
+        wexProcessor = new WEXProcessor();
+        wexGateway = new WexGateway();
+        nbsRequestGeneratorObj = new NBSRequestGenerator();
+
+        wexProcessor.setNbsRequestGeneratorObj(nbsRequestGeneratorObj);
+        nbsRequestGeneratorObj.setApplicationName("AUTHREQ");
+        nbsRequestGeneratorObj.setApplicationVersion("2");
+        nbsRequestGeneratorObj.setDaylightSavingsTimeAtSiteOne("1");
+        nbsRequestGeneratorObj.setCaptureOnlyRequest("C");
+        nbsRequestGeneratorObj.setSessionTypeAuth("A");
+        nbsRequestGeneratorObj.setTransTypePreAuth("8");
+        nbsRequestGeneratorObj.setTransTypeFinalAndSale("10");
+        nbsRequestGeneratorObj.setTransTypeRefund("30");
+        nbsRequestGeneratorObj.setCardTypeWex("WI");
+        nbsRequestGeneratorObj.setServiceType("S");
+
+        wexGateway.setwEXProcessor(wexProcessor);
         settleMessageDAO = new SettleMessageDAO();
         mapper1 = new MappingManager(session).mapper(SettleEntity.class);
         settleMessageDAO.setMapper(mapper1);
         settleMessageDAO.setCassandraSessionFactory(factory);
-       // wexStrategy.setSettleMessageDAO(settleMessageDAO);
-        //wexStrategy.setConfigurator(configurator);
+        wexStrategy.setSettleMessageDAO(settleMessageDAO);
+        wexStrategy.setConfigurator(configurator);
+        wexStrategy.setwEXValidator(wexValidator);
         bsf = new BaseStrategyFactory();
         gatewayFactory = new GatewayFactory();
         gatewayFactory.setEnableStub("true");
-        wexGateway = new WexGateway();
-   //     gatewayFactory.setWexGateway(wexGateway);
-     //   bsf.setWexStrategy(wexStrategy);
-        bs = bsf.findStrategy(StrategyType.DECA);
+        gatewayFactory.setWexGateway(wexGateway);
+        bsf.setwEXStrategy(wexStrategy);
+        bs = bsf.findStrategy(StrategyType.WEX);
         //bsf.setRetailStrategy(retailStrategy);
         bs.setGatewayFactory(gatewayFactory);
 
         authorizer.setBaseStrategyFactory(bsf);
     }
 
-    private Transaction mapRequest(Message requestMessage) {
+    @Ignore
+    @Test
+    public void testSuccessSalerRequest() {
+        sMethodName = "testSuccessSalerRequest";
+        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        // insertDataForTesting();
+        Message creditMessage = this.unmarshalCreditMessage(requestXMLSale);
+        Message result = authorizer.authorize(creditMessage);
+        clearGlobalVariables();
+        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+        deleteDataForTesting();
+        assertEquals("100", result.getResponse().get(0).getReasonCode());
+    }
 
-        Transaction transaction = new Transaction();
-        String[] decimalPart;
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        Date date = new Date();
-        String ts = dateFormat.format(date);
-        transaction.setRequestXmlDateTime(ts);
+    @Ignore
+    @Test
+    public void testDeclineSaleRequest() {
+        sMethodName = "testDeclineSaleRequest";
+        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        Message creditMessage = this.unmarshalCreditMessage(requestXMLSale);
+        Message result = authorizer.authorize(creditMessage);
+        clearGlobalVariables();
+        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+        assertEquals("200", result.getResponse().get(0).getReasonCode());
+    }
 
-        Message.Header header = requestMessage.getHeader();
+    @Ignore
+    @Test
+    public void testTransactionAlreadyExist() {
+        sMethodName = "testTramsactionAlreadyExist";
+        LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        Message creditMessage = this.unmarshalCreditMessage(requestXMLSale);
+        Message result = authorizer.authorize(creditMessage);
+        clearGlobalVariables();
+        deleteDataForTesting();
+        LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
+        assertEquals("TRANSACTION_ALREADY_EXIST", result.getResponse().get(0).getDescriptionField());
+    }
 
-        // Mapping Header Fields
-        if (header.getIdentityUUID() != null) {
-            transaction.setIdentityUuid(header.getIdentityUUID());
-        }
-        transaction.setLocalDateTime(formatLocalDateTime(header.
-                getLocalDateTime()));
-        boolean settleIndicator = header.isSettleIndicator();
-        if (settleIndicator) {
-            transaction.setSettleIndicator("true");
-        } else {
-            transaction.setSettleIndicator("false");
-        }
-        transaction.setOrderNumber(header.getOrderNumber());
-        transaction.setTransactionId(header.getTransactionId());
-        if (header.getTermId() != null) {
-            transaction.setTermId(header.getTermId());
-        }
-        transaction.setComment(header.getComment());
-        transaction.setCustomerId(header.getCustomerID());
-
-        // Mapping Request Fields
-        if (requestMessage.getRequest() != null && requestMessage.getRequest().size() > 1) {
-            throw new AuthorizerException("MULTIPLE_REQUESTS");
-        }
-        Message.Request request = requestMessage.getRequest().get(0);
-        transaction.setRrn(request.getRRN());
-        transaction.setMedia(request.getMedia());
-        if (request.getRequestType() != null && !request.getRequestType().value().isEmpty()) {
-            transaction.setRequestType(request.getRequestType().value());
-        }
-        if (request.getReversal() != null && !request.getReversal().value().isEmpty()) {
-            transaction.setReversal(request.getReversal().value());
-        }
-        if (request.getVoid() != null && !request.getVoid().value().isEmpty()) {
-
-            transaction.setVoidFlag(request.getVoid().value());
-        }
-
-        transaction.setAccount(request.getAccount());
-        if (request.getPan() != null) {
-            if (request.getPan().value().equalsIgnoreCase("PAN")) {
-                transaction.setAccountTypeType(request.getPan().value());
-                transaction.setPan(request.getPan().value());
-            } else {
-                throw new AuthorizerException("INVALID_PAN_TAG");
-            }
-
-        }
-
-        if (request.getToken() != null) {
-            transaction.setTokenId(request.getToken().value());
-            if (request.getToken().value().equalsIgnoreCase("TOKEN")) {
-                transaction.setAccountTypeType(request.getToken().value());
-                transaction.setTokenId(request.getAccount());
-            } else {
-                throw new AuthorizerException("INVALID_TOKEN_TAG");
-            }
-        }
-        if (request.getEncryptedPayload() != null) {
-            transaction.setEncryptedPayLoad(request.getEncryptedPayload().value());
-        }
-        transaction.setCvv(request.getCardVerificationValue());
-        transaction.setKsn(request.getKSN());
-        transaction.setPinBlock(request.getPinBlock());
-        if (request.getExpiration() != null) {
-            //TODO : check for valid expiration date
-            String exp = request.getExpiration().toString();
-            if (exp != null && exp.length() == 4) {
-                String month = exp.substring(2, 4);
-                if (Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1) {
-                    throw new AuthorizerException("INVALID_EXPIRATION_DATE");
-                }
-            } else {
-                throw new AuthorizerException("INVALID_EXPIRATION_DATE");
-            }
-            transaction.setExpiration(request.getExpiration().toString());
-        }
-        //TODO : check amount handling in MPG
+    private Message unmarshalCreditMessage(String content) {
+        Message request = new Message();
         try {
-            BigDecimal amt;
-            amt = request.getAmountField();
-            if (amt != null) {
-                amt = amt.movePointRight(2);
-                if (amt.longValueExact() <= 9999999) {
-                    if (transaction.getRequestType() != null
-                            && !transaction.getRequestType().trim().isEmpty()
-                            && !transaction.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
-                        if (amt.longValueExact() < 0) {
-                            throw new AuthorizerException("INVALID_AMOUNT");
-                        }
-                    }
-                    transaction.setAmount(amt.longValueExact());
-                } else {
-                    throw new AuthorizerException("INVALID_AMOUNT");
-                }
-            }
-        } catch (ArithmeticException e) {
-            throw new AuthorizerException("INVALID_AMOUNT");
+            StringReader reader = new StringReader(content);
+            JAXBContext jc = JAXBContext.newInstance(Message.class);
+            Unmarshaller unmarshaller = jc.createUnmarshaller();
+            JAXBContext jaxbContext = JAXBContext.newInstance(Message.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            request = (Message) jaxbUnmarshaller.unmarshal(reader);
+        } catch (JAXBException ex) {
+            System.out.println(ex.toString());
         }
-        transaction.setGcpin(request.getGCpin());
-        transaction.setInputType(request.getInputType());
-        transaction.setDescriptionField(request.getDescriptionField());
-        transaction.setTrack1(request.getTrackData1());
-        transaction.setTrack2(request.getTrackData2());
-        transaction.setEncryptTrack(request.getEncryptTrack());
-        if (request.getPlanNumbers() != null
-                && request.getPlanNumbers().getPlanNumber() != null
-                && request.getPlanNumbers().getPlanNumber().get(0) != null) {
-            transaction.setPlanNumber(request.getPlanNumbers().getPlanNumber().get(0).toString());
-        }
-
-        if (request.getPumpNmbr() != null) {
-            transaction.setPumpNmbr(request.getPumpNmbr().toString());
-        }
-        if (request.getWEXRequestData() != null) {
-            Message.Request.WEXRequestData wexReqPayAtPump = request.getWEXRequestData();
-            if (transaction.getDriverId() != null) {
-                transaction.setDriverId(wexReqPayAtPump.getDriverId().toString());
-            }
-            if (wexReqPayAtPump.getRestrictCode() != null) {
-                transaction.setRestrictCode(wexReqPayAtPump.getRestrictCode().toString());
-            }
-            if (wexReqPayAtPump.getQtyPumped() != null) {
-                BigDecimal qtyPumped;
-                String strQtyPumped;
-                long n = 0L;
-                if (wexReqPayAtPump.getQtyPumped().size() > 0) {
-                    qtyPumped = (BigDecimal) wexReqPayAtPump.getQtyPumped().get(0);
-                    strQtyPumped = String.valueOf(qtyPumped);
-                    if (null != strQtyPumped && strQtyPumped.contains(".")) {
-                        decimalPart = strQtyPumped.split("\\.");
-                        if (decimalPart[1] != null && decimalPart[1].length() > 0) {
-                            qtyPumped = qtyPumped.movePointRight(decimalPart[1].length());
-                        }
-                    }
-                    n = qtyPumped.longValueExact();
-                }
-                transaction.setQtyPumped(n);
-            }
-            if (wexReqPayAtPump.getFuelPrice() != null) {
-                BigDecimal fuelPrice;
-                String strFuelPrice;
-                long n = 0L;
-                if (wexReqPayAtPump.getFuelPrice().size() > 0) {
-                    fuelPrice = (BigDecimal) wexReqPayAtPump.getFuelPrice().get(0);
-                    strFuelPrice = String.valueOf(fuelPrice);
-                    if (null != strFuelPrice && strFuelPrice.contains(".")) {
-                        decimalPart = strFuelPrice.split("\\.");
-                        if (decimalPart[1].length() > 0) {
-                            fuelPrice = fuelPrice.movePointRight(decimalPart[1].length());
-                        }
-                    }
-                    n = fuelPrice.longValueExact();
-                }
-                transaction.setFuelPrice(n);
-            }
-            if (wexReqPayAtPump.getFuelProdCode() != null
-                    && wexReqPayAtPump.getFuelProdCode().size() > 0 && wexReqPayAtPump.getFuelProdCode().get(0) != null) {
-                transaction.setFuelProdCode(wexReqPayAtPump.getFuelProdCode().get(0).toString());
-            }
-
-            //added lines for new fields mapping starts here
-            if (wexReqPayAtPump.getNonFuelProdCode() != null && wexReqPayAtPump.getNonFuelProdCode().size() > 0
-                    && wexReqPayAtPump.getNonFuelProdCode().get(0) != null) {
-                transaction.setNonFuelProdCode(wexReqPayAtPump.getNonFuelProdCode().get(0).toString());
-            }
-            if (wexReqPayAtPump.getCATFlag() != null && wexReqPayAtPump.getCATFlag().size() > 0) {
-                transaction.setCatFlag(wexReqPayAtPump.getCATFlag().get(0));
-            }
-            if (wexReqPayAtPump.getPricePerUnit() != null) {
-                transaction.setPricePerUnit(wexReqPayAtPump.getPricePerUnit());
-            }
-            if (wexReqPayAtPump.getFuelDollarAmount() != null && wexReqPayAtPump.getFuelDollarAmount().size() > 0) {
-                transaction.setFuelDollerAmount(wexReqPayAtPump.getFuelDollarAmount().get(0));
-            }
-            //added lines for new fields mapping ends here
-
-//            if (wexReqPayAtPump.getUnitOfMeas() != null) {
-            //                transaction.setUnitOfMeas(wexReqPayAtPump.getUnitOfMeas().toString());
-            //            }
-            if (wexReqPayAtPump.getVehicleId() != null) {
-                transaction.setVehicleId(wexReqPayAtPump.getVehicleId().toString());
-            }
-            if (wexReqPayAtPump.getLicenseNumber() != null) {
-                transaction.setLicenceNumber(wexReqPayAtPump.getLicenseNumber());
-            }
-            if (wexReqPayAtPump.getDeptNumber() != null) {
-                transaction.setDeptNumber(wexReqPayAtPump.getDeptNumber().toString());
-            }
-            transaction.setJobValueNumber(wexReqPayAtPump.getJobValueNumber());
-            transaction.setDataNumber(wexReqPayAtPump.getDataNumber());
-            transaction.setUserId(wexReqPayAtPump.getUserId());
-//          TODO:  transaction.setContact(request);
-            if (wexReqPayAtPump.getProdDetailCount() != null) {
-                transaction.setProdDetailCount(wexReqPayAtPump.getProdDetailCount().toString());
-            }
-
-            if (wexReqPayAtPump.getServiceCode() != null && wexReqPayAtPump.getServiceCode().size() > 0) {
-                transaction.setServiceCode(wexReqPayAtPump.getServiceCode().get(0));
-            }
-
-            if (wexReqPayAtPump.getNonFuelAmount() != null) {
-                BigDecimal nonFuelPrice = new BigDecimal("0");
-                String strNonFuelPrice;
-                long n = 0L;
-                if (wexReqPayAtPump.getNonFuelAmount().size() > 0) {
-                    nonFuelPrice = (BigDecimal) wexReqPayAtPump.getNonFuelAmount().get(0);
-                    strNonFuelPrice = String.valueOf(nonFuelPrice);
-                    if (null != strNonFuelPrice && strNonFuelPrice.contains(".")) {
-                        decimalPart = String.valueOf(nonFuelPrice).split("\\.");
-                        if (decimalPart[1] != null && decimalPart[1].length() > 0) {
-                            nonFuelPrice = nonFuelPrice.movePointRight(decimalPart[1].length());
-                        }
-                        n = nonFuelPrice.longValueExact();
-                    }
-                }
-                transaction.setNonFuelAmount(nonFuelPrice);
-            }
-
-            if (wexReqPayAtPump.getOdometer() != null) {
-                transaction.setOdoMeter(wexReqPayAtPump.getOdometer());
-            }
-
-            if (wexReqPayAtPump.getCardSeqNumber() != null) {
-                transaction.setCardSeqNumber(wexReqPayAtPump.getCardSeqNumber());
-            }
-
-            if (wexReqPayAtPump.getQuantity() != null) {
-                BigDecimal quantity = new BigDecimal("0");
-                String strQuantity;
-                long n = 0L;
-                if (wexReqPayAtPump.getQuantity().size() > 0) {
-                    quantity = (BigDecimal) wexReqPayAtPump.getQuantity().get(0);
-                    strQuantity = String.valueOf(quantity);
-                    if (null != strQuantity && strQuantity.contains(".")) {
-                        decimalPart = String.valueOf(quantity).split("\\.");
-                        if (decimalPart[1] != null && decimalPart[1].length() > 0) {
-                            quantity = quantity.movePointRight(decimalPart[1].length());
-                        }
-                        n = quantity.longValueExact();
-                    }
-                }
-                transaction.setQuantity(quantity);
-            }
-
-            if (wexReqPayAtPump.getNonFuelQty() != null) {
-                BigDecimal nonFuelQty = new BigDecimal("0");
-                String strNonFuelQty;
-                long n = 0L;
-                if (wexReqPayAtPump.getNonFuelQty().size() > 0) {
-                    nonFuelQty = (BigDecimal) wexReqPayAtPump.getNonFuelQty().get(0);
-                    strNonFuelQty = String.valueOf(nonFuelQty);
-                    if (null != strNonFuelQty && strNonFuelQty.contains(".")) {
-                        decimalPart = String.valueOf(nonFuelQty).split("\\.");
-                        if (decimalPart[1] != null && decimalPart[1].length() > 0) {
-                            nonFuelQty = nonFuelQty.movePointRight(decimalPart[1].length());
-                        }
-                        n = nonFuelQty.longValueExact();
-                    }
-                }
-                transaction.setNonFuelqty(nonFuelQty);
-            }
-        }
-        //*Uncommented from 502 to 551 and modified some code
-        Message.Request.AddressVerificationService addressVerServc = request.getAddressVerificationService();
-        if (addressVerServc != null) {
-            transaction.setCardHolderName(addressVerServc.getCardHolderName());
-            transaction.setBillingAddress1(addressVerServc.getBillingAddress1());
-            transaction.setBillingAddress2(addressVerServc.getBillingAddress2());
-            transaction.setBillingCountryCode(addressVerServc.getBillingCountryCode());
-            transaction.setShippingCountryCode(addressVerServc.getShippingCountryCode());
-            transaction.setShippingAddress(addressVerServc.getShippingAddress1());
-            transaction.setShippingAddress(addressVerServc.getShippingAddress2());
-            transaction.setBillingZipCode(addressVerServc.getBillingZipCode());
-            transaction.setShippingZipCode(addressVerServc.getShippingZipCode());
-            try {
-                if (addressVerServc.getBillingPhone() != null) {
-                    transaction.setBillingPhone(addressVerServc.getBillingPhone().toString());
-                }
-                if (addressVerServc.getShippingPhone() != null) {
-                    transaction.setShippingPhone(addressVerServc.getShippingPhone().toString());
-                }
-            } catch (NumberFormatException e) {
-                throw new AuthorizerException("INVALID_PHONE_NUM");
-            }
-            transaction.setEmail(addressVerServc.getEmail());
-        }
-        transaction.setZipCode(request.getZipCode());
-        transaction.setUpc(request.getUPC());
-        transaction.setEncryptMgmt(request.getEncryptMgmt());
-        transaction.setEncryptAlgo(request.getEncryptAlgorithm());
-        transaction.setSettleRq(request.getSettleRq());
-        transaction.setOriginalOrder(request.getOriginalOrder());
-        transaction.setOrigTransId(request.getOrigTransId());
-        transaction.setOrigAuthCode(request.getOrigAuthCode());
-        BigDecimal amtPreAuth;
-        amtPreAuth = request.getAmtPreAuthorized();
-        if (amtPreAuth != null) {
-            amtPreAuth = amtPreAuth.movePointRight(2);
-            long n = amtPreAuth.longValueExact();
-            transaction.setAmtPreAuthorized(n);
-        }
-        transaction.setPaymentType(request.getPymntType());
-        // Adding origininal rrn, ordernuber etc
-        if (request.getOriginalOrder() != null && !request.getOriginalOrder().isEmpty()) {
-
-            transaction.setOriginalOrder(request.getOriginalOrder());
-        }
-
-        if (request.getOrigRRN() != null && !request.getOrigRRN().isEmpty()) {
-            transaction.setOrigRRN(request.getOrigRRN().get(0));
-        }
-
-        if (request.getOrigTransId() != null && !request.getOrigTransId().isEmpty()) {
-
-            transaction.setOrigTransId(request.getOrigTransId());
-        }
-
-        if (request.getOrigAuthCode() != null && !request.getOrigAuthCode().isEmpty()) {
-
-            transaction.setOrigAuthCode(request.getOrigAuthCode());
-        }
-        return transaction;
+        return request;
     }
 
-    private String formatLocalDateTime(XMLGregorianCalendar in) {
-        String ts = in.toString();      //2016-11-07T08:54:06
-        String out = ts.substring(2, 4)
-                + ts.substring(5, 7)
-                + ts.substring(8, 10)
-                + ts.substring(11, 13)
-                + ts.substring(14, 16)
-                + ts.substring(17, 19);
-        return out;                     //161107085406
+    public void clearGlobalVariables() {
+        authorizer = null;
+        configurator = null;
+        facilityDAO = null;
+        facility = null;
+        tr = null;
+        td = null;
+        mapper = null;
+        factory = null;
+        session = null;
+        resultSet = null;
+        wexStrategy = null;
+        bsf = null;
     }
 
-    private List<SettleEntity> mapToSettle(Transaction t) {
+    private void deleteDataForTesting() {
+        try {
+            if (factory == null) {
+                factory = new CassandraSessionFactory();
+                factory.setSeedHost("localhost");
+                factory.connect();
+            }
+            if (session == null) {
+                session = factory.getSession();
+            }
+            LOGGER.info("delete STARGATE.TRANSACTIONS Sale query :" + deleteSaleQuery);
+            resultSet = session.execute(deleteSaleQuery);
 
-        List<SettleEntity> settleEntityList = new ArrayList<SettleEntity>();
-        SettleEntity settleEntity = new SettleEntity();
+            if (resultSet != null) {
+                LOGGER.info("delete STARGATE.TRANSACTIONS Sale query Success");
+            } else {
+                LOGGER.error("delete STARGATE.TRANSACTIONS Sale query Fail");
+            }
 
-        settleEntity.setTransactionId(t.getTransactionId());
-        settleEntity.setReceiveddate(getSystemDate());
-        settleEntity.setOrderNumber(t.getOrderNumber());
-        settleEntity.setSettleDate(this.getSystemDate());
-        settleEntity.setOrderDate(this.getSystemDate());
-        //Card Type not available    
-        settleEntity.setTransactionType(t.getTransactiontype());
-        //ClientLineId not available  
-        settleEntity.setClientLineId(t.getTransactionId());
-        settleEntity.setIdentityUUID(t.getIdentityUuid());
-        //LineId not available 
-        //ShipId not available 
-        settleEntity.setRrn(t.getRrn());
-        settleEntity.setPaymentAmount(Long.toString(t.getAmount()));
-        //where to map t.getLocalDateTime()
-        settleEntity.setSettlestatus(SettleStatus.Ready_to_settle);
-        settleEntity.setCardType(t.getMedia());
-        settleEntity.setSettlePlan(t.getPlanNumber());
-        settleEntity.setAuthNum(t.getAuthNumber());
-
-        if (t.getAmount() < 0) {
-            settleEntity.setTransactionType(TransactionType.Refund);
-        } else if (t.getAmount() >= 0) {
-            settleEntity.setTransactionType(TransactionType.Deposit);
+        } catch (Exception ex) {
+            LOGGER.error("Error while delete STARGATE.TRANSACTIONS " + ex.getMessage());
+            throw new GatewayException("INTERNAL SYSTEM ERROR");
+        } finally {
         }
-        if (t.getTokenId() != null && !t.getTokenId().trim().isEmpty()) {
-            settleEntity.setCardToken(t.getTokenId());
-            settleEntity.setTokenBankName(t.getTokenBankName());
-        }
-        settleEntityList.add(settleEntity);
-        return settleEntityList;
     }
-
-    private String getSystemDate() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date();
-        String ts = dateFormat.format(date);
-        return ts;
-    }
-
 }

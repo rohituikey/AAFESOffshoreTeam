@@ -37,7 +37,7 @@ public class WEXValidator {
             this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_NOT_BE_NULL", "PRODUCT_DETAIL_COUNT_NOT_BE_NULL");
             return false;
         } else if ((t.getProdDetailCount() != null || t.getProdDetailCount().trim().isEmpty())
-                && (Integer.parseInt(t.getProdDetailCount()) > 5)) {
+                && (Integer.parseInt(t.getProdDetailCount()) > 2)) {
             this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_EXCEEDED", "MORE_THAN_FIVE_PRODUCTS");
             return false;
         } else if (t.getFuelProdCode() == null || t.getFuelProdCode().trim().isEmpty()) {

@@ -10,6 +10,7 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.Gateway;
+import com.aafes.stargate.gateway.vision.Validator;
 import com.aafes.stargate.tokenizer.TokenBusinessService;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
@@ -56,10 +57,10 @@ public class WEXStrategy extends BaseStrategy {
         t=transaction;
         try {
 
-            boolean retailFieldsValid = this.validateTransactions(t);
-            LOG.info("WEXFieldsValid " + retailFieldsValid + "..." + t.getRrn());
+            boolean wexFieldsValid = this.validateTransactions(t);
+            LOG.info("WEXFieldsValid " + wexFieldsValid + "..." + t.getRrn());
 
-            if (!retailFieldsValid) {
+            if (!wexFieldsValid) {
                 LOG.info("Invalid fields");
                 return t;
             }
@@ -94,15 +95,12 @@ public class WEXStrategy extends BaseStrategy {
         LOG.info("Validating fields in WEXtrategy");
         String accountNumber = "";
         boolean errFlg = false;
+        Validator validator = new Validator();
         if (t.getAccount() == null || t.getAccount().trim().isEmpty()) {
             errFlg = true;
         }
 
         if (!errFlg) {
-            accountNumber = t.getAccount().substring(0, 5);
-            if (accountNumber.equals("690046") || accountNumber.equals("707138")) {
-                errFlg = true;
-            }
 
             if (!errFlg) {
                 accountNumber = t.getAccount().substring(0, 5);

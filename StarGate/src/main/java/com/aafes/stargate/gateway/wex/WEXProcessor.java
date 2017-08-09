@@ -32,10 +32,18 @@ public class WEXProcessor {
 //    private TransactionDAO transactionDAO;
     private NBSRequestGenerator nbsRequestGeneratorObj;
 
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
+
+    public void setNbsRequestGeneratorObj(NBSRequestGenerator nbsRequestGeneratorObj) {
+        this.nbsRequestGeneratorObj = nbsRequestGeneratorObj;
+    }
+
     public Transaction processWexRequests(Transaction t){
         LOG.info("WEXProcessor.processWexRequests mothod started");
         try {
-            nbsRequestGeneratorObj = new NBSRequestGenerator();
+            if(nbsRequestGeneratorObj == null) nbsRequestGeneratorObj = new NBSRequestGenerator();
             byte[] iSOMsg = nbsRequestGeneratorObj.generateLogOnPacketRequest(t);
             NBSClient clientObj = new NBSClient();
             byte[] iSOMsgResponse = clientObj.generateResponse(new String(iSOMsg));
@@ -103,28 +111,28 @@ public class WEXProcessor {
 //        }
 //    }
 
-    public Transaction processSaleRequest(Transaction t) {
-
-        LOG.info("WEXProcessor.ProcessSaleRequest mothod started");
-
-        try {
-//            String responseStr = "";
-//            NBSClient clientObj = new NBSClient();
-//            responseStr = clientObj.generateResponse("APPROVED");
-//            t.setResponseType(responseStr.trim());
-//            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
-//                t.setReasonCode(configurator.get("SUCCESS"));
-//                t.setDescriptionField(ResponseType.APPROVED);
-//            } else {
-//                t.setDescriptionField(ResponseType.DECLINED);
-//            }
-//            t.setResponseType(responseStr);
-//            LOG.info("WEXProcessor.ProcessSaleRequest mothod ended");
-            return t;
-        } catch (Exception e) {
-            throw e;
-        }
-    }
+//    public Transaction processSaleRequest(Transaction t) {
+//
+//        LOG.info("WEXProcessor.ProcessSaleRequest mothod started");
+//
+//        try {
+////            String responseStr = "";
+////            NBSClient clientObj = new NBSClient();
+////            responseStr = clientObj.generateResponse("APPROVED");
+////            t.setResponseType(responseStr.trim());
+////            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
+////                t.setReasonCode(configurator.get("SUCCESS"));
+////                t.setDescriptionField(ResponseType.APPROVED);
+////            } else {
+////                t.setDescriptionField(ResponseType.DECLINED);
+////            }
+////            t.setResponseType(responseStr);
+////            LOG.info("WEXProcessor.ProcessSaleRequest mothod ended");
+//            return t;
+//        } catch (Exception e) {
+//            throw e;
+//        }
+//    }
 
 //    public Transaction processRefundRequest(Transaction t) {
 //        sMethodName = "processRefundRequest";

@@ -254,6 +254,14 @@ in Transaction Cancels and/or Refunds. 28-June-2017.-->
                                                     </xs:restriction>
                                                 </xs:simpleType>
                                             </xs:element>
+<!-- This indicates the number of Prompts being sent by the POS or Pump Device --> 
+                                        <xs:element name="PromptDetailCount" minOccurs="1" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:integer">
+                                                    <xs:totalDigits value="1"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
                                             <xs:element name="DriverId" minOccurs="1" maxOccurs="1">
                                                 <xs:simpleType>
                                                     <xs:restriction base="xs:string">
@@ -285,83 +293,91 @@ in Transaction Cancels and/or Refunds. 28-June-2017.-->
                                                     </xs:restriction>
                                                 </xs:simpleType>
                                             </xs:element>
-                                            <xs:element name="ProdDetailCount" minOccurs="1" maxOccurs="1">
-                                                <xs:simpleType>
-                                                    <xs:restriction base="xs:integer">
-                                                        <xs:totalDigits value="1"/>
-                                                    </xs:restriction>
-                                                </xs:simpleType>
-                                            </xs:element>
-                                            <xs:element name="FuelProdCode" minOccurs="0" maxOccurs="2"> 
-                                                <xs:simpleType>
-                                                    <xs:restriction base="xs:integer">
-                                                        <xs:totalDigits value="3"/>
-                                                    </xs:restriction>
-                                                </xs:simpleType>
-                                            </xs:element>
-                                            <xs:element name="QtyPumped" minOccurs="0" maxOccurs="2">
-                                                <xs:simpleType>
-                                                    <xs:restriction base="xs:decimal" >
-                                                        <xs:fractionDigits value="3"/>    
-                                                    </xs:restriction>
-                                                </xs:simpleType>
-                                            </xs:element>
-                                            <xs:element name="FuelPrice" minOccurs="0" maxOccurs="2">
-                                                <xs:simpleType>
-                                                    <xs:restriction base="xs:decimal">
-                                                        <xs:fractionDigits value="3"/>
-                                                    </xs:restriction>
-                                                </xs:simpleType>
-                                            </xs:element>
-                                            <xs:element name="PricePerUnit" minOccurs="0" maxOccurs="1">
-                                                <xs:simpleType>
-                                                    <xs:restriction base="xs:decimal">
-                                                        <xs:fractionDigits value="3"/>
-                                                    </xs:restriction>
-                                                </xs:simpleType>
-                                            </xs:element>
-                                            <xs:element name="Quantity" minOccurs="0" maxOccurs="2">
-                                                <xs:simpleType>
-                                                    <xs:restriction base="xs:decimal">
-                                                        <xs:fractionDigits value="3"/>
-                                                    </xs:restriction>
-                                                </xs:simpleType>
-                                            </xs:element>
-                                            <xs:element name="FuelDollarAmount" minOccurs="0" maxOccurs="2">
-                                                <xs:simpleType>
-                                                    <xs:restriction base="xs:decimal">
-                                                        <xs:fractionDigits value="3"/>
-                                                    </xs:restriction>
-                                                </xs:simpleType>
-                                            </xs:element>
-                                            <xs:element name="NonFuelPricePerUnit" minOccurs="0" maxOccurs="5">
-                                                <xs:simpleType>
-                                                    <xs:restriction base="xs:decimal">
-                                                        <xs:fractionDigits value="2"/>
-                                                    </xs:restriction>
-                                                </xs:simpleType>
-                                            </xs:element>
-                                            <xs:element name="NonFuelQty" minOccurs="0" maxOccurs="5">
-                                                <xs:simpleType>
-                                                    <xs:restriction base="xs:decimal">
-                                                        <xs:fractionDigits value="2"/>
-                                                    </xs:restriction>
-                                                </xs:simpleType>
-                                            </xs:element>
-                                            <xs:element name="NonFuelProdCode" minOccurs="0" maxOccurs="5">
-                                                <xs:simpleType>
-                                                    <xs:restriction base="xs:integer">
-                                                        <xs:totalDigits value="3"/>
-                                                    </xs:restriction>
-                                                </xs:simpleType>
-                                            </xs:element>
-                                            <xs:element name="NonFuelAmount" minOccurs="0" maxOccurs="5">
-                                                <xs:simpleType>
-                                                    <xs:restriction base="xs:decimal">
-                                                        <xs:fractionDigits value="2"/>
-                                                    </xs:restriction>
-                                                </xs:simpleType>
-                                            </xs:element>
+ <!-- This indicates the number of Products purchased by WEX Fleet card and the Product details for each will follow --> 
+                                        <xs:element name="ProdDetailCount" minOccurs="1" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:integer">
+                                                    <xs:totalDigits value="1"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="FuelProdGroup" minOccurs="0" maxOccurs="2">
+                                            <xs:complexType>
+                                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                                    <!-- PricePerUnit is not sent on PreAuth Request but populated in Final Request under the Wex-Product Details in the Capture Request (Completion or Final Auth Request) 
+                                                    it reflects the price per gallon or liter of fuel pumped when the hose is hung up. -->
+                                                    <xs:element name="PricePerUnit" minOccurs="0" maxOccurs="2">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:decimal">
+                                                                <xs:fractionDigits value="3"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <!-- Quantity is the amount of fuel Pumped. It is Zero on PreAuth Request but populated in Final Request. --> 
+                                                    <xs:element name="Quantity" minOccurs="0" maxOccurs="2">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:decimal" >
+                                                                <xs:fractionDigits value="3"/>    
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element name="FuelProdCode" minOccurs="1" maxOccurs="2"> 
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:integer">
+                                                                <xs:totalDigits value="3"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <!-- FuelDollarAmount is Zero on PreAuth Request but populated in Final Request it reflects the total dollar amount of fuel pumped when the hose is hung up. -->
+                                                    <xs:element name="FuelDollarAmount" minOccurs="0" maxOccurs="2">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:decimal">
+                                                                <xs:fractionDigits value="3"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="NonFuelProductGroup" minOccurs="0" maxOccurs="5">
+                                            <xs:complexType>
+                                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                                    <!-- NonFuelPricePerUnit is used to price with two decimal points the Non-Fuel products purchased on WEX cards like Off the Shelf Oil or a Car Wash -->    
+                                                    <xs:element name="NonFuelPricePerUnit" minOccurs="0" maxOccurs="5">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:decimal">
+                                                                <xs:fractionDigits value="2"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <!-- NonFuelQty is used indicate the amount of the Non-Fuel products purchased on WEX cards like Off the Shelf Oil or a Car Wash. 
+                                                    Usually they will be a whole number but could be a decimal so we will default to decimal-->    
+                                                    <xs:element name="NonFuelQty" minOccurs="0" maxOccurs="5">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:decimal">
+                                                                <xs:fractionDigits value="2"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <!-- NonFuelProdCode is used for Non-Fuel purchased on WEX cards like Off the Shelf Oil or a Car Wash -->
+                                                    <xs:element name="NonFuelProdCode" minOccurs="0" maxOccurs="5"> 
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:integer">
+                                                                <xs:totalDigits value="3"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <!-- NonFuelAmount is used to total price (Per unit and Qty) with two decimal points the Non-Fuel Dollar Amount of this particular product. -->    
+                                                    <xs:element name="NonFuelAmount" minOccurs="0" maxOccurs="5">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:decimal">
+                                                                <xs:fractionDigits value="2"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
                                             <xs:element name="LicenseNumber" minOccurs="0" maxOccurs="1">
                                                 <xs:simpleType>
                                                     <xs:restriction base="xs:string">

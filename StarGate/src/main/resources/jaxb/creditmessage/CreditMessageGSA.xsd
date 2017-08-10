@@ -257,7 +257,7 @@ in Transaction Cancels and/or Refunds. 28-June-2017.-->
 <!-- This indicates the number of Prompts being sent by the POS or Pump Device --> 
                                         <xs:element name="PromptDetailCount" minOccurs="1" maxOccurs="1">
                                             <xs:simpleType>
-                                                <xs:restriction base="xs:integer">
+                                                <xs:restriction base="xs:decimal">
                                                     <xs:totalDigits value="1"/>
                                                 </xs:restriction>
                                             </xs:simpleType>

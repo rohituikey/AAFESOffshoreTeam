@@ -710,6 +710,8 @@ public class Authorizer {
 //              }
 //              transaction.setNonFuelqty(nonFuelQty);
 //            }
+    
+        transaction.setPromptDetailCount(wexReqPayAtPump.getPromptDetailCount());
         }
         //*Uncommented from 502 to 551 and modified some code
         Request.AddressVerificationService addressVerServc = request.getAddressVerificationService();

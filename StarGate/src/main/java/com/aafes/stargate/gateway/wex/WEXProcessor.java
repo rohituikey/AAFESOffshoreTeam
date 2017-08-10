@@ -10,6 +10,7 @@ import com.aafes.stargate.gateway.wex.simulator.NBSClient;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.wex.simulator.NBSFormatter;
 import com.aafes.stargate.util.ResponseType;
+import com.solab.iso8583.IsoMessage;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
@@ -37,14 +38,14 @@ public class WEXProcessor {
         LOG.info("WEXProcessor.processWexRequests mothod started");
         try {
             if(nBSFormatter == null) nBSFormatter = new NBSFormatter();
-            byte[] iSOMsg = nBSFormatter.createRequest(t);
+            IsoMessage iSOMsg = nBSFormatter.createRequest(t);
             NBSClient clientObj = new NBSClient();
-            byte[] iSOMsgResponse = clientObj.generateResponse(new String(iSOMsg));
-            String[] result = nBSFormatter.seperateResponse(iSOMsgResponse);
-            t = nBSFormatter.unmarshalAcknowledgment(result[0]);
-            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) LOG.info("LOGON successfull");
-            else LOG.info("LOGON failed");
-            t = nBSFormatter.createResponse(result[1]);
+            byte[] iSOMsgResponse = clientObj.generateResponse(iSOMsg.writeData().toString());
+//            String[] result = nBSFormatter.seperateResponse(iSOMsgResponse);
+//            t = nBSFormatter.unmarshalAcknowledgment(result[0]);
+//            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) LOG.info("LOGON successfull");
+//            else LOG.info("LOGON failed");
+            t = nBSFormatter.createResponse(iSOMsgResponse);
             LOG.info("WEXProcessor.processWexRequests mothod ended");
             return t;
         } catch (Exception e) {

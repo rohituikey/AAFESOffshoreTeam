@@ -2,8 +2,14 @@
 <!DOCTYPE j8583-config PUBLIC "-//J8583//DTD CONFIG 1.0//EN"
 	"http://j8583.sourceforge.net/j8583.dtd">
 <j8583-config>
+    <template type="0200">       
+        <field num="8" type="NUMERIC" length="4">0000</field> <!--  Merchant Type -->
+        <field num="9" type="NUMERIC" length="3">840</field> <!--  Merchant Country -->
+        <field num="7" type="ALPHA" length="4">0001</field> <!-- Card Seq Number -->
+        <field num="6" type="NUMERIC" length="3">840</field> <!-- Tran Curr Code -->                
+    </template>
     
-    <parse type="0110">
+    <parse type="0210">
         <field num="10" type="LLVAR" length="15" /> <!-- TermId -->
         <field num="12" type="ALPHA" length="7" /> <!-- AppName -->
         <field num="13" type="NUMERIC" length="4" /> <!-- AppVersion -->

@@ -1,11 +1,12 @@
 /*
-* To change this license header, choose License Headers in Project Properties.
-* To change this template file, choose Tools | Templates
-* and open the template in the editor.
-*/
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.aafes.stargate.gateway.wex;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.authorizer.entity.TransactionFuelProdGroup;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.ResponseType;
@@ -14,9 +15,9 @@ import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
 
 /**
-*
-* @author singha
-*/
+ *
+ * @author singha
+ */
 @Stateless
 public class WEXValidator {
 
@@ -39,17 +40,13 @@ public class WEXValidator {
             this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_EXCEEDED", "MORE_THAN_FIVE_PRODUCTS");
             return false;
         } else if (null != t.getFuelProductGroup() && t.getFuelProductGroup().size() > 0) {
-            for (String tmpObj : t.getFuelProductGroup()) {
-                if (tmpObj == null) {
-                    this.buildErrorResponse(t, "ONLY_NONFUEL_PRODUCTS_ARE_NOTALLOWED", "ONLY_NONFUEL_PRODUCTS_ARE_NOTALLOWED");
-                    return false;
-                }
-            }
+            this.buildErrorResponse(t, "ONLY_NONFUEL_PRODUCTS_ARE_NOTALLOWED", "ONLY_NONFUEL_PRODUCTS_ARE_NOTALLOWED");
+            return false;
         }
         if ((t.getNonFuelProductGroup() != null) && (t.getNonFuelProductGroup().size() > 1)) {
-                this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_EXCEEDED", "MORE_THAN_FIVE_PRODUCTS");
-                return false;
-            }
+            this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_EXCEEDED", "MORE_THAN_FIVE_PRODUCTS");
+            return false;
+        }
         return true;
     }
 

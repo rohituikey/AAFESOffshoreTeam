@@ -199,7 +199,7 @@ final public class Transaction {
     /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
     private List<TransactionFuelProdGroup> fuelProductGroup;
     private List<TransactionNonFuelProductGroup> nonFuelProductGroup;
-    private BigInteger promptDetailCount;
+    private BigDecimal promptDetailCount;
     /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - end */
     
     public Transaction() {
@@ -1276,11 +1276,11 @@ final public class Transaction {
         this.nonFuelProductGroup = nonFuelProductGroup;
     }
 
-    public BigInteger getPromptDetailCount() {
+    public BigDecimal getPromptDetailCount() {
         return promptDetailCount;
     }
 
-    public void setPromptDetailCount(BigInteger promptDetailCount) {
+    public void setPromptDetailCount(BigDecimal promptDetailCount) {
         this.promptDetailCount = promptDetailCount;
     }
     

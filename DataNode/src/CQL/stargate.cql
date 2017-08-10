@@ -225,3 +225,7 @@ alter TABLE stargate.transactions ADD catflag text;
 alter TABLE stargate.transactions ADD cardseqnumber text;
 alter TABLE stargate.transactions ADD quantity decimal;
 alter TABLE stargate.transactions ADD nonfuelqty decimal;
+
+alter table stargate.transactions ADD fuelproductgroup list<text>;
+alter table stargate.transactions ADD nonfuelproductgroup list<text>;
+alter table stargate.transactions ADD promptDetailCount decimal;

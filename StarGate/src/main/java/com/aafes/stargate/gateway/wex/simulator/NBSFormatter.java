@@ -19,8 +19,10 @@ import com.solab.iso8583.MessageFactory;
 import com.solab.iso8583.impl.SimpleTraceGenerator;
 import com.solab.iso8583.parse.ConfigParser;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -46,19 +48,19 @@ public class NBSFormatter {
     private String transTypeRefund;
     private String cardTypeWex;
     private String serviceType;
-    private int index = 0;
+    private int index=0;
 
     Transaction transaction = new Transaction();
     @EJB
     private Configurator configurator;
 
-    public byte[] createRequest(Transaction t) {
+    public IsoMessage createRequest(Transaction t) {
         try {
             MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSconfig.xml");
             mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
             mfact.setAssignDate(true);
 
-            IsoMessage isoMsg = mfact.newMessage(0x100);
+            IsoMessage isoMsg = mfact.newMessage(0x200);
             if (configurator == null) {
                 configurator = new Configurator();
                 configurator.postConstruct();
@@ -146,25 +148,25 @@ public class NBSFormatter {
             isoMsg.setValue(124, t.getProdDetailCount(), IsoType.NUMERIC, 2);
 
             // for (int indexNumber = 0; indexNumber < Integer.valueOf(t.getProdDetailCount()); indexNumber++) {
-            if (t.getFuelProductGroup().size() > 0) {
-                for (String fuelProdGroup : t.getFuelProductGroup()) {
-                    isoMsg.setValue(125 + index, fuelProdGroup.getFuelPricePerUnit(), IsoType.AMOUNT, 9);
-                    isoMsg.setValue(126 + index, fuelProdGroup.getFuelQuantity(), IsoType.AMOUNT, 10);
-                    isoMsg.setValue(127 + index, fuelProdGroup.getFuelProductCode(), IsoType.NUMERIC, 3);
-                    isoMsg.setValue(128 + index, fuelProdGroup.getFuelDollarAmount(), IsoType.AMOUNT, 7);
-                    index = index + 1;
+            if (null!=t.getFuelProductGroup() && t.getFuelProductGroup().size()> 0) {
+                for(TransactionFuelProdGroup fuelProdGroup : t.getFuelProductGroup()){
+                isoMsg.setValue(125+index, fuelProdGroup.getFuelPricePerUnit(), IsoType.AMOUNT, 9);
+                isoMsg.setValue(126+index, fuelProdGroup.getFuelQuantity(), IsoType.AMOUNT, 10);
+                isoMsg.setValue(127+index, fuelProdGroup.getFuelProductCode(), IsoType.NUMERIC, 3);
+                isoMsg.setValue(128+index, fuelProdGroup.getFuelDollarAmount(), IsoType.AMOUNT, 7);
+                index = index+1;
                 }
             }
-
-            index = index + 125;
-            if (t.getNonFuelProductGroup().size() > 0) {
-
-                for (TransactionNonFuelProductGroup nonFuelProdGroup : t.getNonFuelProductGroup()) {
-                    isoMsg.setValue(index, nonFuelProdGroup.getNonFuelPricePerUnit(), IsoType.AMOUNT, 9);
-                    isoMsg.setValue(index + 1, nonFuelProdGroup.getNonFuelQuantity(), IsoType.AMOUNT, 10);
-                    isoMsg.setValue(index + 2, nonFuelProdGroup.getNonFuelProductCode(), IsoType.NUMERIC, 3);
-                    isoMsg.setValue(index + 3, nonFuelProdGroup.getNonFuelAmount(), IsoType.AMOUNT, 7);
-                    index = index + 1;
+            
+            index=index+125;
+            if (null!=t.getNonFuelProductGroup() && (t.getNonFuelProductGroup().size()) > 0) {
+                
+                for(TransactionNonFuelProductGroup nonFuelProdGroup : t.getNonFuelProductGroup()){
+                isoMsg.setValue(index, nonFuelProdGroup.getNonFuelPricePerUnit(), IsoType.AMOUNT, 9);
+                isoMsg.setValue(index+1, nonFuelProdGroup.getNonFuelQuantity(), IsoType.AMOUNT, 10);
+                isoMsg.setValue(index+2, nonFuelProdGroup.getNonFuelProductCode(), IsoType.NUMERIC, 3);
+                isoMsg.setValue(index+3, nonFuelProdGroup.getNonFuelAmount(), IsoType.AMOUNT, 7);
+                index = index+1;
                 }
             }
             //}
@@ -172,9 +174,8 @@ public class NBSFormatter {
                     "UTF-8");
             isoMsg.setBinaryBitmap(
                     true);
-            byte[] data = isoMsg.writeData();
 
-            return data;
+            return isoMsg;
 
         } catch (IOException ex) {
             Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
@@ -262,38 +263,6 @@ public class NBSFormatter {
         return transaction;
     }
 
-//    public String[] seperateResponse(byte[] response) {
-//        String responseString = new String(response);
-//        String[] result = {"", ""};
-//        String mTI = responseString.substring(0, 4);
-//        result[0] = responseString.substring(0, responseString.substring(4).indexOf(mTI) + 4);
-//        result[1] = responseString.substring(result[0].length());
-//        return result;
-//    }
-//    public Transaction unmarshalAcknowledgment(String response) throws Exception {
-//        MessageFactory mfact;
-//        try {
-//            mfact = ConfigParser.createFromClasspathConfig("NBSLogonAcnowledgement.xml");
-//
-//            byte[] responce1 = response.getBytes();
-//            IsoMessage resp = null;
-//            try {
-//                resp = mfact.parseMessage(responce1, 0);
-//            } catch (Exception ex) {
-//                throw new Exception("Unable to Parse response: " + Common.convertStackTraceToString(ex));
-//            }
-//            if (resp.getField(10).toString().equalsIgnoreCase("c$")) {
-//                transaction.setResponseType(ResponseType.APPROVED);
-//            } else if (resp.getField(10).toString().equalsIgnoreCase("c?")) {
-//                transaction.setResponseType(ResponseType.DECLINED);
-//            }
-//            transaction.setReasonCode(resp.getField(11).toString());
-//            return transaction;
-//        } catch (IOException ex) {
-//            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        return transaction;
-//    }
     private String CreateDF_forTransaction(String df) {
         //yyyy-MM-dd HH:mm:ss.SSS
         //2017-08-03 09:31:54.316
@@ -337,85 +306,101 @@ public class NBSFormatter {
         ts = ts.substring(11, 13) + ts.substring(14, 16) + daylightSavingsTimeAtSiteOne;
         return ts;
     }
-
+    
     //uncomment for testing purpose
-    public String generateNewResponse() {
-        String logonResponse = logonResponse();
-        String nbsResponse = nbsResponse();
-        return logonResponse + nbsResponse;
-    }
+//    public String generateNewResponse() {
+//        String logonResponse = logonResponse();
+//        String nbsResponse = nbsResponse();
+//        return logonResponse+nbsResponse;
+//    }
+//
+//    private String logonResponse() {
+//        try {
+//            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSAcknowlegment.xml");
+//            mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
+//            mfact.setAssignDate(true);
+//
+//            IsoMessage isoMessage = mfact.newMessage(0x100);
+//        if (true) {
+//            isoMessage.setValue(10, "c$",IsoType.ALPHA,2);
+//            isoMessage.setValue(11, "100",IsoType.ALPHA,3);
+//        } else {
+//            isoMessage.setValue(10, "c?",IsoType.ALPHA,2);
+//            isoMessage.setValue(11, "200",IsoType.ALPHA,3);
+//        }
+//        isoMessage.setCharacterEncoding(
+//                    "UTF-8");
+//            isoMessage.setBinaryBitmap(
+//                    true);
+//            byte[] data = isoMessage.writeData();
+//
+//            return new String(data);
+//        } catch (IOException ex) {
+//            //Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return null;
+//    }
+//    private String nbsResponse() {
+//        try {
+//            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSResponse.xml");
+//            mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
+//            mfact.setAssignDate(true);
+//
+//            IsoMessage isoMessage = mfact.newMessage(0x100);
+//        isoMessage.setValue(10, "A",IsoType.ALPHA,25);
+//        isoMessage.setValue(11, "0278",IsoType.NUMERIC,4);
+//
+//        isoMessage.setValue(12, "3170621071655",IsoType.ALPHA,13);
+//        isoMessage.setValue(13, "N",IsoType.ALPHA,1);
+//        if (true) {
+//            isoMessage.setValue(14, "00",IsoType.ALPHA,2);
+//            isoMessage.setValue(15, "Approved",IsoType.ALPHA,32);
+//        } else {
+//            isoMessage.setValue(14, "01",IsoType.ALPHA,2);
+//            isoMessage.setValue(15, "Declined",IsoType.ALPHA,32);
+//        }
+//        isoMessage.setValue(16, "WEX",IsoType.ALPHA,4);
+//        isoMessage.setValue(17, "",IsoType.ALPHA,6);
+//        isoMessage.setValue(18, "",IsoType.ALPHA,7);
+//        isoMessage.setValue(19, "",IsoType.ALPHA,4);
+//        isoMessage.setValue(20, "",IsoType.ALPHA,4);
+//        isoMessage.setValue(21, "",IsoType.ALPHA,4);
+//        isoMessage.setValue(22, "5",IsoType.ALPHA,2);
+//        isoMessage.setValue(23, "0",IsoType.ALPHA,1);
+//        isoMessage.setValue(24, "308339",IsoType.ALPHA,6);
+//        isoMessage.setValue(25, "75.00",IsoType.AMOUNT,10);
+//        isoMessage.setValue(26, "1",IsoType.ALPHA,2);
+//        isoMessage.setValue(27, "75.0000",IsoType.ALPHA,10);
+//        isoMessage.setValue(28, "001",IsoType.ALPHA,3);
+//        isoMessage.setValue(29, "78965",IsoType.ALPHA,7);
+//
+//        
+//        isoMessage.setCharacterEncoding(
+//                    "UTF-8");
+//            isoMessage.setBinaryBitmap(
+//                    true);
+//            byte[] data = isoMessage.writeData();
+//
+//            return new String(data);
+//        } catch (IOException ex) {
+//         //   Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return null;
+//    }
+    
+//    public void unmarshallTest(IsoMessage isoMessage){
+//        try {
+//            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSRequest.xml");
+//            IsoMessage resp = null;
+//            resp = mfact.parseMessage(isoMessage.writeData(), 0);
+//            resp.writeData();
+//        } catch (IOException ex) {
+//            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (ParseException ex) {
+//            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (Exception ex) {
+//            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
 
-    private String logonResponse() {
-        try {
-            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSAcknowlegment.xml");
-            mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
-            mfact.setAssignDate(true);
-
-            IsoMessage isoMessage = mfact.newMessage(0x100);
-            if (true) {
-                isoMessage.setValue(10, "c$", IsoType.ALPHA, 2);
-                isoMessage.setValue(11, "100", IsoType.ALPHA, 3);
-            } else {
-                isoMessage.setValue(10, "c?", IsoType.ALPHA, 2);
-                isoMessage.setValue(11, "200", IsoType.ALPHA, 3);
-            }
-            isoMessage.setCharacterEncoding(
-                    "UTF-8");
-            isoMessage.setBinaryBitmap(
-                    true);
-            byte[] data = isoMessage.writeData();
-
-            return new String(data);
-        } catch (IOException ex) {
-            //Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-
-    private String nbsResponse() {
-        try {
-            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSResponse.xml");
-            mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
-            mfact.setAssignDate(true);
-
-            IsoMessage isoMessage = mfact.newMessage(0x100);
-            isoMessage.setValue(10, "A", IsoType.ALPHA, 25);
-            isoMessage.setValue(11, "0278", IsoType.NUMERIC, 4);
-
-            isoMessage.setValue(12, "3170621071655", IsoType.ALPHA, 13);
-            isoMessage.setValue(13, "N", IsoType.ALPHA, 1);
-            if (true) {
-                isoMessage.setValue(14, "00", IsoType.ALPHA, 2);
-                isoMessage.setValue(15, "Approved", IsoType.ALPHA, 32);
-            } else {
-                isoMessage.setValue(14, "01", IsoType.ALPHA, 2);
-                isoMessage.setValue(15, "Declined", IsoType.ALPHA, 32);
-            }
-            isoMessage.setValue(16, "WEX", IsoType.ALPHA, 4);
-            isoMessage.setValue(17, "", IsoType.ALPHA, 6);
-            isoMessage.setValue(18, "", IsoType.ALPHA, 7);
-            isoMessage.setValue(19, "", IsoType.ALPHA, 4);
-            isoMessage.setValue(20, "", IsoType.ALPHA, 4);
-            isoMessage.setValue(21, "", IsoType.ALPHA, 4);
-            isoMessage.setValue(22, "5", IsoType.ALPHA, 2);
-            isoMessage.setValue(23, "0", IsoType.ALPHA, 1);
-            isoMessage.setValue(24, "308339", IsoType.ALPHA, 6);
-            isoMessage.setValue(25, "75.00", IsoType.AMOUNT, 10);
-            isoMessage.setValue(26, "1", IsoType.ALPHA, 2);
-            isoMessage.setValue(27, "75.0000", IsoType.ALPHA, 10);
-            isoMessage.setValue(28, "001", IsoType.ALPHA, 3);
-            isoMessage.setValue(29, "78965", IsoType.ALPHA, 7);
-
-            isoMessage.setCharacterEncoding(
-                    "UTF-8");
-            isoMessage.setBinaryBitmap(
-                    true);
-            byte[] data = isoMessage.writeData();
-
-            return new String(data);
-        } catch (IOException ex) {
-            //   Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
 }

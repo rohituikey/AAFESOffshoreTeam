@@ -7,6 +7,7 @@ package com.aafes.stargate.gateway.wex.simulator;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.util.InputType;
+import com.solab.iso8583.IsoMessage;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -43,10 +44,8 @@ public class NBSFormatterTest {
     @Ignore
     @Test
     public void testCreateRequest() {
-        byte[] result = testSubject.createRequest(t);
-        String expResult = new String(result);
-        NBSClient nBSClient = new NBSClient();
-        nBSClient.generateResponse(expResult);
+        IsoMessage result = testSubject.createRequest(t);
+        testSubject.unmarshallTest(result);
     }
 
    

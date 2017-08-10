@@ -276,10 +276,10 @@ public class TestWexDBChanges {
                 List<Message.Request.WEXRequestData.FuelProdGroup> list = wexReqPayAtPump.getFuelProdGroup();
                 for(Message.Request.WEXRequestData.FuelProdGroup tmp : list){
                     fuelProGroupObj = new TransactionFuelProdGroup();
-                    if(tmp.getQuantity() != null) fuelProGroupObj.setFuelQuantity(tmp.getQuantity().get(0));
-                    if(tmp.getFuelDollarAmount() != null) fuelProGroupObj.setFuelDollarAmount(tmp.getFuelDollarAmount().get(0));
-                    if(tmp.getPricePerUnit() != null) fuelProGroupObj.setFuelPricePerUnit(tmp.getPricePerUnit().get(0));
-                    if(tmp.getFuelProdCode() != null) fuelProGroupObj.setFuelProductCode(tmp.getFuelProdCode().get(0));
+                    if(tmp.getQuantity() != null) fuelProGroupObj.setFuelQuantity(tmp.getQuantity());
+                    if(tmp.getFuelDollarAmount() != null) fuelProGroupObj.setFuelDollarAmount(tmp.getFuelDollarAmount());
+                    if(tmp.getPricePerUnit() != null) fuelProGroupObj.setFuelPricePerUnit(tmp.getPricePerUnit());
+                    if(tmp.getFuelProdCode() != null) fuelProGroupObj.setFuelProductCode(tmp.getFuelProdCode());
                     
                     fuelProdDataList.add(fuelProGroupObj);
                     fuelProGroupObj = null;
@@ -295,10 +295,10 @@ public class TestWexDBChanges {
                 List<Message.Request.WEXRequestData.NonFuelProductGroup> list = wexReqPayAtPump.getNonFuelProductGroup();
                 for(Message.Request.WEXRequestData.NonFuelProductGroup tmp : list){
                     nonFuelProGroupObj = new TransactionNonFuelProductGroup();
-                    if(tmp.getNonFuelQty() != null) nonFuelProGroupObj.setNonFuelQuantity(tmp.getNonFuelQty().get(0));
-                    if(tmp.getNonFuelAmount() != null) nonFuelProGroupObj.setNonFuelAmount(tmp.getNonFuelAmount().get(0));
-                    if(tmp.getNonFuelPricePerUnit() != null) nonFuelProGroupObj.setNonFuelPricePerUnit(tmp.getNonFuelPricePerUnit().get(0));
-                    if(tmp.getNonFuelProdCode() != null) nonFuelProGroupObj.setNonFuelProductCode(tmp.getNonFuelProdCode().get(0));
+                    if(tmp.getNonFuelQty() != null) nonFuelProGroupObj.setNonFuelQuantity(tmp.getNonFuelQty());
+                    if(tmp.getNonFuelAmount() != null) nonFuelProGroupObj.setNonFuelAmount(tmp.getNonFuelAmount());
+                    if(tmp.getNonFuelPricePerUnit() != null) nonFuelProGroupObj.setNonFuelPricePerUnit(tmp.getNonFuelPricePerUnit());
+                    if(tmp.getNonFuelProdCode() != null) nonFuelProGroupObj.setNonFuelProductCode(tmp.getNonFuelProdCode());
                     
                     nonFuelProdDataList.add(nonFuelProGroupObj);
                     nonFuelProGroupObj = null;

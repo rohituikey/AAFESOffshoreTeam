@@ -1,0 +1,16 @@
+  <?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE j8583-config PUBLIC "-//J8583//DTD CONFIG 1.0//EN"
+	"http://j8583.sourceforge.net/j8583.dtd">
+<<j8583-config>
+    
+    <parse type="0110">
+    <field id="10" length="2" type = "ALPHA"/><!--ResponseType-->
+    <field id="11" length="3" type ="ALPHA"/><!--ReasonCode-->
+ </parse>
+    
+</j8583-config>  

@@ -182,10 +182,9 @@ public class NBSFormatter {
         return null;
     }
 
-    public Transaction createResponse(IsoMessage isoMessage) throws IOException, Exception {
+    public Transaction createResponse(byte[] buf) throws IOException, Exception {
         try {
             MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSResponceConfig.xml");
-            byte[] buf = isoMessage.writeData();
             String bitmapByte = javax.xml.bind.DatatypeConverter.printHexBinary(
                     Arrays.copyOfRange(buf, 200, 208));
             byte[] mtid = Arrays.copyOfRange(buf, 196, 200);

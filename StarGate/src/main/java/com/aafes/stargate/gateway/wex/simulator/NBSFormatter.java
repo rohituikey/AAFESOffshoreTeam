@@ -19,8 +19,10 @@ import com.solab.iso8583.MessageFactory;
 import com.solab.iso8583.impl.SimpleTraceGenerator;
 import com.solab.iso8583.parse.ConfigParser;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -51,13 +53,13 @@ public class NBSFormatter {
     @EJB
     private Configurator configurator;
 
-    public byte[] createRequest(Transaction t) {
+    public IsoMessage createRequest(Transaction t) {
         try {
             MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSconfig.xml");
             mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
             mfact.setAssignDate(true);
 
-            IsoMessage isoMsg = mfact.newMessage(0x100);
+            IsoMessage isoMsg = mfact.newMessage(0x200);
             if (configurator == null) {
                 configurator = new Configurator();
                 configurator.postConstruct();
@@ -145,7 +147,7 @@ public class NBSFormatter {
             isoMsg.setValue(124, t.getProdDetailCount(), IsoType.NUMERIC, 2);
 
             // for (int indexNumber = 0; indexNumber < Integer.valueOf(t.getProdDetailCount()); indexNumber++) {
-            if (t.getFuelProductGroup().size() > 0) {
+            if (null!=t.getFuelProductGroup() && t.getFuelProductGroup().size()> 0) {
                 for(TransactionFuelProdGroup fuelProdGroup : t.getFuelProductGroup()){
                 isoMsg.setValue(125+index, fuelProdGroup.getFuelPricePerUnit(), IsoType.AMOUNT, 9);
                 isoMsg.setValue(126+index, fuelProdGroup.getFuelQuantity(), IsoType.AMOUNT, 10);
@@ -156,7 +158,7 @@ public class NBSFormatter {
             }
             
             index=index+125;
-            if (t.getNonFuelProductGroup().size() > 0) {
+            if (null!=t.getNonFuelProductGroup() && (t.getNonFuelProductGroup().size()) > 0) {
                 
                 for(TransactionNonFuelProductGroup nonFuelProdGroup : t.getNonFuelProductGroup()){
                 isoMsg.setValue(index, nonFuelProdGroup.getNonFuelPricePerUnit(), IsoType.AMOUNT, 9);
@@ -171,9 +173,8 @@ public class NBSFormatter {
                     "UTF-8");
             isoMsg.setBinaryBitmap(
                     true);
-            byte[] data = isoMsg.writeData();
 
-            return data;
+            return isoMsg;
 
         } catch (IOException ex) {
             Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
@@ -379,6 +380,21 @@ public class NBSFormatter {
 //         //   Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 //        return null;
+//    }
+    
+//    public void unmarshallTest(IsoMessage isoMessage){
+//        try {
+//            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSRequest.xml");
+//            IsoMessage resp = null;
+//            resp = mfact.parseMessage(isoMessage.writeData(), 0);
+//            resp.writeData();
+//        } catch (IOException ex) {
+//            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (ParseException ex) {
+//            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (Exception ex) {
+//            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 //    }
 
 }

@@ -2,4 +2,5 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
     <system systemId="file:/home/ganjis/Shailendra/ECOMM/Projects/stargate/StarGate/../../../Docs/CreditMessageGSA.xsd" uri="src/main/resources/jaxb/creditmessage/CreditMessageGSA.xsd"/>
     <system systemId="file:/D:/Users/burangir/Documents/git/New/StarGate_13June/StarGate/StarGate/src/main/resources/jaxb/nbsRequest/NBSLogonRequestSchema.xsd" uri="src/main/resources/jaxb/nbsRequest/NBSLogonRequestSchema.xsd"/>
+    <system systemId="file:/D:/Users/uikuyr/Documents/NetBeansProjects/Merchant/StarGate/StarGate/src/main/java/com/aafes/stargate/gateway/wex/simulator/NBSResponse.xsd" uri="src/main/resources/jaxb/nbsresponse/NBSResponse.xsd"/>
 </catalog>

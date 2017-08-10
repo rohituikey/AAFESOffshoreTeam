@@ -45,8 +45,9 @@ public class WEXProcessor {
 //            t = nBSFormatter.unmarshalAcknowledgment(result[0]);
 //            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) LOG.info("LOGON successfull");
 //            else LOG.info("LOGON failed");
-            t = nBSFormatter.createResponse(iSOMsgResponse);
-            LOG.info("WEXProcessor.processWexRequests mothod ended");
+//            t = nBSFormatter.createResponse(result[1]);
+//            LOG.info("WEXProcessor.processWexRequests mothod ended");
+               t = nBSFormatter.createResponse(iSOMsgResponse);
             return t;
         } catch (Exception e) {
             throw e;

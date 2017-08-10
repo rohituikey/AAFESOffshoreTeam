@@ -18,7 +18,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -36,7 +35,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -73,7 +73,7 @@ public class TokenGeneratorService {
     private CrosssiteRequestTokenTable tokenObj;
     private CrosssiteRequestUsertable tokenUserDetObj;
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TokenGeneratorService.class.getSimpleName());
+    private static final Logger LOG = Logger.getLogger(TokenGeneratorService.class);
     private String sMethodName = "";
     private final String CLASS_NAME = TokenGeneratorService.this.getClass().getSimpleName();
     private String SCHEMA_PATH = "src/main/resources/jaxb/tokenvalidator/TokenValidator.xsd";
@@ -88,6 +88,11 @@ public class TokenGeneratorService {
     @Consumes("application/xml")
     @Produces("text/plain")
     public String postXml(String requestXML) {
+        LOG.info("***************************Test INFO************************");
+        if(LOG.isDebugEnabled())
+        LOG.debug("***************************Test DEBUG************************");
+        LOG.error("***************************Test ERROR************************");
+        LOG.fatal("*************************Test FATAL************************");
         sMethodName = "postXml";
         boolean validateUserFlg = false;
         LOG.info("Method " + sMethodName + " started." + "in  Class Name " + CLASS_NAME);
@@ -119,7 +124,7 @@ public class TokenGeneratorService {
             LOG.error(e.toString());
             throw new GatewayException("INTERNAL SYSTEM ERROR-->SAXException/JAXBException.. " + e);
         } catch (Exception ex) {
-            Logger.getLogger(TokenGeneratorService.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TokenGeneratorService.class.getName()).log(Priority.ERROR, null, ex);
             throw new GatewayException("INTERNAL SYSTEM ERROR" + ex);
         }
         LOG.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
@@ -237,7 +242,7 @@ public class TokenGeneratorService {
             nextToken = randomNumber.nextInt(900000) + 100000;
             LOG.info("Token Value " + nextToken);
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CLASS_NAME).log(Priority.ERROR, null, ex);
             LOG.equals("NoSuchAlgorithmException"+ex.toString());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }
@@ -265,7 +270,7 @@ public class TokenGeneratorService {
                 LOG.info("User Validation Failed!");
             }
         } catch (Exception ex) {
-            Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CLASS_NAME).log(Priority.ERROR, null, ex);
             LOG.error(ex.toString());
             throw new GatewayException("INTERNAL SYSTEM ERROR");
         }

@@ -48,7 +48,7 @@ public class TransactionFileGenerator {
     public void generateFile(){
         
         SettleEntityList = SettleMessageDAO.returnTransactions();
-        for(SettleEntity transaction: SettleEntityList){
+        for(SettleEntity settleEntity: SettleEntityList){
             
         }
         StringWriter sw = new StringWriter();

@@ -113,7 +113,7 @@ public class WEXSaleRequestTest {
         wexGateway = new WexGateway();
         nbsRequestGeneratorObj = new NBSRequestGenerator();
 
-        wexProcessor.setNbsRequestGeneratorObj(nbsRequestGeneratorObj);
+        //wexProcessor.setNbsRequestGeneratorObj(nbsRequestGeneratorObj);
         nbsRequestGeneratorObj.setApplicationName("AUTHREQ");
         nbsRequestGeneratorObj.setApplicationVersion("2");
         nbsRequestGeneratorObj.setDaylightSavingsTimeAtSiteOne("1");

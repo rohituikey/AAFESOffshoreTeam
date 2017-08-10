@@ -539,39 +539,39 @@ public class Authorizer {
 
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
             if (wexReqPayAtPump.getFuelProdGroup() != null && wexReqPayAtPump.getFuelProdGroup().size() > 0) {
-                TransactionFuelProdGroup fuelProGroupObj;
-                List<TransactionFuelProdGroup> fuelProdDataList = new ArrayList<>();
+                StringBuilder fuelCodeDetailsStr = null;
+                List<String> fuelProdDataList = new ArrayList<>();
                 List<FuelProdGroup> list = wexReqPayAtPump.getFuelProdGroup();
                 for (FuelProdGroup tmp : list) {
-                    fuelProGroupObj = new TransactionFuelProdGroup();
-                    fuelProGroupObj.setFuelQuantity(tmp.getQuantity());
-                    fuelProGroupObj.setFuelDollarAmount(tmp.getFuelDollarAmount());
-                    fuelProGroupObj.setFuelPricePerUnit(tmp.getPricePerUnit());
-                    fuelProGroupObj.setFuelProductCode(tmp.getFuelProdCode());
+                    fuelCodeDetailsStr = new StringBuilder();
+                    fuelCodeDetailsStr.append(tmp.getQuantity()).append(",");
+                    fuelCodeDetailsStr.append(tmp.getFuelDollarAmount()).append(",");
+                    fuelCodeDetailsStr.append(tmp.getPricePerUnit()).append(",");
+                    fuelCodeDetailsStr.append(tmp.getFuelProdCode());
 
-                    fuelProdDataList.add(fuelProGroupObj);
-                    fuelProGroupObj = null;
+                    fuelProdDataList.add(fuelCodeDetailsStr.toString());
+                    fuelCodeDetailsStr = null;
                 }
                 transaction.setFuelProductGroup(fuelProdDataList);
                 fuelProdDataList = null;
             }
 
             if (wexReqPayAtPump.getNonFuelProductGroup() != null && wexReqPayAtPump.getNonFuelProductGroup().size() > 0) {
-                TransactionNonFuelProductGroup nonFuelProGroupObj;
-                List<TransactionNonFuelProductGroup> fuelProdDataList = new ArrayList<>();
+                StringBuilder nonFuelCodeDetailsStr = null;
+                List<String> nonFuelProdDataList = new ArrayList<>();
                 List<NonFuelProductGroup> list = wexReqPayAtPump.getNonFuelProductGroup();
                 for (NonFuelProductGroup tmp : list) {
-                    nonFuelProGroupObj = new TransactionNonFuelProductGroup();
-                    nonFuelProGroupObj.setNonFuelQuantity(tmp.getNonFuelQty());
-                    nonFuelProGroupObj.setNonFuelAmount(tmp.getNonFuelAmount());
-                    nonFuelProGroupObj.setNonFuelPricePerUnit(tmp.getNonFuelPricePerUnit());
-                    nonFuelProGroupObj.setNonFuelProductCode(tmp.getNonFuelProdCode());
+                    nonFuelCodeDetailsStr = new StringBuilder();
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelQty()).append(",");
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelAmount()).append(",");
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelPricePerUnit()).append(",");
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelProdCode());
 
-                    fuelProdDataList.add(nonFuelProGroupObj);
-                    nonFuelProGroupObj = null;
+                    nonFuelProdDataList.add(nonFuelCodeDetailsStr.toString());
+                    nonFuelCodeDetailsStr = null;
                 }
-                transaction.setNonFuelProductGroup(fuelProdDataList);
-                fuelProdDataList = null;
+                transaction.setNonFuelProductGroup(nonFuelProdDataList);
+                nonFuelProdDataList = null;
             }
 
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - end */
@@ -1006,4 +1006,15 @@ public class Authorizer {
 
         return authTran;
     }
+    
+//    private Transaction mapAndUnmapWexFuelNonFuelData(Transaction t){
+//        
+//        if(t.getFuelProductGroup() != null && t.getFuelProductGroup().size() > 0){
+//            
+//        }
+//        
+//        
+//        return t;
+//    }
+    
 }

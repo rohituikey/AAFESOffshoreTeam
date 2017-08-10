@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
@@ -39,6 +40,7 @@ public class NBSFormatterTest {
         testSubject = new NBSFormatter();
     }
     
+    @Ignore
     @Test
     public void testCreateRequest() {
         byte[] result = testSubject.createRequest(t);

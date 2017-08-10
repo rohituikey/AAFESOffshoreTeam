@@ -147,7 +147,7 @@ public class NBSFormatter {
 
             // for (int indexNumber = 0; indexNumber < Integer.valueOf(t.getProdDetailCount()); indexNumber++) {
             if (t.getFuelProductGroup().size() > 0) {
-                for (TransactionFuelProdGroup fuelProdGroup : t.getFuelProductGroup()) {
+                for (String fuelProdGroup : t.getFuelProductGroup()) {
                     isoMsg.setValue(125 + index, fuelProdGroup.getFuelPricePerUnit(), IsoType.AMOUNT, 9);
                     isoMsg.setValue(126 + index, fuelProdGroup.getFuelQuantity(), IsoType.AMOUNT, 10);
                     isoMsg.setValue(127 + index, fuelProdGroup.getFuelProductCode(), IsoType.NUMERIC, 3);

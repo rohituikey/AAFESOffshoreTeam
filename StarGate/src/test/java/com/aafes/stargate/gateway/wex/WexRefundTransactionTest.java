@@ -122,7 +122,7 @@ public class WexRefundTransactionTest {
         nbsRequestGeneratorObj = new NBSRequestGenerator();
         nbsRequestGeneratorObj.setConfigurator(configurator);
         
-        wexProcessor.setNbsRequestGeneratorObj(nbsRequestGeneratorObj);
+        //wexProcessor.setNbsRequestGeneratorObj(nbsRequestGeneratorObj);
         nbsRequestGeneratorObj.setApplicationName("AUTHREQ");
         nbsRequestGeneratorObj.setApplicationVersion("2");
         nbsRequestGeneratorObj.setDaylightSavingsTimeAtSiteOne("1");

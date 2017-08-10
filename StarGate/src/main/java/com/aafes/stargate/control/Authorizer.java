@@ -116,17 +116,19 @@ public class Authorizer {
                 } else {
                     storedTran = null;
                 }
-            }else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia()) && RequestType.REFUND.equalsIgnoreCase(t.getRequestType())){
+            } else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia()) && RequestType.REFUND.equalsIgnoreCase(t.getRequestType())) {
                 LOG.info("Wex Refund........");
                 storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.REFUND);
 
-                if (storedTran != null && storedTran.getResponseType() != null 
+                if (storedTran != null && storedTran.getResponseType() != null
                         && storedTran.getResponseType().trim().equalsIgnoreCase(ResponseType.APPROVED)) {
                     storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REFUNDED"));
                     storedTran.setResponseType(ResponseType.DECLINED);
                     storedTran.setDescriptionField("TRANSACTION_ALREADY_REFUNDED");
-                } else  storedTran = null;
-            }else {
+                } else {
+                    storedTran = null;
+                }
+            } else {
                 storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getRequestType());
             }
 
@@ -177,15 +179,14 @@ public class Authorizer {
                             && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                         LOG.info("Saving and updating transaction.....");
                         tranRepository.saveAndUpdate(t, authTranCancel);
-                    } 
-//                    else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia())
-//                            && ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())){
-//                            LOG.error("Transaction " + t.getResponseType());
-//                            t.setReasonCode(configurator.get(t.getReasonCode()));
-//                            t.setDescriptionField(t.getDescriptionField());
-//                            t.setResponseType(ResponseType.DECLINED);
-//                            mapResponse(t, cm);
-//                    } 
+                    } //                    else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia())
+                    //                            && ResponseType.DECLINED.equalsIgnoreCase(t.getResponseType())){
+                    //                            LOG.error("Transaction " + t.getResponseType());
+                    //                            t.setReasonCode(configurator.get(t.getReasonCode()));
+                    //                            t.setDescriptionField(t.getDescriptionField());
+                    //                            t.setResponseType(ResponseType.DECLINED);
+                    //                            mapResponse(t, cm);
+                    //                    } 
                     else {
                         LOG.info("Saving transaction....." + t.getRrn());
                         encryptValues(t);
@@ -308,25 +309,24 @@ public class Authorizer {
                 t.setReasonCode("100");
                 t.setResponseType(ResponseType.APPROVED);
             }
-        } 
-        /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - start */
-        else if (MediaType.WEX.equalsIgnoreCase(t.getMedia()) && t.getRequestType() != null 
-                && t.getRequestType().equalsIgnoreCase(RequestType.REFUND)){
+        } /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - start */ else if (MediaType.WEX.equalsIgnoreCase(t.getMedia()) && t.getRequestType() != null
+                && t.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
             LOG.info(RequestType.REFUND + " request : " + t.getRrn());
             authTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.FINAL_AUTH);
-            if (authTran == null) throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_REFUND");
-       }
-        /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - end */
-        /* CONDITION ADDED TO CHECK APPROVED PRE-AUTH TRANSACTION FOR WEX FINAL AUTH REQUEST - end */
-        else if(MediaType.WEX.equalsIgnoreCase(t.getMedia()) && t.getRequestType() != null 
-                && t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)){
+            if (authTran == null) {
+                throw new AuthorizerException("NO_AUTHORIZATION_FOUND_FOR_REFUND");
+            }
+        } /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - end */ /* CONDITION ADDED TO CHECK APPROVED PRE-AUTH TRANSACTION FOR WEX FINAL AUTH REQUEST - end */ else if (MediaType.WEX.equalsIgnoreCase(t.getMedia()) && t.getRequestType() != null
+                && t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)) {
             authTran = transactionDAO.find(t.getIdentityUuid(), t.getRrn(), RequestType.PREAUTH);
-            if (authTran == null) throw new AuthorizerException("NO_PRIOR_TRANSACTION");
+            if (authTran == null) {
+                throw new AuthorizerException("NO_PRIOR_TRANSACTION");
+            }
             if (authTran.getAuthNumber() != null) {
                 t.setAuthNumber(authTran.getAuthNumber());
             }
         }
-         /* CONDITION ADDED TO CHECK APPROVED PRE-AUTH TRANSACTION FOR WEX FINAL AUTH REQUEST - end */
+        /* CONDITION ADDED TO CHECK APPROVED PRE-AUTH TRANSACTION FOR WEX FINAL AUTH REQUEST - end */
         return authTran;
     }
 
@@ -536,44 +536,44 @@ public class Authorizer {
             if (wexReqPayAtPump.getRestrictCode() != null) {
                 transaction.setRestrictCode(wexReqPayAtPump.getRestrictCode().toString());
             }
-            
+
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
-            if(wexReqPayAtPump.getFuelProdGroup() != null && wexReqPayAtPump.getFuelProdGroup().size() > 0){
+            if (wexReqPayAtPump.getFuelProdGroup() != null && wexReqPayAtPump.getFuelProdGroup().size() > 0) {
                 TransactionFuelProdGroup fuelProGroupObj;
                 List<TransactionFuelProdGroup> fuelProdDataList = new ArrayList<>();
                 List<FuelProdGroup> list = wexReqPayAtPump.getFuelProdGroup();
-                for(FuelProdGroup tmp : list){
+                for (FuelProdGroup tmp : list) {
                     fuelProGroupObj = new TransactionFuelProdGroup();
-                    if(tmp.getQuantity() != null) fuelProGroupObj.setFuelQuantity(tmp.getQuantity().get(0));
-                    if(tmp.getFuelDollarAmount() != null) fuelProGroupObj.setFuelDollarAmount(tmp.getFuelDollarAmount().get(0));
-                    if(tmp.getPricePerUnit() != null) fuelProGroupObj.setFuelPricePerUnit(tmp.getPricePerUnit().get(0));
-                    if(tmp.getFuelProdCode() != null) fuelProGroupObj.setFuelProductCode(tmp.getFuelProdCode().get(0));
-                    
+                    fuelProGroupObj.setFuelQuantity(tmp.getQuantity());
+                    fuelProGroupObj.setFuelDollarAmount(tmp.getFuelDollarAmount());
+                    fuelProGroupObj.setFuelPricePerUnit(tmp.getPricePerUnit());
+                    fuelProGroupObj.setFuelProductCode(tmp.getFuelProdCode());
+
                     fuelProdDataList.add(fuelProGroupObj);
                     fuelProGroupObj = null;
                 }
                 transaction.setFuelProductGroup(fuelProdDataList);
                 fuelProdDataList = null;
             }
-            
-            if(wexReqPayAtPump.getNonFuelProductGroup() != null && wexReqPayAtPump.getNonFuelProductGroup().size() > 0){
+
+            if (wexReqPayAtPump.getNonFuelProductGroup() != null && wexReqPayAtPump.getNonFuelProductGroup().size() > 0) {
                 TransactionNonFuelProductGroup nonFuelProGroupObj;
                 List<TransactionNonFuelProductGroup> fuelProdDataList = new ArrayList<>();
                 List<NonFuelProductGroup> list = wexReqPayAtPump.getNonFuelProductGroup();
-                for(NonFuelProductGroup tmp : list){
+                for (NonFuelProductGroup tmp : list) {
                     nonFuelProGroupObj = new TransactionNonFuelProductGroup();
-                    if(tmp.getNonFuelQty() != null) nonFuelProGroupObj.setNonFuelQuantity(tmp.getNonFuelQty().get(0));
-                    if(tmp.getNonFuelAmount() != null) nonFuelProGroupObj.setNonFuelAmount(tmp.getNonFuelAmount().get(0));
-                    if(tmp.getNonFuelPricePerUnit() != null) nonFuelProGroupObj.setNonFuelPricePerUnit(tmp.getNonFuelPricePerUnit().get(0));
-                    if(tmp.getNonFuelProdCode() != null) nonFuelProGroupObj.setNonFuelProductCode(tmp.getNonFuelProdCode().get(0));
-                    
+                    nonFuelProGroupObj.setNonFuelQuantity(tmp.getNonFuelQty());
+                    nonFuelProGroupObj.setNonFuelAmount(tmp.getNonFuelAmount());
+                    nonFuelProGroupObj.setNonFuelPricePerUnit(tmp.getNonFuelPricePerUnit());
+                    nonFuelProGroupObj.setNonFuelProductCode(tmp.getNonFuelProdCode());
+
                     fuelProdDataList.add(nonFuelProGroupObj);
                     nonFuelProGroupObj = null;
                 }
                 transaction.setNonFuelProductGroup(fuelProdDataList);
                 fuelProdDataList = null;
             }
-            
+
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - end */
 //            if (wexReqPayAtPump.getFuelProdGroup(). != null) {
 //                BigDecimal qtyPumped;
@@ -627,7 +627,6 @@ public class Authorizer {
 //                transaction.setFuelDollerAmount(wexReqPayAtPump.getFuelDollarAmount().get(0));
 //            }
             //added lines for new fields mapping ends here
-
 //            if (wexReqPayAtPump.getUnitOfMeas() != null) {
             //                transaction.setUnitOfMeas(wexReqPayAtPump.getUnitOfMeas().toString());
             //            }
@@ -647,9 +646,10 @@ public class Authorizer {
             if (wexReqPayAtPump.getProdDetailCount() != null) {
                 transaction.setProdDetailCount(wexReqPayAtPump.getProdDetailCount().toString());
             }
-            
-            if(wexReqPayAtPump.getServiceCode() != null && wexReqPayAtPump.getServiceCode().size() > 0)
+
+            if (wexReqPayAtPump.getServiceCode() != null && wexReqPayAtPump.getServiceCode().size() > 0) {
                 transaction.setServiceCode(wexReqPayAtPump.getServiceCode().get(0));
+            }
 
 //            if (wexReqPayAtPump.getNonFuelAmount() != null) {
 //                BigDecimal nonFuelPrice = new BigDecimal("0");
@@ -668,15 +668,14 @@ public class Authorizer {
 //                }
 //                transaction.setNonFuelAmount(nonFuelPrice);
 //            }
-            
-            if(wexReqPayAtPump.getOdometer() != null){
+            if (wexReqPayAtPump.getOdometer() != null) {
                 transaction.setOdoMeter(wexReqPayAtPump.getOdometer());
             }
-            
-             if(wexReqPayAtPump.getCardSeqNumber()!= null){
+
+            if (wexReqPayAtPump.getCardSeqNumber() != null) {
                 transaction.setCardSeqNumber(wexReqPayAtPump.getCardSeqNumber());
             }
-            
+
 //            if (wexReqPayAtPump.getQuantity() != null) {
 //              BigDecimal quantity = new BigDecimal("0");
 //              String strQuantity;
@@ -694,7 +693,6 @@ public class Authorizer {
 //              }
 //              transaction.setQuantity(quantity);
 //            }
-             
 //            if (wexReqPayAtPump.getNonFuelQty() != null) {
 //              BigDecimal nonFuelQty = new BigDecimal("0");
 //              String strNonFuelQty;

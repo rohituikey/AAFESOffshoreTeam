@@ -8,9 +8,8 @@ package com.aafes.stargate.gateway.wex;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.wex.simulator.NBSClient;
 import com.aafes.stargate.control.Configurator;
-import com.aafes.stargate.dao.TransactionDAO;
+import com.aafes.stargate.gateway.wex.simulator.NBSFormatter;
 import com.aafes.stargate.util.ResponseType;
-import java.math.BigInteger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
@@ -30,28 +29,22 @@ public class WEXProcessor {
     private Configurator configurator;
 //    @EJB
 //    private TransactionDAO transactionDAO;
-    private NBSRequestGenerator nbsRequestGeneratorObj;
+    private NBSFormatter nBSFormatter;
 
-    public void setConfigurator(Configurator configurator) {
-        this.configurator = configurator;
-    }
+   
 
-    public void setNbsRequestGeneratorObj(NBSRequestGenerator nbsRequestGeneratorObj) {
-        this.nbsRequestGeneratorObj = nbsRequestGeneratorObj;
-    }
-
-    public Transaction processWexRequests(Transaction t){
+    public Transaction processWexRequests(Transaction t) throws Exception{
         LOG.info("WEXProcessor.processWexRequests mothod started");
         try {
-            if(nbsRequestGeneratorObj == null) nbsRequestGeneratorObj = new NBSRequestGenerator();
-            byte[] iSOMsg = nbsRequestGeneratorObj.generateLogOnPacketRequest(t);
+            if(nBSFormatter == null) nBSFormatter = new NBSFormatter();
+            byte[] iSOMsg = nBSFormatter.createRequest(t);
             NBSClient clientObj = new NBSClient();
             byte[] iSOMsgResponse = clientObj.generateResponse(new String(iSOMsg));
-            String[] result = nbsRequestGeneratorObj.seperateResponse(iSOMsgResponse);
-            t = nbsRequestGeneratorObj.unmarshalAcknowledgment(result[0]);
+            String[] result = nBSFormatter.seperateResponse(iSOMsgResponse);
+            t = nBSFormatter.unmarshalAcknowledgment(result[0]);
             if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) LOG.info("LOGON successfull");
             else LOG.info("LOGON failed");
-            t = nbsRequestGeneratorObj.unmarshalNbsResponse(result[1]);
+            t = nBSFormatter.createResponse(result[1]);
             LOG.info("WEXProcessor.processWexRequests mothod ended");
             return t;
         } catch (Exception e) {
@@ -63,18 +56,18 @@ public class WEXProcessor {
 //        LOG.info("WEXProcessor.preAuthProcess mothod started");
 //
 //        try {
-//            nbsRequestGeneratorObj = new NBSRequestGenerator();
-//            String requestStr = nbsRequestGeneratorObj.generateLogOnPacketRequest(t);
+//            nBSFormatter = new NBSRequestGenerator();
+//            String requestStr = nBSFormatter.generateLogOnPacketRequest(t);
 //            NBSClient clientObj = new NBSClient();
 //            String responseStr = clientObj.generateResponse(requestStr);
-//            String[] result = nbsRequestGeneratorObj.seperateResponse(responseStr);
-//            t = nbsRequestGeneratorObj.unmarshalAcknowledgment(result[0]);
+//            String[] result = nBSFormatter.seperateResponse(responseStr);
+//            t = nBSFormatter.unmarshalAcknowledgment(result[0]);
 //            if (t.getResponseType().equals(ResponseType.APPROVED)) {
 //                LOG.info("LOGON successfull");
 //            } else {
 //                LOG.info("LOGON failed");
 //            }
-//            t = nbsRequestGeneratorObj.unmarshalNbsResponse(result[1]);
+//            t = nBSFormatter.unmarshalNbsResponse(result[1]);
 //            LOG.info("WEXProcessor.preAuthProcess mothod ended");
 //            return t;
 //        } catch (Exception e) {
@@ -93,17 +86,17 @@ public class WEXProcessor {
 //            if (authTran.getAuthNumber() != null) {
 //                t.setAuthNumber(authTran.getAuthNumber());
 //            }
-//            String requestStr = nbsRequestGeneratorObj.generateLogOnPacketRequest(t);
+//            String requestStr = nBSFormatter.generateLogOnPacketRequest(t);
 //            NBSClient clientObj = new NBSClient();
 //            String responseStr = clientObj.generateResponse(requestStr);
-//            String[] result = nbsRequestGeneratorObj.seperateResponse(responseStr);
-//            t = nbsRequestGeneratorObj.unmarshalAcknowledgment(result[0]);
+//            String[] result = nBSFormatter.seperateResponse(responseStr);
+//            t = nBSFormatter.unmarshalAcknowledgment(result[0]);
 //            if (t.getResponseType().equals(ResponseType.APPROVED)) {
 //                LOG.info("LOGON successfull");
 //            } else {
 //                LOG.info("LOGON failed");
 //            }
-//            t = nbsRequestGeneratorObj.unmarshalNbsResponse(result[1]);
+//            t = nBSFormatter.unmarshalNbsResponse(result[1]);
 //            LOG.info("WEXProcessor.finalAuthProcess mothod ended");
 //            return t;
 //        } catch (Exception e) {
@@ -142,18 +135,18 @@ public class WEXProcessor {
 //        ResponseAcknowlegment responseAcknowlegmentObj1;
 //        NBSResponse nBSResponse;
 //
-//        nbsRequestGeneratorObj = new NBSRequestGenerator();
+//        nBSFormatter = new NBSRequestGenerator();
 ////        wexRequestResponseMappingObj = new WexRequestResponseMapping();
 //
-////        requestStr = nbsRequestGeneratorObj.generateLogOnPacketRequest(wexRequestResponseMappingObj.RequestMap(t));
+////        requestStr = nBSFormatter.generateLogOnPacketRequest(wexRequestResponseMappingObj.RequestMap(t));
 //
 //        NBSClient clientObj = new NBSClient();
 //        responseStr = clientObj.generateResponse(requestStr);
 //        if (responseStr != null) {
-//            seperatedResponseArr = nbsRequestGeneratorObj.seperateResponse(responseStr);
+//            seperatedResponseArr = nBSFormatter.seperateResponse(responseStr);
 ////            if (seperatedResponseArr != null && seperatedResponseArr.length > 0) {
-////                responseAcknowlegmentObj1 = nbsRequestGeneratorObj.unmarshalAcknowledgment(seperatedResponseArr[0]);
-////                nBSResponse = nbsRequestGeneratorObj.unmarshalNbsResponse(seperatedResponseArr[1]);
+////                responseAcknowlegmentObj1 = nBSFormatter.unmarshalAcknowledgment(seperatedResponseArr[0]);
+////                nBSResponse = nBSFormatter.unmarshalNbsResponse(seperatedResponseArr[1]);
 ////
 ////                if (nBSResponse != null) {
 ////                    t.setResponseType(nBSResponse.getAuthResponse().getMessage());
@@ -161,7 +154,7 @@ public class WEXProcessor {
 ////                }
 //            //}
 //
-//            logOffRequest = nbsRequestGeneratorObj.logOffRequest();
+//            logOffRequest = nBSFormatter.logOffRequest();
 //
 //            //clientObj.generateResponse(seperatedResponseArr[0]+logOffRequest);
 //        }
@@ -184,4 +177,13 @@ public class WEXProcessor {
 //        return rs;
 //        //ex  17 05 31 13 31 33
 //    }
+
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
+
+    public void setnBSFormatter(NBSFormatter nBSFormatter) {
+        this.nBSFormatter = nBSFormatter;
+    }
+    
 }

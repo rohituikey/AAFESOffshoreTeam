@@ -24,6 +24,30 @@
         <field num="118" type="AMOUNT" length="9" /> <!-- CardSpecificDataAmount -->
         <field num="119" type="ALPHA" length="12" /> <!-- CardSpecificDataRecieptNumber -->
         <field num="120" type="ALPHA" length="6" /> <!-- CardSpecificDataAuthReference -->
+        <field num="121" type="NUMERIC" length="2" /> <!-- prompt details count -->
+        <field num="122" type="ALPHA" length="1" /> <!-- prompt type-->
+        <field num="123" type="ALPHA" length="10" /> <!-- prompt value-->
+        <field num="124" type="NUMERIC" length="2" /> <!-- product details count-->
+        <field num="125" type="AMOUNT" length="9" /> <!-- price-->
+        <field num="126" type="AMOUNT" length="10" /> <!-- quantity-->
+        <field num="127" type="NUMERIC" length="3" /> <!-- product code-->
+        <field num="128" type="AMOUNT" length="7" /> <!-- Amount-->
+        <field num="129" type="AMOUNT" length="9" /> <!-- price-->
+        <field num="130" type="AMOUNT" length="10" /> <!-- quantity-->
+        <field num="131" type="NUMERIC" length="3" /> <!-- product code-->
+        <field num="132" type="AMOUNT" length="7" /> <!-- Amount-->
+        <field num="133" type="AMOUNT" length="9" /> <!-- price-->
+        <field num="134" type="AMOUNT" length="10" /> <!-- quantity-->
+        <field num="135" type="NUMERIC" length="3" /> <!-- product code-->
+        <field num="136" type="AMOUNT" length="7" /> <!-- Amount-->
+        <field num="137" type="AMOUNT" length="9" /> <!-- price-->
+        <field num="138" type="AMOUNT" length="10" /> <!-- quantity-->
+        <field num="139" type="NUMERIC" length="3" /> <!-- product code-->
+        <field num="140" type="AMOUNT" length="7" /> <!-- Amount-->
+        <field num="141" type="AMOUNT" length="9" /> <!-- price-->
+        <field num="142" type="AMOUNT" length="10" /> <!-- quantity-->
+        <field num="143" type="NUMERIC" length="3" /> <!-- product code-->
+        <field num="144" type="AMOUNT" length="7" /> <!-- Amount-->
     </parse>
     
 </j8583-config>

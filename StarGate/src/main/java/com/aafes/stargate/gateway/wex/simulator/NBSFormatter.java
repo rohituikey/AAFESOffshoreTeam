@@ -6,6 +6,8 @@
 package com.aafes.stargate.gateway.wex.simulator;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.authorizer.entity.TransactionFuelProdGroup;
+import com.aafes.stargate.authorizer.entity.TransactionNonFuelProductGroup;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.vision.Common;
 import com.aafes.stargate.util.InputType;
@@ -43,6 +45,7 @@ public class NBSFormatter {
     private String transTypeRefund;
     private String cardTypeWex;
     private String serviceType;
+    private int index=0;
 
     Transaction transaction = new Transaction();
     @EJB
@@ -121,6 +124,49 @@ public class NBSFormatter {
 //            for (promptCountIndex=promptCountIndex+2 ; promptCountIndex  <  (nbsLogonRequest.getHeaderRecord().getCardSpecificData().getWexProductDetails().getProdDetailCount().getPriceOrQuantityOrProductCode().size()); promptCountIndex++) {
 //                 isoMsg.set(promptCountIndex, (nbsLogonRequest.getHeaderRecord().getCardSpecificData().getWexProductDetails().getProdDetailCount().getPriceOrQuantityOrProductCode().get(promptCountIndex)).toString());
 //            }
+            isoMsg.setValue(121, t.getPromptDetailCount(), IsoType.NUMERIC, 2);
+
+            //prompt details count
+            if (null != t.getPromptDetailCount()) {
+                if (null != t.getVehicleId()) {
+                    isoMsg.setValue(122, 1, IsoType.ALPHA, 1);
+                    isoMsg.setValue(123, t.getVehicleId(), IsoType.ALPHA, 10);
+                }
+                if (null != t.getDriverId()) {
+                    isoMsg.setValue(122, 3, IsoType.ALPHA, 1);
+                    isoMsg.setValue(123, t.getDriverId(), IsoType.ALPHA, 10);
+                }
+                if (null != t.getOdoMeter()) {
+                    isoMsg.setValue(122, 4, IsoType.ALPHA, 1);
+                    isoMsg.setValue(123, t.getOdoMeter(), IsoType.ALPHA, 10);
+                }
+            }
+
+            isoMsg.setValue(124, t.getProdDetailCount(), IsoType.NUMERIC, 2);
+
+            // for (int indexNumber = 0; indexNumber < Integer.valueOf(t.getProdDetailCount()); indexNumber++) {
+            if (t.getFuelProductGroup().size() > 0) {
+                for(TransactionFuelProdGroup fuelProdGroup : t.getFuelProductGroup()){
+                isoMsg.setValue(125+index, fuelProdGroup.getFuelPricePerUnit(), IsoType.AMOUNT, 9);
+                isoMsg.setValue(126+index, fuelProdGroup.getFuelQuantity(), IsoType.AMOUNT, 10);
+                isoMsg.setValue(127+index, fuelProdGroup.getFuelProductCode(), IsoType.NUMERIC, 3);
+                isoMsg.setValue(128+index, fuelProdGroup.getFuelDollarAmount(), IsoType.AMOUNT, 7);
+                index = index+1;
+                }
+            }
+            
+            index=index+125;
+            if (t.getNonFuelProductGroup().size() > 0) {
+                
+                for(TransactionNonFuelProductGroup nonFuelProdGroup : t.getNonFuelProductGroup()){
+                isoMsg.setValue(index, nonFuelProdGroup.getNonFuelPricePerUnit(), IsoType.AMOUNT, 9);
+                isoMsg.setValue(index+1, nonFuelProdGroup.getNonFuelQuantity(), IsoType.AMOUNT, 10);
+                isoMsg.setValue(index+2, nonFuelProdGroup.getNonFuelProductCode(), IsoType.NUMERIC, 3);
+                isoMsg.setValue(index+3, nonFuelProdGroup.getNonFuelAmount(), IsoType.AMOUNT, 7);
+                index = index+1;
+                }
+            }
+            //}
             isoMsg.setCharacterEncoding(
                     "UTF-8");
             isoMsg.setBinaryBitmap(
@@ -206,7 +252,7 @@ public class NBSFormatter {
         } catch (NullPointerException ex) {
             transaction.setReasonCode("");
         }
-              //   application config ,session (auth or captureOnly),max amount need to be mapped
+        //   application config ,session (auth or captureOnly),max amount need to be mapped
         return transaction;
     }
 
@@ -253,4 +299,86 @@ public class NBSFormatter {
         ts = ts.substring(11, 13) + ts.substring(14, 16) + daylightSavingsTimeAtSiteOne;
         return ts;
     }
+    
+    //uncomment for testing purpose
+//    public String generateNewResponse() {
+//        String logonResponse = logonResponse();
+//        String nbsResponse = nbsResponse();
+//        return logonResponse+nbsResponse;
+//    }
+//
+//    private String logonResponse() {
+//        try {
+//            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSAcknowlegment.xml");
+//            mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
+//            mfact.setAssignDate(true);
+//
+//            IsoMessage isoMessage = mfact.newMessage(0x100);
+//        if (true) {
+//            isoMessage.setValue(10, "c$",IsoType.ALPHA,2);
+//            isoMessage.setValue(11, "100",IsoType.ALPHA,3);
+//        } else {
+//            isoMessage.setValue(10, "c?",IsoType.ALPHA,2);
+//            isoMessage.setValue(11, "200",IsoType.ALPHA,3);
+//        }
+//        isoMessage.setCharacterEncoding(
+//                    "UTF-8");
+//            isoMessage.setBinaryBitmap(
+//                    true);
+//            byte[] data = isoMessage.writeData();
+//
+//            return new String(data);
+//        } catch (IOException ex) {
+//            //Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return null;
+//    }
+//    private String nbsResponse() {
+//        try {
+//            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSResponse.xml");
+//            mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
+//            mfact.setAssignDate(true);
+//
+//            IsoMessage isoMessage = mfact.newMessage(0x100);
+//        isoMessage.setValue(10, "A",IsoType.ALPHA,25);
+//        isoMessage.setValue(11, "0278",IsoType.NUMERIC,4);
+//
+//        isoMessage.setValue(12, "3170621071655",IsoType.ALPHA,13);
+//        isoMessage.setValue(13, "N",IsoType.ALPHA,1);
+//        if (true) {
+//            isoMessage.setValue(14, "00",IsoType.ALPHA,2);
+//            isoMessage.setValue(15, "Approved",IsoType.ALPHA,32);
+//        } else {
+//            isoMessage.setValue(14, "01",IsoType.ALPHA,2);
+//            isoMessage.setValue(15, "Declined",IsoType.ALPHA,32);
+//        }
+//        isoMessage.setValue(16, "WEX",IsoType.ALPHA,4);
+//        isoMessage.setValue(17, "",IsoType.ALPHA,6);
+//        isoMessage.setValue(18, "",IsoType.ALPHA,7);
+//        isoMessage.setValue(19, "",IsoType.ALPHA,4);
+//        isoMessage.setValue(20, "",IsoType.ALPHA,4);
+//        isoMessage.setValue(21, "",IsoType.ALPHA,4);
+//        isoMessage.setValue(22, "5",IsoType.ALPHA,2);
+//        isoMessage.setValue(23, "0",IsoType.ALPHA,1);
+//        isoMessage.setValue(24, "308339",IsoType.ALPHA,6);
+//        isoMessage.setValue(25, "75.00",IsoType.AMOUNT,10);
+//        isoMessage.setValue(26, "1",IsoType.ALPHA,2);
+//        isoMessage.setValue(27, "75.0000",IsoType.ALPHA,10);
+//        isoMessage.setValue(28, "001",IsoType.ALPHA,3);
+//        isoMessage.setValue(29, "78965",IsoType.ALPHA,7);
+//
+//        
+//        isoMessage.setCharacterEncoding(
+//                    "UTF-8");
+//            isoMessage.setBinaryBitmap(
+//                    true);
+//            byte[] data = isoMessage.writeData();
+//
+//            return new String(data);
+//        } catch (IOException ex) {
+//         //   Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return null;
+//    }
+
 }

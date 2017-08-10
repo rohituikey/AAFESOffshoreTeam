@@ -401,7 +401,4 @@ public class NBSRequestGenerator {
     public void setSCHEMA_PATH(String SCHEMA_PATH) {
         this.SCHEMA_PATH = SCHEMA_PATH;
     }
-    
-    
-}
 }

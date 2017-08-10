@@ -4,6 +4,8 @@ import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.Table;
 import com.datastax.driver.mapping.annotations.Transient;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
 
 @Table(keyspace = "stargate", name = "transactions")
 final public class Transaction {
@@ -193,6 +195,12 @@ final public class Transaction {
     private BigDecimal quantity;
     private BigDecimal nonFuelqty;
     /* FIELDS ADDED FOR WEX USE CASE - end */
+    
+    /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
+    private List<TransactionFuelProdGroup> fuelProductGroup;
+    private List<TransactionNonFuelProductGroup> nonFuelProductGroup;
+    private BigInteger promptDetailCount;
+    /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - end */
     
     public Transaction() {
 
@@ -1251,5 +1259,31 @@ final public class Transaction {
     public void setNonFuelqty(BigDecimal nonFuelqty) {
         this.nonFuelqty = nonFuelqty;
     }
+
+    public List<TransactionFuelProdGroup> getFuelProductGroup() {
+        return fuelProductGroup;
+    }
+
+    public void setFuelProductGroup(List<TransactionFuelProdGroup> fuelProductGroup) {
+        this.fuelProductGroup = fuelProductGroup;
+    }
+
+    public List<TransactionNonFuelProductGroup> getNonFuelProductGroup() {
+        return nonFuelProductGroup;
+    }
+
+    public void setNonFuelProductGroup(List<TransactionNonFuelProductGroup> nonFuelProductGroup) {
+        this.nonFuelProductGroup = nonFuelProductGroup;
+    }
+
+    public BigInteger getPromptDetailCount() {
+        return promptDetailCount;
+    }
+
+    public void setPromptDetailCount(BigInteger promptDetailCount) {
+        this.promptDetailCount = promptDetailCount;
+    }
+    
+    
   
 }

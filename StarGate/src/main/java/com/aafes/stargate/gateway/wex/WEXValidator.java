@@ -6,6 +6,7 @@
 package com.aafes.stargate.gateway.wex;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.authorizer.entity.TransactionFuelProdGroup;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.ResponseType;
@@ -40,10 +41,18 @@ public class WEXValidator {
                 && (Integer.parseInt(t.getProdDetailCount()) > 2)) {
             this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_EXCEEDED", "MORE_THAN_FIVE_PRODUCTS");
             return false;
-        } else if (t.getFuelProdCode() == null || t.getFuelProdCode().trim().isEmpty()) {
+        } else if (null == t.getFuelProductGroup() || t.getFuelProductGroup().size() == 0){ 
             this.buildErrorResponse(t, "ONLY_NONFUEL_PRODUCTS_ARE_NOTALLOWED", "ONLY_NONFUEL_PRODUCTS_ARE_NOTALLOWED");
             return false;
+        } else if (null != t.getFuelProductGroup() && t.getFuelProductGroup().size() > 0){ 
+            for(TransactionFuelProdGroup tmpObj : t.getFuelProductGroup()){
+                if(tmpObj.getFuelProductCode() == null){
+                    this.buildErrorResponse(t, "ONLY_NONFUEL_PRODUCTS_ARE_NOTALLOWED", "ONLY_NONFUEL_PRODUCTS_ARE_NOTALLOWED");
+                    return false;
+                }
+            }
         }
+           
 //        if (t.getSettleIndicator() == null || !t.getSettleIndicator().equalsIgnoreCase(SettleConstant.TRUE)) {
 //            this.buildErrorResponse(t, "INVALID_SETTLE_INDICATOR", "INVALID_SETTLE_INDICATOR");
 //            return false;

@@ -6,6 +6,8 @@
 package com.aafes.stargate.gateway.wex.simulator;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
+import com.aafes.stargate.authorizer.entity.TransactionFuelProdGroup;
+import com.aafes.stargate.authorizer.entity.TransactionNonFuelProductGroup;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.vision.Common;
 import com.aafes.stargate.util.InputType;
@@ -43,6 +45,7 @@ public class NBSFormatter {
     private String transTypeRefund;
     private String cardTypeWex;
     private String serviceType;
+    private int index=0;
 
     Transaction transaction = new Transaction();
     @EJB
@@ -121,6 +124,49 @@ public class NBSFormatter {
 //            for (promptCountIndex=promptCountIndex+2 ; promptCountIndex  <  (nbsLogonRequest.getHeaderRecord().getCardSpecificData().getWexProductDetails().getProdDetailCount().getPriceOrQuantityOrProductCode().size()); promptCountIndex++) {
 //                 isoMsg.set(promptCountIndex, (nbsLogonRequest.getHeaderRecord().getCardSpecificData().getWexProductDetails().getProdDetailCount().getPriceOrQuantityOrProductCode().get(promptCountIndex)).toString());
 //            }
+            isoMsg.setValue(121, t.getPromptDetailCount(), IsoType.NUMERIC, 2);
+
+            //prompt details count
+            if (null != t.getPromptDetailCount()) {
+                if (null != t.getVehicleId()) {
+                    isoMsg.setValue(122, 1, IsoType.ALPHA, 1);
+                    isoMsg.setValue(123, t.getVehicleId(), IsoType.ALPHA, 10);
+                }
+                if (null != t.getDriverId()) {
+                    isoMsg.setValue(122, 3, IsoType.ALPHA, 1);
+                    isoMsg.setValue(123, t.getDriverId(), IsoType.ALPHA, 10);
+                }
+                if (null != t.getOdoMeter()) {
+                    isoMsg.setValue(122, 4, IsoType.ALPHA, 1);
+                    isoMsg.setValue(123, t.getOdoMeter(), IsoType.ALPHA, 10);
+                }
+            }
+
+            isoMsg.setValue(124, t.getProdDetailCount(), IsoType.NUMERIC, 2);
+
+            // for (int indexNumber = 0; indexNumber < Integer.valueOf(t.getProdDetailCount()); indexNumber++) {
+            if (t.getFuelProductGroup().size() > 0) {
+                for(TransactionFuelProdGroup fuelProdGroup : t.getFuelProductGroup()){
+                isoMsg.setValue(125+index, fuelProdGroup.getFuelPricePerUnit(), IsoType.AMOUNT, 9);
+                isoMsg.setValue(126+index, fuelProdGroup.getFuelQuantity(), IsoType.AMOUNT, 10);
+                isoMsg.setValue(127+index, fuelProdGroup.getFuelProductCode(), IsoType.NUMERIC, 3);
+                isoMsg.setValue(128+index, fuelProdGroup.getFuelDollarAmount(), IsoType.AMOUNT, 7);
+                index = index+1;
+                }
+            }
+            
+            index=index+125;
+            if (t.getNonFuelProductGroup().size() > 0) {
+                
+                for(TransactionNonFuelProductGroup nonFuelProdGroup : t.getNonFuelProductGroup()){
+                isoMsg.setValue(index, nonFuelProdGroup.getNonFuelPricePerUnit(), IsoType.AMOUNT, 9);
+                isoMsg.setValue(index+1, nonFuelProdGroup.getNonFuelQuantity(), IsoType.AMOUNT, 10);
+                isoMsg.setValue(index+2, nonFuelProdGroup.getNonFuelProductCode(), IsoType.NUMERIC, 3);
+                isoMsg.setValue(index+3, nonFuelProdGroup.getNonFuelAmount(), IsoType.AMOUNT, 7);
+                index = index+1;
+                }
+            }
+            //}
             isoMsg.setCharacterEncoding(
                     "UTF-8");
             isoMsg.setBinaryBitmap(
@@ -206,7 +252,7 @@ public class NBSFormatter {
         } catch (NullPointerException ex) {
             transaction.setReasonCode("");
         }
-              //   application config ,session (auth or captureOnly),max amount need to be mapped
+        //   application config ,session (auth or captureOnly),max amount need to be mapped
         return transaction;
     }
 

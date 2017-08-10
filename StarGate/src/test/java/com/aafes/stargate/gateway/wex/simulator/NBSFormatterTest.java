@@ -43,7 +43,8 @@ public class NBSFormatterTest {
     public void testCreateRequest() {
         byte[] result = testSubject.createRequest(t);
         String expResult = new String(result);
-        
+        NBSClient nBSClient = new NBSClient();
+        nBSClient.generateResponse(expResult);
     }
 
    

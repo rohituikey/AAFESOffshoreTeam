@@ -48,7 +48,8 @@ public class NBSFormatter {
     private String transTypeRefund;
     private String cardTypeWex;
     private String serviceType;
-    private int index=0;
+    private int index = 0;
+    String[] productDetails;
 
     Transaction transaction = new Transaction();
     @EJB
@@ -148,28 +149,58 @@ public class NBSFormatter {
             isoMsg.setValue(124, t.getProdDetailCount(), IsoType.NUMERIC, 2);
 
             // for (int indexNumber = 0; indexNumber < Integer.valueOf(t.getProdDetailCount()); indexNumber++) {
-            if (null!=t.getFuelProductGroup() && t.getFuelProductGroup().size()> 0) {
-                for(TransactionFuelProdGroup fuelProdGroup : t.getFuelProductGroup()){
-                isoMsg.setValue(125+index, fuelProdGroup.getFuelPricePerUnit(), IsoType.AMOUNT, 9);
-                isoMsg.setValue(126+index, fuelProdGroup.getFuelQuantity(), IsoType.AMOUNT, 10);
-                isoMsg.setValue(127+index, fuelProdGroup.getFuelProductCode(), IsoType.NUMERIC, 3);
-                isoMsg.setValue(128+index, fuelProdGroup.getFuelDollarAmount(), IsoType.AMOUNT, 7);
-                index = index+1;
+//            if (null!=t.getFuelProductGroup() && t.getFuelProductGroup().size()> 0) {
+//                for(TransactionFuelProdGroup fuelProdGroup : t.getFuelProductGroup()){
+//                isoMsg.setValue(125+index, fuelProdGroup.getFuelPricePerUnit(), IsoType.AMOUNT, 9);
+//                isoMsg.setValue(126+index, fuelProdGroup.getFuelQuantity(), IsoType.AMOUNT, 10);
+//                isoMsg.setValue(127+index, fuelProdGroup.getFuelProductCode(), IsoType.NUMERIC, 3);
+//                isoMsg.setValue(128+index, fuelProdGroup.getFuelDollarAmount(), IsoType.AMOUNT, 7);
+//                index = index+1;
+//                }
+//            }
+//            
+//            index=index+125;
+//            if (null!=t.getNonFuelProductGroup() && (t.getNonFuelProductGroup().size()) > 0) {
+//                
+//                for(TransactionNonFuelProductGroup nonFuelProdGroup : t.getNonFuelProductGroup()){
+//                isoMsg.setValue(index, nonFuelProdGroup.getNonFuelPricePerUnit(), IsoType.AMOUNT, 9);
+//                isoMsg.setValue(index+1, nonFuelProdGroup.getNonFuelQuantity(), IsoType.AMOUNT, 10);
+//                isoMsg.setValue(index+2, nonFuelProdGroup.getNonFuelProductCode(), IsoType.NUMERIC, 3);
+//                isoMsg.setValue(index+3, nonFuelProdGroup.getNonFuelAmount(), IsoType.AMOUNT, 7);
+//                index = index+1;
+//                }
+//            }
+            //}
+            index = 125;
+            if (null != t.getNonFuelProductGroup() && (t.getNonFuelProductGroup().size()) > 0) {
+                for (String nonFuelString : t.getNonFuelProductGroup()) {
+                    if(nonFuelString.contains(",")){
+                      productDetails = nonFuelString.split(",");
+                    }
+                    isoMsg.setValue(index,productDetails[0], IsoType.AMOUNT, 9);
+                    isoMsg.setValue(index + 1, productDetails[1], IsoType.AMOUNT, 10);
+                    isoMsg.setValue(index + 2,productDetails[2], IsoType.NUMERIC, 3);
+                    isoMsg.setValue(index + 3,productDetails[3], IsoType.AMOUNT, 7);
+
+                    index = index + 4;
                 }
             }
             
-            index=index+125;
-            if (null!=t.getNonFuelProductGroup() && (t.getNonFuelProductGroup().size()) > 0) {
-                
-                for(TransactionNonFuelProductGroup nonFuelProdGroup : t.getNonFuelProductGroup()){
-                isoMsg.setValue(index, nonFuelProdGroup.getNonFuelPricePerUnit(), IsoType.AMOUNT, 9);
-                isoMsg.setValue(index+1, nonFuelProdGroup.getNonFuelQuantity(), IsoType.AMOUNT, 10);
-                isoMsg.setValue(index+2, nonFuelProdGroup.getNonFuelProductCode(), IsoType.NUMERIC, 3);
-                isoMsg.setValue(index+3, nonFuelProdGroup.getNonFuelAmount(), IsoType.AMOUNT, 7);
-                index = index+1;
+            
+            if (null != t.getFuelProductGroup() && (t.getFuelProductGroup().size()) > 0) {
+                for (String FuelString : t.getFuelProductGroup()) {
+                    if(FuelString.contains(",")){
+                      productDetails = FuelString.split(",");
+                    }
+                    isoMsg.setValue(index,productDetails[0], IsoType.AMOUNT, 9);
+                    isoMsg.setValue(index + 1, productDetails[1], IsoType.AMOUNT, 10);
+                    isoMsg.setValue(index + 2,productDetails[2], IsoType.NUMERIC, 3);
+                    isoMsg.setValue(index + 3,productDetails[3], IsoType.AMOUNT, 7);
+
+                    index = index + 4;
                 }
             }
-            //}
+
             isoMsg.setCharacterEncoding(
                     "UTF-8");
             isoMsg.setBinaryBitmap(
@@ -306,7 +337,7 @@ public class NBSFormatter {
         ts = ts.substring(11, 13) + ts.substring(14, 16) + daylightSavingsTimeAtSiteOne;
         return ts;
     }
-    
+
     //uncomment for testing purpose
 //    public String generateNewResponse() {
 //        String logonResponse = logonResponse();
@@ -387,7 +418,6 @@ public class NBSFormatter {
 //        }
 //        return null;
 //    }
-    
 //    public void unmarshallTest(IsoMessage isoMessage){
 //        try {
 //            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSRequest.xml");
@@ -402,5 +432,4 @@ public class NBSFormatter {
 //            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 //    }
-
 }

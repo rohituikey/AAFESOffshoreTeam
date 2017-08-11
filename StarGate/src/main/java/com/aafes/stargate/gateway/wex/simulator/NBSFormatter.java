@@ -337,6 +337,7 @@ public class NBSFormatter {
         ts = ts.substring(11, 13) + ts.substring(14, 16) + daylightSavingsTimeAtSiteOne;
         return ts;
     }
+    
 
     //uncomment for testing purpose
 //    public String generateNewResponse() {
@@ -432,4 +433,8 @@ public class NBSFormatter {
 //            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 //    }
+
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
 }

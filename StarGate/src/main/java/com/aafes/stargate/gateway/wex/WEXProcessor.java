@@ -6,7 +6,7 @@
 package com.aafes.stargate.gateway.wex;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.stargate.gateway.wex.simulator.NBSClient;
+import com.aafes.stargate.gateway.wex.simulator.NBSConnector;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.wex.simulator.NBSFormatter;
 import com.aafes.stargate.util.ResponseType;
@@ -39,8 +39,8 @@ public class WEXProcessor {
         try {
             if(nBSFormatter == null) nBSFormatter = new NBSFormatter();
             IsoMessage iSOMsg = nBSFormatter.createRequest(t);
-            NBSClient clientObj = new NBSClient();
-            byte[] iSOMsgResponse = clientObj.generateResponse(iSOMsg.writeData().toString());
+            NBSConnector clientObj = new NBSConnector();
+            byte[] iSOMsgResponse = clientObj.sendRequest(iSOMsg.writeData().toString());
 //            String[] result = nBSFormatter.seperateResponse(iSOMsgResponse);
 //            t = nBSFormatter.unmarshalAcknowledgment(result[0]);
 //            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) LOG.info("LOGON successfull");
@@ -60,7 +60,7 @@ public class WEXProcessor {
 //        try {
 //            nBSFormatter = new NBSRequestGenerator();
 //            String requestStr = nBSFormatter.generateLogOnPacketRequest(t);
-//            NBSClient clientObj = new NBSClient();
+//            NBSConnector clientObj = new NBSConnector();
 //            String responseStr = clientObj.generateResponse(requestStr);
 //            String[] result = nBSFormatter.seperateResponse(responseStr);
 //            t = nBSFormatter.unmarshalAcknowledgment(result[0]);
@@ -89,7 +89,7 @@ public class WEXProcessor {
 //                t.setAuthNumber(authTran.getAuthNumber());
 //            }
 //            String requestStr = nBSFormatter.generateLogOnPacketRequest(t);
-//            NBSClient clientObj = new NBSClient();
+//            NBSConnector clientObj = new NBSConnector();
 //            String responseStr = clientObj.generateResponse(requestStr);
 //            String[] result = nBSFormatter.seperateResponse(responseStr);
 //            t = nBSFormatter.unmarshalAcknowledgment(result[0]);
@@ -112,7 +112,7 @@ public class WEXProcessor {
 //
 //        try {
 ////            String responseStr = "";
-////            NBSClient clientObj = new NBSClient();
+////            NBSConnector clientObj = new NBSConnector();
 ////            responseStr = clientObj.generateResponse("APPROVED");
 ////            t.setResponseType(responseStr.trim());
 ////            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) {
@@ -142,7 +142,7 @@ public class WEXProcessor {
 //
 ////        requestStr = nBSFormatter.generateLogOnPacketRequest(wexRequestResponseMappingObj.RequestMap(t));
 //
-//        NBSClient clientObj = new NBSClient();
+//        NBSConnector clientObj = new NBSConnector();
 //        responseStr = clientObj.generateResponse(requestStr);
 //        if (responseStr != null) {
 //            seperatedResponseArr = nBSFormatter.seperateResponse(responseStr);

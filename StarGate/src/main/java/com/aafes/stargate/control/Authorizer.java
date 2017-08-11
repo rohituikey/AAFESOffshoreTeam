@@ -13,8 +13,6 @@ import com.aafes.stargate.authorizer.BaseStrategy;
 import com.aafes.stargate.authorizer.BaseStrategyFactory;
 import com.aafes.stargate.authorizer.entity.Facility;
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.stargate.authorizer.entity.TransactionFuelProdGroup;
-import com.aafes.stargate.authorizer.entity.TransactionNonFuelProductGroup;
 import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.fdms.FDMSStub;
 import com.aafes.stargate.tokenizer.TokenBusinessService;
@@ -544,11 +542,10 @@ public class Authorizer {
                 List<FuelProdGroup> list = wexReqPayAtPump.getFuelProdGroup();
                 for (FuelProdGroup tmp : list) {
                     fuelCodeDetailsStr = new StringBuilder();
-                    fuelCodeDetailsStr.append(tmp.getQuantity()).append(",");
-                    fuelCodeDetailsStr.append(tmp.getFuelDollarAmount()).append(",");
                     fuelCodeDetailsStr.append(tmp.getPricePerUnit()).append(",");
-                    fuelCodeDetailsStr.append(tmp.getFuelProdCode());
-
+                    fuelCodeDetailsStr.append(tmp.getQuantity()).append(",");
+                    fuelCodeDetailsStr.append(tmp.getFuelProdCode()).append(",");;
+                    fuelCodeDetailsStr.append(tmp.getFuelDollarAmount());
                     fuelProdDataList.add(fuelCodeDetailsStr.toString());
                     fuelCodeDetailsStr = null;
                 }
@@ -562,11 +559,10 @@ public class Authorizer {
                 List<NonFuelProductGroup> list = wexReqPayAtPump.getNonFuelProductGroup();
                 for (NonFuelProductGroup tmp : list) {
                     nonFuelCodeDetailsStr = new StringBuilder();
-                    nonFuelCodeDetailsStr.append(tmp.getNonFuelQty()).append(",");
-                    nonFuelCodeDetailsStr.append(tmp.getNonFuelAmount()).append(",");
                     nonFuelCodeDetailsStr.append(tmp.getNonFuelPricePerUnit()).append(",");
-                    nonFuelCodeDetailsStr.append(tmp.getNonFuelProdCode());
-
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelQty()).append(",");
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelProdCode()).append(",");
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelAmount());
                     nonFuelProdDataList.add(nonFuelCodeDetailsStr.toString());
                     nonFuelCodeDetailsStr = null;
                 }
@@ -710,6 +706,8 @@ public class Authorizer {
 //              }
 //              transaction.setNonFuelqty(nonFuelQty);
 //            }
+    
+        transaction.setPromptDetailCount(wexReqPayAtPump.getPromptDetailCount());
         }
         //*Uncommented from 502 to 551 and modified some code
         Request.AddressVerificationService addressVerServc = request.getAddressVerificationService();
@@ -1006,7 +1004,7 @@ public class Authorizer {
 
         return authTran;
     }
-    
+
 //    private Transaction mapAndUnmapWexFuelNonFuelData(Transaction t){
 //        
 //        if(t.getFuelProductGroup() != null && t.getFuelProductGroup().size() > 0){
@@ -1016,5 +1014,4 @@ public class Authorizer {
 //        
 //        return t;
 //    }
-    
 }

@@ -47,7 +47,7 @@ public class NBSServer {
             BufferedWriter writeResponse
                     = new BufferedWriter(new OutputStreamWriter(connectionSocket.getOutputStream()));
 
-            String response = nBSStub.getResponse(Input);
+            String response = nBSStub.unpackIso8583(Input);
 
             LOG.log(Level.INFO, "sending response as {0}", response);
             writeResponse.write(response+ " \r");

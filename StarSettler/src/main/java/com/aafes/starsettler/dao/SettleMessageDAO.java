@@ -9,9 +9,6 @@ import com.aafes.starsettler.control.CassandraSessionFactory;
 import com.aafes.starsettler.control.Configurator;
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.util.CardType;
-import com.aafes.starsettler.util.TransactionType;
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
@@ -89,6 +86,101 @@ public class SettleMessageDAO {
                     || cardType.equalsIgnoreCase(CardType.DISCOVER)
                     || cardType.equalsIgnoreCase(CardType.MASTER)
                     || cardType.equalsIgnoreCase(CardType.VISA))) {
+                SettleEntity settleEntity = new SettleEntity();
+                settleEntity.setIdentityUUID(row.getString("identityuuid"));
+                settleEntity.setLineId(row.getString("lineId"));
+                settleEntity.setClientLineId(row.getString("clientLineId"));
+                settleEntity.setShipId(row.getString("shipId"));
+                settleEntity.setCrc(row.getString("crc"));
+                settleEntity.setQuantity(row.getString("quantity"));
+                settleEntity.setUnitCost(row.getString("unitCost"));
+                settleEntity.setUnitDiscount(row.getString("unitDiscount"));
+                settleEntity.setUnit(row.getString("unit"));
+                settleEntity.setUnitTotal(row.getString("unitTotal"));
+                settleEntity.setCouponCode(row.getString("couponCode"));
+                settleEntity.setCardType(row.getString("cardType"));
+                settleEntity.setPaymentAmount(row.getString("paymentAmount"));
+                settleEntity.setTransactionType(row.getString("transactionType"));
+                settleEntity.setTransactionId(row.getString("transactionId"));
+                settleEntity.setOrderNumber(row.getString("orderNumber"));
+                settleEntity.setOrderDate(row.getString("orderDate"));
+                settleEntity.setShipDate(row.getString("shipDate"));
+                settleEntity.setSettleDate(row.getString("settleDate"));
+                settleEntity.setCardReferene(row.getString("cardReferene"));
+                settleEntity.setCardToken(row.getString("cardToken"));
+                settleEntity.setExpirationDate(row.getString("expirationDate"));
+                settleEntity.setAuthNum(row.getString("authNum"));
+                settleEntity.setRequestPlan(row.getString("requestPlan"));
+                settleEntity.setResponsePlan(row.getString("responsePlan"));
+                settleEntity.setQualifiedPlan(row.getString("qualifiedPlan"));
+                settleEntity.setRrn(row.getString("rrn"));
+                settleEntity.setFirstName(row.getString("firstName"));
+                settleEntity.setLastName(row.getString("lastName"));
+                settleEntity.setHomePhone(row.getString("homePhone"));
+                settleEntity.setEmail(row.getString("email"));
+                settleEntity.setAddressLine1(row.getString("addressLine1"));
+                settleEntity.setAddressLine2(row.getString("addressLine2"));
+//                settleEntity.setAddressLine3(row.getString("addressLine3"));
+                settleEntity.setCity(row.getString("city"));
+                settleEntity.setProvinceCode(row.getString("provinceCode"));
+                settleEntity.setPostalCode(row.getString("postalCode"));
+                settleEntity.setCountryCode(row.getString("countryCode"));
+                settleEntity.setShippingAmount(row.getString("shippingAmount"));
+                settleEntity.setAppeasementCode(row.getString("appeasementCode"));
+                settleEntity.setAppeasementDate(row.getString("appeasementDate"));
+                settleEntity.setAppeasementDescription(row.getString("appeasementDescription"));
+                settleEntity.setAppeasementReference(row.getString("appeasementReference"));
+                settleEntity.setResponseType(row.getString("responseType"));
+                settleEntity.setReasonCode(row.getString("reasonCode"));
+                settleEntity.setDescriptionField(row.getString("descriptionField"));
+                settleEntity.setBatchId(row.getString("batchId"));
+                settleEntity.setSettleId(row.getString("settleId"));
+                settleEntity.setReceiveddate(row.getString("receivedDate"));
+                settleEntity.setSettlestatus(row.getString("settlestatus"));
+                settleEntity.setResponseReasonCode(row.getString("responsereasoncode"));
+                settleEntity.setResponseDate(row.getString("responsedate"));
+                settleEntity.setAuthoriztionCode(row.getString("authoriztioncode"));
+                settleEntity.setAvsResponseCode(row.getString("avsresponsecode"));
+                settleEntity.setTokenBankName(row.getString("tokenbankname"));
+                fdmsData.add(settleEntity);
+            }
+
+        }
+        LOG.info("Exit from getFDMSData method of Settlemessagedao..");
+        return fdmsData;
+    }
+
+    public List<SettleEntity> getWexData(String identityuuid, String processDate, String settleStatus) {
+
+        LOG.info("Entry in getFDMSData method of Settlemessagedao..");
+        List<SettleEntity> fdmsData = new ArrayList<SettleEntity>();
+
+        if (processDate == null || processDate.isEmpty()) {
+            processDate = this.getProcessDate();
+        }
+
+        // Get settle data from Cassandra
+        String query = "";
+        if (identityuuid != null && !identityuuid.isEmpty()) {
+            query = "SELECT " + buildCoulumns() + " FROM starsettler.settlemessages where receiveddate = '" + processDate
+                    + "' and settlestatus = '" + settleStatus
+                    + "' and identityUUID = '" + identityuuid + "' ALLOW FILTERING";
+        } else {
+            query = "SELECT " + buildCoulumns() + " FROM starsettler.settlemessages where receiveddate = '" + processDate
+                    + "' and settlestatus = '" + settleStatus + "' ALLOW FILTERING";
+        }
+
+        ResultSet result = factory.getSession().execute(query);
+
+        String cardType = "";
+        for (Row row : result) {
+            cardType = row.getString("cardtype");
+            if (cardType != null && !cardType.trim().isEmpty()
+                    && (cardType.equalsIgnoreCase(CardType.AMEX)
+                    || cardType.equalsIgnoreCase(CardType.DISCOVER)
+                    || cardType.equalsIgnoreCase(CardType.MASTER)
+                    || cardType.equalsIgnoreCase(CardType.VISA)
+                    || cardType.equalsIgnoreCase(CardType.WEX))) {
                 SettleEntity settleEntity = new SettleEntity();
                 settleEntity.setIdentityUUID(row.getString("identityuuid"));
                 settleEntity.setLineId(row.getString("lineId"));
@@ -359,6 +451,22 @@ public class SettleMessageDAO {
         return batchId;
 
     }
+     public String getFileSequence() {
+
+        LOG.info("Entry in getFileSequence method of Settlemessagedao..");
+        String batchId = "";
+        String query = "select secquenceId from starsettler.batchidxref "
+                + "where processdate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
+        ResultSet result = factory.getSession().execute(query);
+
+        for (Row rs : result) {
+            batchId = rs.getString("secquenceId");
+            break;
+        }
+        LOG.info("Exit from getBatchId method of Settlemessagedao..");
+        return batchId;
+
+    }
 
     private String buildCoulumns() {
         String columns = "identityuuid, "
@@ -615,4 +723,65 @@ public class SettleMessageDAO {
         LOG.info("Exit from  validateDuplicateRecords method of Settlemessagedao..");
         return recordDuplicate;
     }
+
+    public List<String> getTIDList() {
+        LOG.info("Entry in getTID method of Settlemessagedao..");
+        List<SettleEntity> retailData = new ArrayList<>();
+       
+
+        // Get settle data from Cassandra
+        String query = "";
+
+        query = "SELECT lineId FROM starsettler.settlemessages cardType ='WEX' ALLOW FILTERING";
+
+        ResultSet result = factory.getSession().execute(query);
+        List<String> tid = new ArrayList<String>();
+        for (Row row : result) {
+            tid.add(row.getString(0));
+        }
+
+        LOG.info("Exit from getTID method of Settlemessagedao..");
+        return tid;
+    }
+    
+    public List<SettleEntity> getsettleTransaction(String tid, String uuid, String processDate, String settleStatus) {
+        
+        LOG.info("Entry in getTID method of Settlemessagedao..");
+        List<SettleEntity> settleTransactionList = new ArrayList<SettleEntity>();
+        
+        // Get settle data from Cassandra
+       
+        
+        //Use build column
+        String query = "";
+       
+             query = "SELECT * FROM starsettler.settlemessages where lineId = '" + tid +" ALLOW FILTERING";
+
+         ResultSet result = factory.getSession().execute(query);
+         //set values one by one
+          settleTransactionList.add((SettleEntity)result);
+       
+        LOG.info("Exit from getTID method of Settlemessagedao..");
+        return settleTransactionList;
+    }
+    
+    
+     private String buildWEXCoulumns() {
+        String columns = "identityuuid, "
+                + "lineId,"
+                + "quantity, "
+                + "unitCost, "
+                + "cardType, "
+                + "paymentAmount, "
+                + "transactionType, "
+                + "transactionId, "
+                + "orderDate, "
+                + "batchId, "
+                ;
+              
+        return columns;
+
+    }
+
+
 }

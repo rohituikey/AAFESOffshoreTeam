@@ -50,6 +50,10 @@ public class SettleMessageRepository {
     public List<SettleEntity> getVisionData(String identityUUID, String processDate, String settleStatus) {
         return settleMessageDAO.getVisionData(identityUUID, processDate, settleStatus);
     }
+    
+    public List<SettleEntity> getWexData(String identityUUID, String processDate, String settleStatus) {
+       return settleMessageDAO.getWexData(identityUUID, processDate, settleStatus);
+    }
 
     public List<SettleEntity> getRetailData(String processDate, String settleStatus, String uuid) {
         return settleMessageDAO.getRetailData(processDate, settleStatus, uuid);
@@ -103,6 +107,13 @@ public class SettleMessageRepository {
     public void setTransactionDAO(TransactionDAO transactionDAO) {
         this.transactionDAO = transactionDAO;
     }
+    
+    public List<String> getTIDList() {
+        return settleMessageDAO.getTIDList();
+    }
 
+    public List<SettleEntity> getsettleTransaction(String uuid, String processDate, String settleStatus) {
+        return settleMessageDAO.getsettleTransaction(uuid,processDate,settleStatus,"Ready_to_settle");
+    }
     
 }

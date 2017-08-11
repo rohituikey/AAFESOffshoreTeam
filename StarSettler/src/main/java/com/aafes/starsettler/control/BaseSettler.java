@@ -6,6 +6,7 @@
 package com.aafes.starsettler.control;
 
 import com.aafes.starsettler.entity.SettleEntity;
+import com.aafes.starsettler.util.SettleStatus;
 import com.aafes.starsettler.util.SettlerType;
 import java.util.List;
 import javax.ejb.EJB;
@@ -33,6 +34,10 @@ public abstract class BaseSettler {
             case SettlerType.MILSTAR:
                 settleData = repository.getVisionData(identityUUID,processDate,settleStatus);
                 break;
+                
+            case SettlerType.WEX:
+                settleData = repository.getWexData(identityUUID,processDate,settleStatus);
+                break;
             
             default:
                 settleData = repository.getAll(identityUUID,processDate,settleStatus);
@@ -57,6 +62,27 @@ public abstract class BaseSettler {
     public void updateBatchRef(List<SettleEntity> fdmsData, String processDate) {
         repository.updateBatchRef(fdmsData,processDate);
     }
+    
+    
+    
+    //code for wex
+    public void updateWexData(List<SettleEntity> fdmsData, String In_Progress) {
+        repository.updateFdmsData(fdmsData, In_Progress);
+    }
+
+    public void updateWexBatchRef(List<SettleEntity> fdmsData, String processDate) {
+        repository.updateBatchRef(fdmsData,processDate);
+    }
+    
+    public List<String> getTIDList()
+    {
+        return  repository.getTIDList();
+    }
+    
+    public List<SettleEntity> getsettleTransaction(String identityUUID,String processDate,String SettleStatus) {
+        return repository.getsettleTransaction(identityUUID, processDate, SettleStatus);
+    }
+    
 
     /**
      * @param repository the repository to set

@@ -163,6 +163,35 @@
                             </rules>
                         </configuration>
                     </execution>
+<!--                      Transactionsfile-->
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/transaction/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-transaction.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-transaction</id>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/wextransaction/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-wextransaction.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-wextransaction</id>
+                    </execution>
+                    
+                    
+                    
+                    
                     <!-- BELOW CHANGES WILL GENERATE JACOCO CODE COVERAGE REPORT -->
                     <execution>            
                         <id>post-integration-test</id>            

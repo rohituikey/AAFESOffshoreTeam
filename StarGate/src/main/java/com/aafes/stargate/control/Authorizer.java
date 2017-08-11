@@ -544,11 +544,10 @@ public class Authorizer {
                 List<FuelProdGroup> list = wexReqPayAtPump.getFuelProdGroup();
                 for (FuelProdGroup tmp : list) {
                     fuelCodeDetailsStr = new StringBuilder();
-                    fuelCodeDetailsStr.append(tmp.getQuantity()).append(",");
-                    fuelCodeDetailsStr.append(tmp.getFuelDollarAmount()).append(",");
                     fuelCodeDetailsStr.append(tmp.getPricePerUnit()).append(",");
-                    fuelCodeDetailsStr.append(tmp.getFuelProdCode());
-
+                    fuelCodeDetailsStr.append(tmp.getQuantity()).append(",");
+                    fuelCodeDetailsStr.append(tmp.getFuelProdCode()).append(",");;
+                    fuelCodeDetailsStr.append(tmp.getFuelDollarAmount());
                     fuelProdDataList.add(fuelCodeDetailsStr.toString());
                     fuelCodeDetailsStr = null;
                 }
@@ -562,11 +561,10 @@ public class Authorizer {
                 List<NonFuelProductGroup> list = wexReqPayAtPump.getNonFuelProductGroup();
                 for (NonFuelProductGroup tmp : list) {
                     nonFuelCodeDetailsStr = new StringBuilder();
-                    nonFuelCodeDetailsStr.append(tmp.getNonFuelQty()).append(",");
-                    nonFuelCodeDetailsStr.append(tmp.getNonFuelAmount()).append(",");
                     nonFuelCodeDetailsStr.append(tmp.getNonFuelPricePerUnit()).append(",");
-                    nonFuelCodeDetailsStr.append(tmp.getNonFuelProdCode());
-
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelQty()).append(",");
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelProdCode()).append(",");
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelAmount());
                     nonFuelProdDataList.add(nonFuelCodeDetailsStr.toString());
                     nonFuelCodeDetailsStr = null;
                 }
@@ -1008,7 +1006,7 @@ public class Authorizer {
 
         return authTran;
     }
-    
+
 //    private Transaction mapAndUnmapWexFuelNonFuelData(Transaction t){
 //        
 //        if(t.getFuelProductGroup() != null && t.getFuelProductGroup().size() > 0){
@@ -1018,5 +1016,4 @@ public class Authorizer {
 //        
 //        return t;
 //    }
-    
 }

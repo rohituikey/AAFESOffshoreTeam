@@ -7,7 +7,6 @@ package com.aafes.stargate.gateway.wex;
 
 import com.aafes.credit.Message;
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.stargate.authorizer.entity.TransactionFuelProdGroup;
 import com.aafes.stargate.authorizer.entity.TransactionNonFuelProductGroup;
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.CassandraSessionFactory;
@@ -39,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author burangir
  */
 public class TestWexDBChanges {
-    
+
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TestWexDBChanges.class.getSimpleName());
     String sMethodName = "";
     final String CLASS_NAME = TestWexDBChanges.this.getClass().getSimpleName();
@@ -52,10 +51,9 @@ public class TestWexDBChanges {
     static CassandraSessionFactory factory;
     static Session session;
     static ResultSet resultSet;
-    
-    
-    public static void main(String args[]){
-        
+
+    public static void main(String args[]) {
+
         tr = new TranRepository();
         td = new TransactionDAO();
 
@@ -67,7 +65,7 @@ public class TestWexDBChanges {
         mapper = new MappingManager(session).mapper(Transaction.class);
         td.setMapper(mapper);
         tr.setTransactionDAO(td);
-        
+
         String preAuth = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><cm:Message xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:cm='http://www.aafes.com/credit' xsi:schemaLocation='http://www.aafes.com/credit file:///D:/Users/burangir/Downloads/wildfly-10.1.0.Final/wildfly-10.1.0.Final/standalone/configuration/CreditMessageGSA.xsd' TypeCode=\"Request\" MajorVersion=\"3\" MinorVersion=\"1\" FixVersion=\"0\"><cm:Header><cm:IdentityUUID>eacbc625-6fef-479e-8738-92adcfed7c65</cm:IdentityUUID> <cm:LocalDateTime>2017-07-02T09:04:01</cm:LocalDateTime><cm:SettleIndicator>true</cm:SettleIndicator><cm:OrderNumber>54163254</cm:OrderNumber><cm:transactionId>66324154</cm:transactionId><cm:termId>23</cm:termId></cm:Header><cm:Request RRN=\"TkFwxJKiaTwf\"><cm:Media>WEX</cm:Media> <cm:RequestType>PreAuth</cm:RequestType> <cm:InputType>Swiped</cm:InputType><cm:Pan>Pan</cm:Pan><cm:Account>6006496628299904508</cm:Account><cm:Expiration>2103</cm:Expiration><cm:CardVerificationValue>837</cm:CardVerificationValue> <cm:TrackData2>6900460000000000001=20095004100210123</cm:TrackData2><cm:AmountField>50.62</cm:AmountField><cm:WEXRequestData>    <cm:CardSeqNumber>12345</cm:CardSeqNumber>    <cm:ServiceCode>S</cm:ServiceCode><cm:CATFlag>1</cm:CATFlag><cm:PromptDetailCount>1</cm:PromptDetailCount><cm:DriverId>12365</cm:DriverId><cm:Odometer>36079</cm:Odometer><cm:VehicleId>9213</cm:VehicleId><cm:RestrictCode>01</cm:RestrictCode><cm:ProdDetailCount>1</cm:ProdDetailCount><cm:FuelProdGroup><cm:PricePerUnit>2.099</cm:PricePerUnit><cm:Quantity>8.106</cm:Quantity><cm:FuelProdCode>001</cm:FuelProdCode><cm:FuelDollarAmount>17.01</cm:FuelDollarAmount></cm:FuelProdGroup></cm:WEXRequestData><cm:pumpNmbr>23</cm:pumpNmbr> <cm:DescriptionField>PreAuth</cm:DescriptionField><cm:origAuthCode>130362</cm:origAuthCode><cm:AmtPreAuthorized>75.00</cm:AmtPreAuthorized> </cm:Request></cm:Message>";
         Transaction t = new Transaction();
         Message creditMessage = unmarshalCreditMessage(preAuth);
@@ -76,9 +74,9 @@ public class TestWexDBChanges {
         LOG.info("Saving transaction....." + t.getRrn());
         tranRepository = new TranRepository();
         //tranRepository.save(t);
-        try{
+        try {
             List newList = new ArrayList();
-            newList.add("0,0,0,0");
+            newList.add("0,0,00,0");
             t.setFuelProductGroup(newList);
             t.setNonFuelProductGroup(newList);
             Statement st = new SimpleStatement("INSERT INTO stargate.transactions (identityuuid,rrn,requesttype,account,accounttypetype,actioncode,"
@@ -103,34 +101,33 @@ public class TestWexDBChanges {
                     + "'2017-07-1917:24:49.897','Milstar','','','',null,'0',?,0,null,'','1234567','','','','',null,'','Pan',0,"
                     + "'','','10001',0,'','',0,'',0,0,0,'100','','2017-07-1917:21:49.185','2017-07-1917:21:49.185','','','',"
                     + "'2017-07-1917:22:23.064','','Reversal','','',0,'TRUE','','','','','1122334455','','','','','12',"
-                    + "'90BE73G6XPW1LE84508','',null,null,'10000001','','','','','','','',null);", 
-                    t.getFuelProductGroup(), t.getNonFuelProductGroup()); 
+                    + "'90BE73G6XPW1LE84508','',null,null,'10000001','','','','','','','',null);",
+                    t.getFuelProductGroup(), t.getNonFuelProductGroup());
             ResultSet rs = session.execute(st);
-            
-             try {
-            String query = "SELECT * FROM stargate.transactions "
-                    + "WHERE identityuuid = '0ee1c509-2c70-4bcd-b261-f94f1fe6c43b' and rrn = '2000' "
-                    + "and requesttype = 'Sale' ALLOW FILTERING;";
-            resultSet = session.execute(query);
-            while (!resultSet.isExhausted()) {
-            Row row = resultSet.one();
-            System.out.println("ROE :" +  row);
 
+            try {
+                String query = "SELECT * FROM stargate.transactions "
+                        + "WHERE identityuuid = '0ee1c509-2c70-4bcd-b261-f94f1fe6c43b' and rrn = '2000' "
+                        + "and requesttype = 'Sale' ALLOW FILTERING;";
+                resultSet = session.execute(query);
+                while (!resultSet.isExhausted()) {
+                    Row row = resultSet.one();
+                    System.out.println("ROE :" + row);
 
-        }
-        } catch (Exception ex) {
-            LOG.error("Error while creating cross site request token " + ex.getMessage());
-        } finally {
-        }
-            
-        }catch(Exception e){
+                }
+            } catch (Exception ex) {
+                LOG.error("Error while creating cross site request token " + ex.getMessage());
+            } finally {
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally{
+        } finally {
             session.close();
             factory.close();
         }
     }
-    
+
     private static Transaction mapRequest(Transaction transaction, Message requestMessage) {
         LOG.info("Authorizer.mapRequest method started");
         String[] decimalPart;
@@ -268,47 +265,43 @@ public class TestWexDBChanges {
             if (wexReqPayAtPump.getRestrictCode() != null) {
                 transaction.setRestrictCode(wexReqPayAtPump.getRestrictCode().toString());
             }
-            
+
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
-            if(wexReqPayAtPump.getFuelProdGroup() != null && wexReqPayAtPump.getFuelProdGroup().size() > 0){
-                TransactionFuelProdGroup fuelProGroupObj;
-                List<TransactionFuelProdGroup> fuelProdDataList = new ArrayList<>();
+            if (wexReqPayAtPump.getFuelProdGroup() != null && wexReqPayAtPump.getFuelProdGroup().size() > 0) {
+                StringBuilder fuelCodeDetailsStr = null;
+                List<String> fuelProdDataList = new ArrayList<>();
                 List<Message.Request.WEXRequestData.FuelProdGroup> list = wexReqPayAtPump.getFuelProdGroup();
-                for(Message.Request.WEXRequestData.FuelProdGroup tmp : list){
-                    fuelProGroupObj = new TransactionFuelProdGroup();
-                    if(tmp.getQuantity() != null) fuelProGroupObj.setFuelQuantity(tmp.getQuantity());
-                    if(tmp.getFuelDollarAmount() != null) fuelProGroupObj.setFuelDollarAmount(tmp.getFuelDollarAmount());
-                    if(tmp.getPricePerUnit() != null) fuelProGroupObj.setFuelPricePerUnit(tmp.getPricePerUnit());
-                    if(tmp.getFuelProdCode() != null) fuelProGroupObj.setFuelProductCode(tmp.getFuelProdCode());
-                    
-                    fuelProdDataList.add(fuelProGroupObj);
-                    fuelProGroupObj = null;
+                for (Message.Request.WEXRequestData.FuelProdGroup tmp : list) {
+                    fuelCodeDetailsStr = new StringBuilder();
+                    fuelCodeDetailsStr.append(tmp.getPricePerUnit()).append(",");
+                    fuelCodeDetailsStr.append(tmp.getQuantity()).append(",");
+                    fuelCodeDetailsStr.append(tmp.getFuelProdCode()).append(",");;
+                    fuelCodeDetailsStr.append(tmp.getFuelDollarAmount());
+                    fuelProdDataList.add(fuelCodeDetailsStr.toString());
+                    fuelCodeDetailsStr = null;
                 }
                 transaction.setFuelProductGroup(fuelProdDataList);
                 fuelProdDataList = null;
             }
-            
-            List<TransactionNonFuelProductGroup> nonFuelProdDataList = new ArrayList<>();
-            
-            if(wexReqPayAtPump.getNonFuelProductGroup() != null && wexReqPayAtPump.getNonFuelProductGroup().size() > 0){
-                TransactionNonFuelProductGroup nonFuelProGroupObj;
+
+            if (wexReqPayAtPump.getNonFuelProductGroup() != null && wexReqPayAtPump.getNonFuelProductGroup().size() > 0) {
+                StringBuilder nonFuelCodeDetailsStr = null;
+                List<String> nonFuelProdDataList = new ArrayList<>();
                 List<Message.Request.WEXRequestData.NonFuelProductGroup> list = wexReqPayAtPump.getNonFuelProductGroup();
-                for(Message.Request.WEXRequestData.NonFuelProductGroup tmp : list){
-                    nonFuelProGroupObj = new TransactionNonFuelProductGroup();
-                    if(tmp.getNonFuelQty() != null) nonFuelProGroupObj.setNonFuelQuantity(tmp.getNonFuelQty());
-                    if(tmp.getNonFuelAmount() != null) nonFuelProGroupObj.setNonFuelAmount(tmp.getNonFuelAmount());
-                    if(tmp.getNonFuelPricePerUnit() != null) nonFuelProGroupObj.setNonFuelPricePerUnit(tmp.getNonFuelPricePerUnit());
-                    if(tmp.getNonFuelProdCode() != null) nonFuelProGroupObj.setNonFuelProductCode(tmp.getNonFuelProdCode());
-                    
-                    nonFuelProdDataList.add(nonFuelProGroupObj);
-                    nonFuelProGroupObj = null;
+                for (Message.Request.WEXRequestData.NonFuelProductGroup tmp : list) {
+                    nonFuelCodeDetailsStr = new StringBuilder();
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelPricePerUnit()).append(",");
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelQty()).append(",");
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelProdCode()).append(",");
+                    nonFuelCodeDetailsStr.append(tmp.getNonFuelAmount());
+                    nonFuelProdDataList.add(nonFuelCodeDetailsStr.toString());
+                    nonFuelCodeDetailsStr = null;
                 }
-            }
                 transaction.setNonFuelProductGroup(nonFuelProdDataList);
                 nonFuelProdDataList = null;
-            
+            }
+
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - end */
-            
             if (wexReqPayAtPump.getVehicleId() != null) {
                 transaction.setVehicleId(wexReqPayAtPump.getVehicleId().toString());
             }
@@ -324,15 +317,16 @@ public class TestWexDBChanges {
             if (wexReqPayAtPump.getProdDetailCount() != null) {
                 transaction.setProdDetailCount(wexReqPayAtPump.getProdDetailCount().toString());
             }
-            
-            if(wexReqPayAtPump.getServiceCode() != null && wexReqPayAtPump.getServiceCode().size() > 0)
+
+            if (wexReqPayAtPump.getServiceCode() != null && wexReqPayAtPump.getServiceCode().size() > 0) {
                 transaction.setServiceCode(wexReqPayAtPump.getServiceCode().get(0));
-            
-            if(wexReqPayAtPump.getOdometer() != null){
+            }
+
+            if (wexReqPayAtPump.getOdometer() != null) {
                 transaction.setOdoMeter(wexReqPayAtPump.getOdometer());
             }
-            
-             if(wexReqPayAtPump.getCardSeqNumber()!= null){
+
+            if (wexReqPayAtPump.getCardSeqNumber() != null) {
                 transaction.setCardSeqNumber(wexReqPayAtPump.getCardSeqNumber());
             }
         }
@@ -403,8 +397,7 @@ public class TestWexDBChanges {
         LOG.info("Authorizer.mapRequest method ended");
         return transaction;
     }
-    
-    
+
     private static String getSystemDateTime() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Date date = new Date();
@@ -429,13 +422,13 @@ public class TestWexDBChanges {
                 + ts.substring(17, 19);
         return out;                     //161107085406
     }
-    
+
     private static void encryptValues(Transaction t) {
         String account = t.getAccount();
         account = account.replaceAll("\\w(?=\\w{4})", "");
         t.setAccount(account);
     }
-    
+
     private static Message unmarshalCreditMessage(String content) {
         Message request = new Message();
         try {

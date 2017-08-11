@@ -21,6 +21,7 @@ import com.solab.iso8583.parse.ConfigParser;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -265,7 +266,7 @@ public class NBSFormatter {
             try {
                 transaction.setFuelDollerAmount(new BigDecimal(resp.getField(25).toString()));
             } catch (NullPointerException ex) {
-                transaction.setFuelDollerAmount(new BigDecimal(""));
+                transaction.setFuelDollerAmount(new BigDecimal(BigInteger.ONE));
             }
             try {
                 transaction.setProdDetailCount(resp.getField(26).toString());
@@ -275,7 +276,7 @@ public class NBSFormatter {
             try {
                 transaction.setQuantity(new BigDecimal(resp.getField(27).toString()));
             } catch (NullPointerException ex) {
-                transaction.setQuantity(new BigDecimal(""));
+                transaction.setQuantity(new BigDecimal(BigInteger.ONE));
             }
 
             try {

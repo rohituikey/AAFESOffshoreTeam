@@ -13,8 +13,6 @@ import com.aafes.stargate.authorizer.BaseStrategy;
 import com.aafes.stargate.authorizer.BaseStrategyFactory;
 import com.aafes.stargate.authorizer.entity.Facility;
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.stargate.authorizer.entity.TransactionFuelProdGroup;
-import com.aafes.stargate.authorizer.entity.TransactionNonFuelProductGroup;
 import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.fdms.FDMSStub;
 import com.aafes.stargate.tokenizer.TokenBusinessService;

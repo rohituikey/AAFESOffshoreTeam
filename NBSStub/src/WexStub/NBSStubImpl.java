@@ -183,32 +183,32 @@ public class NBSStubImpl implements NBSStub {
             mfact.setAssignDate(true);
 
             IsoMessage isoMessage = mfact.newMessage(0x100);
-        isoMessage.setValue(10, "A",IsoType.ALPHA,2);
-        isoMessage.setValue(11, "0278",IsoType.ALPHA,2);
+        isoMessage.setValue(10, "A",IsoType.ALPHA,25);
+        isoMessage.setValue(11, "0278",IsoType.NUMERIC,4);
 
-        isoMessage.setValue(12, "3170621071655",IsoType.ALPHA,2);
-        isoMessage.setValue(13, "N",IsoType.ALPHA,2);
+        isoMessage.setValue(12, "3170621071655",IsoType.ALPHA,13);
+        isoMessage.setValue(13, "N",IsoType.ALPHA,1);
         if (correctRequest) {
             isoMessage.setValue(14, "00",IsoType.ALPHA,2);
-            isoMessage.setValue(15, "Approved",IsoType.ALPHA,2);
+            isoMessage.setValue(15, "Approved",IsoType.ALPHA,32);
         } else {
             isoMessage.setValue(14, "01",IsoType.ALPHA,2);
-            isoMessage.setValue(15, "Declined",IsoType.ALPHA,2);
+            isoMessage.setValue(15, "Declined",IsoType.ALPHA,32);
         }
-        isoMessage.setValue(16, "WEX",IsoType.ALPHA,2);
-        isoMessage.setValue(17, "",IsoType.ALPHA,2);
-        isoMessage.setValue(18, "",IsoType.ALPHA,2);
-        isoMessage.setValue(19, "",IsoType.ALPHA,2);
-        isoMessage.setValue(20, "",IsoType.ALPHA,2);
-        isoMessage.setValue(21, "",IsoType.ALPHA,2);
+        isoMessage.setValue(16, "WEX",IsoType.ALPHA,4);
+        isoMessage.setValue(17, "",IsoType.ALPHA,6);
+        isoMessage.setValue(18, "",IsoType.ALPHA,7);
+        isoMessage.setValue(19, "",IsoType.ALPHA,4);
+        isoMessage.setValue(20, "",IsoType.ALPHA,4);
+        isoMessage.setValue(21, "",IsoType.ALPHA,4);
         isoMessage.setValue(22, "5",IsoType.ALPHA,2);
-        isoMessage.setValue(23, "0",IsoType.ALPHA,2);
-        isoMessage.setValue(24, "308339",IsoType.ALPHA,2);
-        isoMessage.setValue(25, "75.00",IsoType.ALPHA,2);
+        isoMessage.setValue(23, "0",IsoType.ALPHA,1);
+        isoMessage.setValue(24, "308339",IsoType.ALPHA,6);
+        isoMessage.setValue(25, "75.00",IsoType.AMOUNT,10);
         isoMessage.setValue(26, "1",IsoType.ALPHA,2);
-        isoMessage.setValue(27, "75.0000",IsoType.ALPHA,2);
-        isoMessage.setValue(28, "001",IsoType.ALPHA,2);
-        isoMessage.setValue(29, "78965",IsoType.ALPHA,2);
+        isoMessage.setValue(27, "75.0000",IsoType.ALPHA,10);
+        isoMessage.setValue(28, "001",IsoType.ALPHA,3);
+        isoMessage.setValue(29, "78965",IsoType.ALPHA,7);
 
         
         isoMessage.setCharacterEncoding(

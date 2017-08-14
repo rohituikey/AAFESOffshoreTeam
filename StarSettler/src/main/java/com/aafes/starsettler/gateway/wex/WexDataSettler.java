@@ -11,9 +11,7 @@ import com.aafes.starsettler.gateway.fdms.FirstDataException;
 import com.aafes.starsettler.util.SettleStatus;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,7 +31,6 @@ public class WexDataSettler extends BaseSettler {
             = LoggerFactory.getLogger(WexDataSettler.class.
                     getSimpleName());
 
-
     @EJB
     private WexDataGatewayBean wexGatewayBean;
 
@@ -41,31 +38,18 @@ public class WexDataSettler extends BaseSettler {
     @Override
     public void run(String identityUUID, String processDate) {
 
-        // Get First Data records from Base Settler
-        // And process them
         log.info(" Wex Settlement process started ");
-       // List<SettleEntity> wexData = getSettleData(identityUUID, SettlerType.WEX, processDate, SettleStatus.Ready_to_settle);
-
-        // Format fdms data and send it to FDMS to settle
-//        if (wexData == null || wexData.isEmpty()) {
-//            log.info("FDMS Data is empty. System is exiting");
-//            return;
-//        }
-//
-//        log.info("Query yielded " + wexData.size() + " transactions.");
 
         try {
-           // String batchId = super.getBatchId();
-            List<String> terminalIdList =  new ArrayList<String>();
-             terminalIdList= super.getTIDList();
-             Map map=new HashMap();
-            for(String tid:terminalIdList){
-                   List<SettleEntity> transactionSettleData=super.getsettleTransaction(identityUUID,processDate,SettleStatus.Ready_to_settle);
-                   map.put(tid,transactionSettleData);
-                   
+            List<String> terminalIdList = new ArrayList<String>();
+            terminalIdList = super.getTIDList();
+            List<SettleEntity> transactionSettleData = super.getsettleTransaction(terminalIdList, identityUUID, processDate, SettleStatus.Ready_to_settle);
+
+            if (transactionSettleData.size() != 0) {
+                //wexGatewayBean =new WexDataGatewayBean();
+                wexGatewayBean.settle(transactionSettleData);
             }
-            wexGatewayBean.settle(map);
-           // super.updateWexData(transactionSettleData, SettleStatus.In_Progress);
+            // super.updateWexData(transactionSettleData, SettleStatus.In_Progress);
             //super.updateWexBatchRef(transactionSettleData, processDate);
 
         } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException | TransformerException ex) {

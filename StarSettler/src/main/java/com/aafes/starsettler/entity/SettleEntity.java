@@ -119,6 +119,7 @@ public class SettleEntity {
     private String service = "";
     private String nonefuelamount = "";
     private String productcode = "";
+    private String filesequencenumber="";
     private List<String>  nonfuelproductgroup=null;
     private List<String>  fuelproductgroup=null;
         
@@ -689,6 +690,14 @@ public class SettleEntity {
 
     public void setFuelproductgroup(List<String> fuelproductgroup) {
         this.fuelproductgroup = fuelproductgroup;
+    }
+
+    public String getFilesequencenumber() {
+        return filesequencenumber;
+    }
+
+    public void setFilesequencenumber(String filesequencenumber) {
+        this.filesequencenumber = filesequencenumber;
     }
     
     

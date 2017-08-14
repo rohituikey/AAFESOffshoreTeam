@@ -109,11 +109,13 @@ public class SettleMessageRepository {
     }
     
     public List<String> getTIDList() {
+       // settleMessageDAO = new SettleMessageDAO();
         return settleMessageDAO.getTIDList();
     }
 
-    public List<SettleEntity> getsettleTransaction(String uuid, String processDate, String settleStatus) {
-        return settleMessageDAO.getsettleTransaction(uuid,processDate,settleStatus,"Ready_to_settle");
+    public List<SettleEntity> getsettleTransaction(List<String> tidList, String uuid, String processDate, String settleStatus) {
+        //settleMessageDAO = new SettleMessageDAO();
+        return settleMessageDAO.getsettleTransaction(tidList, uuid, processDate, settleStatus);
     }
     
 }

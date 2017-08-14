@@ -130,9 +130,9 @@ public class Transactionfile {
 
     protected List<Transactionfile.Batch> batch;
     @XmlAttribute(name = "date")
-    protected Integer date;
+    protected String date;
     @XmlAttribute(name = "time")
-    protected Short time;
+    protected String time;
     @XmlAttribute(name = "sequence")
     protected String sequence;
 
@@ -173,7 +173,7 @@ public class Transactionfile {
      *     {@link Integer }
      *     
      */
-    public Integer getDate() {
+    public String getDate() {
         return date;
     }
 
@@ -185,7 +185,7 @@ public class Transactionfile {
      *     {@link Integer }
      *     
      */
-    public void setDate(Integer value) {
+    public void setDate(String value) {
         this.date = value;
     }
 
@@ -197,7 +197,7 @@ public class Transactionfile {
      *     {@link Short }
      *     
      */
-    public Short getTime() {
+    public String getTime() {
         return time;
     }
 
@@ -209,7 +209,7 @@ public class Transactionfile {
      *     {@link Short }
      *     
      */
-    public void setTime(Short value) {
+    public void setTime(String value) {
         this.time = value;
     }
 
@@ -331,7 +331,7 @@ public class Transactionfile {
         @XmlAttribute(name = "app")
         protected String app;
         @XmlAttribute(name = "version")
-        protected Byte version;
+        protected String version;
 
         /**
          * Gets the value of the trans property.
@@ -442,7 +442,7 @@ public class Transactionfile {
          *     {@link Byte }
          *     
          */
-        public Byte getVersion() {
+        public String getVersion() {
             return version;
         }
 
@@ -454,7 +454,7 @@ public class Transactionfile {
          *     {@link Byte }
          *     
          */
-        public void setVersion(Byte value) {
+        public void setVersion(String value) {
             this.version = value;
         }
 
@@ -553,9 +553,9 @@ public class Transactionfile {
             @XmlAttribute(name = "nbr")
             protected String nbr;
             @XmlAttribute(name = "date")
-            protected Integer date;
+            protected String date;
             @XmlAttribute(name = "time")
-            protected Integer time;
+            protected String time;
 
             /**
              * Gets the value of the card property.
@@ -834,7 +834,7 @@ public class Transactionfile {
              *     {@link Integer }
              *     
              */
-            public Integer getDate() {
+            public String getDate() {
                 return date;
             }
 
@@ -846,7 +846,7 @@ public class Transactionfile {
              *     {@link Integer }
              *     
              */
-            public void setDate(Integer value) {
+            public void setDate(String value) {
                 this.date = value;
             }
 
@@ -858,7 +858,7 @@ public class Transactionfile {
              *     {@link Integer }
              *     
              */
-            public Integer getTime() {
+            public String getTime() {
                 return time;
             }
 
@@ -870,7 +870,7 @@ public class Transactionfile {
              *     {@link Integer }
              *     
              */
-            public void setTime(Integer value) {
+            public void setTime(String value) {
                 this.time = value;
             }
 
@@ -901,7 +901,7 @@ public class Transactionfile {
                 @XmlValue
                 protected String value;
                 @XmlAttribute(name = "track")
-                protected Byte track;
+                protected String track;
 
                 /**
                  * Gets the value of the value property.
@@ -935,7 +935,7 @@ public class Transactionfile {
                  *     {@link Byte }
                  *     
                  */
-                public Byte getTrack() {
+                public String getTrack() {
                     return track;
                 }
 
@@ -947,7 +947,7 @@ public class Transactionfile {
                  *     {@link Byte }
                  *     
                  */
-                public void setTrack(Byte value) {
+                public void setTrack(String value) {
                     this.track = value;
                 }
 

@@ -451,7 +451,8 @@ public class SettleMessageDAO {
         return batchId;
 
     }
-     public String getFileSequence() {
+
+    public String getFileSequence() {
 
         LOG.info("Entry in getFileSequence method of Settlemessagedao..");
         String batchId = "";
@@ -727,13 +728,12 @@ public class SettleMessageDAO {
     public List<String> getTIDList() {
         LOG.info("Entry in getTID method of Settlemessagedao..");
         List<SettleEntity> retailData = new ArrayList<>();
-       
 
         // Get settle data from Cassandra
         String query = "";
 
-        query = "SELECT lineId FROM starsettler.settlemessages cardType ='WEX' ALLOW FILTERING";
-
+        query = "SELECT lineId FROM starsettler.settlemessages where cardType ='WI' ALLOW FILTERING;";
+        factory = new CassandraSessionFactory();
         ResultSet result = factory.getSession().execute(query);
         List<String> tid = new ArrayList<String>();
         for (Row row : result) {
@@ -743,30 +743,73 @@ public class SettleMessageDAO {
         LOG.info("Exit from getTID method of Settlemessagedao..");
         return tid;
     }
-    
-    public List<SettleEntity> getsettleTransaction(String tid, String uuid, String processDate, String settleStatus) {
-        
+
+    public List<SettleEntity> getsettleTransaction(List<String> tidList, String uuid, String processDate, String settleStatus) {
+
         LOG.info("Entry in getTID method of Settlemessagedao..");
         List<SettleEntity> settleTransactionList = new ArrayList<SettleEntity>();
-        
-        // Get settle data from Cassandra
-       
-        
-        //Use build column
-        String query = "";
-       
-             query = "SELECT * FROM starsettler.settlemessages where lineId = '" + tid +" ALLOW FILTERING";
+        StringBuilder strBuilder = new StringBuilder();
+        for (int i = 0; i < tidList.size(); i++) {
+            if (i == 0) {
+                strBuilder.append("'" + tidList.get(i) + "'");
+            } else {
+                strBuilder.append(", '" + tidList.get(i) + "'");
+            }
+        }
 
-         ResultSet result = factory.getSession().execute(query);
-         //set values one by one
-          settleTransactionList.add((SettleEntity)result);
-       
+        String query = "";
+
+        //  try{
+        query = "SELECT identityuuid, lineId, quantity, unitCost, cardType, paymentAmount, transactionType, transactionId, orderDate, "
+                + "batchId, trackdata2, odometer, driverId, authreference, vehicleId, catflag, service, nonefuelamount, productcode, "
+                + "filesequencenumber, nonfuelproductgroup, fuelproductgroup FROM starsettler.settlemessages "
+                + "where identityuuid = '" + uuid + "' and receiveddate = '" + processDate + "' and settlestatus = '" + settleStatus + "' "
+               // + "and lineId in (" + strBuilder + ")" 
+                + "ALLOW FILTERING;";
+
+        factory = new CassandraSessionFactory();
+        ResultSet result = factory.getSession().execute(query);
+//        }catch(Exception e)
+//        {
+        System.out.println("com.aafes.starsettler.dao.SettleMessageDAO.getsettleTransaction()");
+        //set values one by one
+        if (null != result) {
+            for (Row row : result) {
+                SettleEntity settleEntity = new SettleEntity();
+                settleEntity.setIdentityUUID(row.getString("identityuuid"));
+                settleEntity.setCardType(row.getString("cardType"));
+                settleEntity.setLineId(row.getString("lineId"));
+                settleEntity.setQuantity(row.getString("quantity"));
+                settleEntity.setUnitCost(row.getString("unitCost"));
+                settleEntity.setPaymentAmount(row.getString("paymentAmount"));
+                settleEntity.setTransactionType(row.getString("transactionType"));
+                settleEntity.setTransactionId(row.getString("transactionId"));
+                //settleEntity.setOrderNumber(row.getString("ordernumber"));
+              //  settleEntity.setOrderDate(row.getString("orderdate"));
+                settleEntity.setBatchId(row.getString("batchId"));
+               // settleEntity.setExpirationDate(row.getString("expirationdate"));
+               // settleEntity.setRrn(row.getString("rrn"));
+                settleEntity.setTrackdata2(row.getString("trackdata2"));
+                settleEntity.setOdometer(row.getString("odometer"));
+                settleEntity.setDriverId(row.getString("driverId"));
+                settleEntity.setAuthreference(row.getString("authreference"));
+                settleEntity.setVehicleId(row.getString("vehicleId"));
+                settleEntity.setCatflag(row.getString("catflag"));
+                settleEntity.setService(row.getString("service"));
+                settleEntity.setNonefuelamount(row.getString("nonefuelamount"));
+                settleEntity.setProductcode(row.getString("productcode"));
+                settleEntity.setFilesequencenumber(row.getString("filesequencenumber"));
+                settleEntity.setNonfuelproductgroup(row.getList("nonfuelproductgroup", String.class));
+                settleEntity.setFuelproductgroup(row.getList("fuelproductgroup", String.class));
+                settleTransactionList.add(settleEntity);
+            }
+        }
+        //settleTransactionList.add((SettleEntity) result);
         LOG.info("Exit from getTID method of Settlemessagedao..");
         return settleTransactionList;
     }
-    
-    
-     private String buildWEXCoulumns() {
+
+    private String buildWEXCoulumns() {
         String columns = "identityuuid, "
                 + "lineId,"
                 + "quantity, "
@@ -777,11 +820,21 @@ public class SettleMessageDAO {
                 + "transactionId, "
                 + "orderDate, "
                 + "batchId, "
-                ;
-              
+                + "trackdata2, "
+                + "odometer, "
+                + "driverId, "
+                + "authreference, "
+                + "vehicleId, "
+                + "catflag, "
+                + "service, "
+                + "nonefuelamount, "
+                + "productcode, "
+                + "filesequencenumber, "
+                + "nonfuelproductgroup, "
+                + "fuelproductgroup ";
+
         return columns;
 
     }
-
 
 }

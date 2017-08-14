@@ -6,7 +6,6 @@
 package com.aafes.starsettler.control;
 
 import com.aafes.starsettler.entity.SettleEntity;
-import com.aafes.starsettler.util.SettleStatus;
 import com.aafes.starsettler.util.SettlerType;
 import java.util.List;
 import javax.ejb.EJB;
@@ -76,11 +75,13 @@ public abstract class BaseSettler {
     
     public List<String> getTIDList()
     {
+       //  repository =  new SettleMessageRepository();
         return  repository.getTIDList();
     }
     
-    public List<SettleEntity> getsettleTransaction(String identityUUID,String processDate,String SettleStatus) {
-        return repository.getsettleTransaction(identityUUID, processDate, SettleStatus);
+    public List<SettleEntity> getsettleTransaction(List<String> tidList, String identityUUID,String processDate,String SettleStatus) {
+        //repository =  new SettleMessageRepository();
+        return repository.getsettleTransaction(tidList, identityUUID, processDate, SettleStatus);
     }
     
 

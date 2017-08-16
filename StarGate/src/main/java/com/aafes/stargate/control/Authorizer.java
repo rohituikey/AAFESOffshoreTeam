@@ -126,7 +126,20 @@ public class Authorizer {
                 } else {
                     storedTran = null;
                 }
-            } else {
+            } 
+             else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia()) && RequestType.FINAL_AUTH.equalsIgnoreCase(t.getRequestType())) {
+                LOG.info("Wex FianlAuth........");
+                storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.FINAL_AUTH);
+
+                if (storedTran != null && storedTran.getResponseType() != null
+                        && storedTran.getResponseType().trim().equalsIgnoreCase(ResponseType.APPROVED)) {
+                    storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_SETTLED"));
+                    storedTran.setResponseType(ResponseType.DECLINED);
+                    storedTran.setDescriptionField("TRANSACTION_ALREADY_SETTLED");
+                } else {
+                    storedTran = null;
+                }
+            }else {
                 storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getRequestType());
             }
 
@@ -316,7 +329,7 @@ public class Authorizer {
             }
         } /* CONDITION ADDED TO CHECK FINAL-AUTH TRANSACTION FOR WEX REFUND REQUEST - end */ /* CONDITION ADDED TO CHECK APPROVED PRE-AUTH TRANSACTION FOR WEX FINAL AUTH REQUEST - end */ else if (MediaType.WEX.equalsIgnoreCase(t.getMedia()) && t.getRequestType() != null
                 && t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)) {
-            authTran = transactionDAO.find(t.getIdentityUuid(), t.getRrn(), RequestType.PREAUTH);
+            authTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.PREAUTH);
             if (authTran == null) {
                 throw new AuthorizerException("NO_PRIOR_TRANSACTION");
             }

@@ -46,4 +46,10 @@ public class NBSStubTest {
         //fail("The test case is a prototype.");
     }
     
+    @Test
+    public void generateIso8583Response(){
+        NBSStub subjectUnderTest = new NBSStubImpl();
+        String test = subjectUnderTest.unpackIso8583("test");
+    }
+    
 }

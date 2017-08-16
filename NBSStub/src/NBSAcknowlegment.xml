@@ -9,8 +9,8 @@ and open the template in the editor.
 <<j8583-config>
     
     <parse type="0110">
-    <field id="10" length="25" type = "ALPHA"/><!--ResponseType-->
-    <field id="11" length="25" type ="ALPHA"/><!--ReasonCode-->
+    <field id="10" length="2" type = "ALPHA"/><!--ResponseType-->
+    <field id="11" length="3" type ="ALPHA"/><!--ReasonCode-->
  </parse>
     
 </j8583-config> 

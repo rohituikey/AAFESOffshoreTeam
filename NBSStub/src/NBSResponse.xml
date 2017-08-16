@@ -11,7 +11,7 @@ and open the template in the editor.
         <!--<field num="2" type="LLVAR" length="19" />  account number-->
         <field num="10" length="25" type="ALPHA"/> <!--A-->
         <field num="11" length="4"  type="NUMERIC"/><!--Key"-->
-        <field num="12" length="1"  type="ALPHA"/><!--timestamp"-->
+        <field num="12" length="13"  type="ALPHA"/><!--timestamp"-->
         <field num="13" length="1"  type="ALPHA"/><!--ApplicationUpdateNeeded"-->
         <field num="14" length="2"  type="ALPHA"/><!--AuthCode"-->
         <field num="15" length="32" type="ALPHA"/><!--Message-->

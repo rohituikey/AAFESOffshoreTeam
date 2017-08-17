@@ -549,7 +549,7 @@ public class Transactionfile {
             @XmlAttribute(name = "cardCode")
             protected String cardCode;
             @XmlAttribute(name = "type")
-            protected Byte type;
+            protected String type;
             @XmlAttribute(name = "nbr")
             protected String nbr;
             @XmlAttribute(name = "date")
@@ -786,7 +786,7 @@ public class Transactionfile {
              *     {@link Byte }
              *     
              */
-            public Byte getType() {
+            public String getType() {
                 return type;
             }
 
@@ -798,7 +798,7 @@ public class Transactionfile {
              *     {@link Byte }
              *     
              */
-            public void setType(Byte value) {
+            public void setType(String value) {
                 this.type = value;
             }
 
@@ -988,7 +988,7 @@ public class Transactionfile {
                 protected String quantity;
                 protected String price;
                 @XmlAttribute(name = "code")
-                protected Byte code;
+                protected String code;
 
                 /**
                  * Gets the value of the amount property.
@@ -1046,7 +1046,7 @@ public class Transactionfile {
                  *     {@link Byte }
                  *     
                  */
-                public Byte getCode() {
+                public String getCode() {
                     return code;
                 }
 
@@ -1058,7 +1058,7 @@ public class Transactionfile {
                  *     {@link Byte }
                  *     
                  */
-                public void setCode(Byte value) {
+                public void setCode(String value) {
                     this.code = value;
                 }
 

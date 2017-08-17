@@ -79,6 +79,15 @@ public class SettleMessageRepository {
         settleMessageDAO.updateFdmsData(fdmsData, In_Progress);
     }
     
+    public void updateWexData(List<SettleEntity> Wexdata, String In_Progress) {
+        settleMessageDAO.updateWexData(Wexdata, In_Progress);
+    }
+    
+     public void updateFileSeqxRef(List<SettleEntity> wexData, String seqNo) {
+        settleMessageDAO.updateFileSeqxRef(wexData, seqNo);
+    }
+    
+    
      public  boolean validateDuplicateRecords(List<SettleEntity> fdmsData) {
         return  settleMessageDAO.validateDuplicateRecords(fdmsData);
     }
@@ -109,13 +118,15 @@ public class SettleMessageRepository {
     }
     
     public List<String> getTIDList() {
-       // settleMessageDAO = new SettleMessageDAO();
+        settleMessageDAO = new SettleMessageDAO();
         return settleMessageDAO.getTIDList();
     }
 
-    public List<SettleEntity> getsettleTransaction(List<String> tidList, String uuid, String processDate, String settleStatus) {
-        //settleMessageDAO = new SettleMessageDAO();
-        return settleMessageDAO.getsettleTransaction(tidList, uuid, processDate, settleStatus);
+    public List<SettleEntity> getsettleTransaction(String tid, String processDate, String settleStatus) {
+        settleMessageDAO = new SettleMessageDAO();
+        return settleMessageDAO.getsettleTransaction(tid, processDate, settleStatus);
     }
-    
+     public String getFileSequenceId() {
+          return settleMessageDAO.getFileSequenceId();
+     }
 }

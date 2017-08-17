@@ -11,7 +11,7 @@ package com.aafes.starsettler.util;
  */
 public class SettleStatus {
 
-    public static final String Ready_to_settle = "READY";
+    public static final String Ready_to_settle = "Ready";
     public static final String In_Progress = "IN PROGRESS";
     public static final String Done = "DONE";
 }

@@ -8,6 +8,7 @@ package com.aafes.starsettler.control;
 import com.aafes.starsettler.gateway.fdms.FirstDataSettler;
 import com.aafes.starsettler.gateway.retailer.RetailSettler;
 import com.aafes.starsettler.gateway.vision.VisionSettler;
+import com.aafes.starsettler.gateway.wex.WexDataSettler;
 import com.aafes.starsettler.util.SettlerType;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -25,6 +26,8 @@ public class SettleFactory {
     private VisionSettler visionSettler;
     @EJB
     private RetailSettler retailSettler;
+    @EJB
+    private WexDataSettler wexDataSettler;
    
     
     public BaseSettler findSettler(String settlerType) {
@@ -38,6 +41,8 @@ public class SettleFactory {
                 
             case SettlerType.DECA:
                 return retailSettler;
+            case SettlerType.WEX:
+                return wexDataSettler;
             // Add more settlers
             default:
                 return null;

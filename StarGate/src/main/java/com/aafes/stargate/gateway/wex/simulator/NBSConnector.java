@@ -18,10 +18,10 @@ public class NBSConnector {
     private static final Logger LOG = Logger.getLogger(NBSConnector.class.getName());
     private StringBuffer response;
     byte[] isoFormat;
-private Socket nbsSocket;
+    private Socket nbsSocket;
 
-    public byte[] sendRequest(String request) {
-
+    public String sendRequest(String request) {
+        String strResponse = "";
         try {
 
             //creating connections
@@ -39,25 +39,25 @@ private Socket nbsSocket;
 
             getResponse();
             nbsSocket.close();
-            isoFormat = response.toString().getBytes();
-            return isoFormat;
+//            isoFormat = response.toString().getBytes();
+//            return isoFormat;
+        if(response != null) strResponse = response.toString();
         } catch (IOException ex) {
             Logger.getLogger(NBSConnector.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("nbsclient.NBSClient.main()" + ex);
         }
-        return isoFormat;
+        return strResponse;
     }
     
     public void getResponse() throws IOException{
-        String responsePerLine;
-        BufferedReader readResponse
-                    = new BufferedReader(new InputStreamReader(nbsSocket.getInputStream()));
+        String responsePerLine = "";
+        BufferedReader readResponse = new BufferedReader(new InputStreamReader(nbsSocket.getInputStream()));
 
-            while ((responsePerLine = readResponse.readLine()) != null) {
-                if(response == null) response = new StringBuffer();
-                response.append(responsePerLine);
-                LOG.log(Level.INFO, "Response recieved as {0}", response);
-            }
+        while ((responsePerLine = readResponse.readLine()) != null) {
+            if(response == null) response = new StringBuffer();
+            response.append(responsePerLine);
+            LOG.log(Level.INFO, "Response recieved as {0}", response);
+        }
     }
     
 }

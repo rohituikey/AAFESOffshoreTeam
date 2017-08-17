@@ -40,14 +40,15 @@ public class WEXProcessor {
             if(nBSFormatter == null) nBSFormatter = new NBSFormatter();
             IsoMessage iSOMsg = nBSFormatter.createRequest(t);
             NBSConnector clientObj = new NBSConnector();
-            byte[] iSOMsgResponse = clientObj.sendRequest(iSOMsg.writeData().toString());
+            //byte[] iSOMsgResponse = clientObj.sendRequest(iSOMsg.writeData().toString());
+            String iSOMsgResponse = clientObj.sendRequest(iSOMsg.writeData().toString());
 //            String[] result = nBSFormatter.seperateResponse(iSOMsgResponse);
 //            t = nBSFormatter.unmarshalAcknowledgment(result[0]);
 //            if (t.getResponseType().equalsIgnoreCase(ResponseType.APPROVED)) LOG.info("LOGON successfull");
 //            else LOG.info("LOGON failed");
 //            t = nBSFormatter.createResponse(result[1]);
 //            LOG.info("WEXProcessor.processWexRequests mothod ended");
-               t = nBSFormatter.createResponse(iSOMsgResponse);
+            t = nBSFormatter.createResponse(iSOMsgResponse);
             return t;
         } catch (Exception e) {
             throw e;

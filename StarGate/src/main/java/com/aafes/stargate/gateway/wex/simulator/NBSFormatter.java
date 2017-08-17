@@ -172,33 +172,36 @@ public class NBSFormatter {
 //                }
 //            }
             //}
-            index = 125;
+            index = 124;
             if (null != t.getNonFuelProductGroup() && (t.getNonFuelProductGroup().size()) > 0) {
                 for (String nonFuelString : t.getNonFuelProductGroup()) {
-                    if(nonFuelString.contains(",")){
-                      productDetails = nonFuelString.split(",");
+                    if (nonFuelString.contains(",")) {
+                        productDetails = nonFuelString.split(",");
                     }
-                    isoMsg.setValue(index,productDetails[0], IsoType.AMOUNT, 9);
-                    isoMsg.setValue(index + 1, productDetails[1], IsoType.AMOUNT, 10);
-                    isoMsg.setValue(index + 2,productDetails[2], IsoType.NUMERIC, 3);
-                    isoMsg.setValue(index + 3,productDetails[3], IsoType.AMOUNT, 7);
-
-                    index = index + 4;
+                    isoMsg.setValue(++index, productDetails[0], IsoType.AMOUNT, 9);
+                    isoMsg.setValue(++index, productDetails[1], IsoType.AMOUNT, 10);
+                    isoMsg.setValue(++index, productDetails[2], IsoType.NUMERIC, 3);
+                    isoMsg.setValue(++index, productDetails[3], IsoType.AMOUNT, 7);
+                    if (index == 128) {
+                        index = 19;
+                    }
+                    //index = index + 4;
                 }
             }
-            
-            
+
             if (null != t.getFuelProductGroup() && (t.getFuelProductGroup().size()) > 0) {
                 for (String FuelString : t.getFuelProductGroup()) {
-                    if(FuelString.contains(",")){
-                      productDetails = FuelString.split(",");
+                    if (FuelString.contains(",")) {
+                        productDetails = FuelString.split(",");
                     }
-                    isoMsg.setValue(index,productDetails[0], IsoType.AMOUNT, 9);
-                    isoMsg.setValue(index + 1, productDetails[1], IsoType.AMOUNT, 10);
-                    isoMsg.setValue(index + 2,productDetails[2], IsoType.NUMERIC, 3);
-                    isoMsg.setValue(index + 3,productDetails[3], IsoType.AMOUNT, 7);
-
-                    index = index + 4;
+                    isoMsg.setValue(++index, productDetails[0], IsoType.AMOUNT, 9);
+                    isoMsg.setValue(++index, productDetails[1], IsoType.AMOUNT, 10);
+                    isoMsg.setValue(++index, productDetails[2], IsoType.NUMERIC, 3);
+                    isoMsg.setValue(++index, productDetails[3], IsoType.AMOUNT, 7);
+                    if (index == 128) {
+                        index = 19;
+                    }
+                    //index = index + 4;
                 }
             }
 
@@ -215,80 +218,113 @@ public class NBSFormatter {
         return null;
     }
 
-    public Transaction createResponse(byte[] buf) throws IOException, Exception {
+    public Transaction createResponse(String buf) throws IOException, Exception {
         try {
             MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSResponceConfig.xml");
-            String bitmapByte = javax.xml.bind.DatatypeConverter.printHexBinary(
-                    Arrays.copyOfRange(buf, 200, 208));
-            byte[] mtid = Arrays.copyOfRange(buf, 196, 200);
-            byte[] details = Arrays.copyOfRange(buf, 208, buf.length - 1);
-            String rspString = bitmapByte;
-            byte[] response = ArrayUtils.addAll(mtid, bitmapByte.getBytes());
-            response = ArrayUtils.addAll(response, details);
+//            String bitmapByte = javax.xml.bind.DatatypeConverter.printHexBinary(Arrays.copyOfRange(buf, 4, 5));
+//            byte[] mtid = Arrays.copyOfRange(buf, 0, 4);
+//            byte[] details = Arrays.copyOfRange(buf, 5, buf.length - 1);
+//            String rspString = bitmapByte;
+//            byte[] response = ArrayUtils.addAll(mtid, bitmapByte.getBytes());
+//            response = ArrayUtils.addAll(response, details);
 
             IsoMessage resp = null;
-            try {
-                resp = mfact.parseMessage(response, 0);
-            } catch (Exception ex) {
-                throw new Exception("Unable to Parse response: " + Common.
-                        convertStackTraceToString(ex));
-            }
-            try {
-                transaction.setLocalDateTime(this.CreateDF_forTransaction(resp.getField(12).toString()));
-            } catch (NullPointerException ex) {
-                transaction.setLocalDateTime("");
-            }
-
-            try {
-                transaction.setReasonCode(resp.getField(14).toString());
-            } catch (NullPointerException ex) {
-                transaction.setReasonCode("");
-            }
-            try {
-                transaction.setResponseType(resp.getField(15).toString());
-            } catch (NullPointerException ex) {
-                transaction.setResponseType("");
-            }
-            try {
-                if (resp.getField(16).toString().equalsIgnoreCase(cardTypeWex)) {
-                    transaction.setMedia(MediaType.WEX);
+            System.out.println(buf);
+            if (buf.startsWith("0100")) {
+                try {
+                    transaction.setReasonCode("100");
+                } catch (NullPointerException ex) {
+                    transaction.setReasonCode("");
                 }
-            } catch (NullPointerException ex) {
-                transaction.setMedia("");
-            }
-            //promptType.setPromptType(resp.getString(23));}
-            try {
-                transaction.setAuthNumber(resp.getField(24).toString());
-            } catch (NullPointerException ex) {
-                //throw new GatewayException("Unknown AuthCode.");
-                transaction.setAuthNumber("");
-            }
-            try {
-                transaction.setFuelDollerAmount(new BigDecimal(resp.getField(25).toString()));
-            } catch (NullPointerException ex) {
-                transaction.setFuelDollerAmount(new BigDecimal(BigInteger.ONE));
-            }
-            try {
-                transaction.setProdDetailCount(resp.getField(26).toString());
-            } catch (NullPointerException ex) {
-                transaction.setProdDetailCount("");
-            }
-            try {
-                transaction.setQuantity(new BigDecimal(resp.getField(27).toString()));
-            } catch (NullPointerException ex) {
-                transaction.setQuantity(new BigDecimal(BigInteger.ONE));
+            } else if (buf.startsWith("0200")) {
+                try {
+                    transaction.setReasonCode("200");
+                } catch (NullPointerException ex) {
+                    transaction.setReasonCode("");
+                }
             }
 
-            try {
-                transaction.setProductCode(resp.getField(28).toString());
-            } catch (NullPointerException ex) {
-                transaction.setProductCode("");
+            if (buf.contains("Approved")) {
+                try {
+                    transaction.setResponseType("Approved");
+                } catch (NullPointerException ex) {
+                    transaction.setResponseType("");
+                }
+            } else if (buf.contains("Declined")) {
+                try {
+                    transaction.setResponseType("Declined");
+                } catch (NullPointerException ex) {
+                    transaction.setResponseType("");
+                }
+            }
+
+            if (transaction.getMedia() == null || transaction.getMedia().isEmpty()) {
+                try {
+                    if (resp.getField(16).toString().equalsIgnoreCase(cardTypeWex)) {
+                        transaction.setMedia(MediaType.WEX);
+                    }
+                } catch (NullPointerException ex) {
+
+                    transaction.setMedia("");
+                }
+            }
+
+//            try {
+//                resp = mfact.parseMessage(buf.getBytes(), 0);
+//            } catch (Exception ex) {
+//                throw new Exception("Unable to Parse response: " + Common.
+//                        convertStackTraceToString(ex));
+//            }
+            if (transaction.getLocalDateTime() == null || transaction.getLocalDateTime().isEmpty()) {
+                try {
+                    transaction.setLocalDateTime(this.CreateDF_forTransaction(resp.getField(12).toString()));
+                } catch (NullPointerException ex) {
+                    transaction.setLocalDateTime("");
+                }
+            }
+
+            if (transaction.getAuthNumber() == null || transaction.getAuthNumber().isEmpty()) {
+                try {
+                    transaction.setAuthNumber(resp.getField(24).toString());
+                } catch (NullPointerException ex) {
+                    //throw new GatewayException("Unknown AuthCode.");
+                    transaction.setAuthNumber("");
+                }
+            }
+
+            if (transaction.getFuelDollerAmount() == null) {
+                try {
+                    transaction.setFuelDollerAmount(new BigDecimal(resp.getField(25).toString()));
+                } catch (NullPointerException ex) {
+                    transaction.setFuelDollerAmount(new BigDecimal(BigInteger.ONE));
+                }
+            }
+            if (transaction.getProdDetailCount() == null) {
+                try {
+                    transaction.setProdDetailCount(resp.getField(26).toString());
+                } catch (NullPointerException ex) {
+                    transaction.setProdDetailCount("");
+                }
+            }
+            if (transaction.getQuantity() == null) {
+                try {
+                    transaction.setQuantity(new BigDecimal(resp.getField(27).toString()));
+                } catch (NullPointerException ex) {
+                    transaction.setQuantity(new BigDecimal(BigInteger.ONE));
+                }
+            }
+            if (transaction.getProductCode() == null) {
+                try {
+                    transaction.setProductCode(resp.getField(28).toString());
+                } catch (NullPointerException ex) {
+                    transaction.setProductCode("");
+                }
             }
             //productDetails.setMaxAmount(new BigDecimal(resp.getField(29)));
 
             //   application config ,session (auth or captureOnly),max amount need to be mapped
-        } catch (ISOException ex) {
-            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (ISOException ex) {
+//            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
             Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -338,7 +374,6 @@ public class NBSFormatter {
         ts = ts.substring(11, 13) + ts.substring(14, 16) + daylightSavingsTimeAtSiteOne;
         return ts;
     }
-    
 
     //uncomment for testing purpose
 //    public String generateNewResponse() {
@@ -434,7 +469,6 @@ public class NBSFormatter {
 //            Logger.getLogger(NBSFormatter.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 //    }
-
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
     }

@@ -233,3 +233,29 @@ alter table stargate.transactions ADD promptDetailCount decimal;
 alter table stargate.transactions DROP nonfuelproductgroup ;
 alter table stargate.transactions DROP fuelproductgroup ;
 alter table stargate.transactions ADD productgroup list<text>;
+
+CREATE TABLE stargate.wexsettlemessages(
+transactionfiledate text,
+transactionfiletime text,
+transactionfilesequence text,
+batchtid text,
+batchid text,
+batchapp text,
+batchversion text,
+transcardCode text,
+transtype text,
+transnbr text,
+transdate text,
+transtime text,
+cardtrack text,
+pumpcat text,
+pumpservice text,
+pumpnbr text,
+pumpamount text,
+product list<text>,
+odometer text,
+amount text,
+authref text,
+driverid text,
+vehicleid text,
+PRIMARY KEY (transactionfiledate, transactionfiletime, transactionfilesequence, batchtid, batchid));

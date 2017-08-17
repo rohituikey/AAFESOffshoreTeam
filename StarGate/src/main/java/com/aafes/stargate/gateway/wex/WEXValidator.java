@@ -109,4 +109,10 @@ public class WEXValidator {
         t.setDescriptionField(description);
         LOG.error("Exception/Error occured. reasonCode:" + reasonCode + " .description" + description);
     }
+
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
+
+    
 }

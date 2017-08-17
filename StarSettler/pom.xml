@@ -112,7 +112,7 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
-            <plugin>
+<!--            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.7.1.201405082137</version>
@@ -143,7 +143,7 @@
                          <exclude>com/aafes/starsettler/tokenizer/**/*</exclude>
                     </excludes>
                             <rules>
-                                <!--  implmentation is needed only for Maven 2  -->
+                                  implmentation is needed only for Maven 2  
                                 <rule implementation="org.jacoco.maven.RuleConfiguration">
                                     <element>BUNDLE</element>
                                     <limits>
@@ -152,7 +152,7 @@
                                             <value>COVEREDRATIO</value>
                                             <minimum>0.0</minimum>			
                                         </limit>
-                                        <!--  implmentation is needed only for Maven 2  -->
+                                          implmentation is needed only for Maven 2  
                                         <limit implementation="org.jacoco.report.check.Limit">
                                             <counter>COMPLEXITY</counter>
                                             <value>COVEREDRATIO</value>
@@ -163,7 +163,7 @@
                             </rules>
                         </configuration>
                     </execution>
-<!--                      Transactionsfile-->
+                      Transactionsfile
                     <execution>
                         <goals>
                             <goal>generate</goal>
@@ -192,7 +192,7 @@
                     
                     
                     
-                    <!-- BELOW CHANGES WILL GENERATE JACOCO CODE COVERAGE REPORT -->
+                     BELOW CHANGES WILL GENERATE JACOCO CODE COVERAGE REPORT 
                     <execution>            
                         <id>post-integration-test</id>            
                         <phase>post-integration-test</phase>            
@@ -204,9 +204,9 @@
                             <outputDirectory>${project.build.directory}/Report</outputDirectory>            
                         </configuration>        
                     </execution>
-                    <!-- ABOVE CHANGES WILL GENERATE JACOCO CODE COVERAGE REPORT -->
+                     ABOVE CHANGES WILL GENERATE JACOCO CODE COVERAGE REPORT 
                 </executions>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -270,7 +270,7 @@
                     <verbose>true</verbose>
                 </configuration>
             </plugin>
-            <plugin>
+<!--            <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
                 <version>0.12.0</version>
@@ -295,7 +295,7 @@
                     <generateDirectory>${project.build.directory}/generated-sources/xjc</generateDirectory>
                     <verbose>true</verbose>
                 </configuration>
-            </plugin>
+            </plugin>-->
 <!--            <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
@@ -322,7 +322,7 @@
                     <verbose>true</verbose>
                 </configuration>
             </plugin>-->
-            <plugin>
+<!--            <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
                 <version>0.12.0</version>
@@ -347,7 +347,7 @@
                     <generateDirectory>${project.build.directory}/generated-sources/xjc</generateDirectory>
                     <verbose>true</verbose>
                 </configuration>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 

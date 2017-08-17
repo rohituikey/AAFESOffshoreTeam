@@ -9,6 +9,8 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.ResponseType;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.slf4j.LoggerFactory;
@@ -27,31 +29,12 @@ public class WEXValidator {
     private String sMethodName = "";
     private final String CLASS_NAME = WEXValidator.this.getClass().getSimpleName();
     int maxFuelProdCount, maxNonFuelProdCount, maxlProdCountSale, maxFuelProdCountSale;
-
-    public boolean validateForPreAuthAndFinalAuth(Transaction t) {
+    public boolean validatePreAuthAndFinalAuth(Transaction t) {
         LOG.info("Validating fields in WEXValidator for Pre_Auth & Final_Auth");
-        
-        if(configurator.get("TOTAL_FUEL_PRODCODE_ALLWOED") != null)
-            maxFuelProdCount = Integer.parseInt(configurator.get("TOTAL_FUEL_PRODCODE_ALLWOED"));
-        else LOG.error("Please add TOTAL_FUEL_PRODCODE_ALLWOED in stargate.properties");
-        if(configurator.get("TOTAL_NONFUEL_PRODCODE_ALLWOED") != null)
-            maxNonFuelProdCount = Integer.parseInt(configurator.get("TOTAL_NONFUEL_PRODCODE_ALLWOED"));
-        else LOG.error("Please add TOTAL_NONFUEL_PRODCODE_ALLWOED in stargate.properties");
-        
         if (!t.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
             this.buildErrorResponse(t, "INVALID_INPUT_TYPE", "INVALID_INPUT_TYPE");
             return false;
-        } else if (t.getFuelProductGroup() == null || t.getFuelProductGroup().isEmpty()) {
-            this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_NOT_BE_NULL", "PRODUCT_DETAIL_COUNT_NOT_BE_NULL");
-            return false;
-        } else if ((t.getFuelProductGroup() != null) && (t.getFuelProductGroup().size()) > maxFuelProdCount) {
-            this.buildErrorResponse(t, "FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED", "FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
-            return false;
-        } else if ((t.getNonFuelProductGroup() != null) && (t.getNonFuelProductGroup().size() > maxNonFuelProdCount)) {
-            this.buildErrorResponse(t, "NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED", "NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
-            return false;
-        }
-        return true;
+            }else return true;
     }
 
     public boolean validateSale(Transaction t) {

@@ -196,8 +196,9 @@ final public class Transaction {
     /* FIELDS ADDED FOR WEX USE CASE - end */
     
     /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
-    private List<String> fuelProductGroup;
-    private List<String> nonFuelProductGroup;
+    //storing fuel and nonFuel products are strong into one List
+    private List<String> ProductGroup;
+   //private List<String> nonFuelProductGroup;
     private BigDecimal promptDetailCount;
     /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - end */
     
@@ -1259,21 +1260,14 @@ final public class Transaction {
         this.nonFuelqty = nonFuelqty;
     }
 
-    public List<String> getFuelProductGroup() {
-        return fuelProductGroup;
+    public List<String> getProductGroup() {
+        return ProductGroup;
     }
 
-    public void setFuelProductGroup(List<String> fuelProductGroup) {
-        this.fuelProductGroup = fuelProductGroup;
+    public void setProductGroup(List<String> ProductGroup) {
+        this.ProductGroup = ProductGroup;
     }
-
-    public List<String> getNonFuelProductGroup() {
-        return nonFuelProductGroup;
-    }
-
-    public void setNonFuelProductGroup(List<String> nonFuelProductGroup) {
-        this.nonFuelProductGroup = nonFuelProductGroup;
-    }
+    
 
     public BigDecimal getPromptDetailCount() {
         return promptDetailCount;

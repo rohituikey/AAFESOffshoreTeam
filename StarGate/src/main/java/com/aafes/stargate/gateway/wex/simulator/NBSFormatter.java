@@ -172,36 +172,18 @@ public class NBSFormatter {
 //                }
 //            }
             //}
-            index = 124;
-            if (null != t.getNonFuelProductGroup() && (t.getNonFuelProductGroup().size()) > 0) {
-                for (String nonFuelString : t.getNonFuelProductGroup()) {
-                    if (nonFuelString.contains(",")) {
-                        productDetails = nonFuelString.split(",");
+            index = 125;
+            if (null != t.getProductGroup() && (t.getProductGroup().size()) > 0) {
+                for (String nonFuelString : t.getProductGroup()) {
+                    if(nonFuelString.contains(":")){
+                      productDetails = nonFuelString.split(":");
                     }
-                    isoMsg.setValue(++index, productDetails[0], IsoType.AMOUNT, 9);
-                    isoMsg.setValue(++index, productDetails[1], IsoType.AMOUNT, 10);
-                    isoMsg.setValue(++index, productDetails[2], IsoType.NUMERIC, 3);
-                    isoMsg.setValue(++index, productDetails[3], IsoType.AMOUNT, 7);
-                    if (index == 128) {
-                        index = 19;
-                    }
-                    //index = index + 4;
-                }
-            }
+                    isoMsg.setValue(index,productDetails[0], IsoType.AMOUNT, 9);
+                    isoMsg.setValue(index + 1, productDetails[1], IsoType.AMOUNT, 10);
+                    isoMsg.setValue(index + 2,productDetails[2], IsoType.NUMERIC, 3);
+                    isoMsg.setValue(index + 3,productDetails[3], IsoType.AMOUNT, 7);
 
-            if (null != t.getFuelProductGroup() && (t.getFuelProductGroup().size()) > 0) {
-                for (String FuelString : t.getFuelProductGroup()) {
-                    if (FuelString.contains(",")) {
-                        productDetails = FuelString.split(",");
-                    }
-                    isoMsg.setValue(++index, productDetails[0], IsoType.AMOUNT, 9);
-                    isoMsg.setValue(++index, productDetails[1], IsoType.AMOUNT, 10);
-                    isoMsg.setValue(++index, productDetails[2], IsoType.NUMERIC, 3);
-                    isoMsg.setValue(++index, productDetails[3], IsoType.AMOUNT, 7);
-                    if (index == 128) {
-                        index = 19;
-                    }
-                    //index = index + 4;
+                    index = index + 4;
                 }
             }
 

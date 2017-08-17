@@ -97,7 +97,7 @@ public class WEXStrategy extends BaseStrategy {
         //PREAUTH/FINAL_AUTH request validation - start
         if (t.getRequestType() != null && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)
                 || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))) {
-            return wEXValidator.validateForPreAuthAndFinalAuth(t);
+            return wEXValidator.validatePreAuthAndFinalAuth(t);
         } //PREAUTH/FINAL_AUTH request validation - end
         //sale request validation - start
         else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.SALE)) {

@@ -229,3 +229,7 @@ alter TABLE stargate.transactions ADD nonfuelqty decimal;
 alter table stargate.transactions ADD fuelproductgroup list<text>;
 alter table stargate.transactions ADD nonfuelproductgroup list<text>;
 alter table stargate.transactions ADD promptDetailCount decimal;
+
+alter table stargate.transactions DROP nonfuelproductgroup ;
+alter table stargate.transactions DROP fuelproductgroup ;
+alter table stargate.transactions ADD productgroup list<text>;

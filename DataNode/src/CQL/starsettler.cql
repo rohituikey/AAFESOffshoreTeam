@@ -125,3 +125,43 @@ CREATE TABLE starsettler.batchidxref (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
+
+
+CREATE TABLE starsettler.fileidref (
+    processdate text,
+    filesequenceid text,
+    ordernumber text,
+    receiveddate text,
+    PRIMARY KEY (processdate, receiveddate, filesequenceid, ordernumber)
+) WITH CLUSTERING ORDER BY (receiveddate DESC, filesequenceid ASC, ordernumber ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+
+
+alter table starsettler.settlemessages add time text;
+alter table starsettler.settlemessages add trackdata2 text;
+alter table starsettler.settlemessages add odometer text;
+alter table starsettler.settlemessages add driverId text;
+alter table starsettler.settlemessages add authreference text;
+alter table starsettler.settlemessages add vehicleId text;
+alter table starsettler.settlemessages add catflag text;
+alter table starsettler.settlemessages add service text;
+
+#alter table starsettler.settlemessages add productcode text;
+alter table starsettler.settlemessages add filesequencenumber text;
+alter table starsettler.settlemessages ADD nonfuelproductgroup list<text>;
+alter table starsettler.settlemessages ADD fuelproductgroup list<text>;
+alter table  settlemessages add pumpnumber text;

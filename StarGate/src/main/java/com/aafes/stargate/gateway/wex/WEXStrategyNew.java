@@ -86,7 +86,7 @@ public class WEXStrategyNew extends BaseStrategy {
     }
 
     private boolean validateTransactions(Transaction t) {
-        LOG.info("Validating fields in WEXtrategy");
+        LOG.info("Validating fields in WEXStrategyNew");
         Validator validator = new Validator();
 
         //PREAUTH/FINAL_AUTH request validation - start
@@ -133,34 +133,34 @@ public class WEXStrategyNew extends BaseStrategy {
         LOG.info("WEXStrategyNew.saveToWexSettleMessages method is started");
         List<WexSettleMessages> wexSettleMessagesList = new ArrayList();
         wexSettleMessages = new WexSettleMessages();
-        wexSettleMessages.setTransactionfiledate("");
-        wexSettleMessages.setTransactionfiletime("");
-        wexSettleMessages.setTransactionfilesequence("");
-        wexSettleMessages.setBatchtid("");
-        wexSettleMessages.setBatchid("");
-        wexSettleMessages.setBatchapp("");
-        wexSettleMessages.setBatchversion("");
+        wexSettleMessages.setTransactionFileDate("");
+        wexSettleMessages.setTransactionFileTime("");
+        wexSettleMessages.setTransactionFileSequence("");
+        wexSettleMessages.setBatchTId("");
+        wexSettleMessages.setBatchId("");
+        wexSettleMessages.setBatchApp("");
+        wexSettleMessages.setBatchVersion("");
         wexSettleMessages.setTranscardCode("");
-        wexSettleMessages.setTranstype(t.getTransactiontype());
-        wexSettleMessages.setTransnbr("");
-        wexSettleMessages.setTransdate(this.getSystemDate());
-        wexSettleMessages.setTranstime(this.getSystemDate());
-        wexSettleMessages.setCardtrack(t.getTrack2());
-        wexSettleMessages.setPumpcat(t.getPumpNmbr());
-        wexSettleMessages.setPumpservice(t.getPumpNmbr());
-        wexSettleMessages.setPumpnbr(t.getPumpNmbr());
-        wexSettleMessages.setPumpamount(String.valueOf(t.getPumpPrice()));
+        wexSettleMessages.setTransType(t.getTransactiontype());
+        wexSettleMessages.setTransNbr("");
+        wexSettleMessages.setTransDate(this.getSystemDate());
+        wexSettleMessages.setTransTime(this.getSystemTime());
+        wexSettleMessages.setCardTrack(t.getTrack2());
+        wexSettleMessages.setPumpCat(t.getPumpNmbr());
+        wexSettleMessages.setPumpService(t.getPumpNmbr());
+        wexSettleMessages.setPumpNbr(t.getPumpNmbr());
+        wexSettleMessages.setPumpAmount(String.valueOf(t.getPumpPrice()));
         wexSettleMessages.setProduct(t.getProductGroup().toString());
         wexSettleMessages.setOdometer(t.getOdoMeter());
         wexSettleMessages.setAmount(String.valueOf(t.getAmount()));
-        wexSettleMessages.setAuthref(t.getAuthNumber());
-        wexSettleMessages.setDriverid(t.getDriverId());
-        wexSettleMessages.setVehicleid(t.getVehicleId());
+        wexSettleMessages.setAuthRef(t.getAuthNumber());
+        wexSettleMessages.setDriverId(t.getDriverId());
+        wexSettleMessages.setVehicleId(t.getVehicleId());
         wexSettleMessages.setOrderDate(this.getSystemDate());
         wexSettleMessages.setSequenceId(t.getSequenceNumber());
         wexSettleMessages.setSettleId("");
         wexSettleMessages.setSettlestatus(SettleStatus.Ready_to_settle);
-        wexSettleMessages.setTime(this.getSystemDate());
+        wexSettleMessages.setTime(this.getSystemTime());
         wexSettleMessages.setCatflag("");
         wexSettleMessages.setService("");
         
@@ -172,6 +172,13 @@ public class WEXStrategyNew extends BaseStrategy {
 
     private String getSystemDate() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        String ts = dateFormat.format(date);
+        return ts;
+    }
+    
+    private String getSystemTime() {
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();
         String ts = dateFormat.format(date);
         return ts;

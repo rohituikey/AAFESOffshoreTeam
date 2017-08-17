@@ -16,33 +16,33 @@ import com.datastax.driver.mapping.annotations.Table;
 public class WexSettleMessages {
 
     @ClusteringColumn(0)
-    private String transactionfiledate;
+    private String transactionFileDate;
     @ClusteringColumn(1)
-    private String transactionfiletime;
+    private String transactionFileTime;
     @ClusteringColumn(2)
-    private String transactionfilesequence;
+    private String transactionFileSequence;
     @ClusteringColumn(3)
-    private String batchtid;
+    private String batchTId;
     @ClusteringColumn(4)
-    private String batchid;
-    private String batchapp;
-    private String batchversion;
+    private String batchId;
+    private String batchApp;
+    private String batchVersion;
     private String transcardCode;
-    private String transtype;
-    private String transnbr;
-    private String transdate;
-    private String transtime;
-    private String cardtrack;
-    private String pumpcat;
-    private String pumpservice;
-    private String pumpnbr;
-    private String pumpamount;
+    private String transType;
+    private String transNbr;
+    private String transDate;
+    private String transTime;
+    private String cardTrack;
+    private String pumpCat;
+    private String pumpService;
+    private String pumpNbr;
+    private String pumpAmount;
     private String product;
     private String odometer;
     private String amount;
-    private String authref;
-    private String driverid;
-    private String vehicleid;
+    private String authRef;
+    private String driverId;
+    private String vehicleId;
     private String orderDate = "";
     private String sequenceId = "";
     private String settleId = "";
@@ -51,60 +51,60 @@ public class WexSettleMessages {
     private String catflag = "";
     private String service = "";
 
-    public String getTransactionfiledate() {
-        return transactionfiledate;
+    public String getTransactionFileDate() {
+        return transactionFileDate;
     }
 
-    public void setTransactionfiledate(String transactionfiledate) {
-        this.transactionfiledate = transactionfiledate;
+    public void setTransactionFileDate(String transactionFileDate) {
+        this.transactionFileDate = transactionFileDate;
     }
 
-    public String getTransactionfiletime() {
-        return transactionfiletime;
+    public String getTransactionFileTime() {
+        return transactionFileTime;
     }
 
-    public void setTransactionfiletime(String transactionfiletime) {
-        this.transactionfiletime = transactionfiletime;
+    public void setTransactionFileTime(String transactionFileTime) {
+        this.transactionFileTime = transactionFileTime;
     }
 
-    public String getTransactionfilesequence() {
-        return transactionfilesequence;
+    public String getTransactionFileSequence() {
+        return transactionFileSequence;
     }
 
-    public void setTransactionfilesequence(String transactionfilesequence) {
-        this.transactionfilesequence = transactionfilesequence;
+    public void setTransactionFileSequence(String transactionFileSequence) {
+        this.transactionFileSequence = transactionFileSequence;
     }
 
-    public String getBatchtid() {
-        return batchtid;
+    public String getBatchTId() {
+        return batchTId;
     }
 
-    public void setBatchtid(String batchtid) {
-        this.batchtid = batchtid;
+    public void setBatchTId(String batchTId) {
+        this.batchTId = batchTId;
     }
 
-    public String getBatchid() {
-        return batchid;
+    public String getBatchId() {
+        return batchId;
     }
 
-    public void setBatchid(String batchid) {
-        this.batchid = batchid;
+    public void setBatchId(String batchId) {
+        this.batchId = batchId;
     }
 
-    public String getBatchapp() {
-        return batchapp;
+    public String getBatchApp() {
+        return batchApp;
     }
 
-    public void setBatchapp(String batchapp) {
-        this.batchapp = batchapp;
+    public void setBatchApp(String batchApp) {
+        this.batchApp = batchApp;
     }
 
-    public String getBatchversion() {
-        return batchversion;
+    public String getBatchVersion() {
+        return batchVersion;
     }
 
-    public void setBatchversion(String batchversion) {
-        this.batchversion = batchversion;
+    public void setBatchVersion(String batchVersion) {
+        this.batchVersion = batchVersion;
     }
 
     public String getTranscardCode() {
@@ -115,76 +115,76 @@ public class WexSettleMessages {
         this.transcardCode = transcardCode;
     }
 
-    public String getTranstype() {
-        return transtype;
+    public String getTransType() {
+        return transType;
     }
 
-    public void setTranstype(String transtype) {
-        this.transtype = transtype;
+    public void setTransType(String transType) {
+        this.transType = transType;
     }
 
-    public String getTransnbr() {
-        return transnbr;
+    public String getTransNbr() {
+        return transNbr;
     }
 
-    public void setTransnbr(String transnbr) {
-        this.transnbr = transnbr;
+    public void setTransNbr(String transNbr) {
+        this.transNbr = transNbr;
     }
 
-    public String getTransdate() {
-        return transdate;
+    public String getTransDate() {
+        return transDate;
     }
 
-    public void setTransdate(String transdate) {
-        this.transdate = transdate;
+    public void setTransDate(String transDate) {
+        this.transDate = transDate;
     }
 
-    public String getTranstime() {
-        return transtime;
+    public String getTransTime() {
+        return transTime;
     }
 
-    public void setTranstime(String transtime) {
-        this.transtime = transtime;
+    public void setTransTime(String transTime) {
+        this.transTime = transTime;
     }
 
-    public String getCardtrack() {
-        return cardtrack;
+    public String getCardTrack() {
+        return cardTrack;
     }
 
-    public void setCardtrack(String cardtrack) {
-        this.cardtrack = cardtrack;
+    public void setCardTrack(String cardTrack) {
+        this.cardTrack = cardTrack;
     }
 
-    public String getPumpcat() {
-        return pumpcat;
+    public String getPumpCat() {
+        return pumpCat;
     }
 
-    public void setPumpcat(String pumpcat) {
-        this.pumpcat = pumpcat;
+    public void setPumpCat(String pumpCat) {
+        this.pumpCat = pumpCat;
     }
 
-    public String getPumpservice() {
-        return pumpservice;
+    public String getPumpService() {
+        return pumpService;
     }
 
-    public void setPumpservice(String pumpservice) {
-        this.pumpservice = pumpservice;
+    public void setPumpService(String pumpService) {
+        this.pumpService = pumpService;
     }
 
-    public String getPumpnbr() {
-        return pumpnbr;
+    public String getPumpNbr() {
+        return pumpNbr;
     }
 
-    public void setPumpnbr(String pumpnbr) {
-        this.pumpnbr = pumpnbr;
+    public void setPumpNbr(String pumpNbr) {
+        this.pumpNbr = pumpNbr;
     }
 
-    public String getPumpamount() {
-        return pumpamount;
+    public String getPumpAmount() {
+        return pumpAmount;
     }
 
-    public void setPumpamount(String pumpamount) {
-        this.pumpamount = pumpamount;
+    public void setPumpAmount(String pumpAmount) {
+        this.pumpAmount = pumpAmount;
     }
 
     public String getProduct() {
@@ -211,57 +211,83 @@ public class WexSettleMessages {
         this.amount = amount;
     }
 
-    public String getAuthref() {
-        return authref;
+    public String getAuthRef() {
+        return authRef;
     }
 
-    public void setAuthref(String authref) {
-        this.authref = authref;
+    public void setAuthRef(String authRef) {
+        this.authRef = authRef;
     }
 
-    public String getDriverid() {
-        return driverid;
+    public String getDriverId() {
+        return driverId;
     }
 
-    public void setDriverid(String driverid) {
-        this.driverid = driverid;
+    public void setDriverId(String driverId) {
+        this.driverId = driverId;
     }
 
-    public String getVehicleid() {
-        return vehicleid;
+    public String getVehicleId() {
+        return vehicleId;
     }
 
-    public void setVehicleid(String vehicleid) {
-        this.vehicleid = vehicleid;
+    public void setVehicleId(String vehicleId) {
+        this.vehicleId = vehicleId;
+    }
+
+    public String getOrderDate() {
+        return orderDate;
     }
 
     public void setOrderDate(String orderDate) {
         this.orderDate = orderDate;
     }
 
+    public String getSequenceId() {
+        return sequenceId;
+    }
+
     public void setSequenceId(String sequenceId) {
         this.sequenceId = sequenceId;
+    }
+
+    public String getSettleId() {
+        return settleId;
     }
 
     public void setSettleId(String settleId) {
         this.settleId = settleId;
     }
 
+    public String getSettlestatus() {
+        return settlestatus;
+    }
+
     public void setSettlestatus(String settlestatus) {
         this.settlestatus = settlestatus;
+    }
+
+    public String getTime() {
+        return time;
     }
 
     public void setTime(String time) {
         this.time = time;
     }
 
+    public String getCatflag() {
+        return catflag;
+    }
+
     public void setCatflag(String catflag) {
         this.catflag = catflag;
+    }
+
+    public String getService() {
+        return service;
     }
 
     public void setService(String service) {
         this.service = service;
     }
-
-    
 }

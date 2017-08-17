@@ -47,12 +47,19 @@ public class NBSServer {
             BufferedWriter writeResponse
                     = new BufferedWriter(new OutputStreamWriter(connectionSocket.getOutputStream()));
 
-            String response = nBSStub.unpackIso8583(Input);
+            String response = null;
+            try{
+                response = nBSStub.unpackIso8583(Input);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
 
             LOG.log(Level.INFO, "sending response as {0}", response);
             writeResponse.write(response+ " \r");
             writeResponse.flush();
         } catch (IOException ex) {
+            Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (Exception ex) {
             Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
         }finally{
             try { 

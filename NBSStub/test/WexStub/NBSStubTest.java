@@ -7,6 +7,7 @@ package WexStub;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -19,6 +20,7 @@ public class NBSStubTest {
     public void setUp() {
     }
 
+    @Ignore
     @Test
     public void testGetResponse() {
         String request = "0231805FE000000000000000000000061A0000223007AUTHREQ000213451001A663230002WI001123001S00120376900460000000000001=200950041002101230106632415423";
@@ -28,6 +30,7 @@ public class NBSStubTest {
         //fail("The test case is a prototype.");
     }
     
+    @Ignore
     @Test
     public void testGetResponse_Declined() {
         String request = "231805FE00000000000000000000007C000013dummy Term ID013dummy Appname00110042501010dummy Info00110011010dummy Info0011010dummy Info001S0011010dummy Info0011";
@@ -37,6 +40,7 @@ public class NBSStubTest {
         //fail("The test case is a prototype.");
     }
     
+    @Ignore
     @Test
     public void testGetResponseSale_Refund() {
         String request = "231805FE00000000000000000000007C000013dummy Term ID013dummy Appname00110042501010dummy Info00110011010dummy Info0011010dummy Info001S0011010dummy Info0011";

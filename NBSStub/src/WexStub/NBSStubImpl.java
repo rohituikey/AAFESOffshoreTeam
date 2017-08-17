@@ -41,11 +41,11 @@ public class NBSStubImpl implements NBSStub {
                     packager = new GenericPackager(SCHEMA_PATH);
                 } catch (Exception e) {
                     SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSLogonPackager.xml";
-                     packager = new GenericPackager(SCHEMA_PATH);
+                    packager = new GenericPackager(SCHEMA_PATH);
                 }
                 isoMsg.setPackager(packager);
                 isoMsg.unpack(request.getBytes());
-                
+
                 for (int index = 0; index < isoMsg.getMaxField(); index++) {
                     if (isoMsg.hasField(index)) {
                         System.out.println(index + " " + isoMsg.getString(index));
@@ -53,19 +53,19 @@ public class NBSStubImpl implements NBSStub {
                 }
             } catch (ISOException ex) {
                 Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
-                correctRequest=false;
+                correctRequest = false;
             } catch (Exception ex) {
                 Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
-                correctRequest=false;
+                correctRequest = false;
             }
-            
+
             result = generateResponse();
             responseDetails = generateNBSResponse();
             return result + responseDetails;
         } catch (ISOException ex) {
             Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return null;
     }
 
@@ -76,9 +76,9 @@ public class NBSStubImpl implements NBSStub {
             packager = new GenericPackager(SCHEMA_PATH);
         } catch (Exception e) {
             SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/ResponseAcknowledgment.xml";
-             packager = new GenericPackager(SCHEMA_PATH);
+            packager = new GenericPackager(SCHEMA_PATH);
         }
-        
+
         isoMsg.setPackager(packager);
         isoMsg.setMTI("0231");
         if (correctRequest) {
@@ -100,7 +100,7 @@ public class NBSStubImpl implements NBSStub {
             packager = new GenericPackager(SCHEMA_PATH);
         } catch (Exception e) {
             SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSResponse.xml";
-             packager = new GenericPackager(SCHEMA_PATH);
+            packager = new GenericPackager(SCHEMA_PATH);
         }
         isoMsg.setPackager(packager);
         isoMsg.setMTI("0231");
@@ -135,27 +135,36 @@ public class NBSStubImpl implements NBSStub {
         responseDetails = new String(byteResult);
         return responseDetails;
     }
-    
-    public String unpackIso8583(String req){
+
+    public String unpackIso8583(String req) {
         byte[] buf = req.getBytes();
         try {
-            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSRequest.xml");
-            String bitmapByte = javax.xml.bind.DatatypeConverter.printHexBinary(
-                Arrays.copyOfRange(buf, 4, 12));
-        byte[] mtid = Arrays.copyOfRange(buf, 0, 4);
-        byte[] details = Arrays.copyOfRange(buf, 12, buf.length - 1);
-        String rspString = bitmapByte;
-        byte[] response = ArrayUtils.addAll(mtid, bitmapByte.getBytes());
-        response = ArrayUtils.addAll(response, details);
-        IsoMessage resp = null;
-            resp = mfact.parseMessage(response, 12);
-            
+            MessageFactory mfact;
+            SCHEMA_PATH = "src/XML/NBSconfig.xml";
+            try {
+                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
+            } catch (IOException e) {
+                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSconfig.xml";
+                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
+            } catch (Exception e) {
+                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSconfig.xml";
+                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
+            }
+            String bitmapByte = javax.xml.bind.DatatypeConverter.printHexBinary(Arrays.copyOfRange(buf, 4, 12));
+            byte[] mtid = Arrays.copyOfRange(buf, 0, 4);
+            byte[] details = Arrays.copyOfRange(buf, 4, buf.length - 1);
+            String rspString = bitmapByte;
+            byte[] response = ArrayUtils.addAll(mtid, bitmapByte.getBytes());
+            response = ArrayUtils.addAll(response, details);
+            IsoMessage resp = null;
+            resp = mfact.parseMessage(response, 0);
+
         } catch (IOException | ParseException ex) {
             Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
-            correctRequest=false;
-        } catch (Exception ex){
-            System.out.println(ex.getMessage() +"-------------------------" + Arrays.toString(ex.getStackTrace()));
-            correctRequest=false;
+            correctRequest = false;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage() + "-------------------------" + Arrays.toString(ex.getStackTrace()));
+            correctRequest = false;
         }
         return generateNewResponse();
     }
@@ -163,24 +172,31 @@ public class NBSStubImpl implements NBSStub {
     private String generateNewResponse() {
         String logonResponse = logonResponse();
         String nbsResponse = nbsResponse();
-        return logonResponse+nbsResponse;
+        return logonResponse + nbsResponse;
     }
 
     private String logonResponse() {
         try {
-            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSAcknowlegment.xml");
+            MessageFactory mfact;
+            SCHEMA_PATH = "src/XML/NBSAcknowlegment.xml";
+            try {
+                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);;
+            } catch (Exception e) {
+                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSAcknowlegment.xml";
+                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
+            }
             mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
             mfact.setAssignDate(true);
 
             IsoMessage isoMessage = mfact.newMessage(0x100);
-        if (correctRequest) {
-            isoMessage.setValue(10, "c$",IsoType.ALPHA,2);
-            isoMessage.setValue(11, "100",IsoType.ALPHA,3);
-        } else {
-            isoMessage.setValue(10, "c?",IsoType.ALPHA,2);
-            isoMessage.setValue(11, "200",IsoType.ALPHA,3);
-        }
-        isoMessage.setCharacterEncoding(
+            if (correctRequest) {
+                isoMessage.setValue(10, "c$", IsoType.ALPHA, 2);
+                isoMessage.setValue(11, "100", IsoType.ALPHA, 3);
+            } else {
+                isoMessage.setValue(10, "c?", IsoType.ALPHA, 2);
+                isoMessage.setValue(11, "200", IsoType.ALPHA, 3);
+            }
+            isoMessage.setCharacterEncoding(
                     "UTF-8");
             isoMessage.setBinaryBitmap(
                     true);
@@ -200,35 +216,34 @@ public class NBSStubImpl implements NBSStub {
             mfact.setAssignDate(true);
 
             IsoMessage isoMessage = mfact.newMessage(0x100);
-        isoMessage.setValue(10, "A",IsoType.ALPHA,25);
-        isoMessage.setValue(11, "0278",IsoType.NUMERIC,4);
+            isoMessage.setValue(10, "A", IsoType.ALPHA, 25);
+            isoMessage.setValue(11, "0278", IsoType.NUMERIC, 4);
 
-        isoMessage.setValue(12, "3170621071655",IsoType.ALPHA,13);
-        isoMessage.setValue(13, "N",IsoType.ALPHA,1);
-        if (correctRequest) {
-            isoMessage.setValue(14, "00",IsoType.ALPHA,2);
-            isoMessage.setValue(15, "Approved",IsoType.ALPHA,32);
-        } else {
-            isoMessage.setValue(14, "01",IsoType.ALPHA,2);
-            isoMessage.setValue(15, "Declined",IsoType.ALPHA,32);
-        }
-        isoMessage.setValue(16, "WEX",IsoType.ALPHA,4);
-        isoMessage.setValue(17, "",IsoType.ALPHA,6);
-        isoMessage.setValue(18, "",IsoType.ALPHA,7);
-        isoMessage.setValue(19, "",IsoType.ALPHA,4);
-        isoMessage.setValue(20, "",IsoType.ALPHA,4);
-        isoMessage.setValue(21, "",IsoType.ALPHA,4);
-        isoMessage.setValue(22, "5",IsoType.ALPHA,2);
-        isoMessage.setValue(23, "0",IsoType.ALPHA,1);
-        isoMessage.setValue(24, "308339",IsoType.ALPHA,6);
-        isoMessage.setValue(25, "75.00",IsoType.AMOUNT,10);
-        isoMessage.setValue(26, "1",IsoType.ALPHA,2);
-        isoMessage.setValue(27, "75.0000",IsoType.ALPHA,10);
-        isoMessage.setValue(28, "001",IsoType.ALPHA,3);
-        isoMessage.setValue(29, "78965",IsoType.ALPHA,7);
+            isoMessage.setValue(12, "3170621071655", IsoType.ALPHA, 13);
+            isoMessage.setValue(13, "N", IsoType.ALPHA, 1);
+            if (correctRequest) {
+                isoMessage.setValue(14, "00", IsoType.ALPHA, 2);
+                isoMessage.setValue(15, "Approved", IsoType.ALPHA, 32);
+            } else {
+                isoMessage.setValue(14, "01", IsoType.ALPHA, 2);
+                isoMessage.setValue(15, "Declined", IsoType.ALPHA, 32);
+            }
+            isoMessage.setValue(16, "WEX", IsoType.ALPHA, 4);
+            isoMessage.setValue(17, "", IsoType.ALPHA, 6);
+            isoMessage.setValue(18, "", IsoType.ALPHA, 7);
+            isoMessage.setValue(19, "", IsoType.ALPHA, 4);
+            isoMessage.setValue(20, "", IsoType.ALPHA, 4);
+            isoMessage.setValue(21, "", IsoType.ALPHA, 4);
+            isoMessage.setValue(22, "5", IsoType.ALPHA, 2);
+            isoMessage.setValue(23, "0", IsoType.ALPHA, 1);
+            isoMessage.setValue(24, "308339", IsoType.ALPHA, 6);
+            isoMessage.setValue(25, "75.00", IsoType.AMOUNT, 10);
+            isoMessage.setValue(26, "1", IsoType.ALPHA, 2);
+            isoMessage.setValue(27, "75.0000", IsoType.ALPHA, 10);
+            isoMessage.setValue(28, "001", IsoType.ALPHA, 3);
+            isoMessage.setValue(29, "78965", IsoType.ALPHA, 7);
 
-        
-        isoMessage.setCharacterEncoding(
+            isoMessage.setCharacterEncoding(
                     "UTF-8");
             isoMessage.setBinaryBitmap(
                     true);

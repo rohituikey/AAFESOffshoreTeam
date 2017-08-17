@@ -14,6 +14,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -21,6 +28,7 @@ import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
+import jaxb.wextransaction.Transactionfile;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
@@ -50,13 +58,81 @@ public class WexDataGatewayBean {
         log.info("Entry in settle method of WexDataGatewayBean..");
 
         //settleXMLHandler= new WexSettleXmlHandler();
-        String returnXML = settleXMLHandler.formatRequestXML(entity);
-
-        createXmlFile(returnXML);
+//        String returnXML = settleXMLHandler.formatRequestXML(entity);
+//
+//        createXmlFile(returnXML);
         log.info("Exit from settle method of WexDataGatewayBean..");
     }
 
-    private void createXmlFile(String settlexmlrecord) throws
+    public Transactionfile.Batch buildBachTag(String tid, List transactionSettleData) {
+        Transactionfile.Batch batch = new Transactionfile.Batch();
+        String bid = makeBatchId(tid); //getBid(); //get BID Date+time
+        batch.setTid(tid);
+        batch.setApp("AuthREq");
+        batch.setVersion("2");
+        batch.setBid(Integer.parseInt(bid));
+        batch.getTrans().addAll(buildTransactionTag(transactionSettleData));
+        return batch;
+    }
+
+    private List buildTransactionTag(List<SettleEntity> wexDataList) {
+
+        List<Transactionfile.Batch.Trans> entities = new ArrayList<Transactionfile.Batch.Trans>();
+        int i = 1;
+        for (SettleEntity settleEntity : wexDataList) {
+            Transactionfile.Batch.Trans trans = new Transactionfile.Batch.Trans();
+            Transactionfile.Batch.Trans.Pump pump = new Transactionfile.Batch.Trans.Pump();
+            Transactionfile.Batch.Trans.Card card = new Transactionfile.Batch.Trans.Card();
+            trans.setNbr(String.valueOf(i++));
+
+            List<String> nonfuelprodlist = settleEntity.getNonfuelproductgroup();
+            for (String prod : nonfuelprodlist) {
+                List<String> productDetail = Arrays.asList(prod.split(":"));
+                Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
+                product.setQuantity(productDetail.get(0));
+                product.setCode(productDetail.get(1));
+                product.setAmount(productDetail.get(2));
+                product.setPrice(productDetail.get(3));
+                trans.getProduct().add(product);
+            }
+
+            List<String> fuelprodlist = settleEntity.getFuelproductgroup();
+            for (String prod : fuelprodlist) {
+                Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
+                List<String> productDetail = Arrays.asList(prod.split(":"));
+                product.setQuantity(productDetail.get(0));
+                product.setCode(productDetail.get(1));
+                product.setAmount(productDetail.get(2));
+                product.setPrice(productDetail.get(3));
+                trans.getProduct().add(product);
+            }
+
+            pump.setCat(settleEntity.getCatflag());
+            pump.setService(settleEntity.getService());
+            pump.setNbr(Integer.parseInt(settleEntity.getPumpnumber()));
+            pump.setAmount(settleEntity.getPaymentAmount());
+
+            card.setValue(settleEntity.getCardReferene());
+            card.setTrack(settleEntity.getTrackdata2());
+
+            trans.setTime(settleEntity.getTime());
+            trans.setCardCode(settleEntity.getCardType());
+            trans.setType(settleEntity.getTransactionType());
+            trans.setCard(card);
+            trans.setOdometer(settleEntity.getOdometer());
+            trans.setAmount(settleEntity.getPaymentAmount());
+            trans.setAuthref(settleEntity.getAuthreference());
+            trans.setDriver(settleEntity.getDriverId());
+            trans.setVehicle(settleEntity.getVehicleId());
+            trans.setPump(pump);
+            trans.setDate(settleEntity.getTime());
+
+            entities.add(trans);
+        }
+        return entities;
+    }
+
+    public void createXmlFile(String settlexmlrecord) throws
             UnsupportedEncodingException, IOException {
 
         log.info("Entry in createXmlFile method of WexDataGatewayBean..");
@@ -72,6 +148,68 @@ public class WexDataGatewayBean {
             bw.close();
             log.info("Exit from createFile method of WexDataGatewayBean..");
         }
+    }
+
+    public String makeFileSequenceId(String fileSequenceId) {
+
+        log.info("Entry in makeBatchId method of FirstDataGatewayBean..");
+        try {
+            if (fileSequenceId == null || fileSequenceId.trim().isEmpty()) {
+                Calendar cal = Calendar.getInstance();
+                Date currnetDate = new Date();
+                cal.setTime(currnetDate);
+                GregorianCalendar gc = new GregorianCalendar();
+                gc.set(GregorianCalendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH));
+                gc.set(GregorianCalendar.MONTH, cal.get(Calendar.MONTH));
+                gc.set(GregorianCalendar.YEAR, cal.get(Calendar.YEAR));
+                DateFormat df = new SimpleDateFormat("yy");
+                String year = df.format(currnetDate);
+                int JULIAN_DAY = gc.get(GregorianCalendar.DAY_OF_YEAR);
+                String pacckedDay = ("000" + Integer.toString(JULIAN_DAY)).substring((Integer.toString(JULIAN_DAY)).length());
+                fileSequenceId = year + pacckedDay + "001";
+            } else {
+                long oldFileNumber = Long.parseLong(fileSequenceId);
+                oldFileNumber++;
+                fileSequenceId = Long.toString(oldFileNumber);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
+        log.info("Exit from makeBatchId method of FirstDataGatewayBean..");
+        return fileSequenceId;
+    }
+
+    private String makeBatchId(String batchId) {
+
+        log.info("Entry in makeBatchId method of FirstDataGatewayBean..");
+        try {
+            if (batchId == null || batchId.trim().isEmpty()) {
+                Calendar cal = Calendar.getInstance();
+                Date currnetDate = new Date();
+                cal.setTime(currnetDate);
+                GregorianCalendar gc = new GregorianCalendar();
+                gc.set(GregorianCalendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH));
+                gc.set(GregorianCalendar.MONTH, cal.get(Calendar.MONTH));
+                gc.set(GregorianCalendar.YEAR, cal.get(Calendar.YEAR));
+                DateFormat df = new SimpleDateFormat("yy");
+                String year = df.format(currnetDate);
+                int JULIAN_DAY = gc.get(GregorianCalendar.DAY_OF_YEAR);
+                String pacckedDay = ("000" + Integer.toString(JULIAN_DAY)).substring((Integer.toString(JULIAN_DAY)).length());
+                batchId = year + pacckedDay + "001";
+            } else {
+                long oldBatch = Long.parseLong(batchId);
+                oldBatch++;
+                batchId = Long.toString(oldBatch);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
+        log.info("Exit from makeBatchId method of FirstDataGatewayBean..");
+        return batchId;
     }
 
 //    public String getPid() {

@@ -5,6 +5,7 @@ import com.aafes.credit.AddressVerificationResponseType;
 import com.aafes.credit.Message;
 import com.aafes.credit.Message.Header;
 import com.aafes.credit.Message.Request;
+import com.aafes.credit.Message.Request.WEXRequestData;
 import com.aafes.credit.Message.Request.WEXRequestData.FuelProdGroup;
 import com.aafes.credit.Message.Request.WEXRequestData.NonFuelProductGroup;
 import com.aafes.credit.Message.Response;
@@ -62,6 +63,7 @@ public class Authorizer {
     private TransactionDAO transactionDAO;
     private boolean isDuplicateTransaction = false;
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Authorizer.class.getSimpleName());
+    private int maxFuelProdCount, maxNonFuelProdCount, maxlProdCountSale, maxFuelProdCountSale;
 
     public Message authorize(Message cm) {
 
@@ -126,8 +128,7 @@ public class Authorizer {
                 } else {
                     storedTran = null;
                 }
-            } 
-             else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia()) && RequestType.FINAL_AUTH.equalsIgnoreCase(t.getRequestType())) {
+            } else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia()) && RequestType.FINAL_AUTH.equalsIgnoreCase(t.getRequestType())) {
                 LOG.info("Wex FianlAuth........");
                 storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.FINAL_AUTH);
 
@@ -139,7 +140,7 @@ public class Authorizer {
                 } else {
                     storedTran = null;
                 }
-            }else {
+            } else {
                 storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), t.getRequestType());
             }
 
@@ -549,38 +550,42 @@ public class Authorizer {
             }
 
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
-            if (wexReqPayAtPump.getFuelProdGroup() != null && wexReqPayAtPump.getFuelProdGroup().size() > 0) {
-                StringBuilder fuelCodeDetailsStr = null;
-                List<String> fuelProdDataList = new ArrayList<>();
-                List<FuelProdGroup> list = wexReqPayAtPump.getFuelProdGroup();
-                for (FuelProdGroup tmp : list) {
-                    fuelCodeDetailsStr = new StringBuilder();
-                    fuelCodeDetailsStr.append(tmp.getPricePerUnit()).append(",");
-                    fuelCodeDetailsStr.append(tmp.getQuantity()).append(",");
-                    fuelCodeDetailsStr.append(tmp.getFuelProdCode()).append(",");;
-                    fuelCodeDetailsStr.append(tmp.getFuelDollarAmount());
-                    fuelProdDataList.add(fuelCodeDetailsStr.toString());
-                    fuelCodeDetailsStr = null;
+            boolean wexValidateFlag = WEXValidate(wexReqPayAtPump, transaction);
+            if (wexValidateFlag) {
+                if (wexReqPayAtPump.getFuelProdGroup() != null && wexReqPayAtPump.getFuelProdGroup().size() > 0) {
+                    StringBuilder prodCodeDetailsStr = null;
+                    List<String> ProdDataList = new ArrayList<>();
+                    List<FuelProdGroup> list = wexReqPayAtPump.getFuelProdGroup();
+                    //list.size()>2 throws exception
+                    for (FuelProdGroup tmp : list) {
+                        prodCodeDetailsStr = new StringBuilder();
+                        prodCodeDetailsStr.append(tmp.getFuelProdCode());
+                        prodCodeDetailsStr.append(":");
+                        prodCodeDetailsStr.append(tmp.getQuantity());
+                        prodCodeDetailsStr.append(":");
+                        prodCodeDetailsStr.append(tmp.getPricePerUnit());
+                        prodCodeDetailsStr.append(":");
+                        prodCodeDetailsStr.append(tmp.getFuelDollarAmount());
+                        ProdDataList.add(prodCodeDetailsStr.toString());
+                        prodCodeDetailsStr = null;
+                    }
+                    List<NonFuelProductGroup> nList = wexReqPayAtPump.getNonFuelProductGroup();
+                    //  //list.size()>4 throws exception
+                    for (NonFuelProductGroup tmp : nList) {
+                        prodCodeDetailsStr = new StringBuilder();
+                        prodCodeDetailsStr.append(tmp.getNonFuelProdCode());
+                        prodCodeDetailsStr.append(":");
+                        prodCodeDetailsStr.append(tmp.getNonFuelQty());
+                        prodCodeDetailsStr.append(":");
+                        prodCodeDetailsStr.append(tmp.getNonFuelPricePerUnit());
+                        prodCodeDetailsStr.append(":");
+                        prodCodeDetailsStr.append(tmp.getNonFuelAmount());
+                        ProdDataList.add(prodCodeDetailsStr.toString());
+                        prodCodeDetailsStr = null;
+                    }
+                    transaction.setProductGroup(ProdDataList);
+                    ProdDataList = null;
                 }
-                transaction.setFuelProductGroup(fuelProdDataList);
-                fuelProdDataList = null;
-            }
-
-            if (wexReqPayAtPump.getNonFuelProductGroup() != null && wexReqPayAtPump.getNonFuelProductGroup().size() > 0) {
-                StringBuilder nonFuelCodeDetailsStr = null;
-                List<String> nonFuelProdDataList = new ArrayList<>();
-                List<NonFuelProductGroup> list = wexReqPayAtPump.getNonFuelProductGroup();
-                for (NonFuelProductGroup tmp : list) {
-                    nonFuelCodeDetailsStr = new StringBuilder();
-                    nonFuelCodeDetailsStr.append(tmp.getNonFuelPricePerUnit()).append(",");
-                    nonFuelCodeDetailsStr.append(tmp.getNonFuelQty()).append(",");
-                    nonFuelCodeDetailsStr.append(tmp.getNonFuelProdCode()).append(",");
-                    nonFuelCodeDetailsStr.append(tmp.getNonFuelAmount());
-                    nonFuelProdDataList.add(nonFuelCodeDetailsStr.toString());
-                    nonFuelCodeDetailsStr = null;
-                }
-                transaction.setNonFuelProductGroup(nonFuelProdDataList);
-                nonFuelProdDataList = null;
             }
 
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - end */
@@ -719,8 +724,7 @@ public class Authorizer {
 //              }
 //              transaction.setNonFuelqty(nonFuelQty);
 //            }
-    
-        transaction.setPromptDetailCount(wexReqPayAtPump.getPromptDetailCount());
+            transaction.setPromptDetailCount(wexReqPayAtPump.getPromptDetailCount());
         }
         //*Uncommented from 502 to 551 and modified some code
         Request.AddressVerificationService addressVerServc = request.getAddressVerificationService();
@@ -1018,13 +1022,37 @@ public class Authorizer {
         return authTran;
     }
 
-//    private Transaction mapAndUnmapWexFuelNonFuelData(Transaction t){
-//        
-//        if(t.getFuelProductGroup() != null && t.getFuelProductGroup().size() > 0){
-//            
-//        }
-//        
-//        
-//        return t;
-//    }
+    private boolean WEXValidate(WEXRequestData wexReqPayAtPump, Transaction t) {
+        if (configurator.get("TOTAL_FUEL_PRODCODE_ALLWOED_SALE") != null) {
+            maxFuelProdCount = Integer.parseInt(configurator.get("TOTAL_FUEL_PRODCODE_ALLWOED"));
+        } else {
+            LOG.error("Please add TOTAL_FUEL_PRODCODE_ALLWOED_SALE in stargate.properties");
+        }
+        if (configurator.get("TOTAL_NONFUEL_PRODCODE_ALLWOED_SALE") != null) {
+            maxNonFuelProdCount = Integer.parseInt(configurator.get("TOTAL_NONFUEL_PRODCODE_ALLWOED"));
+        } else {
+            LOG.error("Please add TOTAL_NONFUEL_PRODCODE_ALLWOED_SALE in stargate.properties");
+        }
+        if (wexReqPayAtPump.getFuelProdGroup().size() == 0) {
+            this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_NOT_BE_NULL", "PRODUCT_DETAIL_COUNT_NOT_BE_NULL");
+            throw new AuthorizerException("PRODUCT_DETAIL_COUNT_NOT_BE_NULL");
+        } else if (wexReqPayAtPump.getFuelProdGroup().size() > maxFuelProdCount) {
+            this.buildErrorResponse(t, "FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED", "FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
+            throw new AuthorizerException("FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
+        } else if (wexReqPayAtPump.getNonFuelProductGroup().size() > maxNonFuelProdCount) {
+            this.buildErrorResponse(t, "NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED", "NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
+            throw new AuthorizerException("NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
+
+        } else {
+            return true;
+        }
+    }
+
+    private void buildErrorResponse(Transaction t, String reasonCode, String description) {
+        t.setReasonCode(configurator.get(reasonCode));
+        t.setResponseType(ResponseType.DECLINED);
+        t.setDescriptionField(description);
+        LOG.error("Exception/Error occured. reasonCode:" + reasonCode + " .description" + description);
+    }
+
 }

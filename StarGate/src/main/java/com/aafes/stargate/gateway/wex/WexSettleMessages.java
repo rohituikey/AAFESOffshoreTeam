@@ -16,33 +16,40 @@ import com.datastax.driver.mapping.annotations.Table;
 public class WexSettleMessages {
 
     @ClusteringColumn(0)
-    String transactionfiledate;
+    private String transactionfiledate;
     @ClusteringColumn(1)
-    String transactionfiletime;
+    private String transactionfiletime;
     @ClusteringColumn(2)
-    String transactionfilesequence;
+    private String transactionfilesequence;
     @ClusteringColumn(3)
-    String batchtid;
+    private String batchtid;
     @ClusteringColumn(4)
-    String batchid;
-    String batchapp;
-    String batchversion;
-    String transcardCode;
-    String transtype;
-    String transnbr;
-    String transdate;
-    String transtime;
-    String cardtrack;
-    String pumpcat;
-    String pumpservice;
-    String pumpnbr;
-    String pumpamount;
-    String product;
-    String odometer;
-    String amount;
-    String authref;
-    String driverid;
-    String vehicleid;
+    private String batchid;
+    private String batchapp;
+    private String batchversion;
+    private String transcardCode;
+    private String transtype;
+    private String transnbr;
+    private String transdate;
+    private String transtime;
+    private String cardtrack;
+    private String pumpcat;
+    private String pumpservice;
+    private String pumpnbr;
+    private String pumpamount;
+    private String product;
+    private String odometer;
+    private String amount;
+    private String authref;
+    private String driverid;
+    private String vehicleid;
+    private String orderDate = "";
+    private String sequenceId = "";
+    private String settleId = "";
+    private String settlestatus = "";
+    private String time = "";
+    private String catflag = "";
+    private String service = "";
 
     public String getTransactionfiledate() {
         return transactionfiledate;
@@ -228,4 +235,33 @@ public class WexSettleMessages {
         this.vehicleid = vehicleid;
     }
 
+    public void setOrderDate(String orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public void setSequenceId(String sequenceId) {
+        this.sequenceId = sequenceId;
+    }
+
+    public void setSettleId(String settleId) {
+        this.settleId = settleId;
+    }
+
+    public void setSettlestatus(String settlestatus) {
+        this.settlestatus = settlestatus;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public void setCatflag(String catflag) {
+        this.catflag = catflag;
+    }
+
+    public void setService(String service) {
+        this.service = service;
+    }
+
+    
 }

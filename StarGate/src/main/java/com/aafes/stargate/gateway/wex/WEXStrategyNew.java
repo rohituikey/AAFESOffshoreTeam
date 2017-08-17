@@ -14,9 +14,6 @@ import com.aafes.stargate.gateway.vision.Validator;
 import com.aafes.stargate.tokenizer.TokenBusinessService;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
-import com.aafes.stargate.util.TransactionType;
-import com.aafes.starsettler.imported.SettleEntity;
-import com.aafes.starsettler.imported.SettleMessageDAO;
 import com.aafes.starsettler.imported.SettleStatus;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -42,12 +39,11 @@ public class WEXStrategyNew extends BaseStrategy {
 
     private WexSettleMessages wexSettleMessages;
     @EJB
-    private SettleMessageDAO settleMessageDAO;
+    private WexSettleMessageDAO wexSettleMessagesDAO;
     @EJB
     private TokenBusinessService tokenBusinessService;
     Transaction storedTran = null;
-    private static final org.slf4j.Logger LOG
-            = LoggerFactory.getLogger(WEXStrategyNew.class.getSimpleName());
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(WEXStrategyNew.class.getSimpleName());
     private Transaction t;
 
     @Override
@@ -55,7 +51,6 @@ public class WEXStrategyNew extends BaseStrategy {
         LOG.info("WEXStrategyNew.processRequest Entry ... " + transaction.getRrn());
         t = transaction;
         try {
-
             boolean wexFieldsValid = this.validateTransactions(t);
             LOG.info("WEXFieldsValid " + wexFieldsValid + "..." + t.getRrn());
 
@@ -75,7 +70,7 @@ public class WEXStrategyNew extends BaseStrategy {
                     && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
                 LOG.info("WEXStrategyNew.processRequest settlements process");
                 getToken(t);
-                saveToSettle(t);
+                saveToWexSettleMessages(t);
             }
             //ends  here
         } catch (AuthorizerException e) {
@@ -124,9 +119,7 @@ public class WEXStrategyNew extends BaseStrategy {
 
     private void getToken(Transaction t) {
         if ("Pan".equalsIgnoreCase(t.getPan())) {
-
-            if (tokenBusinessService != null
-                    && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
+            if (tokenBusinessService != null && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
                 try {
                     tokenBusinessService.issueToken(t);
                 } catch (ProcessingException e) {
@@ -136,43 +129,45 @@ public class WEXStrategyNew extends BaseStrategy {
         }
     }
 
-    private void saveToSettle(Transaction t) {
-        LOG.info("WEXStrategyNew.saveTOSettle method is started");
-        List<SettleEntity> settleEntityList = new ArrayList<SettleEntity>();
+    private void saveToWexSettleMessages(Transaction t) {
+        LOG.info("WEXStrategyNew.saveToWexSettleMessages method is started");
+        List<WexSettleMessages> wexSettleMessagesList = new ArrayList();
         wexSettleMessages = new WexSettleMessages();
-
-        wexSettleMessages.setTransactionId(t.getTransactionId());
-        wexSettleMessages.setReceiveddate(this.getSystemDate());
-        wexSettleMessages.setOrderNumber(t.getOrderNumber());
-        wexSettleMessages.setSettleDate(this.getSystemDate());
+        wexSettleMessages.setTransactionfiledate("");
+        wexSettleMessages.setTransactionfiletime("");
+        wexSettleMessages.setTransactionfilesequence("");
+        wexSettleMessages.setBatchtid("");
+        wexSettleMessages.setBatchid("");
+        wexSettleMessages.setBatchapp("");
+        wexSettleMessages.setBatchversion("");
+        wexSettleMessages.setTranscardCode("");
+        wexSettleMessages.setTranstype(t.getTransactiontype());
+        wexSettleMessages.setTransnbr("");
+        wexSettleMessages.setTransdate(this.getSystemDate());
+        wexSettleMessages.setTranstime(this.getSystemDate());
+        wexSettleMessages.setCardtrack(t.getTrack2());
+        wexSettleMessages.setPumpcat(t.getPumpNmbr());
+        wexSettleMessages.setPumpservice(t.getPumpNmbr());
+        wexSettleMessages.setPumpnbr(t.getPumpNmbr());
+        wexSettleMessages.setPumpamount(String.valueOf(t.getPumpPrice()));
+        wexSettleMessages.setProduct(t.getProductGroup().toString());
+        wexSettleMessages.setOdometer(t.getOdoMeter());
+        wexSettleMessages.setAmount(String.valueOf(t.getAmount()));
+        wexSettleMessages.setAuthref(t.getAuthNumber());
+        wexSettleMessages.setDriverid(t.getDriverId());
+        wexSettleMessages.setVehicleid(t.getVehicleId());
         wexSettleMessages.setOrderDate(this.getSystemDate());
-        wexSettleMessages.setTransactionType(t.getTransactiontype());
-        wexSettleMessages.setClientLineId(t.getTransactionId());
-        wexSettleMessages.setIdentityUUID(t.getIdentityUuid());
-        wexSettleMessages.setRrn(t.getRrn());
-        wexSettleMessages.setPaymentAmount(Long.toString(t.getAmount()));
-
+        wexSettleMessages.setSequenceId(t.getSequenceNumber());
+        wexSettleMessages.setSettleId("");
         wexSettleMessages.setSettlestatus(SettleStatus.Ready_to_settle);
-        wexSettleMessages.setCardType(t.getMedia());
-        wexSettleMessages.setSettlePlan(t.getPlanNumber());
-        wexSettleMessages.setAuthNum(t.getAuthNumber());
-
-        if (t.getAmount() < 0) {
-            wexSettleMessages.setTransactionType(TransactionType.Refund);
-        } else if (t.getAmount() >= 0) {
-            wexSettleMessages.setTransactionType(TransactionType.Deposit);
-        }
-
-        if (t.getTokenId() != null && !t.getTokenId().trim().isEmpty()) {
-            wexSettleMessages.setCardToken(t.getTokenId());
-            wexSettleMessages.setTokenBankName(t.getTokenBankName());
-        }
-
-        settleEntityList.add(settleEntity);
-        settleMessageDAO.save(settleEntityList);
-        LOG.debug("rrn number in WEXStrategyNew.saveTOSettle is: " + t.getRrn());
-        LOG.info("WEXStrategyNew.saveTOSettle method is ended");
-
+        wexSettleMessages.setTime(this.getSystemDate());
+        wexSettleMessages.setCatflag("");
+        wexSettleMessages.setService("");
+        
+        wexSettleMessagesList.add(wexSettleMessages);
+        wexSettleMessagesDAO.save(wexSettleMessagesList);
+        LOG.debug("rrn number in WEXStrategyNew.saveToWexSettleMessages is: " + t.getRrn());
+        LOG.info("WEXStrategyNew.saveToWexSettleMessages method is ended");
     }
 
     private String getSystemDate() {
@@ -181,12 +176,26 @@ public class WEXStrategyNew extends BaseStrategy {
         String ts = dateFormat.format(date);
         return ts;
     }
-
-     /* ADDED COMMON CODE TO CHECK IF SETTLEMENT STATUS - START */
     
-    public void setSettleMessageDAO(SettleMessageDAO settleMessageDAO) {
-        this.settleMessageDAO = settleMessageDAO;
-    } 
+    public void setWexSettleMessages(WexSettleMessages wexSettleMessages) {
+        this.wexSettleMessages = wexSettleMessages;
+    }
+
+    public void setWexSettleMessagesDAO(WexSettleMessageDAO wexSettleMessagesDAO) {
+        this.wexSettleMessagesDAO = wexSettleMessagesDAO;
+    }
+
+    public void setTokenBusinessService(TokenBusinessService tokenBusinessService) {
+        this.tokenBusinessService = tokenBusinessService;
+    }
+
+    public void setStoredTran(Transaction storedTran) {
+        this.storedTran = storedTran;
+    }
+
+    public void setT(Transaction t) {
+        this.t = t;
+    }
     
     /**
      * @param configurator the configurator to set

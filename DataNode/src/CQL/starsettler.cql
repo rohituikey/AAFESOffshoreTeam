@@ -152,9 +152,9 @@ CREATE TABLE starsettler.batchidxref (
 CREATE TABLE starsettler.fileidref (
     processdate text,
     filesequenceid text,
-    batchid text,
-    PRIMARY KEY (processdate, filesequenceid, batchid)
-) WITH CLUSTERING ORDER BY (filesequenceid DESC, batchid ASC)
+    tid text,
+    PRIMARY KEY (processdate, filesequenceid, tid)
+) WITH CLUSTERING ORDER BY (filesequenceid DESC, tid ASC)
     AND bloom_filter_fp_chance = 0.01
     AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
     AND comment = ''
@@ -176,6 +176,7 @@ CREATE TABLE starsettler.fileidref (
 
 
 alter table starsettler.settlemessages add time text;
+alter table starsettler.settlemessages add date text;
 alter table starsettler.settlemessages add trackdata2 text;
 alter table starsettler.settlemessages add odometer text;
 alter table starsettler.settlemessages add driverId text;
@@ -183,18 +184,12 @@ alter table starsettler.settlemessages add authreference text;
 alter table starsettler.settlemessages add vehicleId text;
 alter table starsettler.settlemessages add catflag text;
 alter table starsettler.settlemessages add service text;
-
-#alter table starsettler.settlemessages add productcode text;
 alter table starsettler.settlemessages add filesequencenumber text;
-alter table starsettler.settlemessages ADD nonfuelproductgroup list<text>;
-alter table starsettler.settlemessages ADD fuelproductgroup list<text>;
+alter table starsettler.settlemessages ADD productgroup list<text>;
 alter table  settlemessages add pumpnumber text;
 
-alter table starsettler.settlemessages add pumpNumber text;
-alter table starsettler.settlemessages DROP nonfuelproductgroup ;
-alter table starsettler.settlemessages DROP fuelproductgroup ;
-alter table starsettler.settlemessages ADD productgroup list<text>;
-alter table starsettler.settlemessages add date text;
+
+
 
 CREATE TABLE starsettler.wexsettlemessages(
 transactionfiledate text,
@@ -202,8 +197,8 @@ transactionfiletime text,
 transactionfilesequence text,
 batchtid text,
 batchid text,
-batchapp text,
-batchversion text,
+appname text,
+appversion text,
 transcardCode text,
 transtype text,
 transnbr text,

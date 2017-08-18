@@ -85,21 +85,31 @@ public class WexDataGatewayBean {
             Transactionfile.Batch.Trans.Card card = new Transactionfile.Batch.Trans.Card();
             trans.setNbr(String.valueOf(i++));
 
-            List<String> nonfuelprodlist = settleEntity.getNonfuelproductgroup();
-            for (String prod : nonfuelprodlist) {
+//            List<String> nonfuelprodlist = settleEntity.getNonfuelproductgroup();
+//            for (String prod : nonfuelprodlist) {
+//                List<String> productDetail = Arrays.asList(prod.split(":"));
+//                Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
+//                product.setQuantity(productDetail.get(0));
+//                product.setCode(productDetail.get(1));
+//                product.setAmount(productDetail.get(2));
+//                product.setPrice(productDetail.get(3));
+//                trans.getProduct().add(product);
+//            }
+//
+//            List<String> fuelprodlist = settleEntity.getFuelproductgroup();
+//            for (String prod : fuelprodlist) {
+//                Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
+//                List<String> productDetail = Arrays.asList(prod.split(":"));
+//                product.setQuantity(productDetail.get(0));
+//                product.setCode(productDetail.get(1));
+//                product.setAmount(productDetail.get(2));
+//                product.setPrice(productDetail.get(3));
+//                trans.getProduct().add(product);
+//            }
+            List<String> prodlist = settleEntity.getProductgroup();
+            for (String prod : prodlist) {
                 List<String> productDetail = Arrays.asList(prod.split(":"));
                 Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
-                product.setQuantity(productDetail.get(0));
-                product.setCode(productDetail.get(1));
-                product.setAmount(productDetail.get(2));
-                product.setPrice(productDetail.get(3));
-                trans.getProduct().add(product);
-            }
-
-            List<String> fuelprodlist = settleEntity.getFuelproductgroup();
-            for (String prod : fuelprodlist) {
-                Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
-                List<String> productDetail = Arrays.asList(prod.split(":"));
                 product.setQuantity(productDetail.get(0));
                 product.setCode(productDetail.get(1));
                 product.setAmount(productDetail.get(2));
@@ -109,7 +119,7 @@ public class WexDataGatewayBean {
 
             pump.setCat(settleEntity.getCatflag());
             pump.setService(settleEntity.getService());
-            pump.setNbr(Integer.parseInt(settleEntity.getPumpnumber()));
+            pump.setNbr(Integer.parseInt(settleEntity.getPumpNumber()));
             pump.setAmount(settleEntity.getPaymentAmount());
 
             card.setValue(settleEntity.getCardReferene());
@@ -125,7 +135,7 @@ public class WexDataGatewayBean {
             trans.setDriver(settleEntity.getDriverId());
             trans.setVehicle(settleEntity.getVehicleId());
             trans.setPump(pump);
-            trans.setDate(settleEntity.getTime());
+            trans.setDate(settleEntity.getDate());
 
             entities.add(trans);
         }

@@ -9,7 +9,6 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.wex.simulator.NBSConnector;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.wex.simulator.NBSFormatter;
-import com.aafes.stargate.util.ResponseType;
 import com.solab.iso8583.IsoMessage;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;

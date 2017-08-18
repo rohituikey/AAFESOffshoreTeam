@@ -6,10 +6,7 @@
 package com.aafes.stargate.gateway.wex.simulator;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
-import com.aafes.stargate.authorizer.entity.TransactionFuelProdGroup;
-import com.aafes.stargate.authorizer.entity.TransactionNonFuelProductGroup;
 import com.aafes.stargate.control.Configurator;
-import com.aafes.stargate.gateway.vision.Common;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.MediaType;
 import com.aafes.stargate.util.RequestType;
@@ -19,19 +16,14 @@ import com.solab.iso8583.MessageFactory;
 import com.solab.iso8583.impl.SimpleTraceGenerator;
 import com.solab.iso8583.parse.ConfigParser;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
-import org.apache.commons.lang3.ArrayUtils;
-import org.jpos.iso.ISOException;
 
 /**
  *
@@ -105,7 +97,7 @@ public class NBSFormatter {
                 isoMsg.setValue(112, Long.toString(transaction.getAmount()), IsoType.AMOUNT, 9);
                 isoMsg.setValue(113, Long.toString(transaction.getAmtPreAuthorized()), IsoType.AMOUNT, 9);
                 isoMsg.setValue(114, transaction.getTransactionId(), IsoType.NUMERIC, 4);
-                isoMsg.setValue(115, createDateAndTime(transaction.getLocalDateTime()), IsoType.DATE10, 12);
+                isoMsg.setValue(115, createDateAndTime(), IsoType.DATE10, 12);
                 isoMsg.setValue(120, transaction.getAuthNumber(), IsoType.ALPHA, 6);
             }
             isoMsg.setValue(116, "2", IsoType.ALPHA, 25);
@@ -340,9 +332,12 @@ public class NBSFormatter {
 //            logResponse = new String(response, 0, length);
 //        }
 //    }
-    public String createDateAndTime(String dt) {
+    public String createDateAndTime() {
         //        YYMMDDhhmmss
         //2017-08-03 09:31:54.316
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date date = new Date();
+        String dt = dateFormat.format(date);
         dt = dt.substring(2, 4) + dt.substring(5, 7) + dt.substring(8, 10) + dt.substring(11, 13) + dt.substring(14, 16) + dt.substring(17, 19);
 
         return dt;

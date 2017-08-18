@@ -157,6 +157,23 @@ public class WEXStrategy extends BaseStrategy {
         settleEntity.setCardType(t.getMedia());
         settleEntity.setSettlePlan(t.getPlanNumber());
         settleEntity.setAuthNum(t.getAuthNumber());
+        settleEntity.setAuthreference(t.getAuthNumber());
+        if(t.getQuantity() != null)
+        settleEntity.setQuantity(t.getQuantity().toString());
+        settleEntity.setProductgroup(t.getProductGroup());
+        settleEntity.setProductcode(t.getProductCode());
+        settleEntity.setReasonCode(t.getReasonCode());
+        settleEntity.setResponseType(t.getResponseType());
+        settleEntity.setCatflag (t.getCatFlag());
+        settleEntity.setOdometer(t.getOdoMeter());
+        settleEntity.setDescriptionField(t.getDriverId());
+        settleEntity.setVehicleId(t.getVehicleId());
+        settleEntity.setTrackdata2(t.getTrack2());
+        settleEntity.setService(t.getServiceCode());
+        settleEntity.setTime(t.getLocalDateTime().substring(11, 22));
+        settleEntity.setSettleDate(t.getLocalDateTime().substring(0, 11));
+        //settleEntity.setFilesequencenumber(t.getf);
+        //2017-08-0715:02:19.935 
 
         if (t.getAmount() < 0) {
             settleEntity.setTransactionType(TransactionType.Refund);
@@ -182,7 +199,7 @@ public class WEXStrategy extends BaseStrategy {
         String ts = dateFormat.format(date);
         return ts;
     }
-
+   
      /* ADDED COMMON CODE TO CHECK IF SETTLEMENT STATUS - START */
     
     public void setSettleMessageDAO(SettleMessageDAO settleMessageDAO) {

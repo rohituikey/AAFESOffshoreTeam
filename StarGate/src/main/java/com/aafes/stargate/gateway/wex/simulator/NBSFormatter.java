@@ -180,8 +180,7 @@ public class NBSFormatter {
                     isoMsg.setValue(++index , productDetails[1], IsoType.AMOUNT, 10);
                     isoMsg.setValue(++index ,productDetails[0], IsoType.NUMERIC, 3);
                     isoMsg.setValue(++index ,productDetails[3], IsoType.AMOUNT, 7);
-
-                    ;
+                    if (index == 128) index = 19;
                 }
             }
 

@@ -120,7 +120,10 @@ public class SettleEntity {
     private String nonefuelamount = "";
     private String productcode = "";
     private String filesequencenumber="";
-    private List<String>  productgroup=null;
+    //added two fields
+    private String pumpNumber = "";
+    private List<String>  productgroup = null;
+    private String date = "";
         
     
     
@@ -690,6 +693,21 @@ public class SettleEntity {
     public void setProductgroup(List<String> productgroup) {
         this.productgroup = productgroup;
     }
-    
+
+    public String getPumpNumber() {
+        return pumpNumber;
+    }
+
+    public void setPumpNumber(String pumpNumber) {
+        this.pumpNumber = pumpNumber;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
     
 }

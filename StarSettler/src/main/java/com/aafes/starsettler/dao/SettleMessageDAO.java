@@ -823,7 +823,7 @@ public class SettleMessageDAO {
                     // settleEntity.setExpirationDate(row.getString("expirationdate"));
                     // settleEntity.setRrn(row.getString("rrn"));
                     settleEntity.setTrackdata2(row.getString("trackdata2"));
-                    settleEntity.setPumpnumber(row.getString("pumpnumber"));
+                    settleEntity.setPumpNumber(row.getString("pumpnumber"));
                     settleEntity.setOdometer(row.getString("odometer"));
                     settleEntity.setTime(row.getString("time"));
                     settleEntity.setCardType(row.getString("cardtype"));
@@ -834,8 +834,8 @@ public class SettleMessageDAO {
                     settleEntity.setCatflag(row.getString("catflag"));
                     settleEntity.setService(row.getString("service"));
                     settleEntity.setFilesequencenumber(row.getString("filesequenceid"));
-                    settleEntity.setNonfuelproductgroup(row.getList("nonfuelproductgroup", String.class));
-                    settleEntity.setFuelproductgroup(row.getList("fuelproductgroup", String.class));
+                    settleEntity.setDate(row.getString("date"));
+                    settleEntity.setProductgroup(row.getList("productgroup", String.class));
                     settleTransactionList.add(settleEntity);
                 }
             }

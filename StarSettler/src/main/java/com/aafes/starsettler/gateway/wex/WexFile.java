@@ -28,8 +28,8 @@ public class WexFile {
 
     private static final Logger log = LoggerFactory.getLogger(WexFile.class.getName());
 
-    @EJB
-    private TokenEndPointService tokenEndPointService;
+//    @EJB
+//    private TokenEndPointService tokenEndPointService;
 
     public void createFile() {
 

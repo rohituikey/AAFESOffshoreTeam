@@ -81,7 +81,6 @@ public class WexDataSettler extends BaseSettler {
             wexService.generateAndSendToVision(xmlString);
             super.updateWexData(settlelist, fileSeqNo);
             super.updateFileidxref(settlelist, fileSeqNo);
-                System.out.println("File not created");
             }
 
 //            List<SettleEntity> transactionSettleData = super.getsettleTransaction(terminalIdList, identityUUID, processDate, SettleStatus.Ready_to_settle);

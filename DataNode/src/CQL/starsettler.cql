@@ -165,6 +165,9 @@ alter table starsettler.settlemessages ADD nonfuelproductgroup list<text>;
 alter table starsettler.settlemessages ADD fuelproductgroup list<text>;
 alter table  settlemessages add pumpnumber text;
 
-alter table starsettler.transactions DROP nonfuelproductgroup ;
-alter table starsettler.transactions DROP fuelproductgroup ;
-alter table starsettler.transactions ADD productgroup list<text>;
+alter table starsettler.settlemessages add pumpNumber text;
+alter table starsettler.settlemessages DROP nonfuelproductgroup ;
+alter table starsettler.settlemessages DROP fuelproductgroup ;
+alter table starsettler.settlemessages ADD productgroup list<text>;
+alter table starsettler.settlemessages add date text;
+

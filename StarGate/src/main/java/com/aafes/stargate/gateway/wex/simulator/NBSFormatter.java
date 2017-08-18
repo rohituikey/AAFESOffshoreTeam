@@ -48,7 +48,7 @@ public class NBSFormatter {
     @EJB
     private Configurator configurator;
 
-    public IsoMessage createRequest(Transaction t) {
+    public IsoMessage createRequest(Transaction t, int retryCount) {
         try {
             MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSconfig.xml");
             mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
@@ -72,11 +72,17 @@ public class NBSFormatter {
             serviceType = configurator.get("SERVICE_TYPE");
 
             transaction = t;
-
-            isoMsg.setValue(10, transaction.getTermId(), IsoType.ALPHA, 15);
-            isoMsg.setValue(12, applicationName, IsoType.ALPHA, 7);
-            isoMsg.setValue(13, applicationVersion, IsoType.NUMERIC, 4);
-            isoMsg.setValue(14, createDateFormat(), IsoType.ALPHA, 5);
+            if(retryCount == 0){
+                isoMsg.setValue(10, transaction.getTermId(), IsoType.ALPHA, 15);
+                isoMsg.setValue(12, applicationName, IsoType.ALPHA, 7);
+                isoMsg.setValue(13, applicationVersion, IsoType.NUMERIC, 4);
+            }else{
+                isoMsg.setValue(10, "", IsoType.ALPHA, 15);
+                isoMsg.setValue(12, "", IsoType.ALPHA, 7);
+                isoMsg.setValue(13, "", IsoType.NUMERIC, 4);
+            }
+            if(retryCount == 0) isoMsg.setValue(14, createDateFormat(), IsoType.ALPHA, 5);
+            else isoMsg.setValue(14, "", IsoType.ALPHA, 5);
             isoMsg.setValue(15, sessionTypeAuth, IsoType.ALPHA, 15);
             isoMsg.setValue(16, transaction.getTransactionId().substring(0, 4), IsoType.ALPHA, 4);
             if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) {

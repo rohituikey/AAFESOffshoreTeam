@@ -44,7 +44,7 @@ public class NBSFormatterTest {
     @Ignore
     @Test
     public void testCreateRequest() {
-        IsoMessage result = testSubject.createRequest(t);
+        IsoMessage result = testSubject.createRequest(t, 0);
         //testSubject.unmarshallTest(result);
  //       testSubject.unmarshallTest(result);
     }

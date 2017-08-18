@@ -5,9 +5,11 @@
  */
 package com.aafes.starsettler.imported;
 
+
 import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
+import java.util.List;
 
 /**
  *
@@ -105,6 +107,27 @@ public class SettleEntity {
     private String authoriztionCode = "";
     private String avsResponseCode = "";
     private String csvResponseCode = "";
+    
+    
+    //field added for wex 
+    private String time = "";
+    private String trackdata2 = "";
+    private String odometer = "";
+    private String driverId = "";
+    private String authreference = "";
+    private String vehicleId = "";
+    private String catflag = "";
+    private String service = "";
+    private String nonefuelamount = "";
+    private String productcode = "";
+    private String filesequencenumber="";
+    private List<String>  productgroup = null;
+        
+    
+    
+    
+    
+    
     
     public String getIdentityUUID() {
         return identityUUID;
@@ -568,6 +591,105 @@ public class SettleEntity {
 
     public void setTokenBankName(String tokenBankName) {
         this.tokenBankName = tokenBankName;
+    }
+    
+    
+    //getter setter for wex fields
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getTrackdata2() {
+        return trackdata2;
+    }
+
+    public void setTrackdata2(String trackdata2) {
+        this.trackdata2 = trackdata2;
+    }
+
+    public String getOdometer() {
+        return odometer;
+    }
+
+    public void setOdometer(String odometer) {
+        this.odometer = odometer;
+    }
+
+    public String getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(String driverId) {
+        this.driverId = driverId;
+    }
+
+    public String getAuthreference() {
+        return authreference;
+    }
+
+    public void setAuthreference(String authreference) {
+        this.authreference = authreference;
+    }
+
+    public String getVehicleId() {
+        return vehicleId;
+    }
+
+    public void setVehicleId(String vehicleId) {
+        this.vehicleId = vehicleId;
+    }
+
+    public String getCatflag() {
+        return catflag;
+    }
+
+    public void setCatflag(String catflag) {
+        this.catflag = catflag;
+    }
+
+    public String getService() {
+        return service;
+    }
+
+    public void setService(String service) {
+        this.service = service;
+    }
+
+    public String getNonefuelamount() {
+        return nonefuelamount;
+    }
+
+    public void setNonefuelamount(String nonefuelamount) {
+        this.nonefuelamount = nonefuelamount;
+    }
+
+    public String getProductcode() {
+        return productcode;
+    }
+
+    public void setProductcode(String productcode) {
+        this.productcode = productcode;
+    }
+
+    public String getFilesequencenumber() {
+        return filesequencenumber;
+    }
+
+    public void setFilesequencenumber(String filesequencenumber) {
+        this.filesequencenumber = filesequencenumber;
+    }
+
+    public List<String> getProductgroup() {
+        return productgroup;
+    }
+
+    public void setProductgroup(List<String> productgroup) {
+        this.productgroup = productgroup;
     }
     
     

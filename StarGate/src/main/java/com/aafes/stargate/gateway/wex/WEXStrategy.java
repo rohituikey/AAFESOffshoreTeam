@@ -171,10 +171,10 @@ public class WEXStrategy extends BaseStrategy {
         settleEntity.setTrackdata2(t.getTrack2());
         settleEntity.setService(t.getServiceCode());
         settleEntity.setTime(t.getLocalDateTime().substring(11, 22));
-        settleEntity.setSettleDate(t.getLocalDateTime().substring(0, 11));
-        //settleEntity.setFilesequencenumber(t.getf);
-        //2017-08-0715:02:19.935 
-
+        settleEntity.setPumpNumber(t.getPumpNmbr());
+        if(t.getPricePerUnit() != null)
+        settleEntity.setUnitCost(t.getPricePerUnit().toString());
+        settleEntity.setDate(t.getLocalDateTime().substring(0, 11));
         if (t.getAmount() < 0) {
             settleEntity.setTransactionType(TransactionType.Refund);
         } else if (t.getAmount() >= 0) {

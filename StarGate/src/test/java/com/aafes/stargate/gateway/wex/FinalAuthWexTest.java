@@ -156,7 +156,6 @@ public class FinalAuthWexTest {
         assertEquals("NO_PRIOR_TRANSACTION", result.getResponse().get(0).getDescriptionField());
     }
 
-    @Ignore
     @Test
     public void testSuccessFinalAuthRequest() {
         sMethodName = "testSuccessFinalAuthRequest";

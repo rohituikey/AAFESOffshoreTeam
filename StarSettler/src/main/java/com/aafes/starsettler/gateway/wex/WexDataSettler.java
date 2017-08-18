@@ -36,12 +36,16 @@ public class WexDataSettler extends BaseSettler {
 
     @EJB
     private WexDataGatewayBean wexGatewayBean;
+    
+    
+    @EJB
+    private WexService wexService;
 
     // Schedular will call this method 
     @Override
     public void run(String identityUUID, String processDate) {
 
-        //wexGatewayBean = new WexDataGatewayBean();
+        wexGatewayBean = new WexDataGatewayBean();
         log.info(" Wex Settlement process started ");
 
         try {
@@ -62,19 +66,23 @@ public class WexDataSettler extends BaseSettler {
             for (String tid : terminalIdList) {
                 List<SettleEntity> transactionSettleData = super.getsettleTransaction(tid, processDate, SettleStatus.Ready_to_settle);
                 if (transactionSettleData.size() != 0) {
-                    settlelist.add(transactionSettleData);
+                    settlelist.addAll(transactionSettleData);
                     Transactionfile.Batch batch = wexGatewayBean.buildBachTag(tid, transactionSettleData);
                     file.getBatch().add(batch);
                 }
             }
 
+            if(!file.getBatch().isEmpty() )
+            {
             StringWriter sw = new StringWriter();
             JAXB.marshal(file, sw);
             xmlString = sw.toString();
 
-            wexGatewayBean.createXmlFile(xmlString);
+            wexService.generateAndSendToVision(xmlString);
             super.updateWexData(settlelist, fileSeqNo);
             super.updateFileidxref(settlelist, fileSeqNo);
+                System.out.println("File not created");
+            }
 
 //            List<SettleEntity> transactionSettleData = super.getsettleTransaction(terminalIdList, identityUUID, processDate, SettleStatus.Ready_to_settle);
 //

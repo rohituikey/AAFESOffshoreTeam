@@ -51,18 +51,14 @@ public class WexDataGatewayBean {
     private String pid;
     private String finalBatchId;
 
-    public void settle(List<SettleEntity> entity) throws
-            ParserConfigurationException, SAXException, IOException,
-            XPathExpressionException, TransformerException, FirstDataException {
-
-        log.info("Entry in settle method of WexDataGatewayBean..");
-
-        //settleXMLHandler= new WexSettleXmlHandler();
-//        String returnXML = settleXMLHandler.formatRequestXML(entity);
+//    public void settle(List<SettleEntity> entity) throws
+//            ParserConfigurationException, SAXException, IOException,
+//            XPathExpressionException, TransformerException, FirstDataException {
 //
-//        createXmlFile(returnXML);
-        log.info("Exit from settle method of WexDataGatewayBean..");
-    }
+//        log.info("Entry in settle method of WexDataGatewayBean..");
+//
+//        log.info("Exit from settle method of WexDataGatewayBean..");
+//    }
 
     public Transactionfile.Batch buildBachTag(String tid, List transactionSettleData) {
         Transactionfile.Batch batch = new Transactionfile.Batch();
@@ -142,23 +138,23 @@ public class WexDataGatewayBean {
         return entities;
     }
 
-    public void createXmlFile(String settlexmlrecord) throws
-            UnsupportedEncodingException, IOException {
-
-        log.info("Entry in createXmlFile method of WexDataGatewayBean..");
-        if (null != settlexmlrecord && !settlexmlrecord.isEmpty()) {
-
-            File file = new File("D:\\Users\\TransactionFile.txt");
-            // if file doesn't exists, then create it
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile())));
-            bw.write(settlexmlrecord);
-            bw.close();
-            log.info("Exit from createFile method of WexDataGatewayBean..");
-        }
-    }
+//    public void createXmlFile(String settlexmlrecord) throws
+//            UnsupportedEncodingException, IOException {
+//
+//        log.info("Entry in createXmlFile method of WexDataGatewayBean..");
+//        if (null != settlexmlrecord && !settlexmlrecord.isEmpty()) {
+//
+//            File file = new File("D:\\Users\\TransactionFile.txt");
+//            // if file doesn't exists, then create it
+//            if (!file.exists()) {
+//                file.createNewFile();
+//            }
+//            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile())));
+//            bw.write(settlexmlrecord);
+//            bw.close();
+//            log.info("Exit from createFile method of WexDataGatewayBean..");
+//        }
+//    }
 
     public String makeFileSequenceId(String fileSequenceId) {
 

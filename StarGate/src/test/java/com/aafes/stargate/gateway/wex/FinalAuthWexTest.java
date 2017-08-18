@@ -36,6 +36,7 @@ import javax.xml.bind.Unmarshaller;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -142,7 +143,7 @@ public class FinalAuthWexTest {
         authorizer.setBaseStrategyFactory(bsf);
     }
 
-    // @Ignore
+    @Ignore
     @Test
     public void testNoAuthorizationFoundForFinalAuthRequest() {
         sMethodName = "testNoAuthorizationFoundForFinalAuthRequest";
@@ -156,6 +157,7 @@ public class FinalAuthWexTest {
         assertEquals("NO_PRIOR_TRANSACTION", result.getResponse().get(0).getDescriptionField());
     }
 
+//    @Ignore
     @Test
     public void testSuccessFinalAuthRequest() {
         sMethodName = "testSuccessFinalAuthRequest";
@@ -175,7 +177,7 @@ public class FinalAuthWexTest {
         assertEquals("100", result.getResponse().get(0).getReasonCode());
     }
 
-//    @Ignore
+       @Ignore
     @Test
     public void testDeclineFinalAuthRequestDueToKeyedTransaction() {
         sMethodName = "testDeclineFinalAuthRequestDueToKeyedTransaction";
@@ -190,6 +192,7 @@ public class FinalAuthWexTest {
         assertEquals("INVALID_INPUT_TYPE", result.getResponse().get(0).getDescriptionField());
     }
 
+    @Ignore
     @Test
     public void testForAlreadySettled() {
         sMethodName = "testSuccessFinalAuthRequest";

@@ -44,6 +44,8 @@ public class WEXStrategy extends BaseStrategy {
     @EJB
     private SettleMessageDAO settleMessageDAO;
     @EJB
+    private WexSettleMessagesDao wexSettleMessagesDao;
+    @EJB
     private TokenBusinessService tokenBusinessService;
     Transaction storedTran = null;
     private static final org.slf4j.Logger LOG
@@ -76,6 +78,7 @@ public class WEXStrategy extends BaseStrategy {
                 LOG.info("WEXStrategy.processRequest settlements process");
                 getToken(t);
                 saveToSettle(t);
+                saveToWexSettle(t);
             }
             //ends  here
         } catch (AuthorizerException e) {
@@ -158,13 +161,14 @@ public class WEXStrategy extends BaseStrategy {
         settleEntity.setSettlePlan(t.getPlanNumber());
         settleEntity.setAuthNum(t.getAuthNumber());
         settleEntity.setAuthreference(t.getAuthNumber());
-        if(t.getQuantity() != null)
-        settleEntity.setQuantity(t.getQuantity().toString());
+        if (t.getQuantity() != null) {
+            settleEntity.setQuantity(t.getQuantity().toString());
+        }
         settleEntity.setProductgroup(t.getProductGroup());
         settleEntity.setProductcode(t.getProductCode());
         settleEntity.setReasonCode(t.getReasonCode());
         settleEntity.setResponseType(t.getResponseType());
-        settleEntity.setCatflag (t.getCatFlag());
+        settleEntity.setCatflag(t.getCatFlag());
         settleEntity.setOdometer(t.getOdoMeter());
         settleEntity.setDescriptionField(t.getDriverId());
         settleEntity.setVehicleId(t.getVehicleId());
@@ -172,8 +176,9 @@ public class WEXStrategy extends BaseStrategy {
         settleEntity.setService(t.getServiceCode());
         settleEntity.setTime(t.getLocalDateTime().substring(11, 22));
         settleEntity.setPumpNumber(t.getPumpNmbr());
-        if(t.getPricePerUnit() != null)
-        settleEntity.setUnitCost(t.getPricePerUnit().toString());
+        if (t.getPricePerUnit() != null) {
+            settleEntity.setUnitCost(t.getPricePerUnit().toString());
+        }
         settleEntity.setDate(t.getLocalDateTime().substring(0, 11));
         if (t.getAmount() < 0) {
             settleEntity.setTransactionType(TransactionType.Refund);
@@ -193,19 +198,56 @@ public class WEXStrategy extends BaseStrategy {
 
     }
 
+//To save in WexSett
+    private void saveToWexSettle(Transaction t) {
+        LOG.info("WexStrategy.saveToWexSettle method is started");
+
+        List<WexSettleEntity> wexSettleEntityList = new ArrayList<WexSettleEntity>();
+        WexSettleEntity wexSettleEntity = new WexSettleEntity();
+
+        wexSettleEntity.setAmount( Long.toString(t.getAmount()));
+        wexSettleEntity.setAuthRef(t.getAuthNumber());
+        wexSettleEntity.setTransactiontype(t.getTransactiontype());
+        wexSettleEntity.setTransactionId(t.getTransactionId());
+        wexSettleEntity.setAppName("");
+        wexSettleEntity.setAppVersion("");
+
+        wexSettleEntity.setTId(t.gettId());
+        //wexSettleEntity.setBatchTId(t.getTid());
+
+        wexSettleEntity.setCardTrack(t.getTrack2());
+        wexSettleEntity.setCatflag(t.getCatFlag());
+        wexSettleEntity.setDriverId(t.getDriverId());
+        wexSettleEntity.setOdometer(t.getOdoMeter());
+        wexSettleEntity.setVehicleId(t.getVehicleId());
+        wexSettleEntity.setService(t.getServiceCode());
+        wexSettleEntity.setProduct(t.getProductGroup());
+        wexSettleEntity.setOrdernumber(t.getOrderNumber());
+        wexSettleEntity.setOrderDate(this.getSystemDate());
+
+        wexSettleEntity.setCatflag(t.getCatFlag());
+        wexSettleEntity.setSettlestatus(SettleStatus.Ready_to_settle);
+        wexSettleEntity.setTransactiontype(t.getTransactiontype());
+
+        wexSettleEntityList.add(wexSettleEntity);
+        wexSettleMessagesDao.saveToWex(wexSettleEntityList);
+        LOG.debug("rrn number in WexStrategy.saveTOSettle is: " + t.getRrn());
+        LOG.info("WexStrategy.saveTOSettle method is ended");
+
+    }
+
     private String getSystemDate() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         String ts = dateFormat.format(date);
         return ts;
     }
-   
-     /* ADDED COMMON CODE TO CHECK IF SETTLEMENT STATUS - START */
-    
+
+    /* ADDED COMMON CODE TO CHECK IF SETTLEMENT STATUS - START */
     public void setSettleMessageDAO(SettleMessageDAO settleMessageDAO) {
         this.settleMessageDAO = settleMessageDAO;
-    } 
-    
+    }
+
     /**
      * @param configurator the configurator to set
      */

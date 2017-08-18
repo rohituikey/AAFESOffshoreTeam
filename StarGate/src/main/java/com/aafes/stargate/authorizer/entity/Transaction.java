@@ -193,6 +193,7 @@ final public class Transaction {
     private String cardSeqNumber;
     private BigDecimal quantity;
     private BigDecimal nonFuelqty;
+    private String tId;
     /* FIELDS ADDED FOR WEX USE CASE - end */
     
     /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
@@ -1275,6 +1276,14 @@ final public class Transaction {
 
     public void setPromptDetailCount(BigDecimal promptDetailCount) {
         this.promptDetailCount = promptDetailCount;
+    }
+
+    public String gettId() {
+        return tId;
+    }
+
+    public void settId(String tId) {
+        this.tId = tId;
     }
     
     

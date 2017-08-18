@@ -120,9 +120,7 @@ public class SettleEntity {
     private String nonefuelamount = "";
     private String productcode = "";
     private String filesequencenumber="";
-    private List<String>  nonfuelproductgroup=null;
-    private List<String>  fuelproductgroup=null;
-    private String pumpnumber;
+    private List<String>  productgroup=null;
         
     
     
@@ -677,22 +675,6 @@ public class SettleEntity {
         this.productcode = productcode;
     }
 
-    public List<String> getNonfuelproductgroup() {
-        return nonfuelproductgroup;
-    }
-
-    public void setNonfuelproductgroup(List<String> nonfuelproductgroup) {
-        this.nonfuelproductgroup = nonfuelproductgroup;
-    }
-
-    public List<String> getFuelproductgroup() {
-        return fuelproductgroup;
-    }
-
-    public void setFuelproductgroup(List<String> fuelproductgroup) {
-        this.fuelproductgroup = fuelproductgroup;
-    }
-
     public String getFilesequencenumber() {
         return filesequencenumber;
     }
@@ -701,14 +683,13 @@ public class SettleEntity {
         this.filesequencenumber = filesequencenumber;
     }
 
-    public String getPumpnumber() {
-        return pumpnumber;
+    public List<String> getProductgroup() {
+        return productgroup;
     }
 
-    public void setPumpnumber(String pumpnumber) {
-        this.pumpnumber = pumpnumber;
+    public void setProductgroup(List<String> productgroup) {
+        this.productgroup = productgroup;
     }
-    
     
     
 }

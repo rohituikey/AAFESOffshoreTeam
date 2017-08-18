@@ -66,6 +66,98 @@ public class WexSettleXmlHandler {
         return "";
     }
 
+    private static String getformatedDate() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        Date date = new Date();
+        String ts = dateFormat.format(date);
+        return ts;
+    }
+
+    private static String getformatedTime() {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("HHmmss");
+        return sdf.format(cal.getTime());
+    }
+
+    private static Transactionfile getTransaction(List<SettleEntity> wexDataList) {
+
+        String currentTid = null, oldTid = null;
+        int batchid = 1;
+        Transactionfile fileObj = new Transactionfile();
+
+        for (SettleEntity settleEntity : wexDataList) {
+
+            Trans trans = new Trans();
+            Pump pump = new Pump();
+            Card card = new Card();
+            int i = 0, transactionnumber = 1;
+            currentTid = settleEntity.getLineId();
+
+            Batch batch = new Batch();
+            if (oldTid == null) {
+                oldTid = currentTid;
+            }
+            if (!currentTid.equalsIgnoreCase(oldTid)) {
+                oldTid = currentTid;
+            }
+            batch.setTid(currentTid);
+            batch.setBid(batchid++);
+//            List<String> nonfuelprodlist = settleEntity.getNonfuelproductgroup();
+//            for (String str : nonfuelprodlist) {
+//                List<String> productDetail = Arrays.asList(str.split(","));
+//                Product product = new Product();
+//                product.setAmount(productDetail.get(0));
+//                trans.getProduct().add(product);
+//            }
+//
+//            List<String> fuelprodlist = settleEntity.getFuelproductgroup();
+//            for (String str : fuelprodlist) {
+//                Product product = new Product();
+//                product.setAmount(str);
+//                product.setAmount(settleEntity.getNonefuelamount());
+//                product.setPrice(settleEntity.getUnitCost());
+//                product.setQuantity(settleEntity.getQuantity());
+//                trans.getProduct().add(product);
+//            }
+//modified as per modifications in settleEntity class.
+            List<String> prodlist = settleEntity.getProductgroup();
+            for (String str : prodlist) {
+                Product product = new Product();
+                product.setAmount(str);
+                product.setAmount(settleEntity.getNonefuelamount());
+                product.setPrice(settleEntity.getUnitCost());
+                product.setQuantity(settleEntity.getQuantity());
+                trans.getProduct().add(product);
+            }
+
+            pump.setCat(settleEntity.getCatflag());
+            pump.setService(settleEntity.getService());
+            pump.setNbr(i++);
+            pump.setAmount(settleEntity.getNonefuelamount());
+            card.setValue(settleEntity.getCardReferene());
+            card.setTrack(settleEntity.getTrackdata2());
+            trans.setNbr(String.format("%04d", transactionnumber));
+            trans.setTime(settleEntity.getTime());
+            trans.setCard(card);
+            trans.setOdometer(settleEntity.getOdometer());
+            trans.setAmount(settleEntity.getPaymentAmount());
+            trans.setAuthref(settleEntity.getAuthreference());
+            trans.setDriver(settleEntity.getDriverId());
+            trans.setVehicle(settleEntity.getVehicleId());
+            trans.setPump(pump);
+            trans.setDate(settleEntity.getSettleDate());
+            batch.getTrans().add(trans);
+            batch.setApp("AuthReq");
+            batch.setVersion("1");
+
+            fileObj.getBatch().add(batch);
+            fileObj.setDate(settleEntity.getSettleDate());
+            fileObj.setTime(settleEntity.getTime());
+            fileObj.setSequence("00001");
+
+        }
+        return fileObj;
+    }
 //    private static String getformatedDate() {
 //        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 //        Date date = new Date();

@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +27,9 @@ public class NBSConnector {
 
             //creating connections
             if(null==nbsSocket || nbsSocket.isClosed()){
-            nbsSocket = new Socket("localhost", 2000);
+            nbsSocket = new Socket();
+            nbsSocket.connect(new InetSocketAddress("localhost", 2000), 1);
+            nbsSocket.setSoTimeout(1);
             LOG.info("Connection Established with NBS socket server");
             LOG.log(Level.INFO, "{0}-----------{1}---------------{2}", new Object[]{nbsSocket.getClass(), nbsSocket.getLocalAddress(), nbsSocket.getLocalPort()});
             } 
@@ -45,6 +48,10 @@ public class NBSConnector {
         } catch (IOException ex) {
             Logger.getLogger(NBSConnector.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("nbsclient.NBSClient.main()" + ex);
+        }catch (Exception ex) {
+            Logger.getLogger(NBSConnector.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("nbsclient.NBSClient.main()" + ex);
+            throw ex;
         }
         return strResponse;
     }

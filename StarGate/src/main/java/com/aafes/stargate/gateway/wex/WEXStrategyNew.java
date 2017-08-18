@@ -37,9 +37,9 @@ public class WEXStrategyNew extends BaseStrategy {
     @EJB
     private WEXValidator wEXValidator;
 
-    private WexSettleMessages wexSettleMessages;
+    private WexSettleEntiry wexSettleMessages;
     @EJB
-    private WexSettleMessageDAO wexSettleMessagesDAO;
+    private WexSettleEntityDAO wexSettleMessagesDAO;
     @EJB
     private TokenBusinessService tokenBusinessService;
     Transaction storedTran = null;
@@ -131,8 +131,8 @@ public class WEXStrategyNew extends BaseStrategy {
 
     private void saveToWexSettleMessages(Transaction t) {
         LOG.info("WEXStrategyNew.saveToWexSettleMessages method is started");
-        List<WexSettleMessages> wexSettleMessagesList = new ArrayList();
-        wexSettleMessages = new WexSettleMessages();
+        List<WexSettleEntiry> wexSettleMessagesList = new ArrayList();
+        wexSettleMessages = new WexSettleEntiry();
         wexSettleMessages.setTransactionFileDate("");
         wexSettleMessages.setTransactionFileTime("");
         wexSettleMessages.setTransactionFileSequence("");
@@ -184,11 +184,11 @@ public class WEXStrategyNew extends BaseStrategy {
         return ts;
     }
     
-    public void setWexSettleMessages(WexSettleMessages wexSettleMessages) {
+    public void setWexSettleMessages(WexSettleEntiry wexSettleMessages) {
         this.wexSettleMessages = wexSettleMessages;
     }
 
-    public void setWexSettleMessagesDAO(WexSettleMessageDAO wexSettleMessagesDAO) {
+    public void setWexSettleMessagesDAO(WexSettleEntityDAO wexSettleMessagesDAO) {
         this.wexSettleMessagesDAO = wexSettleMessagesDAO;
     }
 

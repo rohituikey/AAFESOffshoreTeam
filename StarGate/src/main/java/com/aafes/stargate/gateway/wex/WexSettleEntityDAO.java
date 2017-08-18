@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author ganjis
  */
 @Stateless
-public class WexSettleMessageDAO {
+public class WexSettleEntityDAO {
 
     /**
      * @param mapper the mapper to set
@@ -33,7 +33,7 @@ public class WexSettleMessageDAO {
         this.mapper = mapper;
     }
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(WexSettleMessageDAO.class.getSimpleName());
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(WexSettleEntityDAO.class.getSimpleName());
 
     private Mapper mapper;
     private CassandraSessionFactory factory;
@@ -43,11 +43,11 @@ public class WexSettleMessageDAO {
     @PostConstruct
     public void postConstruct() {
         Session session = factory.getSession();
-        setMapper(new MappingManager(session).mapper(WexSettleMessages.class));
+        setMapper(new MappingManager(session).mapper(WexSettleEntiry.class));
     }
 
-    public void save(List<WexSettleMessages> wexSettleMessagesList) {
-        for (WexSettleMessages wexSettleMessages : wexSettleMessagesList) {
+    public void save(List<WexSettleEntiry> wexSettleMessagesList) {
+        for (WexSettleEntiry wexSettleMessages : wexSettleMessagesList) {
             mapper.save(wexSettleMessages);
         }
     }
@@ -56,17 +56,17 @@ public class WexSettleMessageDAO {
      *
      * @param wexSettleMessages
      */
-    public void update(WexSettleMessages wexSettleMessages) {
+    public void update(WexSettleEntiry wexSettleMessages) {
         //Write a update query
         // mapper.delete(settleEntity);
         mapper.save(wexSettleMessages);
     }
 
-    public WexSettleMessages find(String transactionfiledate, String transactionfiletime, String transactionfilesequence, 
+    public WexSettleEntiry find(String transactionfiledate, String transactionfiletime, String transactionfilesequence, 
             String batchtid, String batchid) {
         LOG.info("WexSettleMessageDAO.find method is started");
 
-        WexSettleMessages wexSettleMessages = null;
+        WexSettleEntiry wexSettleMessages = null;
         String query = "";
         query = "SELECT * FROM stargate.wexsettlemessages "
                 + "where transactionfiledate = '" + transactionfiledate + "', "
@@ -77,7 +77,7 @@ public class WexSettleMessageDAO {
         LOG.info("Query : " + query);
         ResultSet result = factory.getSession().execute(query);
         for (Row row : result) {
-            wexSettleMessages = new WexSettleMessages();
+            wexSettleMessages = new WexSettleEntiry();
             wexSettleMessages.setTransactionFileDate(row.getString("transactionfiledate"));
             wexSettleMessages.setTransactionFileTime(row.getString("transactionfiletime"));
             wexSettleMessages.setTransactionFileSequence(row.getString("transactionfilesequence"));
@@ -113,13 +113,13 @@ public class WexSettleMessageDAO {
         return wexSettleMessages;
     }
     
-    public List<WexSettleMessages> returnTransactions() {
-        List<WexSettleMessages> result = new ArrayList<>();
+    public List<WexSettleEntiry> returnTransactions() {
+        List<WexSettleEntiry> result = new ArrayList<>();
         String query = "Select * from Stargate.transactions";
         resultSet = session.execute(query);
 
-        Result<WexSettleMessages> resultTrans = mapper.map(resultSet);
-        for(WexSettleMessages t : resultTrans){
+        Result<WexSettleEntiry> resultTrans = mapper.map(resultSet);
+        for(WexSettleEntiry t : resultTrans){
             result.add(t);
         }
         return result;

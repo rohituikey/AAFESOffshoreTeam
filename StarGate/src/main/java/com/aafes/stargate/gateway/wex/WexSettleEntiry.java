@@ -13,7 +13,7 @@ import com.datastax.driver.mapping.annotations.Table;
  * @author burangir
  */
 @Table(keyspace = "stargate", name = "wexsettlemessages")
-public class WexSettleMessages {
+public class WexSettleEntiry {
 
     @ClusteringColumn(0)
     private String transactionFileDate;

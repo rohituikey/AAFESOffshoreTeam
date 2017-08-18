@@ -96,7 +96,7 @@ public class NBSFormatter {
                 isoMsg.setValue(15, captureOnlyRequest, IsoType.ALPHA, 15);
                 isoMsg.setValue(112, Long.toString(transaction.getAmount()), IsoType.AMOUNT, 9);
                 isoMsg.setValue(113, Long.toString(transaction.getAmtPreAuthorized()), IsoType.AMOUNT, 9);
-                isoMsg.setValue(114, transaction.getTransactionId(), IsoType.NUMERIC, 4);
+                isoMsg.setValue(114, transaction.getTransactionId().substring(0, 4), IsoType.NUMERIC, 4);
                 isoMsg.setValue(115, createDateAndTime(), IsoType.DATE10, 12);
                 isoMsg.setValue(120, transaction.getAuthNumber(), IsoType.ALPHA, 6);
             }
@@ -164,18 +164,18 @@ public class NBSFormatter {
 //                }
 //            }
             //}
-            index = 125;
+            index = 124;
             if (null != t.getProductGroup() && (t.getProductGroup().size()) > 0) {
                 for (String nonFuelString : t.getProductGroup()) {
                     if(nonFuelString.contains(":")){
                       productDetails = nonFuelString.split(":");
                     }
-                    isoMsg.setValue(index,productDetails[0], IsoType.AMOUNT, 9);
-                    isoMsg.setValue(index + 1, productDetails[1], IsoType.AMOUNT, 10);
-                    isoMsg.setValue(index + 2,productDetails[2], IsoType.NUMERIC, 3);
-                    isoMsg.setValue(index + 3,productDetails[3], IsoType.AMOUNT, 7);
+                    isoMsg.setValue(++index,productDetails[2], IsoType.AMOUNT, 9);
+                    isoMsg.setValue(++index , productDetails[1], IsoType.AMOUNT, 10);
+                    isoMsg.setValue(++index ,productDetails[0], IsoType.NUMERIC, 3);
+                    isoMsg.setValue(++index ,productDetails[3], IsoType.AMOUNT, 7);
 
-                    index = index + 4;
+                    ;
                 }
             }
 

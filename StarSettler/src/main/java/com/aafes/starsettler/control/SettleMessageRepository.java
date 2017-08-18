@@ -83,8 +83,8 @@ public class SettleMessageRepository {
         settleMessageDAO.updateWexData(Wexdata, In_Progress);
     }
     
-     public void updateFileSeqxRef(List<SettleEntity> wexData, String seqNo) {
-        settleMessageDAO.updateFileSeqxRef(wexData, seqNo);
+     public void updateFileSeqxRef(List<String> tids, String seqNo) {
+        settleMessageDAO.updateFileSeqxRef(tids, seqNo);
     }
     
     

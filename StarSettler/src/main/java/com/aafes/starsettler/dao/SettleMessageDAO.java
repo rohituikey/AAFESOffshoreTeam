@@ -23,6 +23,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import jaxb.wextransaction.Transactionfile;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -686,6 +687,7 @@ public class SettleMessageDAO {
                 String query = "update starsettler.settlemessages set "
                         + " filesequenceid = '" + settleData.getSequenceId()
                         + "', settlestatus = '" + status
+                        
                         + "' where receiveddate = '" + settleData.getReceiveddate()
                         + "' and ordernumber = '" + settleData.getOrderNumber()
                         + "' and settledate='" + settleData.getSettleDate()
@@ -701,18 +703,17 @@ public class SettleMessageDAO {
         }
     }
 
-    public void updateFileSeqxRef(List<SettleEntity> wexData, String seqNo) {
+    public void updateFileSeqxRef(List<String> tids, String SeqNo ) {
 
         LOG.info("Entry in updateFileSeqxRef method of Settlemessagedao..");
         factory = new CassandraSessionFactory();
 
         String processDate = this.getProcessDate();
 
-        for (SettleEntity settleData : wexData) {
-            String query = "insert into starsettler.fileidref(receiveddate, filesequenceid , ordernumber, processdate) "
-                    + "VALUES ('" + settleData.getReceiveddate() + "', "
-                    + "'" + settleData.getSequenceId() + "',"
-                    + "'" + settleData.getOrderNumber() + "',"
+        for (String tid : tids) {
+            String query = "insert into starsettler.fileidref(filesequenceid , batchid, processdate) "
+                    + "VALUES ('" + SeqNo + "', "
+                    + "'" + tid + "',"
                     + "'" + processDate + "');";
             factory.getSession().execute(query);
         }
@@ -871,5 +872,5 @@ public class SettleMessageDAO {
         return columns;
 
     }
-
+    
 }

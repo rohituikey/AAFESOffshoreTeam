@@ -67,7 +67,7 @@ public class WexService {
 
     }
 
-    public void generateAndSendToVision(String settlexmlrecord) {
+    public void generateAndSendToNBS(String settlexmlrecord) {
         log.info("Triggered.");
 
         try {
@@ -81,7 +81,7 @@ public class WexService {
             sftp.setTargetAttributes("/FTADV:RECFM=FB,LRECL=37,C=IBM-1047,D=IBM-1047,I=unix,J=mvs,F=record/");
             sftp.setTargetName(this.destination);
             try {
-                String targetName = sourcePath + "visionSFTP_" + createdDate;
+                String targetName = sourcePath + "wexSFTP_" + createdDate;
                 log.info("Sending to " + targetName + ".");
                 if (this.password.equals("none")) {
                     log.info("Using identity.");

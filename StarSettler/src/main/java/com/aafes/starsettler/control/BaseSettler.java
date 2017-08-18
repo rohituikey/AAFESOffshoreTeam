@@ -68,9 +68,9 @@ public abstract class BaseSettler {
         repository.updateWexData(WexData, seqNo);
     }
 
-    public void updateFileidxref(List<SettleEntity> wexData, String sequenceNumber) {
+    public void updateFileidxref(List<String> tids, String sequenceNumber) {
         repository = new SettleMessageRepository();
-        repository.updateFileSeqxRef(wexData, sequenceNumber);
+        repository.updateFileSeqxRef(tids,sequenceNumber);
     }
 
     public List<String> getTIDList() {

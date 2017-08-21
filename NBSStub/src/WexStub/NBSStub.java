@@ -5,8 +5,6 @@
  */
 package WexStub;
 
-import org.jpos.iso.ISOException;
-
 /**
  *
  * @author uikuyr
@@ -14,5 +12,6 @@ import org.jpos.iso.ISOException;
 public interface NBSStub {
     
     public String getResponse(String Request);
+    public String unpackIso8583(String req);
     
 }

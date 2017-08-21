@@ -11,12 +11,11 @@ import java.util.List;
 
 /**
  *
- * @author burangir
+ * @author alugumetlas
  */
-@Table(keyspace = "starsettler", name = "wexsettlemessages")
+@Table(keyspace = "stargate", name = "wexsettlemessages")
 public class WexSettleEntity {
-
-    @ClusteringColumn(0)
+   @ClusteringColumn(0)
     private String transactionFileDate;
     @ClusteringColumn(1)
     private String transactionFileTime;
@@ -32,6 +31,7 @@ public class WexSettleEntity {
     private String AppName;
     private String AppVersion;
     private String transcardCode;
+    private String transType;
     private String transNbr;
     private String transDate;
     private String transTime;
@@ -132,6 +132,14 @@ public class WexSettleEntity {
 
     public void setTranscardCode(String transcardCode) {
         this.transcardCode = transcardCode;
+    }
+
+    public String getTransType() {
+        return transType;
+    }
+
+    public void setTransType(String transType) {
+        this.transType = transType;
     }
 
     public String getTransNbr() {
@@ -301,7 +309,5 @@ public class WexSettleEntity {
     public void setService(String service) {
         this.service = service;
     }
-
-   
-
+ 
 }

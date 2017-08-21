@@ -34,6 +34,7 @@ public class NBSServer {
             NBSStub nBSStub = new NBSStubImpl();
             LOG.info("Logging from NBS Server. Initiating Socket Server");
             ServerSocket NbsSocket = new ServerSocket(2000);
+            NbsSocket.setSoTimeout(0);
 
             connectionSocket = NbsSocket.accept();
             LOG.info("Connection successfully established");

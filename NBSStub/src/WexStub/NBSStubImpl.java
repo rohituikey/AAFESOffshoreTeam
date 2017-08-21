@@ -140,14 +140,14 @@ public class NBSStubImpl implements NBSStub {
         byte[] buf = req.getBytes();
         try {
             MessageFactory mfact;
-            SCHEMA_PATH = "src/XML/NBSconfig.xml";
+            SCHEMA_PATH = "src/XML/NBSConfig.xml";
             try {
                 mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
             } catch (IOException e) {
-                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSconfig.xml";
+                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSConfig.xml";
                 mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
             } catch (Exception e) {
-                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSconfig.xml";
+                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSConfig.xml";
                 mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
             }
             String bitmapByte = javax.xml.bind.DatatypeConverter.printHexBinary(Arrays.copyOfRange(buf, 4, 12));

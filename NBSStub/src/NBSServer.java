@@ -34,6 +34,7 @@ public class NBSServer {
             NBSStub nBSStub = new NBSStubImpl();
             LOG.info("Logging from NBS Server. Initiating Socket Server");
             ServerSocket NbsSocket = new ServerSocket(2000);
+            //NbsSocket.setSoTimeout(1);
 
             connectionSocket = NbsSocket.accept();
             LOG.info("Connection successfully established");
@@ -47,12 +48,19 @@ public class NBSServer {
             BufferedWriter writeResponse
                     = new BufferedWriter(new OutputStreamWriter(connectionSocket.getOutputStream()));
 
-            String response = nBSStub.getResponse(Input);
+            String response = null;
+            try{
+                response = nBSStub.unpackIso8583(Input);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
 
             LOG.log(Level.INFO, "sending response as {0}", response);
             writeResponse.write(response+ " \r");
             writeResponse.flush();
         } catch (IOException ex) {
+            Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (Exception ex) {
             Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
         }finally{
             try { 

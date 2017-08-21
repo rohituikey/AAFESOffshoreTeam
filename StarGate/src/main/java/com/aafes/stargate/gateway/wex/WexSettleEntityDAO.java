@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author ganjis
+ * @author author burangir
  */
 @Stateless
 public class WexSettleEntityDAO {

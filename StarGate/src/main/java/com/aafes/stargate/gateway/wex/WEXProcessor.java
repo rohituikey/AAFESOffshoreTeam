@@ -43,6 +43,7 @@ public class WEXProcessor {
     public Transaction processWexRequests(Transaction t) throws Exception{
         LOGGER.info("WEXProcessor.processWexRequests mothod started");
         try {
+            dupCheckCounter = 0;
             if(nBSFormatter == null) nBSFormatter = new NBSFormatter();
             iSOMsg = nBSFormatter.createRequest(t, 0);
             clientObj = new NBSConnector();

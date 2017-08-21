@@ -172,6 +172,12 @@
             <artifactId>keyczar</artifactId>
             <version>0.71g</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.sun/rt -->
+        <!--dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>rt</artifactId>
+            <version>1.5.0_06</version>
+        </dependency-->
     </dependencies>
     <build>
         <plugins>

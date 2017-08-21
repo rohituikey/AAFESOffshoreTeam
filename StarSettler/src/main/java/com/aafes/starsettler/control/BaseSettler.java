@@ -5,6 +5,7 @@
  */
 package com.aafes.starsettler.control;
 
+import com.aafes.starsettler.dao.SettleMessageDAO;
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.util.SettlerType;
 import java.util.List;
@@ -67,8 +68,9 @@ public abstract class BaseSettler {
         repository.updateWexData(WexData, seqNo);
     }
 
-    public void updateFileidxref(List<SettleEntity> wexData, String sequenceNumber) {
-        repository.updateFileSeqxRef(wexData, sequenceNumber);
+    public void updateFileidxref(List<String> tids, String sequenceNumber) {
+        repository = new SettleMessageRepository();
+        repository.updateFileSeqxRef(tids,sequenceNumber);
     }
 
     public List<String> getTIDList() {

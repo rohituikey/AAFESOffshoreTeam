@@ -74,7 +74,8 @@ public class WEXStrategy extends BaseStrategy {
                     && (t.getRequestType().equalsIgnoreCase(RequestType.SALE)
                     || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     || RequestType.REFUND.equals(t.getRequestType()))
-                    && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
+                    //&& ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())
+                    ) {
                 LOG.info("WEXStrategy.processRequest settlements process");
                 getToken(t);
                 saveToSettle(t);
@@ -212,7 +213,7 @@ public class WEXStrategy extends BaseStrategy {
         wexSettleEntity.setAppName("");
         wexSettleEntity.setAppVersion("");
 
-        wexSettleEntity.setTId(t.gettId());
+        wexSettleEntity.setTId(t.getTid());
         //wexSettleEntity.setBatchTId(t.getTid());
 
         wexSettleEntity.setCardTrack(t.getTrack2());
@@ -261,4 +262,13 @@ public class WEXStrategy extends BaseStrategy {
     public void setwEXValidator(WEXValidator wEXValidator) {
         this.wEXValidator = wEXValidator;
     }
+
+    public WexSettleMessagesDao getWexSettleMessagesDao() {
+        return wexSettleMessagesDao;
+    }
+
+    public void setWexSettleMessagesDao(WexSettleMessagesDao wexSettleMessagesDao) {
+        this.wexSettleMessagesDao = wexSettleMessagesDao;
+    }
+    
 }

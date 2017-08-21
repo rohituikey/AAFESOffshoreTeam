@@ -5,7 +5,6 @@
  */
 package com.aafes.starsettler.imported;
 
-import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.CassandraSessionFactory;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;

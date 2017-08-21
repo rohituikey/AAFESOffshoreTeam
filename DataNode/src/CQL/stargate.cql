@@ -235,3 +235,38 @@ alter table stargate.transactions DROP fuelproductgroup ;
 alter table stargate.transactions ADD productgroup list<text>;
 alter table stargate.transactions ADD tid text;
 
+
+CREATE TABLE stargate.wexsettlemessages(
+transactionfiledate text,
+transactionfiletime text,
+transactionfilesequence text,
+tid text,
+AppName text,
+AppVersion text,
+transcardCode text,
+transnbr text,
+transdate text,
+transtime text,
+cardtrack text,
+pumpcat text,
+pumpservice text,
+pumpnbr text,
+pumpamount text,
+product list<text>,
+odometer text,
+amount text,
+authref text,
+driverid text,
+vehicleid text,
+orderDate text,
+sequenceId text,
+settleId text,
+settlestatus text,
+time text,
+catflag text,
+service text,
+transactionId text,
+ordernumber text, 
+transactiontype text,
+PRIMARY KEY (transactionfiledate, transactionfiletime, transactionfilesequence, transactionId, ordernumber , transactiontype));
+

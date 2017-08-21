@@ -5,15 +5,9 @@
  */
 package com.aafes.starsettler.gateway.wex;
 
+import com.aafes.stargate.imported.WexSettleEntity;
 import com.aafes.starsettler.entity.SettleEntity;
-import com.aafes.starsettler.gateway.fdms.FirstDataException;
 import com.aafes.starsettler.gateway.fdms.FirstDataGatewayBean;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,12 +19,8 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
 import jaxb.wextransaction.Transactionfile;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -59,6 +49,63 @@ public class WexDataGatewayBean {
 //
 //        log.info("Exit from settle method of WexDataGatewayBean..");
 //    }
+    public Transactionfile.Batch buildWexBachTag(String tid, List transactionSettleData) {
+        Transactionfile.Batch batch = new Transactionfile.Batch();
+        String bid = makeBatchId(tid); //getBid(); //get BID Date+time
+        batch.setTid(tid);
+        batch.setApp("AuthREq");
+        batch.setVersion("2");
+        batch.setBid(Integer.parseInt(bid));
+        batch.getTrans().addAll(buildWexTransactionTag(transactionSettleData));
+        return batch;
+    }
+
+    private List buildWexTransactionTag(List<WexSettleEntity> wexDataList) {
+
+        List<Transactionfile.Batch.Trans> entities = new ArrayList<Transactionfile.Batch.Trans>();
+        int i = 1;
+
+        for (WexSettleEntity settleEntity : wexDataList) {
+            Transactionfile.Batch.Trans trans = new Transactionfile.Batch.Trans();
+            Transactionfile.Batch.Trans.Pump pump = new Transactionfile.Batch.Trans.Pump();
+            Transactionfile.Batch.Trans.Card card = new Transactionfile.Batch.Trans.Card();
+            trans.setNbr(String.valueOf(i++));
+
+            List<String> prodlist = settleEntity.getProduct();
+            for (String prod : prodlist) {
+                List<String> productDetail = Arrays.asList(prod.split(":"));
+                Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
+                product.setQuantity(productDetail.get(0));
+                product.setCode(productDetail.get(1));
+                product.setAmount(productDetail.get(2));
+                product.setPrice(productDetail.get(3));
+                trans.getProduct().add(product);
+            }
+
+            pump.setCat(settleEntity.getCatflag());
+            pump.setService(settleEntity.getService());
+            pump.setNbr(Integer.parseInt(settleEntity.getPumpNbr()));
+            pump.setAmount(settleEntity.getPumpAmount());
+
+            card.setValue(settleEntity.getCardTrack());// card reference not available
+            card.setTrack(settleEntity.getCardTrack());
+
+            trans.setTime(settleEntity.getTime());
+            trans.setCardCode(settleEntity.getTransactiontype());//card type not available
+            trans.setType(settleEntity.getTransactiontype());
+            trans.setCard(card);
+            trans.setOdometer(settleEntity.getOdometer());
+            trans.setAmount(settleEntity.getAmount());
+            trans.setAuthref(settleEntity.getAuthRef());
+            trans.setDriver(settleEntity.getDriverId());
+            trans.setVehicle(settleEntity.getVehicleId());
+            trans.setPump(pump);
+            trans.setDate(settleEntity.getTime());
+
+            entities.add(trans);
+        }
+        return entities;
+    }
 
     public Transactionfile.Batch buildBachTag(String tid, List transactionSettleData) {
         Transactionfile.Batch batch = new Transactionfile.Batch();
@@ -75,6 +122,7 @@ public class WexDataGatewayBean {
 
         List<Transactionfile.Batch.Trans> entities = new ArrayList<Transactionfile.Batch.Trans>();
         int i = 1;
+
         for (SettleEntity settleEntity : wexDataList) {
             Transactionfile.Batch.Trans trans = new Transactionfile.Batch.Trans();
             Transactionfile.Batch.Trans.Pump pump = new Transactionfile.Batch.Trans.Pump();
@@ -155,7 +203,6 @@ public class WexDataGatewayBean {
 //            log.info("Exit from createFile method of WexDataGatewayBean..");
 //        }
 //    }
-
     public String makeFileSequenceId(String fileSequenceId) {
 
         log.info("Entry in makeBatchId method of FirstDataGatewayBean..");

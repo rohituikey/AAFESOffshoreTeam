@@ -23,7 +23,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import jaxb.wextransaction.Transactionfile;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -687,7 +686,6 @@ public class SettleMessageDAO {
                 String query = "update starsettler.settlemessages set "
                         + " filesequenceid = '" + settleData.getSequenceId()
                         + "', settlestatus = '" + status
-                        
                         + "' where receiveddate = '" + settleData.getReceiveddate()
                         + "' and ordernumber = '" + settleData.getOrderNumber()
                         + "' and settledate='" + settleData.getSettleDate()
@@ -703,7 +701,7 @@ public class SettleMessageDAO {
         }
     }
 
-    public void updateFileSeqxRef(List<String> tids, String SeqNo ) {
+    public void updateFileSeqxRef(List<String> tids, String SeqNo) {
 
         LOG.info("Entry in updateFileSeqxRef method of Settlemessagedao..");
         factory = new CassandraSessionFactory();
@@ -795,12 +793,13 @@ public class SettleMessageDAO {
 
         try {
             String query = "";
-           query = "SELECT identityuuid, lineId, quantity, unitCost, cardType, paymentAmount, transactionType, transactionId, orderDate, ordernumber, receiveddate, settledate, clientlineid,  "
+            query = "SELECT identityuuid, lineId, quantity, unitCost, cardType, paymentAmount, transactionType, transactionId, orderDate, ordernumber, receiveddate, settledate, clientlineid,  "
                     + "batchId, trackdata2, odometer, driverId, authreference, vehicleId, catflag, service ,pumpnumber,time, cardtype,transactionType, "
                     + "filesequenceid, nonfuelproductgroup, fuelproductgroup FROM starsettler.settlemessages where receiveddate='" + processDate
                     + "' and settlestatus = '" + settleStatus
                     + "' and lineId = '" + tid
                     + "' ALLOW FILTERING;";
+
             factory = new CassandraSessionFactory();
             ResultSet result = factory.getSession().execute(query);
             System.out.println("com.aafes.starsettler.dao.SettleMessageDAO.getsettleTransaction()");
@@ -834,7 +833,7 @@ public class SettleMessageDAO {
                     settleEntity.setService(row.getString("service"));
                     settleEntity.setFilesequencenumber(row.getString("filesequenceid"));
                     settleEntity.setDate(row.getString("date"));
-                    settleEntity.setProductgroup(row.getList("productgroup", String.class)); 
+                    settleEntity.setProductgroup(row.getList("productgroup", String.class));
                     settleTransactionList.add(settleEntity);
                 }
             }
@@ -872,5 +871,5 @@ public class SettleMessageDAO {
         return columns;
 
     }
-    
+
 }

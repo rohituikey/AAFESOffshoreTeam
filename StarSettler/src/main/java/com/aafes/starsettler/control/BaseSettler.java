@@ -5,7 +5,8 @@
  */
 package com.aafes.starsettler.control;
 
-import com.aafes.starsettler.dao.SettleMessageDAO;
+import com.aafes.stargate.imported.WexRepository;
+import com.aafes.stargate.imported.WexSettleEntity;
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.util.SettlerType;
 import java.util.List;
@@ -19,6 +20,9 @@ public abstract class BaseSettler {
 
     @EJB
     private SettleMessageRepository repository;
+
+    @EJB
+    private WexRepository wexRepository;
 
     public abstract void run(String identityUUID, String processDate);
 
@@ -68,9 +72,13 @@ public abstract class BaseSettler {
         repository.updateWexData(WexData, seqNo);
     }
 
+    public void updateWexsettleData(List<WexSettleEntity> WexData, String seqNo) {
+        wexRepository.updateWexSettleData(WexData, seqNo);
+    }
+
     public void updateFileidxref(List<String> tids, String sequenceNumber) {
         repository = new SettleMessageRepository();
-        repository.updateFileSeqxRef(tids,sequenceNumber);
+        repository.updateFileSeqxRef(tids, sequenceNumber);
     }
 
     public List<String> getTIDList() {
@@ -81,6 +89,11 @@ public abstract class BaseSettler {
     public List<SettleEntity> getsettleTransaction(String tid, String processDate, String SettleStatus) {
         repository = new SettleMessageRepository();
         return repository.getsettleTransaction(tid, processDate, SettleStatus);
+    }
+
+    public List<WexSettleEntity> getWexsettleTransaction(String tid, String processDate, String status) {
+        wexRepository = new WexRepository();
+        return wexRepository.getWexTransactions(tid, processDate, status);
     }
 
     /**

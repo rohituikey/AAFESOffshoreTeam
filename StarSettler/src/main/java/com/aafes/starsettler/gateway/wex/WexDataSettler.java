@@ -5,7 +5,9 @@
  */
 package com.aafes.starsettler.gateway.wex;
 
+import com.aafes.stargate.imported.WexSettleEntity;
 import com.aafes.starsettler.control.BaseSettler;
+import com.aafes.starsettler.control.Configurator;
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.util.SettleStatus;
 import java.io.StringWriter;
@@ -36,12 +38,14 @@ public class WexDataSettler extends BaseSettler {
 
     @EJB
     private WexDataGatewayBean wexGatewayBean;
-    
-    
+
     @EJB
     private WexService wexService;
-    
-     List settlelist = new ArrayList();
+    @EJB
+    private Configurator configurator;
+
+    List<WexSettleEntity> wexSettlelist = new ArrayList();
+    List<SettleEntity> settlelist = new ArrayList();
 
     // Schedular will call this method 
     @Override
@@ -53,17 +57,17 @@ public class WexDataSettler extends BaseSettler {
         try {
 
             String xmlString = null;
-           
+
             List<String> terminalIdList = super.getTIDList();
-            
-            Transactionfile file =getFileContent(terminalIdList, processDate);
+
+            Transactionfile file = getFileContent(terminalIdList, processDate);
             file.setDate(getformatedDate());
             file.setTime(getformatedTime());
 
             String fileSeqNo = super.fileSequenceId();
             fileSeqNo = wexGatewayBean.makeFileSequenceId(fileSeqNo);
             file.setSequence(fileSeqNo);
-           // List settlelist = new ArrayList();
+            // List settlelist = new ArrayList();
 
 //            Map map = new HashMap();
 //            for (String tid : terminalIdList) {
@@ -74,18 +78,20 @@ public class WexDataSettler extends BaseSettler {
 //                    file.getBatch().add(batch);
 //                }
 //            }
+            if (!file.getBatch().isEmpty()) {
+                StringWriter sw = new StringWriter();
+                JAXB.marshal(file, sw);
+                xmlString = sw.toString();
 
-            if(!file.getBatch().isEmpty() )
-            {
-            StringWriter sw = new StringWriter();
-            JAXB.marshal(file, sw);
-            xmlString = sw.toString();
+                wexService.generateAndSendToNBS(xmlString);
 
-            wexService.generateAndSendToNBS(xmlString);
-           
-            super.updateWexData(settlelist, fileSeqNo);
-            
-            super.updateFileidxref(terminalIdList,fileSeqNo);
+                if (!"Y".equalsIgnoreCase(configurator.get("ENABLE_WEX_SETTLEMENT_TABLE"))) {
+                    super.updateWexData(settlelist, fileSeqNo);
+                } else {
+                    super.updateWexsettleData(wexSettlelist, fileSeqNo);
+                }
+
+                super.updateFileidxref(terminalIdList, fileSeqNo);
             }
 
 //            List<SettleEntity> transactionSettleData = super.getsettleTransaction(terminalIdList, identityUUID, processDate, SettleStatus.Ready_to_settle);
@@ -131,23 +137,34 @@ public class WexDataSettler extends BaseSettler {
     }
 
     /**
-     * 
+     *
      * @param tids
-     * @param file 
+     * @param file
      */
-    private Transactionfile getFileContent(List<String> tids, String processDate ){
-          Transactionfile file = new Transactionfile();     
-          Map map = new HashMap();
-            
+    private Transactionfile getFileContent(List<String> tids, String processDate) {
+        Transactionfile file = new Transactionfile();
+        Map map = new HashMap();
+
+        if (!"Y".equalsIgnoreCase(configurator.get("ENABLE_WEX_SETTLEMENT_TABLE"))) {
             for (String tid : tids) {
                 List<SettleEntity> transactionSettleData = super.getsettleTransaction(tid, processDate, SettleStatus.Ready_to_settle);
                 if (transactionSettleData.size() != 0) {
-                    
                     Transactionfile.Batch batch = wexGatewayBean.buildBachTag(tid, transactionSettleData);
                     settlelist.addAll(transactionSettleData);
                     file.getBatch().add(batch);
                 }
             }
-    return file;
-}
+        } else {
+            for (String tid : tids) {
+                List<WexSettleEntity> transactionSettleData = super.getWexsettleTransaction(tid, processDate, SettleStatus.Ready_to_settle);
+                if (transactionSettleData.size() != 0) {
+                    Transactionfile.Batch batch = wexGatewayBean.buildWexBachTag(tid, transactionSettleData);
+                    wexSettlelist.addAll(transactionSettleData);
+                    file.getBatch().add(batch);
+                }
+            }
+        }
+
+        return file;
+    }
 }

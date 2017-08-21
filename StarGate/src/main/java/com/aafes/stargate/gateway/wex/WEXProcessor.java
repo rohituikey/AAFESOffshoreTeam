@@ -33,8 +33,6 @@ public class WEXProcessor {
     
     @EJB
     private Configurator configurator;
-//    @EJB
-//    private TransactionDAO transactionDAO;
     private NBSFormatter nBSFormatter;
     // ADDED TO HANDLE TIMEOUT SCENARIO
     String retryReason = "", iSOMsgResponse = "";
@@ -51,6 +49,9 @@ public class WEXProcessor {
             iSOMsgResponse = clientObj.sendRequest(iSOMsg.writeData().toString());
             t = nBSFormatter.createResponse(iSOMsgResponse);
             return t;
+        } catch (SocketTimeoutException e) {
+            retryReason = "Exception : " + e.getMessage();
+            handleRequestTimeOutScenaio(t);
         } catch (Exception e) {
             if(e instanceof SocketTimeoutException){// || e instanceof ClientTransportException){
                 retryReason = "Exception : " + e.getMessage();
@@ -63,14 +64,17 @@ public class WEXProcessor {
     private void handleRequestTimeOutScenaio(Transaction t){
         sMethodName = "handleRequestTimeOutScenaio";
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        int wexRetryCount = 0;
+        int wexRetryCount = 0, wexRetryWaitTime = 0;
         try{
             if(configurator.get("WEX_RETRY_COUNT") != null)
                 wexRetryCount = Integer.parseInt(configurator.get("WEX_RETRY_COUNT"));
             else LOGGER.error("Please add WEX_RETRY_COUNT in stargate.properties");
+            if(configurator.get("WEX_RETRY_WAIT_TIME") != null)
+                wexRetryWaitTime = Integer.parseInt(configurator.get("WEX_RETRY_WAIT_TIME"));
+            else LOGGER.error("Please add WEX_RETRY_WAIT_TIME in stargate.properties");
             ++dupCheckCounter;
             if(dupCheckCounter <= wexRetryCount){
-                TimeUnit.SECONDS.sleep(4);
+                TimeUnit.SECONDS.sleep(wexRetryWaitTime);
                 LOGGER.info("Retrying to send request. Retry Reason " + retryReason + ". Retry Number : "+ dupCheckCounter 
                         + ". Method " + sMethodName + ". Class Name " + CLASS_NAME);
                 iSOMsg = nBSFormatter.createRequest(t, dupCheckCounter);
@@ -86,7 +90,7 @@ public class WEXProcessor {
             if(e instanceof SocketTimeoutException || e instanceof WebServiceException){// || e instanceof ClientTransportException){ || e instanceof WebServiceException){
                 retryReason = "Exception : " + e.getMessage();
                 handleRequestTimeOutScenaio(t);
-                dupCheckCounter++;
+                //dupCheckCounter++;
             } else try {
                 throw e;
             } catch (Exception ex) {

@@ -5,6 +5,8 @@
  */
 package com.aafes.stargate.gateway.wex;
 
+import com.aafes.starsettler.imported.WexSettleMessagesDao;
+import com.aafes.starsettler.imported.WexSettleEntity;
 import com.aafes.stargate.authorizer.BaseStrategy;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.AuthorizerException;
@@ -74,7 +76,7 @@ public class WEXStrategy extends BaseStrategy {
                     && (t.getRequestType().equalsIgnoreCase(RequestType.SALE)
                     || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     || RequestType.REFUND.equals(t.getRequestType()))
-                    //&& ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())
+                    && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())
                     ) {
                 LOG.info("WEXStrategy.processRequest settlements process");
                 getToken(t);
@@ -208,7 +210,8 @@ public class WEXStrategy extends BaseStrategy {
 
         wexSettleEntity.setAmount( Long.toString(t.getAmount()));
         wexSettleEntity.setAuthRef(t.getAuthNumber());
-        wexSettleEntity.setTransactiontype(t.getTransactiontype());
+        //wexSettleEntity.setTransactiontype(t.getTransactiontype());
+        wexSettleEntity.setTransactiontype("10");
         wexSettleEntity.setTransactionId(t.getTransactionId());
         wexSettleEntity.setAppName("");
         wexSettleEntity.setAppVersion("");
@@ -223,13 +226,13 @@ public class WEXStrategy extends BaseStrategy {
         wexSettleEntity.setVehicleId(t.getVehicleId());
         wexSettleEntity.setService(t.getServiceCode());
         wexSettleEntity.setProduct(t.getProductGroup());
-        wexSettleEntity.setOrdernumber(t.getOrderNumber());
+//       if(t.getOrderNumber() == null)
+              wexSettleEntity.setOrdernumber("8888");
         wexSettleEntity.setOrderDate(this.getSystemDate());
 
         wexSettleEntity.setCatflag(t.getCatFlag());
         wexSettleEntity.setSettlestatus(SettleStatus.Ready_to_settle);
-        wexSettleEntity.setTransactiontype(t.getTransactiontype());
-
+        
         wexSettleEntityList.add(wexSettleEntity);
         wexSettleMessagesDao.saveToWex(wexSettleEntityList);
         LOG.debug("rrn number in WexStrategy.saveTOSettle is: " + t.getRrn());

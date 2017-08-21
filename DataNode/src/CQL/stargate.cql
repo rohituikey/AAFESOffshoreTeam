@@ -268,5 +268,5 @@ service text,
 transactionId text,
 ordernumber text, 
 transactiontype text,
-PRIMARY KEY (transactionfiledate, transactionfiletime, transactionfilesequence, transactionId, ordernumber , transactiontype));
+PRIMARY KEY (transactionId, ordernumber , transactiontype));
 

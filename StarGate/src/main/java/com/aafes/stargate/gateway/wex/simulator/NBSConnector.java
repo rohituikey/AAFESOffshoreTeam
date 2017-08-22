@@ -1,5 +1,6 @@
 package com.aafes.stargate.gateway.wex.simulator;
 
+import com.aafes.stargate.control.Configurator;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.EJB;
 
 /**
  *
@@ -21,19 +23,23 @@ public class NBSConnector {
     private StringBuffer response;
     byte[] isoFormat;
     private Socket nbsSocket;
+    @EJB
+    private Configurator configurator;
+    private String wexNbsHostName = "";
+    private int wexNbsPortNumber = 0, wexNbsTimeout = 0;
 
     public String sendRequest(String request) throws SocketTimeoutException {
         String strResponse = "";
         try {
-
+            populateValuesFromPropertiesFile();
             //creating connections
             if(null == nbsSocket || nbsSocket.isClosed()) nbsSocket = new Socket();
             if(nbsSocket != null){
-                nbsSocket.connect(new InetSocketAddress("localhost", 2000), 1);
-                nbsSocket.setSoTimeout(1);
+                nbsSocket.connect(new InetSocketAddress(wexNbsHostName, wexNbsPortNumber), wexNbsTimeout);
+                nbsSocket.setSoTimeout(wexNbsTimeout);
                 LOG.info("Connection Established with NBS socket server");
                 LOG.log(Level.INFO, "{0}-----------{1}---------------{2}", 
-                        new Object[]{nbsSocket.getClass(), nbsSocket.getLocalAddress(), nbsSocket.getLocalPort()});
+                new Object[]{nbsSocket.getClass(), nbsSocket.getLocalAddress(), nbsSocket.getLocalPort()});
             }else LOG.info("Socket client object is null!!");
 
             BufferedWriter writeRequest = new BufferedWriter(new OutputStreamWriter(nbsSocket.getOutputStream()));
@@ -70,4 +76,24 @@ public class NBSConnector {
         }
     }
     
+    private void populateValuesFromPropertiesFile(){
+        LOG.info("Method populateValuesFromPropertiesFile started");
+        if(configurator == null ) configurator = new Configurator();
+        if(configurator.get("WEX_NBS_HOST_NAME") != null) wexNbsHostName = configurator.get("WEX_NBS_HOST_NAME");
+        else{
+            LOG.info("WEX_NBS_HOST_NAME is not present in stargate.properties. Setting default value.");
+            wexNbsHostName = "localhost";
+        }
+        if(configurator.get("WEX_NBS_HOST_NAME") != null) wexNbsPortNumber = Integer.parseInt(configurator.get("WEX_NBS_HOST_PORT"));
+        else{
+            LOG.info("WEX_NBS_HOST_NAME is not present in stargate.properties. Setting default value.");
+            wexNbsPortNumber = 2000;
+        }
+        if(configurator.get("WEX_REQUEST_TIMEOUT") != null) wexNbsTimeout = Integer.parseInt(configurator.get("WEX_REQUEST_TIMEOUT"));
+        else{
+            LOG.info("WEX_REQUEST_TIMEOUT is not present in stargate.properties. Setting default value.");
+            wexNbsTimeout = 0;
+        }
+        LOG.info("Method populateValuesFromPropertiesFile ended");
+    }
 }

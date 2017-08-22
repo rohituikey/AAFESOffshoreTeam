@@ -254,13 +254,13 @@ public class NBSFormatter {
 //                throw new Exception("Unable to Parse response: " + Common.
 //                        convertStackTraceToString(ex));
 //            }
-            if (transaction.getLocalDateTime() == null || transaction.getLocalDateTime().isEmpty()) {
+            //if (transaction.getLocalDateTime() == null || transaction.getLocalDateTime().isEmpty()) {
                 try {
                     transaction.setLocalDateTime(this.CreateDF_forTransaction(resp.getField(12).toString()));
                 } catch (NullPointerException ex) {
                     transaction.setLocalDateTime("");
                 }
-            }
+            //}
 
             if (transaction.getAuthNumber() == null || transaction.getAuthNumber().isEmpty()) {
                 try {

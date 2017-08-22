@@ -22,9 +22,10 @@ import javax.ejb.Stateless;
 public class WexSettleMessagesDao {
     private Mapper mapper;
     private CassandraSessionFactory factory;
+    Session session;
     @PostConstruct
     public void postConstruct() {
-        Session session = factory.getSession();
+        if(session == null) session = factory.getSession();
         setMapper(new MappingManager(session).mapper(WexSettleEntity.class));
     }
    public void saveToWex(List<WexSettleEntity> wexSettleEntityList) {

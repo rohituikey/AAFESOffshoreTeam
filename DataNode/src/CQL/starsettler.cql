@@ -186,7 +186,7 @@ alter table starsettler.settlemessages add catflag text;
 alter table starsettler.settlemessages add service text;
 alter table starsettler.settlemessages add filesequencenumber text;
 alter table starsettler.settlemessages ADD productgroup list<text>;
-alter table  settlemessages add pumpnumber text;
+alter table starsettler.settlemessages add pumpnumber text;
 
 
 

@@ -177,12 +177,14 @@ public class WEXStrategy extends BaseStrategy {
         settleEntity.setVehicleId(t.getVehicleId());
         settleEntity.setTrackdata2(t.getTrack2());
         settleEntity.setService(t.getServiceCode());
-        settleEntity.setTime(t.getLocalDateTime().substring(11, 22));
+        if(t.getLocalDateTime() != null && !t.getLocalDateTime().isEmpty() && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType()))
+            settleEntity.setTime(t.getLocalDateTime().substring(6,12));
         settleEntity.setPumpNumber(t.getPumpNmbr());
         if (t.getPricePerUnit() != null) {
             settleEntity.setUnitCost(t.getPricePerUnit().toString());
         }
-        settleEntity.setDate(t.getLocalDateTime().substring(0, 11));
+        if(t.getLocalDateTime() != null && !t.getLocalDateTime().isEmpty() && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType()))
+            settleEntity.setDate(t.getLocalDateTime().substring(0, 6));
         if (t.getAmount() < 0) {
             settleEntity.setTransactionType(TransactionType.Refund);
         } else if (t.getAmount() >= 0) {
@@ -198,7 +200,6 @@ public class WEXStrategy extends BaseStrategy {
         settleMessageDAO.save(settleEntityList);
         LOG.debug("rrn number in WexStrategy.saveTOSettle is: " + t.getRrn());
         LOG.info("WexStrategy.saveTOSettle method is ended");
-
     }
 
 //To save in WexSett

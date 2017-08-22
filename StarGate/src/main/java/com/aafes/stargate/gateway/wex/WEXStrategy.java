@@ -167,7 +167,7 @@ public class WEXStrategy extends BaseStrategy {
         if (t.getQuantity() != null) {
             settleEntity.setQuantity(t.getQuantity().toString());
         }
-        settleEntity.setProductgroup(t.getProductGroup());
+        settleEntity.setProductgroup(t.getProducts());
         settleEntity.setProductcode(t.getProductCode());
         settleEntity.setReasonCode(t.getReasonCode());
         settleEntity.setResponseType(t.getResponseType());
@@ -226,7 +226,7 @@ public class WEXStrategy extends BaseStrategy {
         wexSettleEntity.setOdometer(t.getOdoMeter());
         wexSettleEntity.setVehicleId(t.getVehicleId());
         wexSettleEntity.setService(t.getServiceCode());
-        wexSettleEntity.setProduct(t.getProductGroup());
+        wexSettleEntity.setProduct(t.getProducts());
 //       if(t.getOrderNumber() == null)
               wexSettleEntity.setOrdernumber("8888");
         wexSettleEntity.setOrderDate(this.getSystemDate());

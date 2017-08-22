@@ -583,7 +583,7 @@ public class Authorizer {
                         ProdDataList.add(prodCodeDetailsStr.toString());
                         prodCodeDetailsStr = null;
                     }
-                    transaction.setProductGroup(ProdDataList);
+                    transaction.setProducts(ProdDataList);
                     ProdDataList = null;
                 }
             }

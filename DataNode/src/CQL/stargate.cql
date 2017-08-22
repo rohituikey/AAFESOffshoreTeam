@@ -215,58 +215,14 @@ password text,
 primary key (identityuuid, userid, password)
 );
 
+
 alter TABLE stargate.transactions ADD origrrn text;
 
-alter TABLE stargate.transactions ADD nonfuelprodcode text;
-alter TABLE stargate.transactions ADD nonfuelamount decimal;
-alter TABLE stargate.transactions ADD fueldolleramount decimal;
-alter TABLE stargate.transactions ADD priceperunit decimal;
+
+### Wex
 alter TABLE stargate.transactions ADD catflag text;
 alter TABLE stargate.transactions ADD cardseqnumber text;
-alter TABLE stargate.transactions ADD quantity decimal;
-alter TABLE stargate.transactions ADD nonfuelqty decimal;
-
-alter table stargate.transactions ADD fuelproductgroup list<text>;
-alter table stargate.transactions ADD nonfuelproductgroup list<text>;
 alter table stargate.transactions ADD promptDetailCount decimal;
-
-alter table stargate.transactions DROP nonfuelproductgroup ;
-alter table stargate.transactions DROP fuelproductgroup ;
-alter table stargate.transactions ADD productgroup list<text>;
-alter table stargate.transactions ADD tid text;
-
-
-CREATE TABLE stargate.wexsettlemessages(
-transactionfiledate text,
-transactionfiletime text,
-transactionfilesequence text,
-tid text,
-AppName text,
-AppVersion text,
-transcardCode text,
-transnbr text,
-transdate text,
-transtime text,
-cardtrack text,
-pumpcat text,
-pumpservice text,
-pumpnbr text,
-pumpamount text,
-product list<text>,
-odometer text,
-amount text,
-authref text,
-driverid text,
-vehicleid text,
-orderDate text,
-sequenceId text,
-settleId text,
-settlestatus text,
-time text,
-catflag text,
-service text,
-transactionId text,
-ordernumber text, 
-transactiontype text,
-PRIMARY KEY (transactionId, ordernumber , transactiontype));
+alter table stargate.transactions ADD products list<text>;
+alter table stargate.transactions ADD tid text; 
 

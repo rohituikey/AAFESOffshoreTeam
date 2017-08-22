@@ -13,7 +13,7 @@ amount text,
 authref text,
 driverid text,
 vehicleid text,
-recieDate text,
+receivedDate text,
 settlestatus text,
 catflag text,
 service text,
@@ -22,9 +22,9 @@ ordernumber text,
 transactiontype text,
 transactioncode text,
 settelmentdate text,
-settelmenttime text
-PRIMARY KEY (tid, recieDate ,settlestatus, traansactionType,ordernumber)
-)WITH CLUSTERING ORDER BY (tid DESC, ordernumber ASC)
+settelmenttime text,
+PRIMARY KEY (receivedDate, settlestatus, transactiontype, ordernumber,tid)
+)WITH CLUSTERING ORDER BY (settlestatus ASC, transactiontype DESC, ordernumber ASC, tid DESC)
     AND bloom_filter_fp_chance = 0.01
     AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
     AND comment = ''

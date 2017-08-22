@@ -13,13 +13,13 @@ import java.util.List;
  *
  * @author alugumetlas
  */
-@Table(keyspace = "stargate", name = "wexsettlemessages")
+@Table(keyspace = "starsettler", name = "wexsettlemessages")
 public class WexSettleEntity {
 
     @ClusteringColumn(0)
     private String tid;
     @ClusteringColumn(1)
-    private String receiveDate;
+    private String receivedDate;
     @ClusteringColumn(2)
     private String settleStatus;
     @ClusteringColumn(3)
@@ -54,14 +54,13 @@ public class WexSettleEntity {
         this.tid = tid;
     }
 
-    public String getReceiveDate() {
-        return receiveDate;
+    public String getReceivedDate() {
+        return receivedDate;
     }
 
-    public void setReceiveDate(String receiveDate) {
-        this.receiveDate = receiveDate;
+    public void setReceivedDate(String receivedDate) {
+        this.receivedDate = receivedDate;
     }
-
 
     public String getSettleStatus() {
         return settleStatus;

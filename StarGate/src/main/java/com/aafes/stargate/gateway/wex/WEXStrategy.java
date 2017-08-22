@@ -76,7 +76,8 @@ public class WEXStrategy extends BaseStrategy {
                     && (t.getRequestType().equalsIgnoreCase(RequestType.SALE)
                     || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     || RequestType.REFUND.equals(t.getRequestType()))
-                    && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
+                   // && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())
+                    ) {
                 LOG.info("WEXStrategy.processRequest settlements process");
                 getToken(t);
                 saveToSettle(t);
@@ -153,6 +154,8 @@ public class WEXStrategy extends BaseStrategy {
         settleEntity.setSettleDate(this.getSystemDate());
         settleEntity.setOrderDate(this.getSystemDate());
         settleEntity.setTransactionType(t.getTransactiontype());
+        if(settleEntity.getTransactionType() == null)
+          settleEntity.setTransactionType("10") ; 
         settleEntity.setClientLineId(t.getTransactionId());
         settleEntity.setIdentityUUID(t.getIdentityUuid());
         settleEntity.setRrn(t.getRrn());
@@ -166,7 +169,7 @@ public class WEXStrategy extends BaseStrategy {
         if (t.getQuantity() != null) {
             settleEntity.setQuantity(t.getQuantity().toString());
         }
-        settleEntity.setProductgroup(t.getProducts());
+        settleEntity.setProducts(t.getProducts());
         settleEntity.setProductcode(t.getProductCode());
         settleEntity.setReasonCode(t.getReasonCode());
         settleEntity.setResponseType(t.getResponseType());
@@ -176,6 +179,7 @@ public class WEXStrategy extends BaseStrategy {
         settleEntity.setVehicleId(t.getVehicleId());
         settleEntity.setTrackdata2(t.getTrack2());
         settleEntity.setService(t.getServiceCode());
+        settleEntity.setClientLineId("0000");
         if (t.getLocalDateTime() != null && !t.getLocalDateTime().isEmpty() && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
             settleEntity.setTime(t.getLocalDateTime().substring(6, 12));
         }
@@ -217,8 +221,12 @@ public class WEXStrategy extends BaseStrategy {
         wexSettleEntity.setTransactionId(t.getTransactionId());
         wexSettleEntity.setAppName("AuthReq");
         wexSettleEntity.setTransactionType(t.getRequestType());
+        if(wexSettleEntity.getTransactionType() == null)
+        wexSettleEntity.setTransactionType("10");
         wexSettleEntity.setAppVersion("");
         wexSettleEntity.setTid(t.getTid());
+        if(wexSettleEntity.getTid() == null)
+        wexSettleEntity.setTid("525454564");
         wexSettleEntity.setCardTrack(t.getTrack2());
         wexSettleEntity.setCatFlag(t.getCatFlag());
         wexSettleEntity.setDriverId(t.getDriverId());
@@ -227,10 +235,10 @@ public class WEXStrategy extends BaseStrategy {
         wexSettleEntity.setService(t.getServiceCode());
         wexSettleEntity.setProduct(t.getProducts());
         wexSettleEntity.setOrderNumber(t.getOrderNumber());
-        wexSettleEntity.setReceiveDate(this.getSystemDate());
+        wexSettleEntity.setReceivedDate(this.getSystemDate());
         wexSettleEntity.setSettleStatus(SettleStatus.Ready_to_settle);
-        wexSettleEntity.setSettelmentDate(t.getLocalDateTime().substring(0,11));
-        wexSettleEntity.setSettelmentDate(t.getLocalDateTime().substring(11,22));
+        //wexSettleEntity.setSettelmentDate(t.getLocalDateTime().substring(0,11));
+        //wexSettleEntity.setSettelmentDate(t.getLocalDateTime().substring(11,22));
         wexSettleEntityList.add(wexSettleEntity);
         wexSettleMessagesDao.saveToWex(wexSettleEntityList);
         LOG.debug("rrn number in WexStrategy.saveTOSettle is: " + t.getRrn());

@@ -605,8 +605,8 @@ public class Authorizer {
 //                }
 //                transaction.setQtyPumped(n);
 //            }
-//            if (wexReqPayAtPump.getFuelPrice() != null) {
 //                BigDecimal fuelPrice;
+//            if (wexReqPayAtPump.getFuelPrice() != null) {
 //                String strFuelPrice;
 //                long n = 0L;
 //                if(wexReqPayAtPump.getFuelPrice().size() > 0){

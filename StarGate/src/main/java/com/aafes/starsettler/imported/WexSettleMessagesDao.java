@@ -5,7 +5,6 @@
  */
 package com.aafes.starsettler.imported;
 
-import com.aafes.starsettler.imported.WexSettleEntity;
 import com.aafes.stargate.control.CassandraSessionFactory;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;

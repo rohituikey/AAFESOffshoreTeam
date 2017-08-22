@@ -118,12 +118,11 @@ public class SettleEntity {
     private String vehicleId = "";
     private String catflag = "";
     private String service = "";
-    private String nonefuelamount = "";
     private String productcode = "";
     private String filesequencenumber="";
     //added two fields
     private String pumpNumber = "";
-    private List<String>  productgroup = null;
+    private List<String>  products = null;
     private String date = "";
         
     
@@ -663,14 +662,6 @@ public class SettleEntity {
         this.service = service;
     }
 
-    public String getNonefuelamount() {
-        return nonefuelamount;
-    }
-
-    public void setNonefuelamount(String nonefuelamount) {
-        this.nonefuelamount = nonefuelamount;
-    }
-
     public String getProductcode() {
         return productcode;
     }
@@ -687,13 +678,15 @@ public class SettleEntity {
         this.filesequencenumber = filesequencenumber;
     }
 
-    public List<String> getProductgroup() {
-        return productgroup;
+    public List<String> getProducts() {
+        return products;
     }
 
-    public void setProductgroup(List<String> productgroup) {
-        this.productgroup = productgroup;
+    public void setProducts(List<String> products) {
+        this.products = products;
     }
+
+
 
     public String getPumpNumber() {
         return pumpNumber;

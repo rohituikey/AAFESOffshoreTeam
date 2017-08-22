@@ -17,94 +17,82 @@ import java.util.List;
 public class WexSettleEntity {
 
     @ClusteringColumn(0)
-    private String ordernumber;
+    private String tid;
     @ClusteringColumn(1)
-    private String TransactionId;
+    private String receiveDate;
     @ClusteringColumn(2)
-    private String transactionFileDate;
-    private String transactionFileTime;
-    private String transactionFileSequence;
-    private String transactiontype;
-    private String TId;
+    private String settleStatus;
+    @ClusteringColumn(3)
+    private String transactionType;
+    @ClusteringColumn(4)
+    private String orderNumber;
+
+    private String fileSequenceId;
     private String AppName;
     private String AppVersion;
-    private String transcardCode;
-    private String transNbr;
-    private String transDate;
-    private String transTime;
     private String cardTrack;
     private String pumpCat;
     private String pumpService;
-    private String pumpNbr;
-    private String pumpAmount;
     private List<String> product;
     private String odometer;
     private String amount;
     private String authRef;
     private String driverId;
     private String vehicleId;
-    private String orderDate = "";
-    private String sequenceId = "";
-    private String settleId = "";
-    private String settlestatus = "";
-    private String time = "";
-    private String catflag = "";
-    private String service = "";
+    private String catFlag;
+    private String service;
+    private String transactionId;
+    private String transactionCode;
+    private String settelmentDate;
+    private String settelmentTime;
 
-    public String getTransactionFileDate() {
-        return transactionFileDate;
+    public String getTid() {
+        return tid;
     }
 
-    public void setTransactionFileDate(String transactionFileDate) {
-        this.transactionFileDate = transactionFileDate;
+    public void setTid(String tid) {
+        this.tid = tid;
     }
 
-    public String getTransactionFileTime() {
-        return transactionFileTime;
+    public String getReceiveDate() {
+        return receiveDate;
     }
 
-    public void setTransactionFileTime(String transactionFileTime) {
-        this.transactionFileTime = transactionFileTime;
+    public void setReceiveDate(String receiveDate) {
+        this.receiveDate = receiveDate;
     }
 
-    public String getTransactionFileSequence() {
-        return transactionFileSequence;
+
+    public String getSettleStatus() {
+        return settleStatus;
     }
 
-    public void setTransactionFileSequence(String transactionFileSequence) {
-        this.transactionFileSequence = transactionFileSequence;
+    public void setSettleStatus(String settleStatus) {
+        this.settleStatus = settleStatus;
     }
 
-    public String getOrdernumber() {
-        return ordernumber;
+    public String getTransactionType() {
+        return transactionType;
     }
 
-    public void setOrdernumber(String ordernumber) {
-        this.ordernumber = ordernumber;
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
     }
 
-    public String getTransactionId() {
-        return TransactionId;
+    public String getOrderNumber() {
+        return orderNumber;
     }
 
-    public void setTransactionId(String TransactionId) {
-        this.TransactionId = TransactionId;
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
     }
 
-    public String getTransactiontype() {
-        return transactiontype;
+    public String getFileSequenceId() {
+        return fileSequenceId;
     }
 
-    public void setTransactiontype(String transactiontype) {
-        this.transactiontype = transactiontype;
-    }
-
-    public String getTId() {
-        return TId;
-    }
-
-    public void setTId(String TId) {
-        this.TId = TId;
+    public void setFileSequenceId(String fileSequenceId) {
+        this.fileSequenceId = fileSequenceId;
     }
 
     public String getAppName() {
@@ -121,38 +109,6 @@ public class WexSettleEntity {
 
     public void setAppVersion(String AppVersion) {
         this.AppVersion = AppVersion;
-    }
-
-    public String getTranscardCode() {
-        return transcardCode;
-    }
-
-    public void setTranscardCode(String transcardCode) {
-        this.transcardCode = transcardCode;
-    }
-
-    public String getTransNbr() {
-        return transNbr;
-    }
-
-    public void setTransNbr(String transNbr) {
-        this.transNbr = transNbr;
-    }
-
-    public String getTransDate() {
-        return transDate;
-    }
-
-    public void setTransDate(String transDate) {
-        this.transDate = transDate;
-    }
-
-    public String getTransTime() {
-        return transTime;
-    }
-
-    public void setTransTime(String transTime) {
-        this.transTime = transTime;
     }
 
     public String getCardTrack() {
@@ -177,22 +133,6 @@ public class WexSettleEntity {
 
     public void setPumpService(String pumpService) {
         this.pumpService = pumpService;
-    }
-
-    public String getPumpNbr() {
-        return pumpNbr;
-    }
-
-    public void setPumpNbr(String pumpNbr) {
-        this.pumpNbr = pumpNbr;
-    }
-
-    public String getPumpAmount() {
-        return pumpAmount;
-    }
-
-    public void setPumpAmount(String pumpAmount) {
-        this.pumpAmount = pumpAmount;
     }
 
     public List<String> getProduct() {
@@ -243,52 +183,12 @@ public class WexSettleEntity {
         this.vehicleId = vehicleId;
     }
 
-    public String getOrderDate() {
-        return orderDate;
+    public String getCatFlag() {
+        return catFlag;
     }
 
-    public void setOrderDate(String orderDate) {
-        this.orderDate = orderDate;
-    }
-
-    public String getSequenceId() {
-        return sequenceId;
-    }
-
-    public void setSequenceId(String sequenceId) {
-        this.sequenceId = sequenceId;
-    }
-
-    public String getSettleId() {
-        return settleId;
-    }
-
-    public void setSettleId(String settleId) {
-        this.settleId = settleId;
-    }
-
-    public String getSettlestatus() {
-        return settlestatus;
-    }
-
-    public void setSettlestatus(String settlestatus) {
-        this.settlestatus = settlestatus;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public String getCatflag() {
-        return catflag;
-    }
-
-    public void setCatflag(String catflag) {
-        this.catflag = catflag;
+    public void setCatFlag(String catFlag) {
+        this.catFlag = catFlag;
     }
 
     public String getService() {
@@ -297,6 +197,38 @@ public class WexSettleEntity {
 
     public void setService(String service) {
         this.service = service;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public String getTransactionCode() {
+        return transactionCode;
+    }
+
+    public void setTransactionCode(String transactionCode) {
+        this.transactionCode = transactionCode;
+    }
+
+    public String getSettelmentDate() {
+        return settelmentDate;
+    }
+
+    public void setSettelmentDate(String settelmentDate) {
+        this.settelmentDate = settelmentDate;
+    }
+
+    public String getSettelmentTime() {
+        return settelmentTime;
+    }
+
+    public void setSettelmentTime(String settelmentTime) {
+        this.settelmentTime = settelmentTime;
     }
 
 }

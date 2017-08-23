@@ -46,6 +46,7 @@ public class WEXProcessor {
             dupCheckCounter = 0;
             if(nBSFormatter == null) nBSFormatter = new NBSFormatter();
             iSOMsg = nBSFormatter.createRequest(t, 0);
+            if(clientObj == null)
             clientObj = new NBSConnector();
             iSOMsgResponse = clientObj.sendRequest(iSOMsg.writeData().toString());
             t = nBSFormatter.createResponse(iSOMsgResponse);
@@ -241,4 +242,9 @@ public class WEXProcessor {
         t.setResponseType(ResponseType.DECLINED);
         t.setDescriptionField(description);
     }
+
+    public void setClientObj(NBSConnector clientObj) {
+        this.clientObj = clientObj;
+    }
+    
 }

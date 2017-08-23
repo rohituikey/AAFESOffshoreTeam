@@ -236,6 +236,8 @@ public class WEXStrategy extends BaseStrategy {
         wexSettleEntity.setProduct(t.getProducts());
         wexSettleEntity.setOrderNumber(t.getOrderNumber());
         wexSettleEntity.setReceivedDate(this.getSystemDate());
+        wexSettleEntity.setPumpNumber(t.getPumpNmbr());
+        wexSettleEntity.setTransactionTime(t.getLocalDateTime());
         wexSettleEntity.setSettleStatus(SettleStatus.Ready_to_settle);
         //wexSettleEntity.setSettelmentDate(t.getLocalDateTime().substring(0,11));
         //wexSettleEntity.setSettelmentDate(t.getLocalDateTime().substring(11,22));

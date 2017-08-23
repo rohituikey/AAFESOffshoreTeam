@@ -198,7 +198,7 @@ final public class Transaction {
     
     /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
     //storing fuel and nonFuel products are strong into one List
-    private List<String> ProductGroup;
+    private List<String> products;
    //private List<String> nonFuelProductGroup;
     private BigDecimal promptDetailCount;
     /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - end */
@@ -1261,12 +1261,12 @@ final public class Transaction {
         this.nonFuelqty = nonFuelqty;
     }
 
-    public List<String> getProductGroup() {
-        return ProductGroup;
+    public List<String> getProducts() {
+        return products;
     }
 
-    public void setProductGroup(List<String> ProductGroup) {
-        this.ProductGroup = ProductGroup;
+    public void setProducts(List<String> products) {
+        this.products = products;
     }
     
 

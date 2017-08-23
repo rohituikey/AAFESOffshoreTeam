@@ -171,8 +171,8 @@ public class NBSFormatter {
 //            }
             //}
             index = 124;
-            if (null != t.getProductGroup() && (t.getProductGroup().size()) > 0) {
-                for (String nonFuelString : t.getProductGroup()) {
+            if (null != t.getProducts() && (t.getProducts().size()) > 0) {
+                for (String nonFuelString : t.getProducts()) {
                     if(nonFuelString.contains(":")){
                       productDetails = nonFuelString.split(":");
                     }

@@ -12,6 +12,6 @@ package WexStub;
 public interface NBSStub {
     
     public String getResponse(String Request);
-    public String unpackIso8583(String req);
+//    public String unpackIso8583(String req);
     
 }

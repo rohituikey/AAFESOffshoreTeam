@@ -2,14 +2,14 @@ package WexStub;
 
 import com.solab.iso8583.IsoMessage;
 import com.solab.iso8583.IsoType;
-import com.solab.iso8583.MessageFactory;
 import com.solab.iso8583.impl.SimpleTraceGenerator;
-import com.solab.iso8583.parse.ConfigParser;
+import com.sun.corba.se.impl.orb.ORBConfiguratorImpl.ConfigParser;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.soap.MessageFactory;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOMsg;
@@ -136,124 +136,124 @@ public class NBSStubImpl implements NBSStub {
         return responseDetails;
     }
 
-    public String unpackIso8583(String req) {
-        byte[] buf = req.getBytes();
-        try {
-            MessageFactory mfact;
-            SCHEMA_PATH = "src/XML/NBSConfig.xml";
-            try {
-                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
-            } catch (IOException e) {
-                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSConfig.xml";
-                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
-            } catch (Exception e) {
-                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSConfig.xml";
-                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
-            }
-            String bitmapByte = javax.xml.bind.DatatypeConverter.printHexBinary(Arrays.copyOfRange(buf, 4, 12));
-            byte[] mtid = Arrays.copyOfRange(buf, 0, 4);
-            byte[] details = Arrays.copyOfRange(buf, 4, buf.length - 1);
-            String rspString = bitmapByte;
-            byte[] response = ArrayUtils.addAll(mtid, bitmapByte.getBytes());
-            response = ArrayUtils.addAll(response, details);
-            IsoMessage resp = null;
-            resp = mfact.parseMessage(response, 0);
-
-        } catch (IOException | ParseException ex) {
-            Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
-            correctRequest = false;
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage() + "-------------------------" + Arrays.toString(ex.getStackTrace()));
-            correctRequest = false;
-        }
-        return generateNewResponse();
-    }
-
-    private String generateNewResponse() {
-        String logonResponse = logonResponse();
-        String nbsResponse = nbsResponse();
-        return logonResponse + nbsResponse;
-    }
-
-    private String logonResponse() {
-        try {
-            MessageFactory mfact;
-            SCHEMA_PATH = "src/XML/NBSAcknowlegment.xml";
-            try {
-                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);;
-            } catch (Exception e) {
-                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSAcknowlegment.xml";
-                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
-            }
-            mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
-            mfact.setAssignDate(true);
-
-            IsoMessage isoMessage = mfact.newMessage(0x100);
-            if (correctRequest) {
-                isoMessage.setValue(10, "c$", IsoType.ALPHA, 2);
-                isoMessage.setValue(11, "100", IsoType.ALPHA, 3);
-            } else {
-                isoMessage.setValue(10, "c?", IsoType.ALPHA, 2);
-                isoMessage.setValue(11, "200", IsoType.ALPHA, 3);
-            }
-            isoMessage.setCharacterEncoding(
-                    "UTF-8");
-            isoMessage.setBinaryBitmap(
-                    true);
-            byte[] data = isoMessage.writeData();
-
-            return new String(data);
-        } catch (IOException ex) {
-            Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-
-    private String nbsResponse() {
-        try {
-            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSResponse.xml");
-            mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
-            mfact.setAssignDate(true);
-
-            IsoMessage isoMessage = mfact.newMessage(0x100);
-            isoMessage.setValue(10, "A", IsoType.ALPHA, 25);
-            isoMessage.setValue(11, "0278", IsoType.NUMERIC, 4);
-
-            isoMessage.setValue(12, "3170621071655", IsoType.ALPHA, 13);
-            isoMessage.setValue(13, "N", IsoType.ALPHA, 1);
-            if (correctRequest) {
-                isoMessage.setValue(14, "00", IsoType.ALPHA, 2);
-                isoMessage.setValue(15, "Approved", IsoType.ALPHA, 32);
-            } else {
-                isoMessage.setValue(14, "01", IsoType.ALPHA, 2);
-                isoMessage.setValue(15, "Declined", IsoType.ALPHA, 32);
-            }
-            isoMessage.setValue(16, "WEX", IsoType.ALPHA, 4);
-            isoMessage.setValue(17, "", IsoType.ALPHA, 6);
-            isoMessage.setValue(18, "", IsoType.ALPHA, 7);
-            isoMessage.setValue(19, "", IsoType.ALPHA, 4);
-            isoMessage.setValue(20, "", IsoType.ALPHA, 4);
-            isoMessage.setValue(21, "", IsoType.ALPHA, 4);
-            isoMessage.setValue(22, "5", IsoType.ALPHA, 2);
-            isoMessage.setValue(23, "0", IsoType.ALPHA, 1);
-            isoMessage.setValue(24, "308339", IsoType.ALPHA, 6);
-            isoMessage.setValue(25, "75.00", IsoType.AMOUNT, 10);
-            isoMessage.setValue(26, "1", IsoType.ALPHA, 2);
-            isoMessage.setValue(27, "75.0000", IsoType.ALPHA, 10);
-            isoMessage.setValue(28, "001", IsoType.ALPHA, 3);
-            isoMessage.setValue(29, "78965", IsoType.ALPHA, 7);
-
-            isoMessage.setCharacterEncoding(
-                    "UTF-8");
-            isoMessage.setBinaryBitmap(
-                    true);
-            byte[] data = isoMessage.writeData();
-
-            return new String(data);
-        } catch (IOException ex) {
-            Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
+//    public String unpackIso8583(String req) {
+//        byte[] buf = req.getBytes();
+//        try {
+//            MessageFactory mfact;
+//            SCHEMA_PATH = "src/XML/NBSConfig.xml";
+//            try {
+//                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
+//            } catch (IOException e) {
+//                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSConfig.xml";
+//                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
+//            } catch (Exception e) {
+//                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSConfig.xml";
+//                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
+//            }
+//            String bitmapByte = javax.xml.bind.DatatypeConverter.printHexBinary(Arrays.copyOfRange(buf, 4, 12));
+//            byte[] mtid = Arrays.copyOfRange(buf, 0, 4);
+//            byte[] details = Arrays.copyOfRange(buf, 4, buf.length - 1);
+//            String rspString = bitmapByte;
+//            byte[] response = ArrayUtils.addAll(mtid, bitmapByte.getBytes());
+//            response = ArrayUtils.addAll(response, details);
+//            IsoMessage resp = null;
+//            resp = mfact.parseMessage(response, 0);
+//
+//        } catch (IOException | ParseException ex) {
+//            Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
+//            correctRequest = false;
+//        } catch (Exception ex) {
+//            System.out.println(ex.getMessage() + "-------------------------" + Arrays.toString(ex.getStackTrace()));
+//            correctRequest = false;
+//        }
+//        return generateNewResponse();
+//    }
+//
+//    private String generateNewResponse() {
+//        String logonResponse = logonResponse();
+//        String nbsResponse = nbsResponse();
+//        return logonResponse + nbsResponse;
+//    }
+//
+//    private String logonResponse() {
+//        try {
+//            MessageFactory mfact;
+//            SCHEMA_PATH = "src/XML/NBSAcknowlegment.xml";
+//            try {
+//                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);;
+//            } catch (Exception e) {
+//                SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSAcknowlegment.xml";
+//                mfact = ConfigParser.createFromClasspathConfig(SCHEMA_PATH);
+//            }
+//            mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
+//            mfact.setAssignDate(true);
+//
+//            IsoMessage isoMessage = mfact.newMessage(0x100);
+//            if (correctRequest) {
+//                isoMessage.setValue(10, "c$", IsoType.ALPHA, 2);
+//                isoMessage.setValue(11, "100", IsoType.ALPHA, 3);
+//            } else {
+//                isoMessage.setValue(10, "c?", IsoType.ALPHA, 2);
+//                isoMessage.setValue(11, "200", IsoType.ALPHA, 3);
+//            }
+//            isoMessage.setCharacterEncoding(
+//                    "UTF-8");
+//            isoMessage.setBinaryBitmap(
+//                    true);
+//            byte[] data = isoMessage.writeData();
+//
+//            return new String(data);
+//        } catch (IOException ex) {
+//            Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return null;
+//    }
+//
+//    private String nbsResponse() {
+//        try {
+//            MessageFactory mfact = ConfigParser.createFromClasspathConfig("NBSResponse.xml");
+//            mfact.setTraceNumberGenerator(new SimpleTraceGenerator((int) (System.currentTimeMillis() % 10000)));
+//            mfact.setAssignDate(true);
+//
+//            IsoMessage isoMessage = mfact.newMessage(0x100);
+//            isoMessage.setValue(10, "A", IsoType.ALPHA, 25);
+//            isoMessage.setValue(11, "0278", IsoType.NUMERIC, 4);
+//
+//            isoMessage.setValue(12, "3170621071655", IsoType.ALPHA, 13);
+//            isoMessage.setValue(13, "N", IsoType.ALPHA, 1);
+//            if (correctRequest) {
+//                isoMessage.setValue(14, "00", IsoType.ALPHA, 2);
+//                isoMessage.setValue(15, "Approved", IsoType.ALPHA, 32);
+//            } else {
+//                isoMessage.setValue(14, "01", IsoType.ALPHA, 2);
+//                isoMessage.setValue(15, "Declined", IsoType.ALPHA, 32);
+//            }
+//            isoMessage.setValue(16, "WEX", IsoType.ALPHA, 4);
+//            isoMessage.setValue(17, "", IsoType.ALPHA, 6);
+//            isoMessage.setValue(18, "", IsoType.ALPHA, 7);
+//            isoMessage.setValue(19, "", IsoType.ALPHA, 4);
+//            isoMessage.setValue(20, "", IsoType.ALPHA, 4);
+//            isoMessage.setValue(21, "", IsoType.ALPHA, 4);
+//            isoMessage.setValue(22, "5", IsoType.ALPHA, 2);
+//            isoMessage.setValue(23, "0", IsoType.ALPHA, 1);
+//            isoMessage.setValue(24, "308339", IsoType.ALPHA, 6);
+//            isoMessage.setValue(25, "75.00", IsoType.AMOUNT, 10);
+//            isoMessage.setValue(26, "1", IsoType.ALPHA, 2);
+//            isoMessage.setValue(27, "75.0000", IsoType.ALPHA, 10);
+//            isoMessage.setValue(28, "001", IsoType.ALPHA, 3);
+//            isoMessage.setValue(29, "78965", IsoType.ALPHA, 7);
+//
+//            isoMessage.setCharacterEncoding(
+//                    "UTF-8");
+//            isoMessage.setBinaryBitmap(
+//                    true);
+//            byte[] data = isoMessage.writeData();
+//
+//            return new String(data);
+//        } catch (IOException ex) {
+//            Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return null;
+//    }
 
 }

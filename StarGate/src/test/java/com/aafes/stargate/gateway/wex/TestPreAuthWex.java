@@ -18,11 +18,14 @@ import com.aafes.stargate.control.TranRepository;
 import com.aafes.stargate.dao.FacilityDAO;
 import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.GatewayFactory;
+import com.aafes.stargate.gateway.wex.simulator.NBSConnector;
 import com.aafes.stargate.gateway.wex.simulator.NBSFormatter;
 import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StrategyType;
 import com.aafes.starsettler.imported.SettleEntity;
 import com.aafes.starsettler.imported.SettleMessageDAO;
+import com.aafes.starsettler.imported.WexSettleEntity;
+import com.aafes.starsettler.imported.WexSettleMessagesDao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
@@ -64,11 +67,14 @@ public class TestPreAuthWex {
     WexGateway wexGateway;
     WEXProcessor wexProcessor;
     WEXValidator wexValidator;
+    WexSettleMessagesDao wexSettleMessagesDao;
     BaseStrategyFactory bsf;
     GatewayFactory gatewayFactory;
     BaseStrategy bs;
     SettleMessageDAO settleMessageDAO;
     NBSFormatter nBSFormatter;
+    NBSConnector nBSConnector;
+    Mapper mapper3;
 
     String requestXMLPreAuth = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><cm:Message xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:cm='http://www.aafes.com/credit' xsi:schemaLocation='http://www.aafes.com/credit file:///D:/Users/alugumetlas/Downloads/wildfly-10.1.0.Final/wildfly-10.1.0.Final/standalone/configuration/CreditMessageGSA.xsd' TypeCode=\"Request\" MajorVersion=\"3\" MinorVersion=\"1\" FixVersion=\"0\"><cm:Header><cm:IdentityUUID>eacbc625-6fef-479e-8738-92adcfed7c65</cm:IdentityUUID><cm:LocalDateTime>2017-07-02T09:04:01</cm:LocalDateTime><cm:SettleIndicator>true</cm:SettleIndicator><cm:OrderNumber>54163254</cm:OrderNumber><cm:transactionId>66324154</cm:transactionId><cm:termId>23</cm:termId></cm:Header><cm:Request RRN=\"TkFwxJKiaTwf\"><cm:Media>WEX</cm:Media>  <cm:RequestType>PreAuth</cm:RequestType><cm:InputType>Swiped</cm:InputType><cm:Pan>Pan</cm:Pan><cm:Account>6006496628299904508</cm:Account><cm:Expiration>2103</cm:Expiration><cm:CardVerificationValue>837</cm:CardVerificationValue>  <cm:TrackData2>6900460000000000001=20095004100210123</cm:TrackData2><cm:AmountField>50.62</cm:AmountField><cm:WEXRequestData> <cm:CardSeqNumber>12345</cm:CardSeqNumber><cm:ServiceCode>S</cm:ServiceCode> <cm:CATFlag>1</cm:CATFlag> <cm:PromptDetailCount>1</cm:PromptDetailCount> <cm:DriverId>12365</cm:DriverId> <cm:Odometer>36079</cm:Odometer><cm:VehicleId>9213</cm:VehicleId><cm:RestrictCode>01</cm:RestrictCode><cm:ProdDetailCount>1</cm:ProdDetailCount> <cm:FuelProdGroup>  <cm:PricePerUnit>2.099</cm:PricePerUnit><cm:Quantity>8.106</cm:Quantity><cm:FuelProdCode>001</cm:FuelProdCode><cm:FuelDollarAmount>17.01</cm:FuelDollarAmount></cm:FuelProdGroup></cm:WEXRequestData><cm:pumpNmbr>23</cm:pumpNmbr> <cm:DescriptionField>PreAuth</cm:DescriptionField><cm:origAuthCode>130362</cm:origAuthCode><cm:AmtPreAuthorized>75.00</cm:AmtPreAuthorized></cm:Request></cm:Message>";
     String requestXMLPreAuthKeyed = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><cm:Message xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:cm='http://www.aafes.com/credit' xsi:schemaLocation='http://www.aafes.com/credit file:///D:/Users/alugumetlas/Downloads/wildfly-10.1.0.Final/wildfly-10.1.0.Final/standalone/configuration/CreditMessageGSA.xsd' TypeCode=\"Request\" MajorVersion=\"3\" MinorVersion=\"1\" FixVersion=\"0\"><cm:Header><cm:IdentityUUID>eacbc625-6fef-479e-8738-92adcfed7c65</cm:IdentityUUID><cm:LocalDateTime>2017-07-02T09:04:01</cm:LocalDateTime><cm:SettleIndicator>true</cm:SettleIndicator><cm:OrderNumber>54163254</cm:OrderNumber><cm:transactionId>66324154</cm:transactionId><cm:termId>23</cm:termId></cm:Header><cm:Request RRN=\"TkFwxJKiaTwf\"><cm:Media>WEX</cm:Media>  <cm:RequestType>PreAuth</cm:RequestType><cm:InputType>Keyed</cm:InputType><cm:Pan>Pan</cm:Pan><cm:Account>6006496628299904508</cm:Account><cm:Expiration>2103</cm:Expiration><cm:CardVerificationValue>837</cm:CardVerificationValue>  <cm:TrackData2>6900460000000000001=20095004100210123</cm:TrackData2><cm:AmountField>50.62</cm:AmountField><cm:WEXRequestData> <cm:CardSeqNumber>12345</cm:CardSeqNumber><cm:ServiceCode>S</cm:ServiceCode> <cm:CATFlag>1</cm:CATFlag> <cm:PromptDetailCount>1</cm:PromptDetailCount> <cm:DriverId>12365</cm:DriverId> <cm:Odometer>36079</cm:Odometer><cm:VehicleId>9213</cm:VehicleId><cm:RestrictCode>01</cm:RestrictCode><cm:ProdDetailCount>1</cm:ProdDetailCount> <cm:FuelProdGroup>  <cm:PricePerUnit>2.099</cm:PricePerUnit><cm:Quantity>8.106</cm:Quantity><cm:FuelProdCode>001</cm:FuelProdCode><cm:FuelDollarAmount>17.01</cm:FuelDollarAmount></cm:FuelProdGroup></cm:WEXRequestData><cm:pumpNmbr>23</cm:pumpNmbr> <cm:DescriptionField>PreAuth</cm:DescriptionField><cm:origAuthCode>130362</cm:origAuthCode><cm:AmtPreAuthorized>75.00</cm:AmtPreAuthorized></cm:Request></cm:Message>";
@@ -81,6 +87,9 @@ public class TestPreAuthWex {
     public void setDataForTesting() {
         authorizer = new Authorizer();
         configurator = new Configurator();
+        configurator.postConstruct();
+        configurator.load();
+        authorizer.setConfigurator(configurator);
 
         facilityDAO = mock(FacilityDAO.class);
         facility = new Facility();
@@ -109,9 +118,11 @@ public class TestPreAuthWex {
         wexValidator = new WEXValidator();
         wexProcessor = new WEXProcessor();
         wexGateway = new WexGateway();
+        wexSettleMessagesDao = new WexSettleMessagesDao();
+        nBSConnector = new NBSConnector();
+        nBSConnector.setConfigurator(configurator);
+        wexProcessor.setClientObj(nBSConnector);
         nBSFormatter = new NBSFormatter();
-        configurator.postConstruct();
-        configurator.load();
         nBSFormatter.setConfigurator(configurator);
 
         wexGateway.setwEXProcessor(wexProcessor);
@@ -120,6 +131,10 @@ public class TestPreAuthWex {
         mapper1 = new MappingManager(session).mapper(SettleEntity.class);
         settleMessageDAO.setMapper(mapper1);
         settleMessageDAO.setCassandraSessionFactory(factory);
+        mapper3 = new MappingManager(session).mapper(WexSettleEntity.class);
+        wexSettleMessagesDao.setMapper(mapper3);
+        wexSettleMessagesDao.setFactory(factory);
+        wexStrategy.setWexSettleMessagesDao(wexSettleMessagesDao);
         wexStrategy.setSettleMessageDAO(settleMessageDAO);
         wexStrategy.setConfigurator(configurator);
         wexValidator.setConfigurator(configurator);
@@ -131,11 +146,6 @@ public class TestPreAuthWex {
         bsf.setwEXStrategy(wexStrategy);
         bs = bsf.findStrategy(StrategyType.WEX);
         bs.setGatewayFactory(gatewayFactory);
-        configurator.postConstruct();
-        configurator.load();
-        authorizer.setConfigurator(configurator);
-        authorizer.setBaseStrategyFactory(bsf);
-
         authorizer.setBaseStrategyFactory(bsf);
         // insertDataToFacMapper();
     }

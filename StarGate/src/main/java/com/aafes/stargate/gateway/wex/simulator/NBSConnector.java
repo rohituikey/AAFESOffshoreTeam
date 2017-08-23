@@ -89,11 +89,20 @@ public class NBSConnector {
             LOG.info("WEX_NBS_HOST_NAME is not present in stargate.properties. Setting default value.");
             wexNbsPortNumber = 2000;
         }
-        if(configurator.get("WEX_REQUEST_TIMEOUT") != null) wexNbsTimeout = Integer.parseInt(configurator.get("WEX_REQUEST_TIMEOUT"));
+        if(configurator.get("WEX_REQUEST_TIMEOUT_VAL") != null) wexNbsTimeout = Integer.parseInt(configurator.get("WEX_REQUEST_TIMEOUT_VAL"));
         else{
-            LOG.info("WEX_REQUEST_TIMEOUT is not present in stargate.properties. Setting default value.");
+            LOG.info("WEX_REQUEST_TIMEOUT_VAL is not present in stargate.properties. Setting default value.");
             wexNbsTimeout = 0;
         }
         LOG.info("Method populateValuesFromPropertiesFile ended");
     }
+
+    public Configurator getConfigurator() {
+        return configurator;
+    }
+
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
+    
 }

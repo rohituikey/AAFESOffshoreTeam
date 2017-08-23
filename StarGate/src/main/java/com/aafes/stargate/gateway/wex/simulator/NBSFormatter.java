@@ -454,4 +454,5 @@ public class NBSFormatter {
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
     }
+    
 }

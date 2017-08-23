@@ -45,6 +45,8 @@ public class WexSettleEntity {
     private String transactionCode;
     private String settelmentDate;
     private String settelmentTime;
+    private String transactionTime;
+    private String pumpNumber;
 
     public String getTid() {
         return tid;
@@ -230,4 +232,21 @@ public class WexSettleEntity {
         this.settelmentTime = settelmentTime;
     }
 
+    public String getTransactionTime() {
+        return transactionTime;
+    }
+
+    public void setTransactionTime(String transactionTime) {
+        this.transactionTime = transactionTime;
+    }
+
+    public String getPumpNumber() {
+        return pumpNumber;
+    }
+
+    public void setPumpNumber(String pumpNumber) {
+        this.pumpNumber = pumpNumber;
+    }
+
+    
 }

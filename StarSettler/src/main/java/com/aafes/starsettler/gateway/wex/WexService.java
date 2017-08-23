@@ -70,6 +70,7 @@ public class WexService {
     public void generateAndSendToNBS(String settlexmlrecord) {
         log.info("Triggered.");
 
+        wexFile=new WexFile();
         try {
 
             Date date = new Date();

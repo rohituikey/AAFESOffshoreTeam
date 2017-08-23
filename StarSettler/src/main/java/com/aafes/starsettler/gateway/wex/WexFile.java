@@ -40,7 +40,7 @@ public class WexFile {
              Date date = new Date();
             String createdDate = dateFormat.format(date);
         log.info("Entry in createXmlFile method of WexDataGatewayBean..");
-       
+       sourcePath="D:\\Users\\";
         if (null != settlexmlrecord && !settlexmlrecord.isEmpty()) {
              String filename = sourcePath + "wexSFTP_" + createdDate;
            

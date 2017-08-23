@@ -20,7 +20,7 @@ public class WexRepository {
     private WexSettleMessagesDao settleMessageDAO;
 
     public List<WexSettleEntity> getWexTransactions(String tid, String processDate, String status) {
-
+         settleMessageDAO= new WexSettleMessagesDao();
         return settleMessageDAO.getWexTransactions(tid, processDate, status);
     }
 
@@ -29,7 +29,12 @@ public class WexRepository {
     }
     
     public List<String> getWexTIDList() {
+        settleMessageDAO= new WexSettleMessagesDao();
        return settleMessageDAO.getWexTIDList();
     }
+    
+     public String getfileWexSequenceId() {
+          return settleMessageDAO.getfileWexSequenceId();
+     }
     
 }

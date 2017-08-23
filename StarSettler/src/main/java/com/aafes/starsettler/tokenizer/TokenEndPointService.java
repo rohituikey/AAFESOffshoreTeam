@@ -8,6 +8,7 @@ package com.aafes.starsettler.tokenizer;
 import com.aafes.credit.AccountTypeType;
 import com.aafes.credit.RequestTypeType;
 import com.aafes.starsettler.entity.SettleEntity;
+import com.aafes.token.TokenMessage;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.ProcessingException;

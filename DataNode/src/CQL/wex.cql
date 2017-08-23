@@ -39,3 +39,7 @@ PRIMARY KEY (receivedDate, settlestatus, transactiontype, ordernumber,tid)
     AND min_index_interval = 128
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
+
+
+alter table starsettler.wexsettlemessages add transactiontime text;
+alter table starsettler.wexsettlemessages add pumpnumber text;

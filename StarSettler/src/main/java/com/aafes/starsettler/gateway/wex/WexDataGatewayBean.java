@@ -82,17 +82,17 @@ public class WexDataGatewayBean {
                 trans.getProduct().add(product);
             }
 
-            pump.setCat(settleEntity.getCatflag());
+            pump.setCat(settleEntity.getCatFlag());
             pump.setService(settleEntity.getService());
-            pump.setNbr(Integer.parseInt(settleEntity.getPumpNbr()));
-            pump.setAmount(settleEntity.getPumpAmount());
+            pump.setNbr(Integer.parseInt(settleEntity.getPumpNumber()));
+            pump.setAmount(settleEntity.getAmount());
 
             card.setValue(settleEntity.getCardTrack());// card reference not available
             card.setTrack(settleEntity.getCardTrack());
 
-            trans.setTime(settleEntity.getTime());
-            trans.setCardCode(settleEntity.getTransactiontype());//card type not available
-            trans.setType(settleEntity.getTransactiontype());
+            trans.setTime(settleEntity.getTransactionTime());
+            trans.setCardCode(settleEntity.getTransactionCode());//card type not available
+            trans.setType(settleEntity.getTransactionType());
             trans.setCard(card);
             trans.setOdometer(settleEntity.getOdometer());
             trans.setAmount(settleEntity.getAmount());
@@ -100,7 +100,7 @@ public class WexDataGatewayBean {
             trans.setDriver(settleEntity.getDriverId());
             trans.setVehicle(settleEntity.getVehicleId());
             trans.setPump(pump);
-            trans.setDate(settleEntity.getTime());
+            trans.setDate(settleEntity.getReceivedDate());
 
             entities.add(trans);
         }

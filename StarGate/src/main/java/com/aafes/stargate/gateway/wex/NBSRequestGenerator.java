@@ -49,8 +49,9 @@ public class NBSRequestGenerator {
     private String transTypeRefund;
     private String cardTypeWex;
     private String serviceType;
-
+    private int index = 0;
     private String SCHEMA_PATH = "";
+    String[] productDetails;
     @EJB
     private Configurator configurator;
 
@@ -72,18 +73,37 @@ public class NBSRequestGenerator {
         cardTypeWex = configurator.get("CARD_TYPE_WEX");
         serviceType = configurator.get("SERVICE_TYPE");
 
-        
-        if(applicationName == null) applicationName = configurator.get("APPLICATION_NAME");
-        if(applicationVersion == null) applicationVersion = configurator.get("APPLICATION_VERSION");
-        if(daylightSavingsTimeAtSiteOne == null) daylightSavingsTimeAtSiteOne = configurator.get("DAYLIGHT_SAVINGS_TIME_AT_SITE_ONE");
-        if(captureOnlyRequest == null) captureOnlyRequest = configurator.get("CAPTURE_ONLY_REQUEST");
-        if(sessionTypeAuth == null) sessionTypeAuth = configurator.get("SESSION_TYPE_AUTH");
-        if(transTypePreAuth == null) transTypePreAuth = configurator.get("TRANS_TYPE_PRE_AUTH");
-        if(transTypeFinalAndSale == null) transTypeFinalAndSale = configurator.get("TRANS_TYPE_FINAL_AND_SALE");
-        if(transTypeRefund == null) transTypeRefund = configurator.get("TRANS_TYPE_REFUND");
-        if(cardTypeWex == null) cardTypeWex = configurator.get("CARD_TYPE_WEX");
-        if(serviceType == null) serviceType = configurator.get("SERVICE_TYPE");
-        
+        if (applicationName == null) {
+            applicationName = configurator.get("APPLICATION_NAME");
+        }
+        if (applicationVersion == null) {
+            applicationVersion = configurator.get("APPLICATION_VERSION");
+        }
+        if (daylightSavingsTimeAtSiteOne == null) {
+            daylightSavingsTimeAtSiteOne = configurator.get("DAYLIGHT_SAVINGS_TIME_AT_SITE_ONE");
+        }
+        if (captureOnlyRequest == null) {
+            captureOnlyRequest = configurator.get("CAPTURE_ONLY_REQUEST");
+        }
+        if (sessionTypeAuth == null) {
+            sessionTypeAuth = configurator.get("SESSION_TYPE_AUTH");
+        }
+        if (transTypePreAuth == null) {
+            transTypePreAuth = configurator.get("TRANS_TYPE_PRE_AUTH");
+        }
+        if (transTypeFinalAndSale == null) {
+            transTypeFinalAndSale = configurator.get("TRANS_TYPE_FINAL_AND_SALE");
+        }
+        if (transTypeRefund == null) {
+            transTypeRefund = configurator.get("TRANS_TYPE_REFUND");
+        }
+        if (cardTypeWex == null) {
+            cardTypeWex = configurator.get("CARD_TYPE_WEX");
+        }
+        if (serviceType == null) {
+            serviceType = configurator.get("SERVICE_TYPE");
+        }
+
         transaction = t;
         try {
             SCHEMA_PATH = "src/main/resources/xml/NBSLogonPackager.xml";
@@ -112,28 +132,61 @@ public class NBSRequestGenerator {
             }
             isoMsg.set(18, cardTypeWex);
             isoMsg.set(19, transaction.getCatFlag());
-            isoMsg.set(110, transaction.getPumpNmbr());
-            isoMsg.set(111, serviceType);
+            isoMsg.set(20, transaction.getPumpNmbr());
+            isoMsg.set(21, serviceType);
 
             if (transaction.getRequestType().equals(RequestType.FINAL_AUTH)) {
                 isoMsg.set(15, captureOnlyRequest);
-                isoMsg.set(112, Long.toString(transaction.getAmount()));
-                isoMsg.set(113, Long.toString(transaction.getAmtPreAuthorized()));
-                isoMsg.set(114, transaction.getTransactionId());
-                isoMsg.set(115, createDateAndTime());
-                isoMsg.set(120, transaction.getAuthNumber());
+                isoMsg.set(22, Long.toString(transaction.getAmount()));
+                isoMsg.set(23, Long.toString(transaction.getAmtPreAuthorized()));
+                isoMsg.set(24, transaction.getTransactionId());
+                isoMsg.set(25, createDateAndTime());
+                isoMsg.set(30, transaction.getAuthNumber());
             }
-            isoMsg.set(116, "2");
+            isoMsg.set(26, "2");
             if (transaction.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
-                isoMsg.set(117, transaction.getTrack2());
-            } else if (transaction.getInputType().equalsIgnoreCase(InputType.KEYED))//isoMsg.set(113, transaction.getTrack2());//Track0 formatt
+                isoMsg.set(27, transaction.getTrack2());
+            } else if (transaction.getInputType().equalsIgnoreCase(InputType.KEYED))//isoMsg.set(23, transaction.getTrack2());//Track0 formatt
             {
                 if (!(transaction.getRequestType().equals(RequestType.FINAL_AUTH))) {
-                    isoMsg.set(118, Long.toString(t.getAmount()));
+                    isoMsg.set(28, Long.toString(t.getAmount()));
                 }
             }
             if ("10".equalsIgnoreCase(transTypeFinalAndSale) || "30".equalsIgnoreCase(transTypeRefund)) {
-                isoMsg.set(119, (t.getTransactionId() + t.getTermId()));
+                isoMsg.set(29, (t.getTransactionId() + t.getTermId()));
+            }
+
+            isoMsg.set(31, t.getPromptDetailCount().toString());
+
+            //prompt details count
+            if (null != t.getPromptDetailCount()) {
+                if (null != t.getVehicleId()) {
+                    isoMsg.set(32, "1");
+                    isoMsg.set(33, t.getVehicleId());
+                }
+                if (null != t.getDriverId()) {
+                    isoMsg.set(32, "3");
+                    isoMsg.set(33, t.getDriverId());
+                }
+                if (null != t.getOdoMeter()) {
+                    isoMsg.set(32, "4");
+                    isoMsg.set(33, t.getOdoMeter());
+                }
+            }
+
+            isoMsg.set(34, t.getProdDetailCount());
+            
+            index = 35;
+            if (null != t.getProducts() && (t.getProducts().size()) > 0) {
+                for (String nonFuelString : t.getProducts()) {
+                    if (nonFuelString.contains(":")) {
+                        productDetails = nonFuelString.split(":");
+                    }
+                    isoMsg.set(++index, productDetails[2]);
+                    isoMsg.set(++index, productDetails[1]);
+                    isoMsg.set(++index, productDetails[0]);
+                    isoMsg.set(++index, productDetails[3]);
+                }
             }
 
 //            isoMsg.set(15, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getWexPromptDetails().getPromptDetailCount().toString());
@@ -154,7 +207,6 @@ public class NBSRequestGenerator {
         return null;
     }
 
-    
     public String createDateAndTime() {
         //        YYMMDDhhmmss
         //2017-08-03 09:31:54.316

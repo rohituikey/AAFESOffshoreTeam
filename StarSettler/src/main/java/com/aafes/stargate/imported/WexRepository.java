@@ -28,7 +28,7 @@ public class WexRepository {
         settleMessageDAO.updateWexSettleData(Wexdata, In_Progress);
     }
     
-    List<String> getWexTIDList() {
+    public List<String> getWexTIDList() {
        return settleMessageDAO.getWexTIDList();
     }
     

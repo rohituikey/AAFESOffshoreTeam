@@ -93,7 +93,7 @@ public abstract class BaseSettler {
 
     public List<String> getWexTIDList() {
          wexRepository = new WexRepository();
-        return wexRepository.getTIDList();
+        return wexRepository.getWexTIDList();
     }
     
     public List<WexSettleEntity> getWexsettleTransaction(String tid, String processDate, String status) {

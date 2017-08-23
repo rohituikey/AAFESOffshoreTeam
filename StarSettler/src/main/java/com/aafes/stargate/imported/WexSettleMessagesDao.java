@@ -41,7 +41,7 @@ public class WexSettleMessagesDao {
         }
     }
 
-    List<String> getWexTIDList() {
+    public List<String> getWexTIDList() {
         List<String> tid = new ArrayList<String>();
         String query = "";
 

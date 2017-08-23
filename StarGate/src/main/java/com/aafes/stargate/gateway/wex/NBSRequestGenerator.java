@@ -115,7 +115,7 @@ public class NBSRequestGenerator {
             }
             isoMsg = new ISOMsg();
             isoMsg.setPackager(packager);
-            isoMsg.setMTI("0231");
+            isoMsg.setMTI("0200");
             isoMsg.set(10, transaction.getTermId());
             isoMsg.set(12, applicationName);
             isoMsg.set(13, applicationVersion);
@@ -176,7 +176,7 @@ public class NBSRequestGenerator {
 
             isoMsg.set(34, t.getProdDetailCount());
             
-            index = 35;
+            index = 34;
             if (null != t.getProducts() && (t.getProducts().size()) > 0) {
                 for (String nonFuelString : t.getProducts()) {
                     if (nonFuelString.contains(":")) {

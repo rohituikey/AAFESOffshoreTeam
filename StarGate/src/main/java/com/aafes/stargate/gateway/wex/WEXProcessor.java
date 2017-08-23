@@ -8,9 +8,7 @@ package com.aafes.stargate.gateway.wex;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.wex.simulator.NBSConnector;
 import com.aafes.stargate.control.Configurator;
-import com.aafes.stargate.gateway.wex.simulator.NBSFormatter;
 import com.aafes.stargate.util.ResponseType;
-import com.solab.iso8583.IsoMessage;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -33,23 +31,30 @@ public class WEXProcessor {
     
     @EJB
     private Configurator configurator;
-    private NBSFormatter nBSFormatter;
+    private NBSRequestGenerator nbsRequestGenerator;
     // ADDED TO HANDLE TIMEOUT SCENARIO
     String retryReason = "", iSOMsgResponse = "";
     int dupCheckCounter = 0;
     NBSConnector clientObj;
-    IsoMessage iSOMsg;
+    byte[] iSOMsg;
+    String[] responseArr;
 
     public Transaction processWexRequests(Transaction t) throws Exception{
         LOGGER.info("WEXProcessor.processWexRequests mothod started");
         try {
             dupCheckCounter = 0;
-            if(nBSFormatter == null) nBSFormatter = new NBSFormatter();
-            iSOMsg = nBSFormatter.createRequest(t, 0);
+            if(nbsRequestGenerator == null) nbsRequestGenerator = new NBSRequestGenerator();
+            iSOMsg = nbsRequestGenerator.generateLogOnPacketRequest(t);
             if(clientObj == null)
             clientObj = new NBSConnector();
-            iSOMsgResponse = clientObj.sendRequest(iSOMsg.writeData().toString());
-            t = nBSFormatter.createResponse(iSOMsgResponse);
+            iSOMsgResponse = clientObj.sendRequest(iSOMsg.toString());
+            responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
+            if(responseArr != null || responseArr.length < 2){
+                t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
+                t = nbsRequestGenerator.unmarshalNbsResponse(responseArr[1]);
+            }else{
+                LOGGER.info("Invalid response from NBS.");
+            }
             return t;
         } catch (SocketTimeoutException e) {
             retryReason = "Exception : " + e.getMessage();
@@ -79,8 +84,10 @@ public class WEXProcessor {
                 TimeUnit.SECONDS.sleep(wexRetryWaitTime);
                 LOGGER.info("Retrying to send request. Retry Reason " + retryReason + ". Retry Number : "+ dupCheckCounter 
                         + ". Method " + sMethodName + ". Class Name " + CLASS_NAME);
-                iSOMsg = nBSFormatter.createRequest(t, dupCheckCounter);
-                iSOMsgResponse = clientObj.sendRequest(iSOMsg.writeData().toString());
+                iSOMsgResponse = clientObj.sendRequest(iSOMsg.toString());
+                responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
+                t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
+                t = nbsRequestGenerator.unmarshalNbsResponse(responseArr[1]);
             } else if(dupCheckCounter > wexRetryCount){
                 LOGGER.info("Retry count exausted. Please continue with manual follow-up!! " + "Method " + sMethodName + 
                         ". Class Name " + CLASS_NAME);
@@ -233,8 +240,8 @@ public class WEXProcessor {
         this.configurator = configurator;
     }
 
-    public void setnBSFormatter(NBSFormatter nBSFormatter) {
-        this.nBSFormatter = nBSFormatter;
+    public void setNbsRequestGenerator(NBSRequestGenerator nbsRequestGenerator) {
+        this.nbsRequestGenerator = nbsRequestGenerator;
     }
     
     private void buildErrorResponse(Transaction t, String reasonCode, String description) {
@@ -246,5 +253,4 @@ public class WEXProcessor {
     public void setClientObj(NBSConnector clientObj) {
         this.clientObj = clientObj;
     }
-    
 }

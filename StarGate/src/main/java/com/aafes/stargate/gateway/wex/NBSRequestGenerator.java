@@ -176,7 +176,7 @@ public class NBSRequestGenerator {
 
             isoMsg.set(34, t.getProdDetailCount());
             
-            index = 35;
+            index = 34;
             if (null != t.getProducts() && (t.getProducts().size()) > 0) {
                 for (String nonFuelString : t.getProducts()) {
                     if (nonFuelString.contains(":")) {

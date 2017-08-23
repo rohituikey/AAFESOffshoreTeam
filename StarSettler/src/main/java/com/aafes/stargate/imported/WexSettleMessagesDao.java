@@ -41,6 +41,21 @@ public class WexSettleMessagesDao {
         }
     }
 
+    List<String> getWexTIDList() {
+        List<String> tid = new ArrayList<String>();
+        String query = "";
+
+        query = "SELECT tid FROM starsettler.wexsettlemessages where cardType ='WEX' ALLOW FILTERING;";
+        factory = new CassandraSessionFactory();
+        ResultSet result = factory.getSession().execute(query);
+
+        for (Row row : result) {
+            tid.add(row.getString(0));
+        }
+        return tid;
+
+    }
+
     public void updateWexSettleData(List<WexSettleEntity> Wexdata, String In_Progress) {
         factory = new CassandraSessionFactory();
         String status = "compleated";
@@ -92,8 +107,6 @@ public class WexSettleMessagesDao {
             wexSettleMessages.setPumpCat(row.getString("pumpcat"));
             wexSettleMessages.setPumpService(row.getString("pumpservice"));
             wexSettleMessages.setService(row.getString("service"));
-            // wexSettleMessages.setSettelmentDate(row.getString("settelmentdate"));
-            //wexSettleMessages.setSettelmentTime(row.getString("settelmenttime"));
             wexSettleMessages.setTransactionCode(row.getString("transactioncode"));
             wexSettleMessages.setTransactionId(row.getString("transactionid"));
             wexSettleMessages.setVehicleId(row.getString("vehicleid"));

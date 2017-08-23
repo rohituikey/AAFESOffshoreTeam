@@ -58,7 +58,13 @@ public class WexDataSettler extends BaseSettler {
 
             String xmlString = null;
 
-            List<String> terminalIdList = super.getTIDList();
+            List<String> terminalIdList = new ArrayList<>();
+
+            if (!"Y".equalsIgnoreCase(configurator.get("ENABLE_WEX_SETTLEMENT_TABLE"))) {
+                terminalIdList = super.getTIDList();
+            } else {
+                terminalIdList = super.getWexTIDList();
+            }
 
             Transactionfile file = getFileContent(terminalIdList, processDate);
             file.setDate(getformatedDate());

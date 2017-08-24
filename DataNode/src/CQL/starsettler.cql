@@ -162,4 +162,4 @@ alter table starsettler.settlemessages add service text;
 alter table starsettler.settlemessages add filesequencenumber text;
 alter table starsettler.settlemessages ADD products list <text>;
 alter table starsettler.settlemessages ADD productcode text;
-alter table  settlemessages add pumpnumber text;
+alter table starsettler.settlemessages add pumpnumber text;

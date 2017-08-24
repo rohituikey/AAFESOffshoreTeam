@@ -9,14 +9,14 @@ and open the template in the editor.
 <j8583-config>
     <parse type="0110">
         <!--<field num="2" type="LLVAR" length="19" />  account number-->
-        <field num="10" length="25" type="ALPHA"/> <!--A-->
+        <field num="10" length="1" type="ALPHA"/> <!--A-->
         <field num="11" length="4"  type="NUMERIC"/><!--Key"-->
         <field num="12" length="13"  type="ALPHA"/><!--timestamp"-->
         <field num="13" length="1"  type="ALPHA"/><!--ApplicationUpdateNeeded"-->
         <field num="14" length="2"  type="ALPHA"/><!--AuthCode"-->
         <field num="15" length="32" type="ALPHA"/><!--Message-->
         <field num="16" length="4"  type="ALPHA"/><!--CardType"-->
-        <field num="17" length="6"  type="ALPHA"/><!--numentity-->
+        <field num="17" length="6"  type="ALPHA"/><!--Identity-->
         <field num="18" length="4"  type="ALPHA"/> <!--hostNumber"-->
         <field num="19" length="7"  type="ALPHA"/><!--CardNumber"-->
         <field num="20" length="4"  type="ALPHA"/><!--VehicleNumber-->

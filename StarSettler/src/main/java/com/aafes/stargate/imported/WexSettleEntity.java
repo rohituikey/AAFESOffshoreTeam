@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author alugumetlas
  */
-@Table(keyspace = "stargate", name = "wexsettlemessages")
+@Table(keyspace = "starsettler", name = "wexsettlemessages")
 public class WexSettleEntity {
 
     @ClusteringColumn(0)

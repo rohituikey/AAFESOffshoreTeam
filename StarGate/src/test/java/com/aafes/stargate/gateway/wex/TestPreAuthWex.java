@@ -123,9 +123,8 @@ public class TestPreAuthWex {
         wexProcessor.setClientObj(nBSConnector);
         nbSRequestGenerator = new NBSRequestGenerator();
         nbSRequestGenerator.setConfigurator(configurator);
-
-        wexGateway.setwEXProcessor(wexProcessor);
         wexProcessor.setNbsRequestGenerator(nbSRequestGenerator);
+        wexGateway.setwEXProcessor(wexProcessor);
         settleMessageDAO = new SettleMessageDAO();
         mapper1 = new MappingManager(session).mapper(SettleEntity.class);
         settleMessageDAO.setMapper(mapper1);

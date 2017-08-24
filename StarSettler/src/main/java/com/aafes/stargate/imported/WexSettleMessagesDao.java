@@ -50,7 +50,7 @@ public class WexSettleMessagesDao {
         String query = "";
 
         query = "SELECT tid FROM starsettler.wexsettlemessages where transactiontype ='FinalAuth' ALLOW FILTERING;";
-        factory = new CassandraSessionFactory();
+       // factory = new CassandraSessionFactory();
         ResultSet result = factory.getSession().execute(query);
 
         for (Row row : result) {
@@ -61,7 +61,7 @@ public class WexSettleMessagesDao {
     }
 
     public void updateWexSettleData(List<WexSettleEntity> Wexdata, String In_Progress) {
-        factory = new CassandraSessionFactory();
+        //factory = new CassandraSessionFactory();
         String status = "compleated";
         try {
             for (WexSettleEntity settleData : Wexdata) {
@@ -84,12 +84,12 @@ public class WexSettleMessagesDao {
     public List<WexSettleEntity> getWexTransactions(String tid, String processDate, String status) {
 
         List<WexSettleEntity> wexSettleMessagesList = new ArrayList<>();
-        factory = new CassandraSessionFactory();
+       // factory = new CassandraSessionFactory();
         String query = "";
         String processDate1 = "2017-08-23";
         query = "SELECT * FROM starsettler.wexsettlemessages "
                 + "where receiveddate = '" + processDate1 + "'and "
-                // + "settlestatus = '" + status + "'and "
+                 + "settlestatus = '" + status + "'and "
                 + "tid = '" + tid + "' ALLOW FILTERING;";
 
         ResultSet result = factory.getSession().execute(query);

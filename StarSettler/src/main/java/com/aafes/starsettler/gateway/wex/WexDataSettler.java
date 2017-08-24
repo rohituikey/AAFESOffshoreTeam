@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.xml.bind.JAXB;
 import jaxb.wextransaction.Transactionfile;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,9 @@ public class WexDataSettler extends BaseSettler {
     @EJB
     private Configurator configurator;
 
+    @Inject
+    private String enableWexTable;
+
     List<WexSettleEntity> wexSettlelist = new ArrayList();
     List<SettleEntity> settlelist = new ArrayList();
 
@@ -52,7 +56,7 @@ public class WexDataSettler extends BaseSettler {
     public void run(String identityUUID, String processDate) {
 
         configurator = new Configurator();
-        wexService= new WexService();
+        wexService = new WexService();
         wexGatewayBean = new WexDataGatewayBean();
         log.info(" Wex Settlement process started ");
 
@@ -62,31 +66,27 @@ public class WexDataSettler extends BaseSettler {
 
             List<String> terminalIdList = new ArrayList<>();
 
-            if (!"Y".equalsIgnoreCase("Y"))//configurator.get("ENABLE_WEX_SETTLEMENT_TABLE")))
-            {
+            if (!"Y".equalsIgnoreCase(enableWexTable)) {
                 terminalIdList = super.getTIDList();
             } else {
                 terminalIdList = super.getWexTIDList();
             }
 
-            if(0 != terminalIdList.size())
-            {
-            Transactionfile file = getFileContent(terminalIdList, processDate);
-            file.setDate(getformatedDate());
-            file.setTime(getformatedTime());
+            if (0 != terminalIdList.size()) {
+                Transactionfile file = getFileContent(terminalIdList, processDate);
+                file.setDate(getformatedDate());
+                file.setTime(getformatedTime());
 
-             String fileSeqNo= null;
-              if (!"Y".equalsIgnoreCase("Y"))//configurator.get("ENABLE_WEX_SETTLEMENT_TABLE")))
-            {
-                fileSeqNo= super.fileSequenceId();
-            } else {
-                fileSeqNo = super.fileWexSequenceId();
-            }
-              
-            
-            fileSeqNo = wexGatewayBean.makeFileSequenceId(fileSeqNo);
-            file.setSequence(fileSeqNo);
-            // List settlelist = new ArrayList();
+                String fileSeqNo = null;
+                if (!"Y".equalsIgnoreCase(enableWexTable)) {
+                    fileSeqNo = super.fileSequenceId();
+                } else {
+                    fileSeqNo = super.fileWexSequenceId();
+                }
+
+                fileSeqNo = wexGatewayBean.makeFileSequenceId(fileSeqNo);
+                file.setSequence(fileSeqNo);
+                // List settlelist = new ArrayList();
 
 //            Map map = new HashMap();
 //            for (String tid : terminalIdList) {
@@ -97,22 +97,21 @@ public class WexDataSettler extends BaseSettler {
 //                    file.getBatch().add(batch);
 //                }
 //            }
-            if (!file.getBatch().isEmpty()) {
-                StringWriter sw = new StringWriter();
-                JAXB.marshal(file, sw);
-                xmlString = sw.toString();
+                if (!file.getBatch().isEmpty()) {
+                    StringWriter sw = new StringWriter();
+                    JAXB.marshal(file, sw);
+                    xmlString = sw.toString();
 
-                wexService.generateAndSendToNBS(xmlString);
+                    wexService.generateAndSendToNBS(xmlString);
 
-                if (!"Y".equalsIgnoreCase("Y"))//configurator.get("ENABLE_WEX_SETTLEMENT_TABLE"))) {
-                {
-                    super.updateWexData(settlelist, fileSeqNo);
-                } else {
-                    super.updateWexsettleData(wexSettlelist, fileSeqNo);
+                    if (!"Y".equalsIgnoreCase(enableWexTable)) {
+                        super.updateWexData(settlelist, fileSeqNo);
+                    } else {
+                        super.updateWexsettleData(wexSettlelist, fileSeqNo);
+                    }
+
+                    super.updateFileidxref(terminalIdList, fileSeqNo);
                 }
-
-                super.updateFileidxref(terminalIdList, fileSeqNo);
-            }
             }
 //            List<SettleEntity> transactionSettleData = super.getsettleTransaction(terminalIdList, identityUUID, processDate, SettleStatus.Ready_to_settle);
 //
@@ -165,8 +164,7 @@ public class WexDataSettler extends BaseSettler {
         Transactionfile file = new Transactionfile();
         Map map = new HashMap();
 
-        if (!"Y".equalsIgnoreCase("Y"))//configurator.get("ENABLE_WEX_SETTLEMENT_TABLE"))) {
-        {
+        if (!"Y".equalsIgnoreCase(enableWexTable)) {
             for (String tid : tids) {
                 List<SettleEntity> transactionSettleData = super.getsettleTransaction(tid, processDate, SettleStatus.Ready_to_settle);
                 if (transactionSettleData.size() != 0) {
@@ -188,4 +186,13 @@ public class WexDataSettler extends BaseSettler {
 
         return file;
     }
+
+    public String getEnableWexTable() {
+        return enableWexTable;
+    }
+
+    public void setEnableWexTable(String enableWexTable) {
+        this.enableWexTable = enableWexTable;
+    }
+
 }

@@ -20,7 +20,7 @@ import javax.ejb.EJB;
 public class NBSConnector {
 
     private static final Logger LOG = Logger.getLogger(NBSConnector.class.getName());
-    private StringBuffer response;
+    //private StringBuffer response;
     byte[] isoFormat;
     private Socket nbsSocket;
     @EJB
@@ -45,11 +45,11 @@ public class NBSConnector {
             BufferedWriter writeRequest = new BufferedWriter(new OutputStreamWriter(nbsSocket.getOutputStream()));
             writeRequest.write(request + "\n");
             writeRequest.flush();
-            getResponse();
+            strResponse = getResponse();
             nbsSocket.close();
 //            isoFormat = response.toString().getBytes();
 //            return isoFormat;
-        if(response != null) strResponse = response.toString();
+        ///if(response != null) strResponse = response.toString();
         } catch (SocketTimeoutException ex) {
             Logger.getLogger(NBSConnector.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("nbsclient.NBSClient.main()" + ex);
@@ -65,15 +65,18 @@ public class NBSConnector {
         return strResponse;
     }
     
-    public void getResponse() throws IOException{
+    public String getResponse() throws IOException{
         String responsePerLine = "";
+        StringBuilder response = null;
         BufferedReader readResponse = new BufferedReader(new InputStreamReader(nbsSocket.getInputStream()));
 
         while ((responsePerLine = readResponse.readLine()) != null) {
-            if(response == null) response = new StringBuffer();
+            if(response == null) response = new StringBuilder();
             response.append(responsePerLine);
             LOG.log(Level.INFO, "Response recieved as {0}", response);
         }
+        if(response != null) return response.toString();
+        else return "";
     }
     
     private void populateValuesFromPropertiesFile(){

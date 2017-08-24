@@ -50,7 +50,7 @@ public class NBSServer {
 
             String response = null;
             try{
-                response = nBSStub.unpackIso8583(Input);
+                response = nBSStub.getResponse(Input);
             }catch(Exception e){
                 e.printStackTrace();
             }

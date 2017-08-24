@@ -15,6 +15,7 @@ import com.datastax.driver.mapping.MappingManager;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 /**
@@ -33,12 +34,22 @@ public class WexSettleMessagesDao {
         if (session == null) {
             session = factory.getSession();
         }
-        setMapper(new MappingManager(session).mapper(WexSettleEntity.class));
+        //MappingManager obj = new MappingManager(session);
+        try{
+            mapper = new MappingManager(session).mapper(WexSettleEntity.class);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void saveToWex(List<WexSettleEntity> wexSettleEntityList) {
-        for (WexSettleEntity wexSettleEntity : wexSettleEntityList) {
-            mapper.save(wexSettleEntity);
+        try{
+            for (WexSettleEntity wexSettleEntity : wexSettleEntityList) {
+                mapper.save(wexSettleEntity);
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -139,6 +150,11 @@ public class WexSettleMessagesDao {
     }
 
     public void setFactory(CassandraSessionFactory factory) {
+        this.factory = factory;
+    }
+    
+    @EJB
+    public void setCassandraSessionFactory(CassandraSessionFactory factory) {
         this.factory = factory;
     }
 

@@ -55,9 +55,14 @@ public abstract class BaseSettler {
         return repository.getBatchId();
     }
 
-    public String fileSequenceId() {
+    public String fileWexSequenceId(){
+        return wexRepository.getfileWexSequenceId();
+    }
+    
+     public String fileSequenceId() {
         return repository.getFileSequenceId();
     }
+    
 
     public void updateFdmsData(List<SettleEntity> fdmsData, String In_Progress) {
         repository.updateFdmsData(fdmsData, In_Progress);

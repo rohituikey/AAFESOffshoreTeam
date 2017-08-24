@@ -170,7 +170,6 @@ public class TestPreAuthWex {
     }
     // @Ignore
 
-    @Ignore
     @Test
     public void testDeclinePreAuthRequestDueToKeyedTransaction() {
         sMethodName = "testDeclinePreAuthRequestDueToKeyedTransaction";
@@ -185,7 +184,7 @@ public class TestPreAuthWex {
         assertEquals("INVALID_INPUT_TYPE", result.getResponse().get(0).getDescriptionField());
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testDeclinePreAuthRequestDueToNoFuelProducts() {
         sMethodName = "testDeclinePreAuthRequestDueToNoFuelProducts";
@@ -200,7 +199,7 @@ public class TestPreAuthWex {
         assertEquals("PRODUCT_DETAIL_COUNT_NOT_BE_NULL", result.getResponse().get(0).getDescriptionField());
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testForCountExceededForFuelProdCodes() {
         sMethodName = "testForCountExceededForFuelProdCodes";
@@ -215,7 +214,7 @@ public class TestPreAuthWex {
         assertEquals("FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED", result.getResponse().get(0).getDescriptionField());
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testForCountExceededForNonFuelProdCodes() {
         sMethodName = "testForCountExceededForNonFuelProdCodes";

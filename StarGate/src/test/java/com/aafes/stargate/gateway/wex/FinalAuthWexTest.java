@@ -157,14 +157,14 @@ public class FinalAuthWexTest {
         authorizer.setBaseStrategyFactory(bsf);
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testNoAuthorizationFoundForFinalAuthRequest() {
         sMethodName = "testNoAuthorizationFoundForFinalAuthRequest";
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
+        session.execute("TRUNCATE STARGATE.TRANSACTIONS");
         Message creditMessage = this.unmarshalCreditMessage(requestXMLFinalAuth);
         Message result = authorizer.authorize(creditMessage);
-        insertDataForTesting();
         session.execute("TRUNCATE STARGATE.TRANSACTIONS");
         clearGlobalVariables();
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
@@ -191,7 +191,7 @@ public class FinalAuthWexTest {
         assertEquals("100", result.getResponse().get(0).getReasonCode());
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testDeclineFinalAuthRequestDueToKeyedTransaction() {
         sMethodName = "testDeclineFinalAuthRequestDueToKeyedTransaction";
@@ -205,8 +205,9 @@ public class FinalAuthWexTest {
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         assertEquals("INVALID_INPUT_TYPE", result.getResponse().get(0).getDescriptionField());
     }
+    //1.7.21 s 1.2.17 l   
 
-    @Ignore
+//    @Ignore
     @Test
     public void testForAlreadySettled() {
         sMethodName = "testSuccessFinalAuthRequest";

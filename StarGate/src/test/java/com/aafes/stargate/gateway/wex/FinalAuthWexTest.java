@@ -75,7 +75,7 @@ public class FinalAuthWexTest {
     GatewayFactory gatewayFactory;
     BaseStrategy bs;
     SettleMessageDAO settleMessageDAO;
-    NBSFormatter nBSFormatter;
+    NBSRequestGenerator nbSRequestGenerator;
     NBSConnector nBSConnector;
     Mapper mapper3;
 
@@ -93,7 +93,7 @@ public class FinalAuthWexTest {
 
     @Before
     public void setDataForTesting() {
-        authorizer = new Authorizer();
+         authorizer = new Authorizer();
         configurator = new Configurator();
         configurator.postConstruct();
         configurator.load();
@@ -130,11 +130,11 @@ public class FinalAuthWexTest {
         nBSConnector = new NBSConnector();
         nBSConnector.setConfigurator(configurator);
         wexProcessor.setClientObj(nBSConnector);
-        nBSFormatter = new NBSFormatter();
-        nBSFormatter.setConfigurator(configurator);
+        nbSRequestGenerator = new NBSRequestGenerator();
+        nbSRequestGenerator.setConfigurator(configurator);
 
         wexGateway.setwEXProcessor(wexProcessor);
-        wexProcessor.setnBSFormatter(nBSFormatter);
+        wexProcessor.setNbsRequestGenerator(nbSRequestGenerator);
         settleMessageDAO = new SettleMessageDAO();
         mapper1 = new MappingManager(session).mapper(SettleEntity.class);
         settleMessageDAO.setMapper(mapper1);

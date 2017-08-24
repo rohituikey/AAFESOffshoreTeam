@@ -47,7 +47,7 @@ public class WEXProcessor {
             iSOMsg = nbsRequestGenerator.generateLogOnPacketRequest(t);
             if(clientObj == null)
             clientObj = new NBSConnector();
-            iSOMsgResponse = clientObj.sendRequest(iSOMsg.toString());
+            iSOMsgResponse = clientObj.sendRequest(new String(iSOMsg));
             responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
             if(responseArr != null || responseArr.length < 2){
                 t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);

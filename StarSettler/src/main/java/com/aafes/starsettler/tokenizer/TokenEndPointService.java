@@ -6,9 +6,11 @@
 package com.aafes.starsettler.tokenizer;
 
 import com.aafes.credit.AccountTypeType;
-import com.aafes.credit.RequestTypeType;
+import com.aafes.credit.Message.Request;
 import com.aafes.starsettler.entity.SettleEntity;
+import com.aafes.token.RequestTypeType;
 import com.aafes.token.TokenMessage;
+import generated.Settlement.Response;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.ProcessingException;
@@ -17,7 +19,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -42,7 +43,7 @@ public class TokenEndPointService {
         log.info("TokenServicer#lookupAccount#Done WebTarget.........");
 
         TokenMessage tm = new TokenMessage();
-        TokenMessage.Request request = new TokenMessage.Request();
+        Request request = new Request();
         request.setAccount(t.getCardToken());
         request.setAccountType(AccountTypeType.TOKEN);
         request.setMedia(t.getCardType());

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE isopackager SYSTEM "NBSResponse.dtd">
+<isopackager>
+    <isofield
+      id="0"
+      length="4"
+      name="MESSAGE TYPE INDICATOR"
+      class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+      id="1"
+      length="64"
+      name="BIT MAP"
+      class="org.jpos.iso.IFA_BITMAP"/>
+    <isofield
+        id="10"
+        length="25"
+        name="A"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+    <isofield
+        id="11"
+        length="4"
+        name="Key"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+        <isofield
+        id="12"
+        length="13"
+        name="TimeStamp"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="13"
+        length="1"
+        name="ApplicationUpdateNeeded"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="14"
+        length="2"
+        name="AuthCode"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="15"
+        length="32"
+        name="Message"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="16"
+        length="4"
+        name="CardType"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="17"
+        length="6"
+        name="Identity"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="18"
+        length="4"
+        name="HostNumber"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="19"
+        length="7"
+        name="CardNumber"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="20"
+        length="4"
+        name="VehicleNumber"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="21"
+        length="4"
+        name="ServiceOption"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="22"
+        length="2"
+        name="promptCount"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="23"
+        length="1"
+        name="promptType"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="24"
+        length="6"
+        name="authRef"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="25"
+        length="10"
+        name="maxAmount"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="26"
+        length="2"
+        name="productAuthCount"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="27"
+        length="10"
+        name="maxQuantity"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="28"
+        length="3"
+        name="productCode"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+	<isofield
+        id="29"
+        length="7"
+        name="productDeatailsMaxAmount"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+</isopackager>

@@ -80,7 +80,7 @@ public class NBSStubImpl implements NBSStub {
         }
 
         isoMsg.setPackager(packager);
-        isoMsg.setMTI("0231");
+        isoMsg.setMTI("0200");
         if (correctRequest) {
             isoMsg.set(10, "c$");
             isoMsg.set(11, "100");
@@ -103,7 +103,7 @@ public class NBSStubImpl implements NBSStub {
             packager = new GenericPackager(SCHEMA_PATH);
         }
         isoMsg.setPackager(packager);
-        isoMsg.setMTI("0231");
+        isoMsg.setMTI("0200");
         isoMsg.set(10, "A");
         isoMsg.set(11, "0278");
 

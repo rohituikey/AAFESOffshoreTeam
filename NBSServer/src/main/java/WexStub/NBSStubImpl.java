@@ -73,11 +73,11 @@ public class NBSStubImpl implements NBSStub {
         isoMsg.setPackager(packager);
         isoMsg.setMTI("0200");
         if (correctRequest) {
-            isoMsg.set(10, "c$");
-            isoMsg.set(11, "100");
+            isoMsg.set(2, "c$");
+            isoMsg.set(3, "100");
         } else {
-            isoMsg.set(10, "c?");
-            isoMsg.set(11, "200");
+            isoMsg.set(2, "c?");
+            isoMsg.set(3, "200");
         }
         byte[] byteResult = isoMsg.pack();
         result = new String(byteResult);
@@ -95,32 +95,32 @@ public class NBSStubImpl implements NBSStub {
         }
         isoMsg.setPackager(packager);
         isoMsg.setMTI("0200");
-        isoMsg.set(10, "A");
-        isoMsg.set(11, "0278");
+        isoMsg.set(2, "A");
+        isoMsg.set(3, "0278");
 
-        isoMsg.set(12, "3170621071655");
-        isoMsg.set(13, "N");
+        isoMsg.set(4, "3170621071655");
+        isoMsg.set(5, "N");
         if (correctRequest) {
-            isoMsg.set(14, "00");
-            isoMsg.set(15, "Approved");
+            isoMsg.set(6, "00");
+            isoMsg.set(7, "Approved");
         } else {
-            isoMsg.set(14, "01");
-            isoMsg.set(15, "Declined");
+            isoMsg.set(6, "01");
+            isoMsg.set(7, "Declined");
         }
-        isoMsg.set(16, "WEX");
-        isoMsg.set(17, "");
-        isoMsg.set(18, "");
-        isoMsg.set(19, "");
-        isoMsg.set(20, "");
-        isoMsg.set(21, "");
-        isoMsg.set(22, "5");
-        isoMsg.set(23, "0");
-        isoMsg.set(24, "308339");
-        isoMsg.set(25, "75.00");
-        isoMsg.set(26, "1");
-        isoMsg.set(27, "75.0000");
-        isoMsg.set(28, "001");
-        isoMsg.set(29, "78965");
+        isoMsg.set(8, "WEX");
+        isoMsg.set(9, "");
+        isoMsg.set(10, "");
+        isoMsg.set(11, "");
+        isoMsg.set(12, "");
+        isoMsg.set(13, "");
+        isoMsg.set(14, "5");
+        isoMsg.set(15, "0");
+        isoMsg.set(16, "308339");
+        isoMsg.set(17, "75.00");
+        isoMsg.set(18, "1");
+        isoMsg.set(19, "75.0000");
+        isoMsg.set(20, "001");
+        isoMsg.set(21, "78965");
 
         byte[] byteResult = isoMsg.pack();
         responseDetails = new String(byteResult);

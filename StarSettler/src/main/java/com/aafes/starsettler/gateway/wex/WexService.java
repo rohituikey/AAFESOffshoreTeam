@@ -67,7 +67,7 @@ public class WexService {
 
     }
 
-    public void generateAndSendToNBS(String settlexmlrecord) {
+    public void generateAndSendToNBS(String settlexmlrecord, String fileSeqNo) {
         log.info("Triggered.");
 
         wexFile=new WexFile();
@@ -75,7 +75,7 @@ public class WexService {
 
             Date date = new Date();
             String createdDate = dateFormat.format(date);
-            wexFile.createFile(sourcePath,settlexmlrecord);
+            wexFile.createFile(sourcePath,settlexmlrecord, fileSeqNo);
             sftp.setSFTPUSER(this.user);
             sftp.setSFTPHOST(this.host);
             sftp.setSFTPPORT(SFTPPORT);

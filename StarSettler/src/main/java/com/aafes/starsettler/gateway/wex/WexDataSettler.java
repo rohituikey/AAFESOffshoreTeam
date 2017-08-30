@@ -102,7 +102,7 @@ public class WexDataSettler extends BaseSettler {
                     JAXB.marshal(file, sw);
                     xmlString = sw.toString();
 
-                    wexService.generateAndSendToNBS(xmlString);
+                    wexService.generateAndSendToNBS(xmlString,fileSeqNo);
 
                     if (!"Y".equalsIgnoreCase(enableWexTable)) {
                         super.updateWexData(settlelist, fileSeqNo);
@@ -195,4 +195,5 @@ public class WexDataSettler extends BaseSettler {
         this.enableWexTable = enableWexTable;
     }
 
+    
 }

@@ -35,7 +35,7 @@ public class NBSServer {
             ServerSocket NbsSocket = new ServerSocket(2000);
             //NbsSocket.setSoTimeout(1);
 
-            while (true) {
+            //while (true) {
                 connectionSocket = NbsSocket.accept();
                 LOG.info("Connection successfully established");
 
@@ -58,7 +58,7 @@ public class NBSServer {
                 LOG.log(Level.INFO, "sending response as {0}", response);
                 writeResponse.write(response + " \r");
                 writeResponse.flush();
-            }
+            //}
         } catch (IOException ex) {
             Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {

@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -36,35 +35,39 @@ public class NBSServer {
             ServerSocket NbsSocket = new ServerSocket(2000);
             //NbsSocket.setSoTimeout(1);
 
-            connectionSocket = NbsSocket.accept();
-            LOG.info("Connection successfully established");
+            while (true) {
+                connectionSocket = NbsSocket.accept();
+                LOG.info("Connection successfully established");
 
-            BufferedReader readRequest
-                    = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                BufferedReader readRequest
+                        = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
-            String Input = readRequest.readLine().trim();
-            LOG.log(Level.INFO, "recieved request as {0}", Input);
+                String Input = readRequest.readLine().trim();
+                LOG.log(Level.INFO, "recieved request as {0}", Input);
 
-            BufferedWriter writeResponse
-                    = new BufferedWriter(new OutputStreamWriter(connectionSocket.getOutputStream()));
+                BufferedWriter writeResponse
+                        = new BufferedWriter(new OutputStreamWriter(connectionSocket.getOutputStream()));
 
-            String response = null;
-            try{
-                response = nBSStub.getResponse(Input);
-            }catch(Exception e){
-                e.printStackTrace();
+                String response = null;
+                try {
+                    response = nBSStub.getResponse(Input);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                LOG.log(Level.INFO, "sending response as {0}", response);
+                writeResponse.write(response + " \r");
+                writeResponse.flush();
             }
-
-            LOG.log(Level.INFO, "sending response as {0}", response);
-            writeResponse.write(response+ " \r");
-            writeResponse.flush();
         } catch (IOException ex) {
             Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
-        }finally{
-            try { 
-                if(connectionSocket != null) connectionSocket.close();
+        } finally {
+            try {
+                if (connectionSocket != null) {
+                    connectionSocket.close();
+                }
             } catch (IOException ex) {
                 Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
             }

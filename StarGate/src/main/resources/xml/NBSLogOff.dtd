@@ -3,7 +3,7 @@
 <!--
     TODO define vocabulary identification
     PUBLIC ID: -//vendor//vocabulary//EN
-    SYSTEM ID: http://server/path/NBSLogonPackager.dtd
+    SYSTEM ID: http://server/path/NBSLogOff.dtd
 
 -->
 
@@ -12,7 +12,7 @@
 
     <?xml version="1.0"?>
 
-    <!DOCTYPE isopackager SYSTEM "NBSLogonPackager.dtd">
+    <!DOCTYPE isopackager SYSTEM "NBSLogOff.dtd">
 
     <isopackager>
     ...

@@ -47,8 +47,7 @@ public class WEXProcessor {
             iSOMsg = nbsRequestGenerator.generateLogOnPacketRequest(t);
             if(clientObj == null)
             clientObj = new NBSConnector();
-            String str = new String(iSOMsg);
-            iSOMsgResponse = clientObj.sendRequest(str);
+            iSOMsgResponse = clientObj.sendRequest(iSOMsg);
             responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
             if(responseArr != null || responseArr.length < 2){
                 t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
@@ -85,7 +84,7 @@ public class WEXProcessor {
                 TimeUnit.SECONDS.sleep(wexRetryWaitTime);
                 LOGGER.info("Retrying to send request. Retry Reason " + retryReason + ". Retry Number : "+ dupCheckCounter 
                         + ". Method " + sMethodName + ". Class Name " + CLASS_NAME);
-                iSOMsgResponse = clientObj.sendRequest(iSOMsg.toString());
+                iSOMsgResponse = clientObj.sendRequest(iSOMsg);
                 responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
                 t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
                 t = nbsRequestGenerator.unmarshalNbsResponse(responseArr[1]);

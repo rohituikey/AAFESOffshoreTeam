@@ -53,9 +53,9 @@ public class NBSRequestGenerator {
     private String SCHEMA_PATH = "";
     @EJB
     private Configurator configurator;
-
-    public byte[] generateLogOnPacketRequest(Transaction t) {
-
+    
+    public byte[] generateLogOnPacketRequest(Transaction t, boolean isTimeoutRetry) {
+        
         if (configurator == null) {
             configurator = new Configurator();
             configurator.postConstruct();
@@ -95,45 +95,36 @@ public class NBSRequestGenerator {
             }
             isoMsg = new ISOMsg();
             isoMsg.setPackager(packager);
-            isoMsg.setMTI("0231");
-            isoMsg.set(10, transaction.getTermId());
-            isoMsg.set(12, applicationName);
-            isoMsg.set(13, applicationVersion);
-            isoMsg.set(14, createDateFormat());
-            isoMsg.set(15, sessionTypeAuth);
-            isoMsg.set(16, transaction.getTransactionId().substring(0, 4));
+            isoMsg.setMTI("0200");
+            if(!isTimeoutRetry){
+                isoMsg.set(2, transaction.getTermId());
+                isoMsg.set(3, applicationName);
+                isoMsg.set(4, applicationVersion);
+                isoMsg.set(5, createDateFormat());
+            }
+            isoMsg.set(6, sessionTypeAuth);
+            isoMsg.set(7, transaction.getTransactionId().substring(0, 4));
             if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) {
-                isoMsg.set(17, transTypePreAuth);
+                isoMsg.set(8, transTypePreAuth);
             } else if (transaction.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     || transaction.getRequestType().equalsIgnoreCase(RequestType.SALE)) {
-                isoMsg.set(17, transTypeFinalAndSale);
+                isoMsg.set(8, transTypeFinalAndSale);
             } else if (transaction.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
-                isoMsg.set(17, transTypeRefund);
+                isoMsg.set(8, transTypeRefund);
             }
-            isoMsg.set(18, cardTypeWex);
-            isoMsg.set(19, transaction.getCatFlag());
-            isoMsg.set(110, transaction.getPumpNmbr());
-            isoMsg.set(111, serviceType);
-
             if (transaction.getRequestType().equals(RequestType.FINAL_AUTH)) {
-                isoMsg.set(15, captureOnlyRequest);
-                isoMsg.set(112, Long.toString(transaction.getAmount()));
-                isoMsg.set(113, Long.toString(transaction.getAmtPreAuthorized()));
-                isoMsg.set(114, transaction.getTransactionId());
-                isoMsg.set(115, createDateAndTime());
-                isoMsg.set(120, transaction.getAuthNumber());
             }
-            isoMsg.set(116, "2");
             if (transaction.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
-                isoMsg.set(117, transaction.getTrack2());
-            } else if (transaction.getInputType().equalsIgnoreCase(InputType.KEYED))//isoMsg.set(113, transaction.getTrack2());//Track0 formatt
             {
                 if (!(transaction.getRequestType().equals(RequestType.FINAL_AUTH))) {
-                    isoMsg.set(118, Long.toString(t.getAmount()));
                 }
             }
             if ("10".equalsIgnoreCase(transTypeFinalAndSale) || "30".equalsIgnoreCase(transTypeRefund)) {
-                isoMsg.set(119, (t.getTransactionId() + t.getTermId()));
+            isoMsg.set(9, cardTypeWex);
+            isoMsg.set(10, transaction.getCatFlag());
+            isoMsg.set(11, transaction.getPumpNmbr());
+            isoMsg.set(12, serviceType);
+            
             }
 
 //            isoMsg.set(15, nbsLogonRequest.getHeaderRecord().getCardSpecificData().getWexPromptDetails().getPromptDetailCount().toString());
@@ -187,12 +178,12 @@ public class NBSRequestGenerator {
             }
             isoMsg.setPackager(packager);
             isoMsg.unpack(response.getBytes());
-            if (isoMsg.getString(10).trim().equalsIgnoreCase("c$")) {
+            if (isoMsg.getString(2).trim().equalsIgnoreCase("c$")) {
                 transaction.setResponseType(ResponseType.APPROVED);
-            } else if (isoMsg.getString(10).trim().equalsIgnoreCase("c?")) {
+            } else if (isoMsg.getString(2).trim().equalsIgnoreCase("c?")) {
                 transaction.setResponseType(ResponseType.DECLINED);
             }
-            transaction.setReasonCode(isoMsg.getString(11));
+            transaction.setReasonCode(isoMsg.getString(3));
             return transaction;
         } catch (ISOException ex) {
             Logger.getLogger(NBSRequestGenerator.class.getName()).log(Level.SEVERE, null, ex);
@@ -219,16 +210,16 @@ public class NBSRequestGenerator {
             isoMsg.unpack(response.getBytes());
 
             //promptType.setPromptType(isoMsg.getString(23));
-            transaction.setAuthNumber(isoMsg.getString(24));
+            transaction.setAuthNumber(isoMsg.getString(16));
             //promptType.setMaxAmount(new BigDecimal(isoMsg.getString(25)));
             //promptType.setProductAuthCount(new BigInteger(isoMsg.getString(26)));
 
-            transaction.setProdDetailCount(isoMsg.getString(27));
-            transaction.setProductCode(isoMsg.getString(28));
+            transaction.setProdDetailCount(isoMsg.getString(11));
+            transaction.setProductCode(isoMsg.getString(20));
             //productDetails.setMaxAmount(new BigDecimal(isoMsg.getString(29)));
 
-            transaction.setResponseType(isoMsg.getString(15));
-            transaction.setMedia(isoMsg.getString(16));
+            transaction.setResponseType(isoMsg.getString(7));
+            transaction.setMedia(isoMsg.getString(8));
             transaction.setLocalDateTime(SvsUtil.formatLocalDateTime());
 //            authResponse.setIdentity(isoMsg.getString(17));
             //          authResponse.setHostNumber(isoMsg.getString(18));
@@ -265,8 +256,8 @@ public class NBSRequestGenerator {
                 packager = new GenericPackager(SCHEMA_PATH);
             }
             isoMsg.setPackager(packager);
-            isoMsg.setMTI("0231");
-            isoMsg.set(10, "O");
+            isoMsg.setMTI("0200");
+            isoMsg.set(2, "O");
             byte[] data = isoMsg.pack();
             result = new String(data);
             return result;
@@ -402,3 +393,11 @@ public class NBSRequestGenerator {
         this.SCHEMA_PATH = SCHEMA_PATH;
     }
 }
+                isoMsg.set(6, captureOnlyRequest);
+                isoMsg.set(13, Long.toString(transaction.getAmount()));
+                isoMsg.set(14, Long.toString(transaction.getAmtPreAuthorized()));
+                if (null != transaction.getTransactionId()) {
+                    isoMsg.set(15, transaction.getTransactionId().substring(0, 4));
+                }
+                isoMsg.set(16, createDateAndTime());
+                isoMsg.set(21, transaction.getAuthNumber());

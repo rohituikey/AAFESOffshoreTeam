@@ -5,12 +5,10 @@
  */
 package com.aafes.starsettler.gateway.wex;
 
-import com.aafes.starsettler.entity.SettleEntity;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -67,14 +65,14 @@ public class WexService {
 
     }
 
-    public void generateAndSendToNBS(String settlexmlrecord) {
+    public void generateAndSendToNBS(String settlexmlrecord, String fileSeqNo) {
         log.info("Triggered.");
 
         try {
 
             Date date = new Date();
             String createdDate = dateFormat.format(date);
-            wexFile.createFile(sourcePath,settlexmlrecord);
+            wexFile.createFile(sourcePath,settlexmlrecord, fileSeqNo);
             sftp.setSFTPUSER(this.user);
             sftp.setSFTPHOST(this.host);
             sftp.setSFTPPORT(SFTPPORT);

@@ -17,108 +17,233 @@ and open the template in the editor.
         name="BIT MAP"
         class="org.jpos.iso.IFA_BITMAP"/>
     <isofield
-        id="10"
+        id="2"
         length="15"
         name="TermId"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
-        id="12"
+        id="3"
         length="7"
         name="AppName"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
-        id="13"
+        id="4"
         length="4"
         name="AppVersion"
         class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield
-        id="14"
+        id="5"
         length="5"
         name="TimeZone"
         class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield
-        id="15"
+        id="6"
         length="25"
         name="HeaderRecordA"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
-        id="16"
+        id="7"
         length="4"
         name="Key"
         class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield
-        id="17"
+        id="8"
         length="2"
         name="TransType"
         class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield
-        id="18"
+        id="9"
         length="2"
         name="CardType"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
-        id="19"
+        id="10"
         length="1"
         name="CATFlag"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
-        id="110"
+        id="11"
         length="2"
         name="PumpNo"
         class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield
-        id="111"
+        id="12"
         length="1"
         name="ServiceType"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     
     <isofield
-        id="112"
+        id="13"
         length="9"
         name="Amount"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
-        id="113"
+        id="14"
         length="9"
         name="CATamount"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
-        id="114"
+        id="15"
         length="4"
         name="TransNumber"
         class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield
-        id="115"
+        id="16"
         length="12"
         name="DateTime"
         class="org.jpos.iso.IFA_NUMERIC"/>
     
         
     <isofield
-        id="116"
+        id="17"
         length="25"
         name="Track"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
-        id="117"
+        id="18"
         length="79"
         name="CardSpecificDataAccountInfo"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
-        id="118"
+        id="19"
         length="9"
         name="CardSpecificDataAmount"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
-        id="119"
+        id="20"
         length="12"
         name="CardSpecificDataRecieptNumber"
         class="org.jpos.iso.IFA_LLLCHAR"/>
     <isofield
-        id="120"
+        id="21"
         length="6"
         name="CardSpecificDataAuthReference"
         class="org.jpos.iso.IFA_LLLCHAR"/>
+    <isofield
+        id="22"
+        length="2"
+        name="PromptDetailsCount"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="23"
+        length="1"
+        name="PrompType"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+    <isofield
+        id="24"
+        length="10"
+        name="PromptValue"
+        class="org.jpos.iso.IFA_LLLCHAR"/>
+    <isofield
+        id="25"
+        length="2"
+        name="PromptDetailsCount"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+<!--    to be looped-->
+    <isofield
+        id="26"
+        length="9"
+        name="price"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="27"
+        length="10"
+        name="quantity"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="28"
+        length="3"
+        name="prodCode"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="29"
+        length="7"
+        name="Amount"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <!--    to be looped-->
+    <isofield
+        id="30"
+        length="9"
+        name="price"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="31"
+        length="10"
+        name="quantity"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="32"
+        length="3"
+        name="prodCode"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="33"
+        length="7"
+        name="Amount"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <!--    to be looped-->
+    <isofield
+        id="34"
+        length="9"
+        name="price"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="35"
+        length="10"
+        name="quantity"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="36"
+        length="3"
+        name="prodCode"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="37"
+        length="7"
+        name="Amount"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <!--    to be looped-->
+    <isofield
+        id="38"
+        length="9"
+        name="price"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="39"
+        length="10"
+        name="quantity"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="40"
+        length="3"
+        name="prodCode"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="41"
+        length="7"
+        name="Amount"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <!--    to be looped-->
+    <isofield
+        id="42"
+        length="9"
+        name="price"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="43"
+        length="10"
+        name="quantity"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="44"
+        length="3"
+        name="prodCode"
+        class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield
+        id="45"
+        length="7"
+        name="Amount"
+        class="org.jpos.iso.IFA_NUMERIC"/>
 </isopackager>
   
   

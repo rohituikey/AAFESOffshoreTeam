@@ -4,7 +4,7 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
-<!DOCTYPE isopackager SYSTEM "ResponseAcknowledgment.dtd">
+<!DOCTYPE isopackager SYSTEM "NBSLogOff.dtd">
 <isopackager>
     <isofield
       id="0"
@@ -17,13 +17,8 @@ and open the template in the editor.
       name="BIT MAP"
       class="org.jpos.iso.IFA_BITMAP"/>
     <isofield
-        id="10"
+        id="2"
         length="25"
-        name="ResponseType"
-        class="org.jpos.iso.IFA_LLLCHAR"/>
-    <isofield
-        id="11"
-        length="25"
-        name="ReasonCode"
+        name="LogOffParam"
         class="org.jpos.iso.IFA_LLLCHAR"/>
 </isopackager>

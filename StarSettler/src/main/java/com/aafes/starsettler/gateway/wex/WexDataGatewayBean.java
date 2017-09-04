@@ -208,18 +208,27 @@ public class WexDataGatewayBean {
         log.info("Entry in makeBatchId method of FirstDataGatewayBean..");
         try {
             if (fileSequenceId == null || fileSequenceId.trim().isEmpty()) {
-                Calendar cal = Calendar.getInstance();
-                Date currnetDate = new Date();
-                cal.setTime(currnetDate);
-                GregorianCalendar gc = new GregorianCalendar();
-                gc.set(GregorianCalendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH));
-                gc.set(GregorianCalendar.MONTH, cal.get(Calendar.MONTH));
-                gc.set(GregorianCalendar.YEAR, cal.get(Calendar.YEAR));
-                DateFormat df = new SimpleDateFormat("yy");
-                String year = df.format(currnetDate);
-                int JULIAN_DAY = gc.get(GregorianCalendar.DAY_OF_YEAR);
-                String pacckedDay = ("000" + Integer.toString(JULIAN_DAY)).substring((Integer.toString(JULIAN_DAY)).length());
-                fileSequenceId = year + pacckedDay + "001";
+//                Calendar cal = Calendar.getInstance();
+//                Date currnetDate = new Date();
+//                cal.setTime(currnetDate);
+//                GregorianCalendar gc = new GregorianCalendar();
+//                gc.set(GregorianCalendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH));
+//                gc.set(GregorianCalendar.MONTH, cal.get(Calendar.MONTH));
+//                gc.set(GregorianCalendar.YEAR, cal.get(Calendar.YEAR));
+//                DateFormat df = new SimpleDateFormat("yy");
+//                String year = df.format(currnetDate);
+//                int JULIAN_DAY = gc.get(GregorianCalendar.DAY_OF_YEAR);
+//                String pacckedDay = ("000" + Integer.toString(JULIAN_DAY)).substring((Integer.toString(JULIAN_DAY)).length());
+//                fileSequenceId = year + pacckedDay + "001";
+
+                //Calendar cal = Calendar.getInstance();
+                Date date = new Date();
+                SimpleDateFormat sdf = new SimpleDateFormat("MMdd");
+                //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+               // String time = sdf.format(cal.getTime());
+                String formateddate=sdf.format(date);
+                fileSequenceId = formateddate+"01";
+
             } else {
                 long oldFileNumber = Long.parseLong(fileSequenceId);
                 oldFileNumber++;
@@ -234,7 +243,7 @@ public class WexDataGatewayBean {
         return fileSequenceId;
     }
 
-    private String makeBatchId(String batchId) {
+    private String makeBatchId(String batchId) {    
 
         log.info("Entry in makeBatchId method of FirstDataGatewayBean..");
         try {

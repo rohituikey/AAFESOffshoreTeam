@@ -35,14 +35,14 @@ public class WexFile {
 
     }
 
-    public void createFile(String sourcePath ,String settlexmlrecord) throws UnsupportedEncodingException, IOException {
+    public void createFile(String sourcePath ,String settlexmlrecord, String fileSeqNo) throws UnsupportedEncodingException, IOException {
           log.info("Entry in createFile method of WexFile..");
              Date date = new Date();
-            String createdDate = dateFormat.format(date);
+           // String createdDate = dateFormat.format(date);
         log.info("Entry in createXmlFile method of WexDataGatewayBean..");
        
         if (null != settlexmlrecord && !settlexmlrecord.isEmpty()) {
-             String filename = sourcePath + "wexSFTP_" + createdDate;
+             String filename = sourcePath +fileSeqNo; //"wexSFTP_" + createdDate;
            
              File file = new File(filename);
             if (!file.exists()) {

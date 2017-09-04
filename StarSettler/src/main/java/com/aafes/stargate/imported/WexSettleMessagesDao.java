@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 /**
@@ -181,6 +182,11 @@ public class WexSettleMessagesDao {
     }
 
     public void setFactory(CassandraSessionFactory factory) {
+        this.factory = factory;
+    }
+    
+     @EJB
+    public void setCassandraSessionFactory(CassandraSessionFactory factory) {
         this.factory = factory;
     }
 

@@ -5,12 +5,10 @@
  */
 package com.aafes.starsettler.gateway.wex;
 
-import com.aafes.starsettler.entity.SettleEntity;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;

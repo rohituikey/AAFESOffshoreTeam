@@ -221,10 +221,13 @@ public class WexDataGatewayBean {
 //                String pacckedDay = ("000" + Integer.toString(JULIAN_DAY)).substring((Integer.toString(JULIAN_DAY)).length());
 //                fileSequenceId = year + pacckedDay + "001";
 
-                Calendar cal = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                String time = sdf.format(cal.getTime());
-                fileSequenceId = time.replace(":", "");
+                //Calendar cal = Calendar.getInstance();
+                Date date = new Date();
+                SimpleDateFormat sdf = new SimpleDateFormat("MMdd");
+                //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+               // String time = sdf.format(cal.getTime());
+                String formateddate=sdf.format(date);
+                fileSequenceId = formateddate+"01";
 
             } else {
                 long oldFileNumber = Long.parseLong(fileSequenceId);
@@ -240,7 +243,7 @@ public class WexDataGatewayBean {
         return fileSequenceId;
     }
 
-    private String makeBatchId(String batchId) {
+    private String makeBatchId(String batchId) {    
 
         log.info("Entry in makeBatchId method of FirstDataGatewayBean..");
         try {

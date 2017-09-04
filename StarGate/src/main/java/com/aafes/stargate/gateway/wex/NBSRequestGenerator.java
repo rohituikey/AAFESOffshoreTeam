@@ -57,7 +57,7 @@ public class NBSRequestGenerator {
     @EJB
     private Configurator configurator;
     
-    public byte[] generateLogOnPacketRequest(Transaction t) {
+    public byte[] generateLogOnPacketRequest(Transaction t, boolean isTimeoutRetry) {
         
         if (configurator == null) {
             configurator = new Configurator();
@@ -118,10 +118,12 @@ public class NBSRequestGenerator {
             isoMsg = new ISOMsg();
             isoMsg.setPackager(packager);
             isoMsg.setMTI("0200");
-            isoMsg.set(2, transaction.getTermId());
-            isoMsg.set(3, applicationName);
-            isoMsg.set(4, applicationVersion);
-            isoMsg.set(5, createDateFormat());
+            if(!isTimeoutRetry){
+                isoMsg.set(2, transaction.getTermId());
+                isoMsg.set(3, applicationName);
+                isoMsg.set(4, applicationVersion);
+                isoMsg.set(5, createDateFormat());
+            }
             isoMsg.set(6, sessionTypeAuth);
             isoMsg.set(7, transaction.getTransactionId().substring(0, 4));
             if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) {

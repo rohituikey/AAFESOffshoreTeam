@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
  */
 @Stateless
 public class WEXProcessor {
-
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(WEXProcessor.class.getSimpleName());
     private String sMethodName = "";
     private final String CLASS_NAME = WEXProcessor.this.getClass().getSimpleName();
@@ -38,22 +37,29 @@ public class WEXProcessor {
     NBSConnector clientObj;
     byte[] iSOMsg;
     String[] responseArr;
+    boolean isTimeoutRetry = false;
 
     public Transaction processWexRequests(Transaction t) throws Exception{
         LOGGER.info("WEXProcessor.processWexRequests mothod started");
         try {
             dupCheckCounter = 0;
+            isTimeoutRetry = false;
             if(nbsRequestGenerator == null) nbsRequestGenerator = new NBSRequestGenerator();
-            iSOMsg = nbsRequestGenerator.generateLogOnPacketRequest(t);
-            if(clientObj == null)
-            clientObj = new NBSConnector();
+            iSOMsg = nbsRequestGenerator.generateLogOnPacketRequest(t, isTimeoutRetry);
+            if(clientObj == null) clientObj = new NBSConnector();
             iSOMsgResponse = clientObj.sendRequest(iSOMsg);
-            responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
-            if(responseArr != null || responseArr.length < 2){
-                t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
-                t = nbsRequestGenerator.unmarshalNbsResponse(responseArr[1]);
+            if(null != iSOMsgResponse && !iSOMsgResponse.isEmpty()){
+                responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
+                if(responseArr != null || responseArr.length < 2){
+                    t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
+                    t = nbsRequestGenerator.unmarshalNbsResponse(responseArr[1]);
+                }else{
+                    LOGGER.info("Invalid response from NBS.");
+                    buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
+                }
             }else{
                 LOGGER.info("Invalid response from NBS.");
+                buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
             }
             return t;
         } catch (SocketTimeoutException e) {
@@ -84,15 +90,22 @@ public class WEXProcessor {
                 TimeUnit.SECONDS.sleep(wexRetryWaitTime);
                 LOGGER.info("Retrying to send request. Retry Reason " + retryReason + ". Retry Number : "+ dupCheckCounter 
                         + ". Method " + sMethodName + ". Class Name " + CLASS_NAME);
+                isTimeoutRetry = true;
+                if(nbsRequestGenerator == null) nbsRequestGenerator = new NBSRequestGenerator();
+                iSOMsg = nbsRequestGenerator.generateLogOnPacketRequest(t, isTimeoutRetry);
+                if(clientObj == null) clientObj = new NBSConnector();
                 iSOMsgResponse = clientObj.sendRequest(iSOMsg);
-                responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
-                t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
-                t = nbsRequestGenerator.unmarshalNbsResponse(responseArr[1]);
+                if(null != iSOMsgResponse && !iSOMsgResponse.isEmpty()){
+                    responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
+                    t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
+                    t = nbsRequestGenerator.unmarshalNbsResponse(responseArr[1]);
+                }
             } else if(dupCheckCounter > wexRetryCount){
                 LOGGER.info("Retry count exausted. Please continue with manual follow-up!! " + "Method " + sMethodName + 
                         ". Class Name " + CLASS_NAME);
                 dupCheckCounter = 0;
                 buildErrorResponse(t, configurator.get("WEX_REQUEST_TIMEOUT"), "WEX_REQUEST_TIMEOUT");
+                isTimeoutRetry = false;
             }
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());

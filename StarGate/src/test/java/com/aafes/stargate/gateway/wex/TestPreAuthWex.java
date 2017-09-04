@@ -150,7 +150,7 @@ public class TestPreAuthWex {
         // insertDataToFacMapper();
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testSuccessPreAuthRequest() {
         sMethodName = "testSuccessPreAuthRequest";

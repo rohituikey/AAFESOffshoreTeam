@@ -21,7 +21,7 @@ import static org.jboss.resteasy.test.EmbeddedContainer.start;
 public class NBSConnector {
 
     private static final Logger LOG = Logger.getLogger(NBSConnector.class.getName());
-    private StringBuffer response;
+    //private StringBuffer response;
     byte[] isoFormat;
     private Socket nbsSocket;
     @EJB
@@ -79,15 +79,21 @@ public class NBSConnector {
 
     public String getResponse() throws IOException {
         String responsePerLine = "";
+        StringBuilder response = null;
         BufferedReader readResponse = new BufferedReader(new InputStreamReader(nbsSocket.getInputStream()));
 
         while ((responsePerLine = readResponse.readLine()) != null) {
-            response.append(responsePerLine);
-            LOG.log(Level.INFO, "Response recieved as {0}", response);
-        }
             if (response == null) {
                 response = new StringBuilder();
             }
+            response.append(responsePerLine);
+            LOG.log(Level.INFO, "Response recieved as {0}", response);
+        }
+        if (response != null) {
+            return response.toString();
+        } else {
+            return "";
+        }
     }
 
     private void populateValuesFromPropertiesFile() {
@@ -125,8 +131,3 @@ public class NBSConnector {
     }
 
 }
-        if (response != null) {
-            return response.toString();
-        } else {
-            return "";
-        }

@@ -19,11 +19,11 @@ import java.util.logging.Logger;
  */
 public class GenerateLogWexDetails {
 
-    public static void generateDetails(String logDetails) {
+    public static void generateDetails(String logFilename, String iSOMsgResponse,String iSOMsg) {
         BufferedWriter logs = null;
         FileWriter fw = null;
         try {
-            File file = new File("WexLog.log");
+            File file = new File(logFilename+".log");
             if (!file.exists()) {
                 file.createNewFile();
             }
@@ -31,7 +31,7 @@ public class GenerateLogWexDetails {
             // true = append file
             fw = new FileWriter(file.getAbsoluteFile(), true);
             logs = new BufferedWriter(fw);
-            logs.write("\n" +new Date() + logDetails);
+            logs.write("\n" +new Date()+"\n" + "AUTH REQUEST : " + iSOMsg+ "\n"   +"AUTH RESPONSE :"+iSOMsgResponse);
 
         } catch (IOException ex) {
             Logger.getLogger(GenerateLogWexDetails.class.getName()).log(Level.SEVERE, null, ex);

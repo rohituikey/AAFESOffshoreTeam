@@ -8,9 +8,7 @@ package com.aafes.stargate.gateway.wex;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.gateway.wex.simulator.NBSConnector;
 import com.aafes.stargate.control.Configurator;
-import com.aafes.stargate.gateway.wex.simulator.NBSFormatter;
 import com.aafes.stargate.util.ResponseType;
-import com.solab.iso8583.IsoMessage;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -26,13 +24,14 @@ import org.slf4j.LoggerFactory;
  */
 @Stateless
 public class WEXProcessor {
+
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(WEXProcessor.class.getSimpleName());
     private String sMethodName = "";
     private final String CLASS_NAME = WEXProcessor.this.getClass().getSimpleName();
-    
+
     @EJB
     private Configurator configurator;
-    private NBSFormatter nBSFormatter;
+    private NBSRequestGenerator nbsRequestGenerator;
     // ADDED TO HANDLE TIMEOUT SCENARIO
     String retryReason = "", iSOMsgResponse = "";
     int dupCheckCounter = 0;
@@ -40,91 +39,130 @@ public class WEXProcessor {
     byte[] iSOMsg;
     String[] responseArr;
     boolean isTimeoutRetry = false;
+    boolean logEnabled;
 
-    public Transaction processWexRequests(Transaction t) throws Exception{
+    public Transaction processWexRequests(Transaction t) throws Exception {
         LOGGER.info("WEXProcessor.processWexRequests mothod started");
         try {
+            GenerateLogWexDetails generateLogWexDetails = new GenerateLogWexDetails() ;
             dupCheckCounter = 0;
             isTimeoutRetry = false;
-            if(nbsRequestGenerator == null) nbsRequestGenerator = new NBSRequestGenerator();
+            if (nbsRequestGenerator == null) {
+                nbsRequestGenerator = new NBSRequestGenerator();
+            }
             iSOMsg = nbsRequestGenerator.generateLogOnPacketRequest(t, isTimeoutRetry);
-            if(clientObj == null) clientObj = new NBSConnector();
+            if (clientObj == null) {
+                clientObj = new NBSConnector();
+            }
             iSOMsgResponse = clientObj.sendRequest(iSOMsg);
-            if(null != iSOMsgResponse && !iSOMsgResponse.isEmpty()){
+            if (null != iSOMsgResponse && !iSOMsgResponse.isEmpty()) {
                 responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
-                if(responseArr != null || responseArr.length < 2){
+                if (responseArr != null || responseArr.length < 2) {
                     t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
+                    if ((ResponseType.ACCEPTED).equalsIgnoreCase(t.getResponseType())) {
+                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.ACCEPTED);
+                        //t.setResponseType(ResponseType.APPROVED);
+                    } else if ((ResponseType.REJECTED).equalsIgnoreCase(t.getResponseType())) {
+                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.REJECTED);
+                        handleRequestTimeOutScenaio(t);
+                    } else if ((ResponseType.CANCELED).equalsIgnoreCase(t.getResponseType())) {
+                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.CANCELED);
+                        buildErrorResponse(t, configurator.get("NBS_AUTH_UNAVAILABLE"), "NBS_AUTH_UNAVAILABLE");
+                    }
                     t = nbsRequestGenerator.unmarshalNbsResponse(responseArr[1]);
-                }else{
+                } else {
                     LOGGER.info("Invalid response from NBS.");
                     buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
                 }
-            }else{
+            } else {
                 LOGGER.info("Invalid response from NBS.");
                 buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
             }
+            if(logEnabled)
+            generateLogWexDetails.generateDetails(t.getRequestType(), iSOMsgResponse, iSOMsg.toString());
             return t;
         } catch (SocketTimeoutException e) {
             retryReason = "Exception : " + e.getMessage();
             handleRequestTimeOutScenaio(t);
         } catch (Exception e) {
-            if(e instanceof SocketTimeoutException){// || e instanceof ClientTransportException){
+            if (e instanceof SocketTimeoutException) {// || e instanceof ClientTransportException){
                 retryReason = "Exception : " + e.getMessage();
                 handleRequestTimeOutScenaio(t);
-            } else throw e;
+            } else {
+                throw e;
+            }
         }
         return t;
     }
-    
-    private void handleRequestTimeOutScenaio(Transaction t){
+
+    private void handleRequestTimeOutScenaio(Transaction t) {
         sMethodName = "handleRequestTimeOutScenaio";
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
         int wexRetryCount = 0, wexRetryWaitTime = 0;
-        try{
-            if(configurator.get("WEX_RETRY_COUNT") != null)
+        try {
+            if (configurator.get("WEX_RETRY_COUNT") != null) {
                 wexRetryCount = Integer.parseInt(configurator.get("WEX_RETRY_COUNT"));
-            else LOGGER.error("Please add WEX_RETRY_COUNT in stargate.properties");
-            if(configurator.get("WEX_RETRY_WAIT_TIME") != null)
+            } else {
+                LOGGER.error("Please add WEX_RETRY_COUNT in stargate.properties");
+            }
+            if (configurator.get("WEX_RETRY_WAIT_TIME") != null) {
                 wexRetryWaitTime = Integer.parseInt(configurator.get("WEX_RETRY_WAIT_TIME"));
-            else LOGGER.error("Please add WEX_RETRY_WAIT_TIME in stargate.properties");
+            } else {
+                LOGGER.error("Please add WEX_RETRY_WAIT_TIME in stargate.properties");
+            }
             ++dupCheckCounter;
-            if(dupCheckCounter <= wexRetryCount){
+            if (dupCheckCounter <= wexRetryCount) {
                 TimeUnit.SECONDS.sleep(wexRetryWaitTime);
-                LOGGER.info("Retrying to send request. Retry Reason " + retryReason + ". Retry Number : "+ dupCheckCounter 
+                LOGGER.info("Retrying to send request. Retry Reason " + retryReason + ". Retry Number : " + dupCheckCounter
                         + ". Method " + sMethodName + ". Class Name " + CLASS_NAME);
                 isTimeoutRetry = true;
-                if(nbsRequestGenerator == null) nbsRequestGenerator = new NBSRequestGenerator();
+                if (nbsRequestGenerator == null) {
+                    nbsRequestGenerator = new NBSRequestGenerator();
+                }
                 iSOMsg = nbsRequestGenerator.generateLogOnPacketRequest(t, isTimeoutRetry);
-                if(clientObj == null) clientObj = new NBSConnector();
+                if (clientObj == null) {
+                    clientObj = new NBSConnector();
+                }
                 iSOMsgResponse = clientObj.sendRequest(iSOMsg);
-                if(null != iSOMsgResponse && !iSOMsgResponse.isEmpty()){
+                if (null != iSOMsgResponse && !iSOMsgResponse.isEmpty()) {
                     responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
                     t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
+                    if ((ResponseType.ACCEPTED).equalsIgnoreCase(t.getResponseType())) {
+                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.ACCEPTED);
+                        //t.setResponseType(ResponseType.APPROVED);
+                    } else if ((ResponseType.REJECTED).equalsIgnoreCase(t.getResponseType())) {
+                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.REJECTED);
+                        handleRequestTimeOutScenaio(t);
+                    } else if ((ResponseType.CANCELED).equalsIgnoreCase(t.getResponseType())) {
+                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.CANCELED);
+                        buildErrorResponse(t, configurator.get("NBS_AUTH_UNAVAILABLE"), "NBS_AUTH_UNAVAILABLE");
+                    }
                     t = nbsRequestGenerator.unmarshalNbsResponse(responseArr[1]);
                 }
-            } else if(dupCheckCounter > wexRetryCount){
-                LOGGER.info("Retry count exausted. Please continue with manual follow-up!! " + "Method " + sMethodName + 
-                        ". Class Name " + CLASS_NAME);
+            } else if (dupCheckCounter > wexRetryCount) {
+                LOGGER.info("Retry count exausted. Please continue with manual follow-up!! " + "Method " + sMethodName
+                        + ". Class Name " + CLASS_NAME);
                 dupCheckCounter = 0;
                 buildErrorResponse(t, configurator.get("WEX_REQUEST_TIMEOUT"), "WEX_REQUEST_TIMEOUT");
                 isTimeoutRetry = false;
             }
         } catch (Exception e) {
             LOGGER.error("Exception occured in " + sMethodName + ". Exception  : " + e.getMessage());
-            if(e instanceof SocketTimeoutException || e instanceof WebServiceException){// || e instanceof ClientTransportException){ || e instanceof WebServiceException){
+            if (e instanceof SocketTimeoutException || e instanceof WebServiceException) {// || e instanceof ClientTransportException){ || e instanceof WebServiceException){
                 retryReason = "Exception : " + e.getMessage();
                 handleRequestTimeOutScenaio(t);
                 //dupCheckCounter++;
-            } else try {
-                throw e;
-            } catch (Exception ex) {
-                Logger.getLogger(WEXProcessor.class.getName()).log(Level.SEVERE, null, ex);
+            } else {
+                try {
+                    throw e;
+                } catch (Exception ex) {
+                    Logger.getLogger(WEXProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
     }
-    
-    
+
 //    public Transaction preAuthProcess(Transaction t) {
 //        LOG.info("WEXProcessor.preAuthProcess mothod started");
 //
@@ -147,7 +185,6 @@ public class WEXProcessor {
 //            throw e;
 //        }
 //    }
-
 //    public Transaction finalAuthProcess(Transaction t) {
 //        LOG.info("WEXProcessor.finalAuthProcess mothod started");
 //        try {
@@ -176,7 +213,6 @@ public class WEXProcessor {
 //            throw e;
 //        }
 //    }
-
 //    public Transaction processSaleRequest(Transaction t) {
 //
 //        LOG.info("WEXProcessor.ProcessSaleRequest mothod started");
@@ -199,7 +235,6 @@ public class WEXProcessor {
 //            throw e;
 //        }
 //    }
-
 //    public Transaction processRefundRequest(Transaction t) {
 //        sMethodName = "processRefundRequest";
 //        LOG.info("Method " + sMethodName + " started." + "in  Class Name " + CLASS_NAME);
@@ -234,7 +269,6 @@ public class WEXProcessor {
 //        LOG.info("Method " + sMethodName + " ended." + "in  Class Name " + CLASS_NAME);
 //        return t;
 //    }
-
 //    private void buildErrorResponse(Transaction t, String reasonCode, String description) {
 //        t.setReasonCode(configurator.get(reasonCode));
 //        t.setResponseType(ResponseType.DECLINED);
@@ -250,15 +284,14 @@ public class WEXProcessor {
 //        return rs;
 //        //ex  17 05 31 13 31 33
 //    }
-
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
     }
 
-    public void setnBSFormatter(NBSFormatter nBSFormatter) {
-        this.nBSFormatter = nBSFormatter;
+    public void setNbsRequestGenerator(NBSRequestGenerator nbsRequestGenerator) {
+        this.nbsRequestGenerator = nbsRequestGenerator;
     }
-    
+
     private void buildErrorResponse(Transaction t, String reasonCode, String description) {
         t.setReasonCode(reasonCode);
         t.setResponseType(ResponseType.DECLINED);
@@ -268,5 +301,4 @@ public class WEXProcessor {
     public void setClientObj(NBSConnector clientObj) {
         this.clientObj = clientObj;
     }
-    
 }

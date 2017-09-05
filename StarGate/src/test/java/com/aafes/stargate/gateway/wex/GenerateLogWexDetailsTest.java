@@ -5,6 +5,7 @@
  */
 package com.aafes.stargate.gateway.wex;
 
+import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,8 +23,8 @@ public class GenerateLogWexDetailsTest {
      */
     @Test
     public void testGenerateDetails() {
-            GenerateLogWexDetails.generateDetails("test for dummy request");
-            GenerateLogWexDetails.generateDetails("\n test for appending response");
+            GenerateLogWexDetails.generateDetails(new Date().toString(),"","test for dummy request");
+//            GenerateLogWexDetails.generateDetails("\n test for appending response");
     }
     
 }

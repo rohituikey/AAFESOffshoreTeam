@@ -75,7 +75,7 @@ public class FinalAuthWexTest {
     GatewayFactory gatewayFactory;
     BaseStrategy bs;
     SettleMessageDAO settleMessageDAO;
-    NBSRequestGenerator nbSRequestGenerator;
+    NBSRequestGenerator nBSRequestGenerator;
     NBSConnector nBSConnector;
     Mapper mapper3;
 
@@ -93,7 +93,7 @@ public class FinalAuthWexTest {
 
     @Before
     public void setDataForTesting() {
-         authorizer = new Authorizer();
+        authorizer = new Authorizer();
         configurator = new Configurator();
         configurator.postConstruct();
         configurator.load();
@@ -130,11 +130,11 @@ public class FinalAuthWexTest {
         nBSConnector = new NBSConnector();
         nBSConnector.setConfigurator(configurator);
         wexProcessor.setClientObj(nBSConnector);
-        nbSRequestGenerator = new NBSRequestGenerator();
-        nbSRequestGenerator.setConfigurator(configurator);
+        nBSRequestGenerator = new NBSRequestGenerator();
+        nBSRequestGenerator.setConfigurator(configurator);
 
         wexGateway.setwEXProcessor(wexProcessor);
-        wexProcessor.setNbsRequestGenerator(nbSRequestGenerator);
+        wexProcessor.setNbsRequestGenerator(nBSRequestGenerator);
         settleMessageDAO = new SettleMessageDAO();
         mapper1 = new MappingManager(session).mapper(SettleEntity.class);
         settleMessageDAO.setMapper(mapper1);
@@ -157,14 +157,14 @@ public class FinalAuthWexTest {
         authorizer.setBaseStrategyFactory(bsf);
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testNoAuthorizationFoundForFinalAuthRequest() {
         sMethodName = "testNoAuthorizationFoundForFinalAuthRequest";
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        session.execute("TRUNCATE STARGATE.TRANSACTIONS");
         Message creditMessage = this.unmarshalCreditMessage(requestXMLFinalAuth);
         Message result = authorizer.authorize(creditMessage);
+        insertDataForTesting();
         session.execute("TRUNCATE STARGATE.TRANSACTIONS");
         clearGlobalVariables();
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
@@ -191,7 +191,7 @@ public class FinalAuthWexTest {
         assertEquals("100", result.getResponse().get(0).getReasonCode());
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testDeclineFinalAuthRequestDueToKeyedTransaction() {
         sMethodName = "testDeclineFinalAuthRequestDueToKeyedTransaction";
@@ -205,9 +205,8 @@ public class FinalAuthWexTest {
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         assertEquals("INVALID_INPUT_TYPE", result.getResponse().get(0).getDescriptionField());
     }
-    //1.7.21 s 1.2.17 l   
 
-//    @Ignore
+    @Ignore
     @Test
     public void testForAlreadySettled() {
         sMethodName = "testSuccessFinalAuthRequest";

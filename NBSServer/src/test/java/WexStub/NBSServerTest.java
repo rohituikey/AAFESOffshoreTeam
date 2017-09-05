@@ -5,26 +5,31 @@
  */
 package WexStub;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author uikuyr
  */
-public class NBSStubTest {
-
-    NBSStub subjectUnderTest;
-
+public class NBSServerTest {
+    
+    public NBSServerTest() {
+    }
+    
     @Before
     public void setUp() {
-        subjectUnderTest = new NBSStubImpl();
     }
 
     @Test
-    public void testGetResponse() {
-        String Request = "02007EF0D7800000000000201007AUTHREQ000213091001A0100002WI001N00001S0012006123456007010000101001400000";
-     //   String result = subjectUnderTest.getResponse(Request.getBytes());
+    public void testMain() {
+        String[] args = null;
+        NBSServer.main(args);
+        
     }
-
+    
 }

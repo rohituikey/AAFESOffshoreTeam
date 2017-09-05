@@ -17,7 +17,7 @@ import org.jpos.iso.packager.GenericPackager;
  */
 public class NBSStubImpl implements NBSStub {
 
-    private String result;
+    private String[] result = new String[2];
     private String responseDetails;
     ISOMsg isoMsg = new ISOMsg();
     boolean correctRequest = true;
@@ -25,7 +25,7 @@ public class NBSStubImpl implements NBSStub {
     private String SCHEMA_PATH = "src/XML/NBSLogonPackager.xml";
 
     @Override
-    public String getResponse(String request) {
+    public String[] getResponse(byte[] request) {
         try {
             try {
                 try {
@@ -35,7 +35,7 @@ public class NBSStubImpl implements NBSStub {
                     packager = new GenericPackager(SCHEMA_PATH);
                 }
                 isoMsg.setPackager(packager);
-                isoMsg.unpack(request.getBytes());
+                isoMsg.unpack(request);
 
                 for (int index = 0; index < isoMsg.getMaxField(); index++) {
                     if (isoMsg.hasField(index)) {
@@ -44,15 +44,16 @@ public class NBSStubImpl implements NBSStub {
                 }
             } catch (ISOException ex) {
                 Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
+                checkIfLogOff(request);
                 correctRequest = false;
             } catch (Exception ex) {
                 Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
                 correctRequest = false;
             }
 
-            result = generateResponse();
-            responseDetails = generateNBSResponse();
-            return result + responseDetails;
+            result[0] = generateResponse();
+            result[1] = generateNBSResponse();
+            return result;
         } catch (ISOException ex) {
             Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -80,11 +81,11 @@ public class NBSStubImpl implements NBSStub {
             isoMsg.set(3, "200");
         }
         byte[] byteResult = isoMsg.pack();
-        result = new String(byteResult);
-        return result;
+        result[0] = new String(byteResult);
+        return result[0];
     }
 
-    private String generateNBSResponse() throws ISOException {
+    public String generateNBSResponse() throws ISOException {
         isoMsg = new ISOMsg();
         SCHEMA_PATH = "src/XML/NBSResponse.xml";
         try {
@@ -246,5 +247,14 @@ public class NBSStubImpl implements NBSStub {
 //        }
 //        return null;
 //    }
+    private void checkIfLogOff(byte[] request) throws ISOException {
+        try {
+            packager = new GenericPackager("src/XML/NBSLogOff.xml");
+        } catch (Exception e) {
+            SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/NBSLogOff.xml";
+            packager = new GenericPackager(SCHEMA_PATH);
+        }
+        NBSServer.logOff = true;
+    }
 
 }

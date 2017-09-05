@@ -79,15 +79,18 @@ public class NBSStubImpl implements NBSStub {
 
         isoMsg.setPackager(packager);
         isoMsg.setMTI("0200");
-        if (responseDecider.equals("6900460000000000001=20095004100210123")) {
+        if (responseDecider.equals("6006496628299904508=20095004100210123")) {
             isoMsg.set(2, "c$");
             isoMsg.set(3, "100");
-        } else if(responseDecider.equals("6900460000000000001=20095004100219999")){
+        } else if(responseDecider.equals("6006496628299904508=20095004100219999")){
             isoMsg.set(2, "c?");
             isoMsg.set(3, "200");
-        } else if(responseDecider.equals("6900460000000000001=20095004100210000")){
+        } else if(responseDecider.equals("6006496628299904508=20095004100210000")){
             isoMsg.set(2, "c!");
             //isoMsg.set(3, "200");
+        } else {
+            isoMsg.set(2, "c$");
+            isoMsg.set(3, "100");
         }
         byte[] byteResult = isoMsg.pack();
         result[0] = new String(byteResult);
@@ -119,6 +122,9 @@ public class NBSStubImpl implements NBSStub {
         } else if(responseDecider.equals("6900460000000000001=20095004100210000")){
         //  isoMsg.set(6, "c!");
             isoMsg.set(7, "Cancel");
+        } else {
+            isoMsg.set(6, "00");
+            isoMsg.set(7, "Approved");
         }
 //        if (correctRequest) {
 //            isoMsg.set(6, "00");

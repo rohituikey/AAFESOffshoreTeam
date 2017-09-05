@@ -112,6 +112,101 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
+<!--            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.1.201405082137</version>
+                <configuration>
+                    
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pre-unit-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>		
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                     <excludes>
+                        <exclude>com/aafes/starsettler/entity/**/*</exclude>
+                        <exclude>generated/**/*</exclude>
+                        <exclude>com/aafes/starsettler/util/**/*</exclude>
+                        <exclude>com/aafes/starsettler/boundary/ApplicationConfig.*</exclude>
+                        <exclude>com/aafes/starsettler/boundary/BasicAuthenticationHeader.*</exclude>
+                         <exclude>com/aafes/starsettler/tokenizer/**/*</exclude>
+                    </excludes>
+                            <rules>
+                                  implmentation is needed only for Maven 2  
+                                <rule implementation="org.jacoco.maven.RuleConfiguration">
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit implementation="org.jacoco.report.check.Limit">
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.0</minimum>			
+                                        </limit>
+                                          implmentation is needed only for Maven 2  
+                                        <limit implementation="org.jacoco.report.check.Limit">
+                                            <counter>COMPLEXITY</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.0</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                      Transactionsfile
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/transaction/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-transaction.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-transaction</id>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaIncludes>
+                                <include>jaxb/wextransaction/*.xsd</include>
+                            </schemaIncludes>
+                            <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-wextransaction.episode</episodeFile>
+                        </configuration>
+                        <id>jaxb-generate-wextransaction</id>
+                    </execution>
+                    
+                    
+                    
+                    
+                     BELOW CHANGES WILL GENERATE JACOCO CODE COVERAGE REPORT 
+                    <execution>            
+                        <id>post-integration-test</id>            
+                        <phase>post-integration-test</phase>            
+                        <goals>                
+                            <goal>report</goal>            
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                            <outputDirectory>${project.build.directory}/Report</outputDirectory>            
+                        </configuration>        
+                    </execution>
+                     ABOVE CHANGES WILL GENERATE JACOCO CODE COVERAGE REPORT 
+                </executions>
+            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -142,7 +237,7 @@
                 <artifactId>maven-jaxb2-plugin</artifactId>
                 <version>0.12.0</version>
                 <executions>
-                    <execution>
+                     <execution>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -225,7 +320,8 @@
                     <generateDirectory>${project.build.directory}/generated-sources/xjc</generateDirectory>
                     <verbose>true</verbose>
                 </configuration>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
+
 </project>

@@ -12,5 +12,9 @@ final public class ResponseType {
     public static final String PENDING = "Pending";
     public static final String CALLCREDIT = "CALLCREDIT";
     public static final String SendToService = "SendToService";
+    public static final String CANCELED = "Canceled";
+    public static final String ACCEPTED = "Accepted";
+    public static final String REJECTED = "Rejected";
+    
 
 }

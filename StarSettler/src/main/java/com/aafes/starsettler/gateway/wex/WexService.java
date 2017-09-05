@@ -68,7 +68,6 @@ public class WexService {
     public void generateAndSendToNBS(String settlexmlrecord, String fileSeqNo) {
         log.info("Triggered.");
 
-        wexFile=new WexFile();
         try {
 
             Date date = new Date();

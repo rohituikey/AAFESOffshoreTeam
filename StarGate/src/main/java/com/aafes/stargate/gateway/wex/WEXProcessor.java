@@ -58,6 +58,9 @@ public class WEXProcessor {
                 //if(responseArr != null || responseArr.length < 2){
                 t = nbsRequestGenerator.unmarshalAcknowledgment(iSOMsgResponse[0]);
                 t = nbsRequestGenerator.unmarshalNbsResponse(iSOMsgResponse[1]);
+                
+                iSOMsg = nbsRequestGenerator.logOffRequest();
+                
 //                }else{
 //                    LOGGER.info("Invalid response from NBS.");
 //                    buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");

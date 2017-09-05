@@ -311,8 +311,8 @@ public class NBSRequestGenerator {
         return transaction;
     }
     
-    public String logOffRequest() {
-        String result = "";
+    public byte[] logOffRequest() {
+        byte[] result = null;
         try {
             isoMsg = new ISOMsg();
             SCHEMA_PATH = "src/main/resources/xml/NBSLogOff.xml";
@@ -326,8 +326,7 @@ public class NBSRequestGenerator {
             isoMsg.setMTI("0200");
             isoMsg.set(2, "O");
             byte[] data = isoMsg.pack();
-            result = new String(data);
-            return result;
+            return data;
         } catch (ISOException ex) {
             Logger.getLogger(NBSRequestGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }

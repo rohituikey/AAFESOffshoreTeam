@@ -33,11 +33,11 @@ public class WEXProcessor {
     private Configurator configurator;
     private NBSRequestGenerator nbsRequestGenerator;
     // ADDED TO HANDLE TIMEOUT SCENARIO
-    String retryReason = "", iSOMsgResponse = "";
+    String retryReason = "";
     int dupCheckCounter = 0;
     NBSConnector clientObj;
     byte[] iSOMsg;
-    String[] responseArr;
+    String[] responseArr, iSOMsgResponse;
     boolean isTimeoutRetry = false;
     boolean logEnabled;
 
@@ -55,25 +55,15 @@ public class WEXProcessor {
                 clientObj = new NBSConnector();
             }
             iSOMsgResponse = clientObj.sendRequest(iSOMsg);
-            if (null != iSOMsgResponse && !iSOMsgResponse.isEmpty()) {
-                responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
-                if (responseArr != null || responseArr.length < 2) {
-                    t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
-                    if ((ResponseType.ACCEPTED).equalsIgnoreCase(t.getResponseType())) {
-                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.ACCEPTED);
-                        //t.setResponseType(ResponseType.APPROVED);
-                    } else if ((ResponseType.REJECTED).equalsIgnoreCase(t.getResponseType())) {
-                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.REJECTED);
-                        handleRequestTimeOutScenaio(t);
-                    } else if ((ResponseType.CANCELED).equalsIgnoreCase(t.getResponseType())) {
-                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.CANCELED);
-                        buildErrorResponse(t, configurator.get("NBS_AUTH_UNAVAILABLE"), "NBS_AUTH_UNAVAILABLE");
-                    }
-                    t = nbsRequestGenerator.unmarshalNbsResponse(responseArr[1]);
-                } else {
-                    LOGGER.info("Invalid response from NBS.");
-                    buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
-                }
+            if (null != iSOMsgResponse || iSOMsgResponse.length < 2) {
+                //  responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
+                //if(responseArr != null || responseArr.length < 2){
+                t = nbsRequestGenerator.unmarshalAcknowledgment(iSOMsgResponse[0]);
+                t = nbsRequestGenerator.unmarshalNbsResponse(iSOMsgResponse[1]);
+//                }else{
+//                    LOGGER.info("Invalid response from NBS.");
+//                    buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
+//                }
             } else {
                 LOGGER.info("Invalid response from NBS.");
                 buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
@@ -124,20 +114,10 @@ public class WEXProcessor {
                     clientObj = new NBSConnector();
                 }
                 iSOMsgResponse = clientObj.sendRequest(iSOMsg);
-                if (null != iSOMsgResponse && !iSOMsgResponse.isEmpty()) {
-                    responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
-                    t = nbsRequestGenerator.unmarshalAcknowledgment(responseArr[0]);
-                    if ((ResponseType.ACCEPTED).equalsIgnoreCase(t.getResponseType())) {
-                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.ACCEPTED);
-                        //t.setResponseType(ResponseType.APPROVED);
-                    } else if ((ResponseType.REJECTED).equalsIgnoreCase(t.getResponseType())) {
-                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.REJECTED);
-                        handleRequestTimeOutScenaio(t);
-                    } else if ((ResponseType.CANCELED).equalsIgnoreCase(t.getResponseType())) {
-                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.CANCELED);
-                        buildErrorResponse(t, configurator.get("NBS_AUTH_UNAVAILABLE"), "NBS_AUTH_UNAVAILABLE");
-                    }
-                    t = nbsRequestGenerator.unmarshalNbsResponse(responseArr[1]);
+                if (null != iSOMsgResponse || iSOMsgResponse.length<2) {
+            //        responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
+                    t = nbsRequestGenerator.unmarshalAcknowledgment(iSOMsgResponse[0]);
+                    t = nbsRequestGenerator.unmarshalNbsResponse(iSOMsgResponse[1]);
                 }
             } else if (dupCheckCounter > wexRetryCount) {
                 LOGGER.info("Retry count exausted. Please continue with manual follow-up!! " + "Method " + sMethodName

@@ -16,20 +16,20 @@ import static org.junit.Assert.*;
  *
  * @author uikuyr
  */
-public class NBSServerTest {
-    
-    public NBSServerTest() {
+public class LogGeneratorTest {
+
+    public LogGeneratorTest() {
     }
-    
+
     @Before
     public void setUp() {
     }
 
     @Test
-    public void testMain() {
-        String[] args = null;
-        NBSServer.main(args);
-        
+    public void testGenerateLogFile() {
+        LogGenerator instance = new LogGenerator();
+        instance.generateLogFile("first Line");
+        instance.generateLogFile("Second Line");
     }
-    
+
 }

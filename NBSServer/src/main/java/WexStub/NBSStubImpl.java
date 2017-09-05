@@ -20,12 +20,14 @@ public class NBSStubImpl implements NBSStub {
     private String[] result = new String[2];
     private String responseDetails;
     ISOMsg isoMsg = new ISOMsg();
-    boolean correctRequest = true;
+    String responseDecider = "";
     GenericPackager packager;
     private String SCHEMA_PATH = "src/XML/NBSLogonPackager.xml";
+    LogGenerator logGenerator = new LogGenerator();
 
     @Override
     public String[] getResponse(byte[] request) {
+        logGenerator.generateLogFile("request recieved as "+new String(request));
         try {
             try {
                 try {
@@ -36,23 +38,27 @@ public class NBSStubImpl implements NBSStub {
                 }
                 isoMsg.setPackager(packager);
                 isoMsg.unpack(request);
-
+                logGenerator.generateLogFile("**request with their index numbers are:-");
                 for (int index = 0; index < isoMsg.getMaxField(); index++) {
                     if (isoMsg.hasField(index)) {
                         System.out.println(index + " " + isoMsg.getString(index));
+                        logGenerator.generateLogFile(index + " " + isoMsg.getString(index));
                     }
+                }
+                if(isoMsg.hasField(18)){
+                    responseDecider = isoMsg.getString(18);
                 }
             } catch (ISOException ex) {
                 Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
                 checkIfLogOff(request);
-                correctRequest = false;
             } catch (Exception ex) {
                 Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
-                correctRequest = false;
             }
 
             result[0] = generateResponse();
+            logGenerator.generateLogFile("acknowledgment " + result[0]);
             result[1] = generateNBSResponse();
+            logGenerator.generateLogFile("response " + result[1]);
             return result;
         } catch (ISOException ex) {
             Logger.getLogger(NBSStubImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -73,12 +79,15 @@ public class NBSStubImpl implements NBSStub {
 
         isoMsg.setPackager(packager);
         isoMsg.setMTI("0200");
-        if (correctRequest) {
+        if (responseDecider.equals("6900460000000000001=20095004100210123")) {
             isoMsg.set(2, "c$");
             isoMsg.set(3, "100");
-        } else {
+        } else if(responseDecider.equals("6900460000000000001=20095004100219999")){
             isoMsg.set(2, "c?");
             isoMsg.set(3, "200");
+        } else if(responseDecider.equals("6900460000000000001=20095004100210000")){
+            isoMsg.set(2, "c!");
+            //isoMsg.set(3, "200");
         }
         byte[] byteResult = isoMsg.pack();
         result[0] = new String(byteResult);
@@ -101,13 +110,23 @@ public class NBSStubImpl implements NBSStub {
 
         isoMsg.set(4, "3170621071655");
         isoMsg.set(5, "N");
-        if (correctRequest) {
+        if (responseDecider.equals("6900460000000000001=20095004100210123")) {
             isoMsg.set(6, "00");
             isoMsg.set(7, "Approved");
-        } else {
+        } else if(responseDecider.equals("6900460000000000001=20095004100219999")){
             isoMsg.set(6, "01");
             isoMsg.set(7, "Declined");
+        } else if(responseDecider.equals("6900460000000000001=20095004100210000")){
+        //  isoMsg.set(6, "c!");
+            isoMsg.set(7, "Cancel");
         }
+//        if (correctRequest) {
+//            isoMsg.set(6, "00");
+//            isoMsg.set(7, "Approved");
+//        } else {
+//            isoMsg.set(6, "01");
+//            isoMsg.set(7, "Declined");
+//        }
         isoMsg.set(8, "WEX");
         isoMsg.set(9, "");
         isoMsg.set(10, "");

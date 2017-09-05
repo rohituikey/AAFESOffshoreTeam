@@ -44,7 +44,7 @@ public class WEXProcessor {
     public Transaction processWexRequests(Transaction t) throws Exception {
         LOGGER.info("WEXProcessor.processWexRequests mothod started");
         try {
-            GenerateLogWexDetails generateLogWexDetails = new GenerateLogWexDetails() ;
+            GenerateLogWexDetails generateLogWexDetails = new GenerateLogWexDetails();
             dupCheckCounter = 0;
             isTimeoutRetry = false;
             if (nbsRequestGenerator == null) {
@@ -59,6 +59,16 @@ public class WEXProcessor {
                 //  responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
                 //if(responseArr != null || responseArr.length < 2){
                 t = nbsRequestGenerator.unmarshalAcknowledgment(iSOMsgResponse[0]);
+                if ((ResponseType.ACCEPTED).equalsIgnoreCase(t.getResponseType())) {
+                    LOGGER.info("Acknoledgement recieved from :" + ResponseType.ACCEPTED);
+                    //t.setResponseType(ResponseType.APPROVED);
+                } else if ((ResponseType.REJECTED).equalsIgnoreCase(t.getResponseType())) {
+                    LOGGER.info("Acknoledgement recieved from :" + ResponseType.REJECTED);
+                    handleRequestTimeOutScenaio(t);
+                } else if ((ResponseType.CANCELED).equalsIgnoreCase(t.getResponseType())) {
+                    LOGGER.info("Acknoledgement recieved from :" + ResponseType.CANCELED);
+                    buildErrorResponse(t, configurator.get("NBS_AUTH_UNAVAILABLE"), "NBS_AUTH_UNAVAILABLE");
+                }
                 t = nbsRequestGenerator.unmarshalNbsResponse(iSOMsgResponse[1]);
 //                }else{
 //                    LOGGER.info("Invalid response from NBS.");
@@ -68,8 +78,9 @@ public class WEXProcessor {
                 LOGGER.info("Invalid response from NBS.");
                 buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
             }
-            if(logEnabled)
-            generateLogWexDetails.generateDetails(t.getRequestType(), iSOMsgResponse, iSOMsg.toString());
+            if (logEnabled) {
+                generateLogWexDetails.generateDetails(t.getRequestType(), iSOMsgResponse.toString(), iSOMsg.toString());
+            }
             return t;
         } catch (SocketTimeoutException e) {
             retryReason = "Exception : " + e.getMessage();
@@ -114,9 +125,19 @@ public class WEXProcessor {
                     clientObj = new NBSConnector();
                 }
                 iSOMsgResponse = clientObj.sendRequest(iSOMsg);
-                if (null != iSOMsgResponse || iSOMsgResponse.length<2) {
-            //        responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
+                if (null != iSOMsgResponse || iSOMsgResponse.length < 2) {
+                    //        responseArr = nbsRequestGenerator.seperateResponse(iSOMsgResponse.getBytes());
                     t = nbsRequestGenerator.unmarshalAcknowledgment(iSOMsgResponse[0]);
+                    if ((ResponseType.ACCEPTED).equalsIgnoreCase(t.getResponseType())) {
+                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.ACCEPTED);
+                        //t.setResponseType(ResponseType.APPROVED);
+                    } else if ((ResponseType.REJECTED).equalsIgnoreCase(t.getResponseType())) {
+                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.REJECTED);
+                        handleRequestTimeOutScenaio(t);
+                    } else if ((ResponseType.CANCELED).equalsIgnoreCase(t.getResponseType())) {
+                        LOGGER.info("Acknoledgement recieved from :"+ResponseType.CANCELED);
+                        buildErrorResponse(t, configurator.get("NBS_AUTH_UNAVAILABLE"), "NBS_AUTH_UNAVAILABLE");
+                    }
                     t = nbsRequestGenerator.unmarshalNbsResponse(iSOMsgResponse[1]);
                 }
             } else if (dupCheckCounter > wexRetryCount) {

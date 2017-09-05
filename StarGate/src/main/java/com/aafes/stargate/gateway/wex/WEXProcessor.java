@@ -90,6 +90,8 @@ public class WEXProcessor {
                 retryReason = "Exception : " + e.getMessage();
                 handleRequestTimeOutScenaio(t);
             } else {
+                LOGGER.info("Invalid response from NBS.");
+                buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
                 throw e;
             }
         }

@@ -160,7 +160,7 @@ public class TestPreAuthWex {
         // insertDataToFacMapper();
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testFuelOnlyApproval() {
         sMethodName = "testFuelOnlyApproval";
@@ -173,7 +173,7 @@ public class TestPreAuthWex {
         clearGlobalVariables();
         assertEquals("100", result.getResponse().get(0).getReasonCode());
     }
-
+    @Ignore
     @Test
     public void testFuelOnlyDeclained() throws SocketTimeoutException {
         sMethodName = "testFuelOnlyDeclained";
@@ -196,7 +196,7 @@ public class TestPreAuthWex {
         clearGlobalVariables();
         assertEquals("200", transaction.getReasonCode());
     }
-
+    @Ignore
     @Test
     public void testApprovalForOneFuelAndOneNonFuel() {
         sMethodName = "testSuccessPreAuthRequest";
@@ -209,7 +209,7 @@ public class TestPreAuthWex {
         clearGlobalVariables();
         assertEquals("100", result.getResponse().get(0).getReasonCode());
     }
-
+    @Ignore
     @Test
     public void testDeclineForOneFuelAndOneNonFuel() {
         try {
@@ -236,8 +236,7 @@ public class TestPreAuthWex {
             Logger.getLogger(TestPreAuthWex.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    // @Ignore
-
+    @Ignore
     @Test
     public void testDeclinePreAuthRequestDueToKeyedTransaction() {
         sMethodName = "testDeclinePreAuthRequestDueToKeyedTransaction";
@@ -252,7 +251,7 @@ public class TestPreAuthWex {
         assertEquals("INVALID_INPUT_TYPE", result.getResponse().get(0).getDescriptionField());
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testDeclineDueToOnlyNonFuelProducts() {
         sMethodName = "testDeclinePreAuthRequestDueToNoFuelProducts";
@@ -267,7 +266,7 @@ public class TestPreAuthWex {
         assertEquals("PRODUCT_DETAIL_COUNT_NOT_BE_NULL", result.getResponse().get(0).getDescriptionField());
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testForCountExceededForFuelProdCodes() {
         sMethodName = "testForCountExceededForFuelProdCodes";
@@ -282,7 +281,7 @@ public class TestPreAuthWex {
         assertEquals("FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED", result.getResponse().get(0).getDescriptionField());
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testForCountExceededForNonFuelProdCodes() {
         sMethodName = "testForCountExceededForNonFuelProdCodes";
@@ -296,7 +295,7 @@ public class TestPreAuthWex {
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         assertEquals("NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED", result.getResponse().get(0).getDescriptionField());
     }
-
+    @Ignore
     @Test
     public void testForRejectedResponseFromNBS() throws SocketTimeoutException {
         sMethodName = "testForRejectedResponseFromNBS";
@@ -319,7 +318,7 @@ public class TestPreAuthWex {
         clearGlobalVariables();
         assertEquals("200", transaction.getReasonCode());
     }
-@Ignore
+    @Ignore
     @Test
     public void testForCanceledResponseFromNBS() throws SocketTimeoutException {
         sMethodName = "testForCanceledResponseFromNBS";

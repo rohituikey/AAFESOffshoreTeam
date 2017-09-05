@@ -6,16 +6,22 @@
 package com.aafes.stargate.imported;
 
 import com.aafes.starsettler.control.CassandraSessionFactory;
+import com.aafes.starsettler.dao.SettleMessageDAO;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -27,6 +33,8 @@ public class WexSettleMessagesDao {
     private Mapper mapper;
     private CassandraSessionFactory factory;
     Session session;
+    private static final org.slf4j.Logger LOG
+            = LoggerFactory.getLogger(WexSettleMessagesDao.class.getSimpleName());
 
     @PostConstruct
     public void postConstruct() {
@@ -61,6 +69,24 @@ public class WexSettleMessagesDao {
             System.out.println("com.aafes.starsettler.dao.SettleMessageDAO.updateWexData()");
         }
 
+    }
+
+    public void updateWexFileSeqxRef(List<String> tids, String SeqNo) {
+
+        LOG.info("Entry in updateFileSeqxRef method of Settlemessagedao..");
+        factory = new CassandraSessionFactory();
+
+        String processDate = this.getProcessDate();
+
+        for (String tid : tids) {
+            String query = "insert into starsettler.fileidref(filesequenceid , batchid, processdate) "
+                    + "VALUES ('" + SeqNo + "', "
+                    + "'" + tid + "',"
+                    + "'" + processDate + "');";
+            factory.getSession().execute(query);
+        }
+
+        LOG.info("Exit from updateFileSeqxRef method of Settlemessagedao..");
     }
 
     public List<WexSettleEntity> getWexTransactions(String tid, String processDate, String status) {
@@ -126,6 +152,39 @@ public class WexSettleMessagesDao {
         return wexSettleMessagesList;
     }
 
+    public List<String> getWexTIDList() {
+
+        LOG.info("Entry in getWexTIDList method of WexSettlemessagedao..");
+        List<String> tidList = new ArrayList<String>();
+        String query = "select tid from starsettler.wexsettlemessages "
+                + "where processdate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
+        ResultSet result = factory.getSession().execute(query);
+
+        for (Row rs : result) {
+            tidList.add(rs.getString("batchid"));
+            break;
+        }
+        LOG.info("Exit from getWexTIDList method of WexSettlemessagedao..");
+        return tidList;
+
+    }
+
+    public String getfileWexSequenceId() {
+        
+        LOG.info("Entry in getfileWexSequenceId method of WexSettlemessagedao..");
+        String query = "select filesequenceid from starsettler.wexsettlemessages "
+                + "where processdate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
+        ResultSet result = factory.getSession().execute(query);
+
+        String filesequenceid="";
+        for (Row rs : result) {
+             filesequenceid= rs.getString("filesequenceid");
+            break;
+        }
+        LOG.info("Exit from getfileWexSequenceId method of WexSettlemessagedao..");
+        return filesequenceid;
+    }
+
     public Mapper getMapper() {
         return mapper;
     }
@@ -141,10 +200,22 @@ public class WexSettleMessagesDao {
     public void setFactory(CassandraSessionFactory factory) {
         this.factory = factory;
     }
-    
-     @EJB
+
+    @EJB
     public void setCassandraSessionFactory(CassandraSessionFactory factory) {
         this.factory = factory;
+    }
+
+    private String getProcessDate() {
+
+        LOG.info("Entry in getProcessDate method of WexSettlemessagedao..");
+        // TODO
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        String processDate = dateFormat.format(new Date());
+        LOG.info("Exit from getProcessDate method of Settlemessagedao..");
+        return processDate;
     }
 
 }

@@ -27,9 +27,7 @@ public class SettleMessageRepository {
     @EJB
     private FacilityDAO facilityDAO;
     @EJB
-    private TransactionDAO transactionDAO;   
-    
-     
+    private TransactionDAO transactionDAO;
 
     public void save(List<SettleEntity> settleEntityList) {
         settleMessageDAO.save(settleEntityList);
@@ -44,25 +42,25 @@ public class SettleMessageRepository {
     }
 
     public List<SettleEntity> getFDMSData(String identityUUID, String processDate, String settleStatus) {
-       return settleMessageDAO.getFDMSData(identityUUID, processDate, settleStatus);
+        return settleMessageDAO.getFDMSData(identityUUID, processDate, settleStatus);
     }
 
     public List<SettleEntity> getVisionData(String identityUUID, String processDate, String settleStatus) {
         return settleMessageDAO.getVisionData(identityUUID, processDate, settleStatus);
     }
-    
+
     public List<SettleEntity> getWexData(String identityUUID, String processDate, String settleStatus) {
-       return settleMessageDAO.getWexData(identityUUID, processDate, settleStatus);
+        return settleMessageDAO.getWexData(identityUUID, processDate, settleStatus);
     }
 
     public List<SettleEntity> getRetailData(String processDate, String settleStatus, String uuid) {
         return settleMessageDAO.getRetailData(processDate, settleStatus, uuid);
     }
-    
+
     public List<String> getUuidList(String strategyStr) {
         return settleMessageDAO.getIdentityUuidList(strategyStr);
-    } 
-    
+    }
+
     public List<SettleEntity> getAll(String identityUUID, String processDate, String settleStatus) {
         return settleMessageDAO.getAll(identityUUID, processDate, settleStatus);
     }
@@ -78,18 +76,16 @@ public class SettleMessageRepository {
     public void updateFdmsData(List<SettleEntity> fdmsData, String In_Progress) {
         settleMessageDAO.updateFdmsData(fdmsData, In_Progress);
     }
-    
-    public void updateWexData(List<SettleEntity> Wexdata, String In_Progress) {
-        settleMessageDAO.updateWexData(Wexdata, In_Progress);
-    }
-    
-     public void updateFileSeqxRef(List<String> tids, String seqNo) {
+
+//    public void updateWexData(List<SettleEntity> Wexdata, String In_Progress) {
+//        settleMessageDAO.updateWexData(Wexdata, In_Progress);
+//    }
+    public void updateFileSeqxRef(List<String> tids, String seqNo) {
         settleMessageDAO.updateFileSeqxRef(tids, seqNo);
     }
-    
-    
-     public  boolean validateDuplicateRecords(List<SettleEntity> fdmsData) {
-        return  settleMessageDAO.validateDuplicateRecords(fdmsData);
+
+    public boolean validateDuplicateRecords(List<SettleEntity> fdmsData) {
+        return settleMessageDAO.validateDuplicateRecords(fdmsData);
     }
 
     public void updateBatchRef(List<SettleEntity> fdmsData, String processDate) {
@@ -116,17 +112,16 @@ public class SettleMessageRepository {
     public void setTransactionDAO(TransactionDAO transactionDAO) {
         this.transactionDAO = transactionDAO;
     }
-    
-    public List<String> getTIDList() {
-        settleMessageDAO = new SettleMessageDAO();
-        return settleMessageDAO.getTIDList();
-    }
 
-    public List<SettleEntity> getsettleTransaction(String tid, String processDate, String settleStatus) {
-        settleMessageDAO = new SettleMessageDAO();
-        return settleMessageDAO.getsettleTransaction(tid, processDate, settleStatus);
-    }
-     public String getFileSequenceId() {
-          return settleMessageDAO.getFileSequenceId();
-     }
+//    public List<String> getTIDList() {
+//        settleMessageDAO = new SettleMessageDAO();
+//        return settleMessageDAO.getTIDList();
+//    }
+//    public List<SettleEntity> getsettleTransaction(String tid, String processDate, String settleStatus) {
+//        settleMessageDAO = new SettleMessageDAO();
+//        return settleMessageDAO.getsettleTransaction(tid, processDate, settleStatus);
+//    }
+//     public String getFileSequenceId() {
+//          return settleMessageDAO.getFileSequenceId();
+//     }
 }

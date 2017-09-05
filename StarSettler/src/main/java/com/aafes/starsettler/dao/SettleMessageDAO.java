@@ -452,23 +452,22 @@ public class SettleMessageDAO {
 
     }
 
-    public String getFileSequenceId() {
-
-        LOG.info("Entry in getFileSequence method of Settlemessagedao..");
-        String fileSequenceId = "";
-        String query = "select filesequenceid from starsettler.fileidref "
-                + "where processdate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
-        ResultSet result = factory.getSession().execute(query);
-
-        for (Row rs : result) {
-            fileSequenceId = rs.getString("filesequenceid");
-            break;
-        }
-        LOG.info("Exit from getBatchId method of Settlemessagedao..");
-        return fileSequenceId;
-
-    }
-
+//    public String getFileSequenceId() {
+//
+//        LOG.info("Entry in getFileSequence method of Settlemessagedao..");
+//        String fileSequenceId = "";
+//        String query = "select filesequenceid from starsettler.fileidref "
+//                + "where processdate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
+//        ResultSet result = factory.getSession().execute(query);
+//
+//        for (Row rs : result) {
+//            fileSequenceId = rs.getString("filesequenceid");
+//            break;
+//        }
+//        LOG.info("Exit from getBatchId method of Settlemessagedao..");
+//        return fileSequenceId;
+//
+//    }
     private String buildCoulumns() {
         String columns = "identityuuid, "
                 + "lineId,"
@@ -676,31 +675,30 @@ public class SettleMessageDAO {
         LOG.info("Exit from updateFdmsData method of Settlemessagedao..");
     }
 
-    public void updateWexData(List<SettleEntity> wexdata, String filesequenceid) {
-
-        LOG.info("Entry in updateFdmsData method of Settlemessagedao..");
-        factory = new CassandraSessionFactory();
-        String status = "compleated";
-        try {
-            for (SettleEntity settleData : wexdata) {
-                String query = "update starsettler.settlemessages set "
-                        + " filesequenceid = '" + settleData.getSequenceId()
-                        + "', settlestatus = '" + status
-                        + "' where receiveddate = '" + settleData.getReceiveddate()
-                        + "' and ordernumber = '" + settleData.getOrderNumber()
-                        + "' and settledate='" + settleData.getSettleDate()
-                        + "' and cardtype='" + settleData.getCardType()
-                        + "' and transactiontype = '" + settleData.getTransactionType()
-                        + "' and clientlineid='" + settleData.getClientLineId()
-                        + "' and transactionid='" + settleData.getTransactionId() + "';";
-                factory.getSession().execute(query);
-            }
-            LOG.info("Exit from updateFdmsData method of Settlemessagedao..");
-        } catch (Exception e) {
-            System.out.println("com.aafes.starsettler.dao.SettleMessageDAO.updateWexData()");
-        }
-    }
-
+//    public void updateWexData(List<SettleEntity> wexdata, String filesequenceid) {
+//
+//        LOG.info("Entry in updateFdmsData method of Settlemessagedao..");
+//        factory = new CassandraSessionFactory();
+//        String status = "compleated";
+//        try {
+//            for (SettleEntity settleData : wexdata) {
+//                String query = "update starsettler.settlemessages set "
+//                        + " filesequenceid = '" + settleData.getSequenceId()
+//                        + "', settlestatus = '" + status
+//                        + "' where receiveddate = '" + settleData.getReceiveddate()
+//                        + "' and ordernumber = '" + settleData.getOrderNumber()
+//                        + "' and settledate='" + settleData.getSettleDate()
+//                        + "' and cardtype='" + settleData.getCardType()
+//                        + "' and transactiontype = '" + settleData.getTransactionType()
+//                        + "' and clientlineid='" + settleData.getClientLineId()
+//                        + "' and transactionid='" + settleData.getTransactionId() + "';";
+//                factory.getSession().execute(query);
+//            }
+//            LOG.info("Exit from updateFdmsData method of Settlemessagedao..");
+//        } catch (Exception e) {
+//            System.out.println("com.aafes.starsettler.dao.SettleMessageDAO.updateWexData()");
+//        }
+//    }
     public void updateFileSeqxRef(List<String> tids, String SeqNo) {
 
         LOG.info("Entry in updateFileSeqxRef method of Settlemessagedao..");
@@ -768,82 +766,80 @@ public class SettleMessageDAO {
         return recordDuplicate;
     }
 
-    public List<String> getTIDList() {
-
-        LOG.info("Entry in getTID method of Settlemessagedao..");
-        List<String> tid = new ArrayList<String>();
-        String query = "";
-
-        query = "SELECT lineId FROM starsettler.settlemessages where cardType ='WEX' ALLOW FILTERING;";
-        factory = new CassandraSessionFactory();
-        ResultSet result = factory.getSession().execute(query);
-
-        for (Row row : result) {
-            tid.add(row.getString(0));
-        }
-
-        LOG.info("Exit from getTID method of Settlemessagedao..");
-        return tid;
-    }
-
-    public List<SettleEntity> getsettleTransaction(String tid, String processDate, String settleStatus) {
-
-        LOG.info("Entry in getTID method of Settlemessagedao..");
-        List<SettleEntity> settleTransactionList = new ArrayList<SettleEntity>();
-
-        try {
-            String query = "";
-            query = "SELECT identityuuid, lineId, quantity, unitCost, cardType, paymentAmount, transactionType, transactionId, orderDate, ordernumber, receiveddate, settledate, clientlineid,  "
-                    + "batchId, trackdata2, odometer, driverId, authreference, vehicleId, catflag, service ,pumpnumber,time, cardtype,transactionType, "
-                    + "filesequenceid, nonfuelproductgroup, fuelproductgroup FROM starsettler.settlemessages where receiveddate='" + processDate
-                    + "' and settlestatus = '" + settleStatus
-                    + "' and lineId = '" + tid
-                    + "' ALLOW FILTERING;";
-
-            factory = new CassandraSessionFactory();
-            ResultSet result = factory.getSession().execute(query);
-            System.out.println("com.aafes.starsettler.dao.SettleMessageDAO.getsettleTransaction()");
-            //set values one by one
-            if (null != result) {
-                for (Row row : result) {
-                    SettleEntity settleEntity = new SettleEntity();
-                    settleEntity.setCardType(row.getString("cardType"));
-                    settleEntity.setLineId(row.getString("lineId"));
-                    settleEntity.setQuantity(row.getString("quantity"));
-                    settleEntity.setUnitCost(row.getString("unitCost"));
-                    settleEntity.setPaymentAmount(row.getString("paymentAmount"));
-                    settleEntity.setTransactionType(row.getString("transactionType"));
-                    settleEntity.setTransactionId(row.getString("transactionId"));
-                    settleEntity.setOrderNumber(row.getString("ordernumber"));
-                    settleEntity.setOrderDate(row.getString("orderdate"));
-                    settleEntity.setBatchId(row.getString("batchId"));
-                    settleEntity.setClientLineId(row.getString("clientlineid"));
-                    settleEntity.setReceiveddate(row.getString("receiveddate"));
-                    settleEntity.setSettleDate(row.getString("settledate"));
-                    settleEntity.setTrackdata2(row.getString("trackdata2"));
-                    settleEntity.setPumpNumber(row.getString("pumpnumber"));
-                    settleEntity.setOdometer(row.getString("odometer"));
-                    settleEntity.setTime(row.getString("time"));
-                    settleEntity.setCardType(row.getString("cardtype"));
-                    settleEntity.setTransactionType(row.getString("transactionType"));
-                    settleEntity.setDriverId(row.getString("driverId"));
-                    settleEntity.setAuthreference(row.getString("authreference"));
-                    settleEntity.setVehicleId(row.getString("vehicleId"));
-                    settleEntity.setCatflag(row.getString("catflag"));
-                    settleEntity.setService(row.getString("service"));
-                    settleEntity.setFilesequencenumber(row.getString("filesequenceid"));
-                    settleEntity.setDate(row.getString("date"));
-                    settleEntity.setProductgroup(row.getList("productgroup", String.class));
-                    settleTransactionList.add(settleEntity);
-                }
-            }
-            LOG.info("Exit from getTID method of Settlemessagedao..");
-        } catch (Exception e) {
-            System.out.println("com.aafes.starsettler.dao.SettleMessageDAO.getsettleTransaction()");
-        }
-        return settleTransactionList;
-    }
-
+//    public List<String> getTIDList() {
+//
+//        LOG.info("Entry in getTID method of Settlemessagedao..");
+//        List<String> tid = new ArrayList<String>();
+//        String query = "";
+//
+//        query = "SELECT lineId FROM starsettler.settlemessages where cardType ='WEX' ALLOW FILTERING;";
+//        factory = new CassandraSessionFactory();
+//        ResultSet result = factory.getSession().execute(query);
+//
+//        for (Row row : result) {
+//            tid.add(row.getString(0));
+//        }
+//
+//        LOG.info("Exit from getTID method of Settlemessagedao..");
+//        return tid;
+//    }
+//    public List<SettleEntity> getsettleTransaction(String tid, String processDate, String settleStatus) {
+//
+//        LOG.info("Entry in getTID method of Settlemessagedao..");
+//        List<SettleEntity> settleTransactionList = new ArrayList<SettleEntity>();
+//
+//        try {
+//            String query = "";
+//            query = "SELECT identityuuid, lineId, quantity, unitCost, cardType, paymentAmount, transactionType, transactionId, orderDate, ordernumber, receiveddate, settledate, clientlineid,  "
+//                    + "batchId, trackdata2, odometer, driverId, authreference, vehicleId, catflag, service ,pumpnumber,time, cardtype,transactionType, "
+//                    + "filesequenceid, nonfuelproductgroup, fuelproductgroup FROM starsettler.settlemessages where receiveddate='" + processDate
+//                    + "' and settlestatus = '" + settleStatus
+//                    + "' and lineId = '" + tid
+//                    + "' ALLOW FILTERING;";
+//
+//            factory = new CassandraSessionFactory();
+//            ResultSet result = factory.getSession().execute(query);
+//            System.out.println("com.aafes.starsettler.dao.SettleMessageDAO.getsettleTransaction()");
+//            //set values one by one
+//            if (null != result) {
+//                for (Row row : result) {
+//                    SettleEntity settleEntity = new SettleEntity();
+//                    settleEntity.setCardType(row.getString("cardType"));
+//                    settleEntity.setLineId(row.getString("lineId"));
+//                    settleEntity.setQuantity(row.getString("quantity"));
+//                    settleEntity.setUnitCost(row.getString("unitCost"));
+//                    settleEntity.setPaymentAmount(row.getString("paymentAmount"));
+//                    settleEntity.setTransactionType(row.getString("transactionType"));
+//                    settleEntity.setTransactionId(row.getString("transactionId"));
+//                    settleEntity.setOrderNumber(row.getString("ordernumber"));
+//                    settleEntity.setOrderDate(row.getString("orderdate"));
+//                    settleEntity.setBatchId(row.getString("batchId"));
+//                    settleEntity.setClientLineId(row.getString("clientlineid"));
+//                    settleEntity.setReceiveddate(row.getString("receiveddate"));
+//                    settleEntity.setSettleDate(row.getString("settledate"));
+//                    settleEntity.setTrackdata2(row.getString("trackdata2"));
+//                    settleEntity.setPumpNumber(row.getString("pumpnumber"));
+//                    settleEntity.setOdometer(row.getString("odometer"));
+//                    settleEntity.setTime(row.getString("time"));
+//                    settleEntity.setCardType(row.getString("cardtype"));
+//                    settleEntity.setTransactionType(row.getString("transactionType"));
+//                    settleEntity.setDriverId(row.getString("driverId"));
+//                    settleEntity.setAuthreference(row.getString("authreference"));
+//                    settleEntity.setVehicleId(row.getString("vehicleId"));
+//                    settleEntity.setCatflag(row.getString("catflag"));
+//                    settleEntity.setService(row.getString("service"));
+//                    settleEntity.setFilesequencenumber(row.getString("filesequenceid"));
+//                    settleEntity.setDate(row.getString("date"));
+//                    settleEntity.setProductgroup(row.getList("productgroup", String.class));
+//                    settleTransactionList.add(settleEntity);
+//                }
+//            }
+//            LOG.info("Exit from getTID method of Settlemessagedao..");
+//        } catch (Exception e) {
+//            System.out.println("com.aafes.starsettler.dao.SettleMessageDAO.getsettleTransaction()");
+//        }
+//        return settleTransactionList;
+//    }
     private String buildWEXCoulumns() {
         String columns = "identityuuid, "
                 + "lineId,"

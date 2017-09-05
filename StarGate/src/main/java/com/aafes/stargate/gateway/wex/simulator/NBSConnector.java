@@ -2,17 +2,16 @@ package com.aafes.stargate.gateway.wex.simulator;
 
 import com.aafes.stargate.control.Configurator;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
-import static org.jboss.resteasy.test.EmbeddedContainer.start;
 
 /**
  *
@@ -24,41 +23,56 @@ public class NBSConnector {
     //private StringBuffer response;
     byte[] isoFormat;
     private Socket nbsSocket;
+    private DatagramSocket datagramSocket;
+    private DatagramPacket datagramPacket;
     @EJB
     private Configurator configurator;
     private String wexNbsHostName = "";
-    private int wexNbsPortNumber = 0, wexNbsTimeout = 0;
+    private int wexNbsPortNumber = 0, wexNbsTimeout = 0, count = 0;
 
-    public String sendRequest(byte[] request) throws SocketTimeoutException {
-        String strResponse = "";
+    public String[] sendRequest(byte[] request) throws SocketTimeoutException {
+        String[] strResponse = new String[2];
         try {
+            if (null == datagramSocket || datagramSocket.isClosed()) {
+                datagramSocket = new DatagramSocket();
+            }
             populateValuesFromPropertiesFile();
-            //creating connections
-            if (null == nbsSocket || nbsSocket.isClosed()) {
-                nbsSocket = new Socket();
-            }
-            if (nbsSocket != null) {
-                nbsSocket.connect(new InetSocketAddress(wexNbsHostName, wexNbsPortNumber), wexNbsTimeout);
-                nbsSocket.setSoTimeout(wexNbsTimeout);
-                LOG.info("Connection Established with NBS socket server");
-                LOG.log(Level.INFO, "{0}-----------{1}---------------{2}",
-                        new Object[]{nbsSocket.getClass(), nbsSocket.getLocalAddress(), nbsSocket.getLocalPort()});
-            } else {
-                LOG.info("Socket client object is null!!");
-            }
+            datagramPacket = new DatagramPacket(request, request.length, InetAddress.getByName(wexNbsHostName), wexNbsPortNumber);
+            datagramSocket.setSoTimeout(wexNbsTimeout);
+            datagramSocket.send(datagramPacket);
+            while (count != 2) {
+                //creating connections
+//            if (null == nbsSocket || nbsSocket.isClosed()) {
+//                nbsSocket = new Socket();
+//            }
 
-//            BufferedWriter writeRequest = new BufferedWriter(new OutputStreamWriter(nbsSocket.getOutputStream()));
-//            writeRequest.write(request + "\n");
-//            writeRequest.flush();
-            OutputStream out = nbsSocket.getOutputStream();
-            DataOutputStream dos = new DataOutputStream(out);
-
-            dos.writeInt(request.length);
-            if (request.length > 0) {
-                dos.write(request, 0, request.length);
+//            if (nbsSocket != null) {
+//                nbsSocket.connect(new InetSocketAddress(wexNbsHostName, wexNbsPortNumber), wexNbsTimeout);
+//                nbsSocket.setSoTimeout(wexNbsTimeout);
+//                LOG.info("Connection Established with NBS socket server");
+//                LOG.log(Level.INFO, "{0}-----------{1}---------------{2}",
+//                        new Object[]{nbsSocket.getClass(), nbsSocket.getLocalAddress(), nbsSocket.getLocalPort()});
+//            } else {
+//                LOG.info("Socket client object is null!!");
+//            }
+//
+////            BufferedWriter writeRequest = new BufferedWriter(new OutputStreamWriter(nbsSocket.getOutputStream()));
+////            writeRequest.write(request + "\n");
+////            writeRequest.flush();
+//            OutputStream out = nbsSocket.getOutputStream();
+//            DataOutputStream dos = new DataOutputStream(out);
+//
+//            dos.writeInt(request.length);
+//            if (request.length > 0) {
+//                dos.write(request, 0, request.length);
+//            }
+                datagramSocket.receive(datagramPacket);
+                LOG.info(new String(datagramPacket.getData()));
+                strResponse[count] = new String(datagramPacket.getData());
+                count++;
             }
-            strResponse = getResponse();
-            nbsSocket.close();
+//            strResponse = getResponse();
+//            nbsSocket.close();
 //            isoFormat = response.toString().getBytes();
 //            return isoFormat;
             ///if(response != null) strResponse = response.toString();
@@ -74,6 +88,7 @@ public class NBSConnector {
             System.out.println("nbsclient.NBSClient.main()" + ex);
             throw ex;
         }
+        datagramSocket.close();
         return strResponse;
     }
 

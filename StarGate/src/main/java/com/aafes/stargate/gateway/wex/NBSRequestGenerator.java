@@ -105,7 +105,6 @@ public class NBSRequestGenerator {
         if (serviceType == null) {
             serviceType = configurator.get("SERVICE_TYPE");
         }
-        
         transaction = t;
         try {
             SCHEMA_PATH = "src/main/resources/xml/NBSLogonPackager.xml";
@@ -246,9 +245,11 @@ public class NBSRequestGenerator {
             isoMsg.setPackager(packager);
             isoMsg.unpack(response.getBytes());
             if (isoMsg.getString(2).trim().equalsIgnoreCase("c$")) {
-                transaction.setResponseType(ResponseType.APPROVED);
+                transaction.setResponseType(ResponseType.ACCEPTED);
             } else if (isoMsg.getString(2).trim().equalsIgnoreCase("c?")) {
-                transaction.setResponseType(ResponseType.DECLINED);
+                transaction.setResponseType(ResponseType.CANCELED);
+            }else if (isoMsg.getString(2).trim().equalsIgnoreCase("c!")) {
+                transaction.setResponseType(ResponseType.REJECTED);
             }
             transaction.setReasonCode(isoMsg.getString(3));
             return transaction;

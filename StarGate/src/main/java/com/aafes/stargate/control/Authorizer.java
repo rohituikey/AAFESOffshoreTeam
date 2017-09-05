@@ -384,7 +384,8 @@ public class Authorizer {
     // Map the inbound Message to a Transaction.
     private Transaction mapRequest(Transaction transaction, Message requestMessage) {
         LOG.info("Authorizer.mapRequest method started");
-        String[] decimalPart;
+        //String[] decimalPart;
+        boolean wexValidateFlag ;
         transaction.setRequestXmlDateTime(this.getSystemDateTime());
 
         Header header = requestMessage.getHeader();
@@ -505,7 +506,7 @@ public class Authorizer {
         if (request.getPlanNumbers() != null
                 && request.getPlanNumbers().getPlanNumber() != null
                 && request.getPlanNumbers().getPlanNumber().get(0) != null) {
-            transaction.setPlanNumber(request.getPlanNumbers().getPlanNumber().get(0).toString());
+            transaction.setPlanNumber(request.getPlanNumbers().getPlanNumber().get(0));
         }
 //        if (request.getEssoRequestData() != null) {
 //            BigDecimal pumpAmt;
@@ -542,15 +543,15 @@ public class Authorizer {
         }
         if (request.getWEXRequestData() != null) {
             Request.WEXRequestData wexReqPayAtPump = request.getWEXRequestData();
+             wexValidateFlag = WEXValidate(wexReqPayAtPump, transaction);
             if (transaction.getDriverId() != null) {
-                transaction.setDriverId(wexReqPayAtPump.getDriverId().toString());
+                transaction.setDriverId(wexReqPayAtPump.getDriverId());
             }
             if (wexReqPayAtPump.getRestrictCode() != null) {
-                transaction.setRestrictCode(wexReqPayAtPump.getRestrictCode().toString());
+                transaction.setRestrictCode(wexReqPayAtPump.getRestrictCode());
             }
 
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
-            boolean wexValidateFlag = WEXValidate(wexReqPayAtPump, transaction);
             if (wexValidateFlag) {
                 if (wexReqPayAtPump.getFuelProdGroup() != null && wexReqPayAtPump.getFuelProdGroup().size() > 0) {
                     StringBuilder prodCodeDetailsStr = null;
@@ -645,7 +646,7 @@ public class Authorizer {
             //                transaction.setUnitOfMeas(wexReqPayAtPump.getUnitOfMeas().toString());
             //            }
             if (wexReqPayAtPump.getVehicleId() != null) {
-                transaction.setVehicleId(wexReqPayAtPump.getVehicleId().toString());
+                transaction.setVehicleId(wexReqPayAtPump.getVehicleId());
             }
             if (wexReqPayAtPump.getLicenseNumber() != null) {
                 transaction.setLicenceNumber(wexReqPayAtPump.getLicenseNumber());
@@ -1023,26 +1024,30 @@ public class Authorizer {
     }
 
     private boolean WEXValidate(WEXRequestData wexReqPayAtPump, Transaction t) {
-        if (configurator.get("TOTAL_FUEL_PRODCODE_ALLWOED_SALE") != null) {
+        if (configurator.get("TOTAL_FUEL_PRODCODE_ALLWOED") != null) {
             maxFuelProdCount = Integer.parseInt(configurator.get("TOTAL_FUEL_PRODCODE_ALLWOED"));
         } else {
-            LOG.error("Please add TOTAL_FUEL_PRODCODE_ALLWOED_SALE in stargate.properties");
+            LOG.error("Please add TOTAL_FUEL_PRODCODE_ALLWOED in stargate.properties");
         }
-        if (configurator.get("TOTAL_NONFUEL_PRODCODE_ALLWOED_SALE") != null) {
+        if (configurator.get("TOTAL_NONFUEL_PRODCODE_ALLWOED") != null) {
             maxNonFuelProdCount = Integer.parseInt(configurator.get("TOTAL_NONFUEL_PRODCODE_ALLWOED"));
         } else {
-            LOG.error("Please add TOTAL_NONFUEL_PRODCODE_ALLWOED_SALE in stargate.properties");
+            LOG.error("Please add TOTAL_NONFUEL_PRODCODE_ALLWOED in stargate.properties");
         }
-        if (wexReqPayAtPump.getFuelProdGroup().size() == 0) {
-            this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_NOT_BE_NULL", "PRODUCT_DETAIL_COUNT_NOT_BE_NULL");
-            throw new AuthorizerException("PRODUCT_DETAIL_COUNT_NOT_BE_NULL");
-        } else if (wexReqPayAtPump.getFuelProdGroup().size() > maxFuelProdCount) {
-            this.buildErrorResponse(t, "FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED", "FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
-            throw new AuthorizerException("FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
-        } else if (wexReqPayAtPump.getNonFuelProductGroup().size() > maxNonFuelProdCount) {
-            this.buildErrorResponse(t, "NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED", "NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
-            throw new AuthorizerException("NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
-
+        if (wexReqPayAtPump.getFuelProdGroup().isEmpty()) {
+            if (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)
+                    || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)) {
+                this.buildErrorResponse(t, "PRODUCT_DETAIL_COUNT_NOT_BE_NULL", "PRODUCT_DETAIL_COUNT_NOT_BE_NULL");
+                throw new AuthorizerException("PRODUCT_DETAIL_COUNT_NOT_BE_NULL");
+            } else if (wexReqPayAtPump.getFuelProdGroup().size() > maxFuelProdCount) {
+                this.buildErrorResponse(t, "FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED", "FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
+                throw new AuthorizerException("FUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
+            } else if (wexReqPayAtPump.getNonFuelProductGroup().size() > maxNonFuelProdCount) {
+                this.buildErrorResponse(t, "NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED", "NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
+                throw new AuthorizerException("NONFUEL_PRODUCT_DETAIL_COUNT_EXCEEDED");
+            } else {
+                return true;
+            }
         } else {
             return true;
         }

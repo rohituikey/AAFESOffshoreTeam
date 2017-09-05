@@ -55,14 +55,9 @@ public abstract class BaseSettler {
         return repository.getBatchId();
     }
 
-    public String fileWexSequenceId(){
-        return wexRepository.getfileWexSequenceId();
-    }
-    
-     public String fileSequenceId() {
+    public String fileSequenceId() {
         return repository.getFileSequenceId();
     }
-    
 
     public void updateFdmsData(List<SettleEntity> fdmsData, String In_Progress) {
         repository.updateFdmsData(fdmsData, In_Progress);
@@ -96,11 +91,6 @@ public abstract class BaseSettler {
         return repository.getsettleTransaction(tid, processDate, SettleStatus);
     }
 
-    public List<String> getWexTIDList() {
-         wexRepository = new WexRepository();
-        return wexRepository.getWexTIDList();
-    }
-    
     public List<WexSettleEntity> getWexsettleTransaction(String tid, String processDate, String status) {
         wexRepository = new WexRepository();
         return wexRepository.getWexTransactions(tid, processDate, status);

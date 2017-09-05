@@ -11,11 +11,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -46,23 +42,8 @@ public class WexSettleMessagesDao {
         }
     }
 
-    public List<String> getWexTIDList() {
-        List<String> tid = new ArrayList<String>();
-        String query = "";
-
-        query = "SELECT tid FROM starsettler.wexsettlemessages where transactiontype ='FinalAuth' ALLOW FILTERING;";
-       // factory = new CassandraSessionFactory();
-        ResultSet result = factory.getSession().execute(query);
-
-        for (Row row : result) {
-            tid.add(row.getString(0));
-        }
-        return tid;
-
-    }
-
     public void updateWexSettleData(List<WexSettleEntity> Wexdata, String In_Progress) {
-        //factory = new CassandraSessionFactory();
+        factory = new CassandraSessionFactory();
         String status = "compleated";
         try {
             for (WexSettleEntity settleData : Wexdata) {
@@ -85,12 +66,10 @@ public class WexSettleMessagesDao {
     public List<WexSettleEntity> getWexTransactions(String tid, String processDate, String status) {
 
         List<WexSettleEntity> wexSettleMessagesList = new ArrayList<>();
-       // factory = new CassandraSessionFactory();
         String query = "";
-        String processDate1 = "2017-08-23";
-        query = "SELECT * FROM starsettler.wexsettlemessages "
-                + "where receiveddate = '" + processDate1 + "'and "
-                 + "settlestatus = '" + status + "'and "
+        query = "SELECT * FROM stargate.wexsettlemessages "
+                + "where receiveddate = '" + processDate + "', "
+                + "settlestatus = '" + status + "', "
                 + "tid = '" + tid + "' ALLOW FILTERING;";
 
         ResultSet result = factory.getSession().execute(query);
@@ -114,6 +93,8 @@ public class WexSettleMessagesDao {
             wexSettleMessages.setPumpCat(row.getString("pumpcat"));
             wexSettleMessages.setPumpService(row.getString("pumpservice"));
             wexSettleMessages.setService(row.getString("service"));
+            // wexSettleMessages.setSettelmentDate(row.getString("settelmentdate"));
+            //wexSettleMessages.setSettelmentTime(row.getString("settelmenttime"));
             wexSettleMessages.setTransactionCode(row.getString("transactioncode"));
             wexSettleMessages.setTransactionId(row.getString("transactionid"));
             wexSettleMessages.setVehicleId(row.getString("vehicleid"));
@@ -143,30 +124,6 @@ public class WexSettleMessagesDao {
         }
         //LOG.info("WexSettleMessageDAO.find method is ended");
         return wexSettleMessagesList;
-    }
-
-    public String getfileWexSequenceId() {
-
-        String fileSequenceId = "";
-        String query = "select filesequenceid from starsettler.fileidref "
-                + "where processdate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
-        ResultSet result = factory.getSession().execute(query);
-
-        for (Row rs : result) {
-            fileSequenceId = rs.getString("filesequenceid");
-            break;
-        }
-        return fileSequenceId;
-    }
-
-    private String getProcessDate() {
-
-        // TODO
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        final Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        String processDate = dateFormat.format(new Date());
-        return processDate;
     }
 
     public Mapper getMapper() {

@@ -15,6 +15,7 @@ import com.datastax.driver.mapping.MappingManager;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 /**
@@ -138,8 +139,8 @@ public class WexSettleMessagesDao {
         return factory;
     }
 
+    @EJB
     public void setFactory(CassandraSessionFactory factory) {
         this.factory = factory;
     }
-
 }

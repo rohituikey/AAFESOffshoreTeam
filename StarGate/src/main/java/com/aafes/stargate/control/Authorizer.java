@@ -553,9 +553,9 @@ public class Authorizer {
 
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
             if (wexValidateFlag) {
+                StringBuilder prodCodeDetailsStr = null;
+                List<String> ProdDataList = new ArrayList<>();
                 if (wexReqPayAtPump.getFuelProdGroup() != null && wexReqPayAtPump.getFuelProdGroup().size() > 0) {
-                    StringBuilder prodCodeDetailsStr = null;
-                    List<String> ProdDataList = new ArrayList<>();
                     List<FuelProdGroup> list = wexReqPayAtPump.getFuelProdGroup();
                     //list.size()>2 throws exception
                     for (FuelProdGroup tmp : list) {
@@ -570,6 +570,8 @@ public class Authorizer {
                         ProdDataList.add(prodCodeDetailsStr.toString());
                         prodCodeDetailsStr = null;
                     }
+                }
+                 if (wexReqPayAtPump.getNonFuelProductGroup() != null && wexReqPayAtPump.getFuelProdGroup().size() > 0) {
                     List<NonFuelProductGroup> nList = wexReqPayAtPump.getNonFuelProductGroup();
                     //  //list.size()>4 throws exception
                     for (NonFuelProductGroup tmp : nList) {

@@ -6,7 +6,6 @@
 package com.aafes.stargate.imported;
 
 import com.aafes.starsettler.control.CassandraSessionFactory;
-import com.aafes.starsettler.dao.SettleMessageDAO;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
@@ -154,10 +153,11 @@ public class WexSettleMessagesDao {
 
     public List<String> getWexTIDList() {
 
+        factory = new CassandraSessionFactory();
         LOG.info("Entry in getWexTIDList method of WexSettlemessagedao..");
         List<String> tidList = new ArrayList<String>();
         String query = "select tid from starsettler.wexsettlemessages "
-                + "where processdate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
+                + "where receiveddate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
         ResultSet result = factory.getSession().execute(query);
 
         for (Row rs : result) {
@@ -172,7 +172,7 @@ public class WexSettleMessagesDao {
     public String getfileWexSequenceId() {
         
         LOG.info("Entry in getfileWexSequenceId method of WexSettlemessagedao..");
-        String query = "select filesequenceid from starsettler.wexsettlemessages "
+        String query = "select filesequenceid from starsettler.fileidref "
                 + "where processdate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
         ResultSet result = factory.getSession().execute(query);
 

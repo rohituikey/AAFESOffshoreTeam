@@ -31,7 +31,8 @@ public class GenerateLogWexDetails {
             // true = append file
             fw = new FileWriter(file.getAbsoluteFile(), true);
             logs = new BufferedWriter(fw);
-            logs.write("\n" +new Date()+"\n" + "AUTH REQUEST : " + iSOMsg+ "\n"   +"AUTH RESPONSE :"+iSOMsgResponse);
+            logs.write("\n" +new Date()+"\n" + "AUTH REQUEST : "+"\n" + iSOMsg+ "\n"  
+                    +"AUTH RESPONSE :"+"\n"+iSOMsgResponse+"\n"+"-----------------------------------------------------------------------------------------------------------------------------------------------------------");
 
         } catch (IOException ex) {
             Logger.getLogger(GenerateLogWexDetails.class.getName()).log(Level.SEVERE, null, ex);

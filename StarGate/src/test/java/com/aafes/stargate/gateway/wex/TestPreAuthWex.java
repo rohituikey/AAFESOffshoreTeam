@@ -36,8 +36,6 @@ import java.math.BigDecimal;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -45,9 +43,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.slf4j.LoggerFactory;
@@ -56,6 +51,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author alugumetlas
  */
+@Ignore
 public class TestPreAuthWex {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TestPreAuthWex.class.getSimpleName());
@@ -134,6 +130,7 @@ public class TestPreAuthWex {
         wexSettleMessagesDao = new WexSettleMessagesDao();
         nBSConnector = new NBSConnector();
         nBSConnector.setConfigurator(configurator);
+        wexProcessor.setConfigurator(configurator);
         wexProcessor.setClientObj(nBSConnector);
         nBSRequestGenerator = new NBSRequestGenerator();
         nBSRequestGenerator.setConfigurator(configurator);
@@ -283,16 +280,16 @@ public class TestPreAuthWex {
     public void testForRejectedResponseFromNBS() throws SocketTimeoutException {
         sMethodName = "testForRejectedResponseFromNBS";
         LOGGER.info("Method " + sMethodName + " started." + " Class Name " + CLASS_NAME);
-        Message creditMessage = this.unmarshalCreditMessage(requestXMLPreAuth);
+        Message creditMessage = this.unmarshalCreditMessage(requestXMLPreAuthRejected);
         Message result = authorizer.authorize(creditMessage);
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
         session = intiateSession();
         session.execute("TRUNCATE STARGATE.TRANSACTIONS");
         clearGlobalVariables();
-        assertEquals("200", result.getResponse().get(0).getReasonCode());
+        assertEquals("939", result.getResponse().get(0).getReasonCode());
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testForCanceledResponseFromNBS() throws SocketTimeoutException {
         sMethodName = "testForCanceledResponseFromNBS";

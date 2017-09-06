@@ -39,11 +39,12 @@ public class WEXProcessor {
     byte[] iSOMsg;
     String[] responseArr, iSOMsgResponse;
     boolean isTimeoutRetry = false;
-    boolean logEnabled;
+    boolean logEnabled ;
 
     public Transaction processWexRequests(Transaction t) throws Exception {
         LOGGER.info("WEXProcessor.processWexRequests mothod started");
         try {
+            logEnabled = Boolean.parseBoolean(configurator.get("IS_LOG_ENABLED"));
             GenerateLogWexDetails generateLogWexDetails = new GenerateLogWexDetails();
             dupCheckCounter = 0;
             isTimeoutRetry = false;
@@ -79,7 +80,7 @@ public class WEXProcessor {
                 buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
             }
             if (logEnabled) {
-                generateLogWexDetails.generateDetails(t.getRequestType(), iSOMsgResponse.toString(), iSOMsg.toString());
+                generateLogWexDetails.generateDetails(t.getRequestType(), iSOMsgResponse[0]+iSOMsgResponse[1], new String(iSOMsg));
             }
             return t;
         } catch (SocketTimeoutException e) {

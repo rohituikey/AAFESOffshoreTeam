@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author alugumetlas
  */
+@Ignore
 public class FinalAuthWexTest {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TestPreAuthWex.class.getSimpleName());

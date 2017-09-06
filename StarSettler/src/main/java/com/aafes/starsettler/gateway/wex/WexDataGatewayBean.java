@@ -6,7 +6,6 @@
 package com.aafes.starsettler.gateway.wex;
 
 import com.aafes.stargate.imported.WexSettleEntity;
-import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.gateway.fdms.FirstDataGatewayBean;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -32,23 +31,9 @@ public class WexDataGatewayBean {
     private static final org.slf4j.Logger log
             = LoggerFactory.getLogger(FirstDataGatewayBean.class.
                     getSimpleName());
-
-    @EJB
-    private WexSettleXmlHandler settleXMLHandler;
-    @Inject
-    private String sourcePath;
     @Inject
     private String pid;
-    private String finalBatchId;
 
-//    public void settle(List<SettleEntity> entity) throws
-//            ParserConfigurationException, SAXException, IOException,
-//            XPathExpressionException, TransformerException, FirstDataException {
-//
-//        log.info("Entry in settle method of WexDataGatewayBean..");
-//
-//        log.info("Exit from settle method of WexDataGatewayBean..");
-//    }
     public Transactionfile.Batch buildWexBachTag(String tid, List transactionSettleData) {
         Transactionfile.Batch batch = new Transactionfile.Batch();
         String bid = makeBatchId(tid); //getBid(); //get BID Date+time
@@ -107,30 +92,50 @@ public class WexDataGatewayBean {
         return entities;
     }
 
-    public Transactionfile.Batch buildBachTag(String tid, List transactionSettleData) {
-        Transactionfile.Batch batch = new Transactionfile.Batch();
-        String bid = makeBatchId(tid); //getBid(); //get BID Date+time
-        batch.setTid(tid);
-        batch.setApp("AuthREq");
-        batch.setVersion("2");
-        batch.setBid(Integer.parseInt(bid));
-        batch.getTrans().addAll(buildTransactionTag(transactionSettleData));
-        return batch;
-    }
-
-    private List buildTransactionTag(List<SettleEntity> wexDataList) {
-
-        List<Transactionfile.Batch.Trans> entities = new ArrayList<Transactionfile.Batch.Trans>();
-        int i = 1;
-
-        for (SettleEntity settleEntity : wexDataList) {
-            Transactionfile.Batch.Trans trans = new Transactionfile.Batch.Trans();
-            Transactionfile.Batch.Trans.Pump pump = new Transactionfile.Batch.Trans.Pump();
-            Transactionfile.Batch.Trans.Card card = new Transactionfile.Batch.Trans.Card();
-            trans.setNbr(String.valueOf(i++));
-
-//            List<String> nonfuelprodlist = settleEntity.getNonfuelproductgroup();
-//            for (String prod : nonfuelprodlist) {
+//    public Transactionfile.Batch buildBachTag(String tid, List transactionSettleData) {
+//        Transactionfile.Batch batch = new Transactionfile.Batch();
+//        String bid = makeBatchId(tid); //getBid(); //get BID Date+time
+//        batch.setTid(tid);
+//        batch.setApp("AuthREq");
+//        batch.setVersion("2");
+//        batch.setBid(Integer.parseInt(bid));
+//        batch.getTrans().addAll(buildTransactionTag(transactionSettleData));
+//        return batch;
+//    }
+//    private List buildTransactionTag(List<SettleEntity> wexDataList) {
+//
+//        List<Transactionfile.Batch.Trans> entities = new ArrayList<Transactionfile.Batch.Trans>();
+//        int i = 1;
+//
+//        for (SettleEntity settleEntity : wexDataList) {
+//            Transactionfile.Batch.Trans trans = new Transactionfile.Batch.Trans();
+//            Transactionfile.Batch.Trans.Pump pump = new Transactionfile.Batch.Trans.Pump();
+//            Transactionfile.Batch.Trans.Card card = new Transactionfile.Batch.Trans.Card();
+//            trans.setNbr(String.valueOf(i++));
+//
+////            List<String> nonfuelprodlist = settleEntity.getNonfuelproductgroup();
+////            for (String prod : nonfuelprodlist) {
+////                List<String> productDetail = Arrays.asList(prod.split(":"));
+////                Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
+////                product.setQuantity(productDetail.get(0));
+////                product.setCode(productDetail.get(1));
+////                product.setAmount(productDetail.get(2));
+////                product.setPrice(productDetail.get(3));
+////                trans.getProduct().add(product);
+////            }
+////
+////            List<String> fuelprodlist = settleEntity.getFuelproductgroup();
+////            for (String prod : fuelprodlist) {
+////                Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
+////                List<String> productDetail = Arrays.asList(prod.split(":"));
+////                product.setQuantity(productDetail.get(0));
+////                product.setCode(productDetail.get(1));
+////                product.setAmount(productDetail.get(2));
+////                product.setPrice(productDetail.get(3));
+////                trans.getProduct().add(product);
+////            }
+//            List<String> prodlist = settleEntity.getProductgroup();
+//            for (String prod : prodlist) {
 //                List<String> productDetail = Arrays.asList(prod.split(":"));
 //                Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
 //                product.setQuantity(productDetail.get(0));
@@ -140,68 +145,29 @@ public class WexDataGatewayBean {
 //                trans.getProduct().add(product);
 //            }
 //
-//            List<String> fuelprodlist = settleEntity.getFuelproductgroup();
-//            for (String prod : fuelprodlist) {
-//                Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
-//                List<String> productDetail = Arrays.asList(prod.split(":"));
-//                product.setQuantity(productDetail.get(0));
-//                product.setCode(productDetail.get(1));
-//                product.setAmount(productDetail.get(2));
-//                product.setPrice(productDetail.get(3));
-//                trans.getProduct().add(product);
-//            }
-            List<String> prodlist = settleEntity.getProductgroup();
-            for (String prod : prodlist) {
-                List<String> productDetail = Arrays.asList(prod.split(":"));
-                Transactionfile.Batch.Trans.Product product = new Transactionfile.Batch.Trans.Product();
-                product.setQuantity(productDetail.get(0));
-                product.setCode(productDetail.get(1));
-                product.setAmount(productDetail.get(2));
-                product.setPrice(productDetail.get(3));
-                trans.getProduct().add(product);
-            }
-
-            pump.setCat(settleEntity.getCatflag());
-            pump.setService(settleEntity.getService());
-            pump.setNbr(Integer.parseInt(settleEntity.getPumpNumber()));
-            pump.setAmount(settleEntity.getPaymentAmount());
-
-            card.setValue(settleEntity.getCardReferene());
-            card.setTrack(settleEntity.getTrackdata2());
-
-            trans.setTime(settleEntity.getTime());
-            trans.setCardCode(settleEntity.getCardType());
-            trans.setType(settleEntity.getTransactionType());
-            trans.setCard(card);
-            trans.setOdometer(settleEntity.getOdometer());
-            trans.setAmount(settleEntity.getPaymentAmount());
-            trans.setAuthref(settleEntity.getAuthreference());
-            trans.setDriver(settleEntity.getDriverId());
-            trans.setVehicle(settleEntity.getVehicleId());
-            trans.setPump(pump);
-            trans.setDate(settleEntity.getDate());
-
-            entities.add(trans);
-        }
-        return entities;
-    }
-
-//    public void createXmlFile(String settlexmlrecord) throws
-//            UnsupportedEncodingException, IOException {
+//            pump.setCat(settleEntity.getCatflag());
+//            pump.setService(settleEntity.getService());
+//            pump.setNbr(Integer.parseInt(settleEntity.getPumpNumber()));
+//            pump.setAmount(settleEntity.getPaymentAmount());
 //
-//        log.info("Entry in createXmlFile method of WexDataGatewayBean..");
-//        if (null != settlexmlrecord && !settlexmlrecord.isEmpty()) {
+//            card.setValue(settleEntity.getCardReferene());
+//            card.setTrack(settleEntity.getTrackdata2());
 //
-//            File file = new File("D:\\Users\\TransactionFile.txt");
-//            // if file doesn't exists, then create it
-//            if (!file.exists()) {
-//                file.createNewFile();
-//            }
-//            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile())));
-//            bw.write(settlexmlrecord);
-//            bw.close();
-//            log.info("Exit from createFile method of WexDataGatewayBean..");
+//            trans.setTime(settleEntity.getTime());
+//            trans.setCardCode(settleEntity.getCardType());
+//            trans.setType(settleEntity.getTransactionType());
+//            trans.setCard(card);
+//            trans.setOdometer(settleEntity.getOdometer());
+//            trans.setAmount(settleEntity.getPaymentAmount());
+//            trans.setAuthref(settleEntity.getAuthreference());
+//            trans.setDriver(settleEntity.getDriverId());
+//            trans.setVehicle(settleEntity.getVehicleId());
+//            trans.setPump(pump);
+//            trans.setDate(settleEntity.getDate());
+//
+//            entities.add(trans);
 //        }
+//        return entities;
 //    }
     public String makeFileSequenceId(String fileSequenceId) {
 
@@ -225,9 +191,9 @@ public class WexDataGatewayBean {
                 Date date = new Date();
                 SimpleDateFormat sdf = new SimpleDateFormat("MMdd");
                 //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-               // String time = sdf.format(cal.getTime());
-                String formateddate=sdf.format(date);
-                fileSequenceId = formateddate+"01";
+                // String time = sdf.format(cal.getTime());
+                String formateddate = sdf.format(date);
+                fileSequenceId = formateddate + "01";
 
             } else {
                 long oldFileNumber = Long.parseLong(fileSequenceId);
@@ -243,7 +209,7 @@ public class WexDataGatewayBean {
         return fileSequenceId;
     }
 
-    private String makeBatchId(String batchId) {    
+    private String makeBatchId(String batchId) {
 
         log.info("Entry in makeBatchId method of FirstDataGatewayBean..");
         try {
@@ -273,22 +239,4 @@ public class WexDataGatewayBean {
         log.info("Exit from makeBatchId method of FirstDataGatewayBean..");
         return batchId;
     }
-
-//    public String getPid() {
-//        return pid;
-//    }
-//
-//    private String format(int sequnceNumber) {
-//        String seq = Integer.toString(sequnceNumber);
-//
-//        seq = ("000000" + seq).substring(seq.length());
-//
-//        return seq;
-//    }
-    /**
-     * @param settleXMLHandler the settleXMLHandler to set
-     */
-//    public void setSettleXMLHandler(WexSettleXmlHandler wexSettleXMLHandler) {
-//        this.settleXMLHandler = wexSettleXMLHandler;
-//    }
 }

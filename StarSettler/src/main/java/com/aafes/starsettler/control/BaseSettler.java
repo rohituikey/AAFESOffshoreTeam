@@ -7,6 +7,7 @@ package com.aafes.starsettler.control;
 
 import com.aafes.stargate.imported.WexRepository;
 import com.aafes.stargate.imported.WexSettleEntity;
+import com.aafes.stargate.imported.WexSettleMessagesDao;
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.util.SettlerType;
 import java.util.List;
@@ -55,10 +56,13 @@ public abstract class BaseSettler {
         return repository.getBatchId();
     }
 
-    public String fileSequenceId() {
-        return repository.getFileSequenceId();
+    public String fileWexSequenceId() {
+        return wexRepository.getfileWexSequenceId();
     }
 
+//     public String fileSequenceId() {
+//        return repository.getFileSequenceId();
+//    }
     public void updateFdmsData(List<SettleEntity> fdmsData, String In_Progress) {
         repository.updateFdmsData(fdmsData, In_Progress);
     }
@@ -68,10 +72,9 @@ public abstract class BaseSettler {
     }
 
     //code for wex
-    public void updateWexData(List<SettleEntity> WexData, String seqNo) {
-        repository.updateWexData(WexData, seqNo);
-    }
-
+//    public void updateWexData(List<SettleEntity> WexData, String seqNo) {
+//    }
+//        repository.updateWexData(WexData, seqNo);
     public void updateWexsettleData(List<WexSettleEntity> WexData, String seqNo) {
         wexRepository.updateWexSettleData(WexData, seqNo);
     }
@@ -80,15 +83,25 @@ public abstract class BaseSettler {
         repository = new SettleMessageRepository();
         repository.updateFileSeqxRef(tids, sequenceNumber);
     }
-
-    public List<String> getTIDList() {
-        repository = new SettleMessageRepository();
-        return repository.getTIDList();
+    
+    public void updateWexFileidxref(List<String> tids, String sequenceNumber) {
+        wexRepository = new WexRepository();
+        wexRepository.updateWexFileSeqxRef(tids, sequenceNumber);
     }
+    
+    
 
-    public List<SettleEntity> getsettleTransaction(String tid, String processDate, String SettleStatus) {
-        repository = new SettleMessageRepository();
-        return repository.getsettleTransaction(tid, processDate, SettleStatus);
+//    public List<String> getTIDList() {
+//        repository = new SettleMessageRepository();
+//        return repository.getTIDList();
+//    }
+//    public List<SettleEntity> getsettleTransaction(String tid, String processDate, String SettleStatus) {
+//        repository = new SettleMessageRepository();
+//        return repository.getsettleTransaction(tid, processDate, SettleStatus);
+//    }
+    public List<String> getWexTIDList() {
+        wexRepository = new WexRepository();
+        return wexRepository.getWexTIDList();
     }
 
     public List<WexSettleEntity> getWexsettleTransaction(String tid, String processDate, String status) {

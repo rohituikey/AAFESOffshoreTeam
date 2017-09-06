@@ -7,7 +7,6 @@ package com.aafes.starsettler.gateway.wex;
 
 import com.aafes.stargate.imported.WexSettleEntity;
 import com.aafes.starsettler.control.BaseSettler;
-import com.aafes.starsettler.control.Configurator;
 import com.aafes.starsettler.entity.SettleEntity;
 import com.aafes.starsettler.util.SettleStatus;
 import java.io.StringWriter;
@@ -41,8 +40,6 @@ public class WexDataSettler extends BaseSettler {
 
     @EJB
     private WexService wexService;
-    @EJB
-    private Configurator configurator;
 
     List<WexSettleEntity> wexSettlelist = new ArrayList();
     List<SettleEntity> settlelist = new ArrayList();
@@ -51,69 +48,37 @@ public class WexDataSettler extends BaseSettler {
     @Override
     public void run(String identityUUID, String processDate) {
 
+        wexService = new WexService();
         wexGatewayBean = new WexDataGatewayBean();
         log.info(" Wex Settlement process started ");
-
         try {
-
             String xmlString = null;
+            List<String> terminalIdList = new ArrayList<>();
+            terminalIdList = super.getWexTIDList();
+            if (terminalIdList.size() > 0) {
+                Transactionfile file = getFileContent(terminalIdList, processDate);
+                file.setDate(getformatedDate());
+                file.setTime(getformatedTime());
+                String fileSeqNo = null;
+                fileSeqNo = super.fileWexSequenceId();
+                fileSeqNo = wexGatewayBean.makeFileSequenceId(fileSeqNo);
+                file.setSequence(fileSeqNo);
 
-            List<String> terminalIdList = super.getTIDList();
-
-            Transactionfile file = getFileContent(terminalIdList, processDate);
-            file.setDate(getformatedDate());
-            file.setTime(getformatedTime());
-
-            String fileSeqNo = super.fileSequenceId();
-            fileSeqNo = wexGatewayBean.makeFileSequenceId(fileSeqNo);
-            file.setSequence(fileSeqNo);
-            // List settlelist = new ArrayList();
-
-//            Map map = new HashMap();
-//            for (String tid : terminalIdList) {
-//                List<SettleEntity> transactionSettleData = super.getsettleTransaction(tid, processDate, SettleStatus.Ready_to_settle);
-//                if (transactionSettleData.size() != 0) {
-//                    settlelist.addAll(transactionSettleData);
-//                    Transactionfile.Batch batch = wexGatewayBean.buildBachTag(tid, transactionSettleData);
-//                    file.getBatch().add(batch);
-//                }
-//            }
-            if (!file.getBatch().isEmpty()) {
-                StringWriter sw = new StringWriter();
-                JAXB.marshal(file, sw);
-                xmlString = sw.toString();
-
-                    wexService.generateAndSendToNBS(xmlString,fileSeqNo);
-
-                if (!"Y".equalsIgnoreCase(configurator.get("ENABLE_WEX_SETTLEMENT_TABLE"))) {
-                    super.updateWexData(settlelist, fileSeqNo);
-                } else {
+                if (!file.getBatch().isEmpty()) {
+                    StringWriter sw = new StringWriter();
+                    JAXB.marshal(file, sw);
+                    xmlString = sw.toString();
+                    wexService.generateAndSendToNBS(xmlString, fileSeqNo);
                     super.updateWexsettleData(wexSettlelist, fileSeqNo);
+                    super.updateWexFileidxref(terminalIdList, fileSeqNo);
                 }
-
-                super.updateFileidxref(terminalIdList, fileSeqNo);
             }
-
-//            List<SettleEntity> transactionSettleData = super.getsettleTransaction(terminalIdList, identityUUID, processDate, SettleStatus.Ready_to_settle);
-//
-//            if (transactionSettleData.size() != 0) {
-//                //wexGatewayBean =new WexDataGatewayBean();
-//                wexGatewayBean.settle(transactionSettleData);
-//            }
-//            super.updateWexData(transactionSettleData, SettleStatus.In_Progress);
-//            super.updateWexBatchRef(transactionSettleData, processDate);
-//        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException | TransformerException ex) {
-//            log.info("Error while formatting the FDMS Data " + ex.getMessage());
-//            log.info("System is exiting.");
-//            return;
-//
         } catch (Exception e) {
             e.printStackTrace();
             log.info("Error while formatting the FDMS Data " + e.getMessage());
             log.info("System is exiting.");
             return;
         }
-
     }
 
     /**
@@ -145,36 +110,15 @@ public class WexDataSettler extends BaseSettler {
         Transactionfile file = new Transactionfile();
         Map map = new HashMap();
 
-        if (!"Y".equalsIgnoreCase(configurator.get("ENABLE_WEX_SETTLEMENT_TABLE"))) {
-            for (String tid : tids) {
-                List<SettleEntity> transactionSettleData = super.getsettleTransaction(tid, processDate, SettleStatus.Ready_to_settle);
-                if (transactionSettleData.size() != 0) {
-                    Transactionfile.Batch batch = wexGatewayBean.buildBachTag(tid, transactionSettleData);
-                    settlelist.addAll(transactionSettleData);
-                    file.getBatch().add(batch);
-                }
-            }
-        } else {
-            for (String tid : tids) {
-                List<WexSettleEntity> transactionSettleData = super.getWexsettleTransaction(tid, processDate, SettleStatus.Ready_to_settle);
-                if (transactionSettleData.size() != 0) {
-                    Transactionfile.Batch batch = wexGatewayBean.buildWexBachTag(tid, transactionSettleData);
-                    wexSettlelist.addAll(transactionSettleData);
-                    file.getBatch().add(batch);
-                }
+        for (String tid : tids) {
+            List<WexSettleEntity> transactionSettleData = super.getWexsettleTransaction(tid, processDate, SettleStatus.Ready_to_settle);
+            if (transactionSettleData.size() != 0) {
+                Transactionfile.Batch batch = wexGatewayBean.buildWexBachTag(tid, transactionSettleData);
+                wexSettlelist.addAll(transactionSettleData);
+                file.getBatch().add(batch);
             }
         }
-
         return file;
     }
 
-    public String getEnableWexTable() {
-        return enableWexTable;
-    }
-
-    public void setEnableWexTable(String enableWexTable) {
-        this.enableWexTable = enableWexTable;
-    }
-
-    
 }

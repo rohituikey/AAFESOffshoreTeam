@@ -72,6 +72,9 @@ public class WexDataSettler extends BaseSettler {
                     super.updateWexsettleData(wexSettlelist, fileSeqNo);
                     super.updateWexFileidxref(terminalIdList, fileSeqNo);
                 }
+            } else {
+                log.info("Transaction not exist for settlement");
+                return;
             }
         } catch (Exception e) {
             e.printStackTrace();

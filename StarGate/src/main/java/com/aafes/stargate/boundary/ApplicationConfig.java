@@ -26,7 +26,6 @@ final public class ApplicationConfig extends Application {
 
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(com.aafes.stargate.boundary.CreditMessageResource.class);
-        resources.add(com.aafes.stargate.reversal.SaleReversalProcessor.class);
         resources.add(com.aafes.stargate.validatetoken.TokenGeneratorService.class);
     }
 

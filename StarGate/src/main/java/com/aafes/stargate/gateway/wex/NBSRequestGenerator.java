@@ -13,6 +13,7 @@ import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.SvsUtil;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -264,9 +265,6 @@ public class NBSRequestGenerator {
     public Transaction unmarshalNbsResponse(String response) {
         try {
             isoMsg = new ISOMsg();
-//            NBSResponse.AuthResponse authResponse = new NBSResponse.AuthResponse();
-//            NBSResponse.AuthResponse.PromptTypeDetails promptType = new NBSResponse.AuthResponse.PromptTypeDetails();
-//            NBSResponse.AuthResponse.ProductDetails productDetails = new NBSResponse.AuthResponse.ProductDetails();
             SCHEMA_PATH = "src/main/resources/xml/NBSResponse.xml";
             try {
                 packager = new GenericPackager(SCHEMA_PATH);
@@ -276,35 +274,17 @@ public class NBSRequestGenerator {
             }
             isoMsg.setPackager(packager);
             isoMsg.unpack(response.getBytes());
-
-            //promptType.setPromptType(isoMsg.getString(23));
-            transaction.setAuthNumber(isoMsg.getString(16));
-            //promptType.setMaxAmount(new BigDecimal(isoMsg.getString(25)));
-            //promptType.setProductAuthCount(new BigInteger(isoMsg.getString(26)));
-
-            transaction.setProdDetailCount(isoMsg.getString(11));
-            transaction.setProductCode(isoMsg.getString(20));
-            //productDetails.setMaxAmount(new BigDecimal(isoMsg.getString(29)));
-
+            transaction.setReasonCode(isoMsg.getString(6));
             transaction.setResponseType(isoMsg.getString(7));
             transaction.setMedia(isoMsg.getString(8));
             transaction.setLocalDateTime(SvsUtil.formatLocalDateTime());
-//            authResponse.setIdentity(isoMsg.getString(17));
-            //          authResponse.setHostNumber(isoMsg.getString(18));
-//            authResponse.setCardNumber(isoMsg.getString(19));
-//            authResponse.setVehicleNumber(new BigInteger(isoMsg.getString(20)));
-//            authResponse.setServiceOption(new BigInteger(isoMsg.getString(21)));
-//            authResponse.setPromptCount(new BigInteger(isoMsg.getString(22)));
-//            authResponse.setProductDetails(productDetails);
-//            authResponse.setPromptTypeDetails(promptType);
-//
-//            nBSResponse.setA(isoMsg.getString(10));
-//            nBSResponse.setKey(new BigInteger(isoMsg.getString(11)));
-//            nBSResponse.setApplicationUpdateNeeded(isoMsg.getString(12));
-//            nBSResponse.setAuthCode(new BigInteger(isoMsg.getString(13)));
-//            nBSResponse.setA(isoMsg.getString(14));
-//            nBSResponse.setAuthResponse(authResponse);
-
+            //9-15 are not to use
+            transaction.setAuthNumber(isoMsg.getString(16));
+            transaction.setAmount(Long.parseLong(isoMsg.getString(17)));
+            transaction.setProdDetailCount(isoMsg.getString(18));
+            transaction.setQuantity(new BigDecimal(isoMsg.getString(18)));
+            transaction.setProductCode(isoMsg.getString(20));
+            //transaction.set//productDeatailsMaxAmount/21 no field matched
             return transaction;
         } catch (ISOException ex) {
             Logger.getLogger(NBSRequestGenerator.class.getName()).log(Level.SEVERE, null, ex);

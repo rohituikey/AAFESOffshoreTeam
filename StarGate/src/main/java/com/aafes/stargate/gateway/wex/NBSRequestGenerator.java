@@ -9,6 +9,7 @@ import com.aafes.nbsresponse.NBSResponse;
 import com.aafes.nbsresponseacknowledgmentschema.ResponseAcknowlegment;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Configurator;
+import com.aafes.stargate.util.ConstantsUtil;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
@@ -21,7 +22,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import org.jpos.iso.ISOException;
-import org.jpos.iso.ISOHeader;
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.packager.GenericPackager;
 import org.slf4j.LoggerFactory;
@@ -33,79 +33,20 @@ import org.slf4j.LoggerFactory;
 public class NBSRequestGenerator {
     
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(NBSRequestGenerator.class.getSimpleName());
-    private String iso8583Format;
-    private int promptCountIndex;
+    private String iso8583Format, SCHEMA_PATH = "";
+    private int promptCountIndex, index = 0;
     private ISOMsg isoMsg;
-    private ISOHeader iSOHeader;
+    //private ISOHeader iSOHeader;
     private GenericPackager packager;
     private ResponseAcknowlegment responseAcknowlegment;
     private NBSResponse nBSResponse;
     Transaction transaction = new Transaction();
-    
-    private String applicationName;
-    private String applicationVersion;
-    private String daylightSavingsTimeAtSiteOne;
-    private String captureOnlyRequest;
-    private String sessionTypeAuth;
-    private String transTypePreAuth;
-    private String transTypeFinalAndSale;
-    private String transTypeRefund;
-    private String cardTypeWex;
-    private String serviceType;
-    private int index = 0;
-    private String SCHEMA_PATH = "";
     String[] productDetails;
     @EJB
     private Configurator configurator;
     
     public byte[] generateLogOnPacketRequest(Transaction t, boolean isTimeoutRetry) {
         
-        if (configurator == null) {
-            configurator = new Configurator();
-            configurator.postConstruct();
-        }
-        
-        applicationName = configurator.get("APPLICATION_NAME");
-        applicationVersion = configurator.get("APPLICATION_VERSION");
-        daylightSavingsTimeAtSiteOne = configurator.get("DAYLIGHT_SAVINGS_TIME_AT_SITE_ONE");
-        captureOnlyRequest = configurator.get("CAPTURE_ONLY_REQUEST");
-        sessionTypeAuth = configurator.get("SESSION_TYPE_AUTH");
-        transTypePreAuth = configurator.get("TRANS_TYPE_PRE_AUTH");
-        transTypeFinalAndSale = configurator.get("TRANS_TYPE_FINAL_AND_SALE");
-        transTypeRefund = configurator.get("TRANS_TYPE_REFUND");
-        cardTypeWex = configurator.get("CARD_TYPE_WEX");
-        serviceType = configurator.get("SERVICE_TYPE");
-        
-        if (applicationName == null) {
-            applicationName = configurator.get("APPLICATION_NAME");
-        }
-        if (applicationVersion == null) {
-            applicationVersion = configurator.get("APPLICATION_VERSION");
-        }
-        if (daylightSavingsTimeAtSiteOne == null) {
-            daylightSavingsTimeAtSiteOne = configurator.get("DAYLIGHT_SAVINGS_TIME_AT_SITE_ONE");
-        }
-        if (captureOnlyRequest == null) {
-            captureOnlyRequest = configurator.get("CAPTURE_ONLY_REQUEST");
-        }
-        if (sessionTypeAuth == null) {
-            sessionTypeAuth = configurator.get("SESSION_TYPE_AUTH");
-        }
-        if (transTypePreAuth == null) {
-            transTypePreAuth = configurator.get("TRANS_TYPE_PRE_AUTH");
-        }
-        if (transTypeFinalAndSale == null) {
-            transTypeFinalAndSale = configurator.get("TRANS_TYPE_FINAL_AND_SALE");
-        }
-        if (transTypeRefund == null) {
-            transTypeRefund = configurator.get("TRANS_TYPE_REFUND");
-        }
-        if (cardTypeWex == null) {
-            cardTypeWex = configurator.get("CARD_TYPE_WEX");
-        }
-        if (serviceType == null) {
-            serviceType = configurator.get("SERVICE_TYPE");
-        }
         transaction = t;
         try {
             SCHEMA_PATH = "src/main/resources/xml/NBSLogonPackager.xml";
@@ -117,31 +58,31 @@ public class NBSRequestGenerator {
             }
             isoMsg = new ISOMsg();
             isoMsg.setPackager(packager);
-            isoMsg.setMTI("0200");
+            isoMsg.setMTI(ConstantsUtil.MTI);
             if(!isTimeoutRetry){
                 isoMsg.set(2, transaction.getTermId());
-                isoMsg.set(3, applicationName);
-                isoMsg.set(4, applicationVersion);
+                isoMsg.set(3, ConstantsUtil.APPLICATIONNAME);
+                isoMsg.set(4, ConstantsUtil.APPLICATIONVERSION);
                 isoMsg.set(5, createDateFormat());
             }
-            isoMsg.set(6, sessionTypeAuth);
+            isoMsg.set(6, ConstantsUtil.SESSIONTYPEAUTH);
             isoMsg.set(7, transaction.getTransactionId().substring(0, 4));
             if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) {
-                isoMsg.set(8, transTypePreAuth);
+                isoMsg.set(8, ConstantsUtil.TRANSTYPEPREAUTH);
             } else if (transaction.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     || transaction.getRequestType().equalsIgnoreCase(RequestType.SALE)) {
-                isoMsg.set(8, transTypeFinalAndSale);
+                isoMsg.set(8, ConstantsUtil.TRANSTYPEFINALANDSALE);
             } else if (transaction.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
-                isoMsg.set(8, transTypeRefund);
+                isoMsg.set(8, ConstantsUtil.TRANSTYPEREFUND);
             }
-            isoMsg.set(9, cardTypeWex);
+            isoMsg.set(9, ConstantsUtil.CARDTYPEWEX);
             isoMsg.set(10, transaction.getCatFlag());
             isoMsg.set(11, transaction.getPumpNmbr());
-            isoMsg.set(12, serviceType);
+            isoMsg.set(12, ConstantsUtil.SERVICETYPE);
+            isoMsg.set(13, Long.toString(transaction.getAmount()));
             
             if (transaction.getRequestType().equals(RequestType.FINAL_AUTH)) {
-                isoMsg.set(6, captureOnlyRequest);
-                isoMsg.set(13, Long.toString(transaction.getAmount()));
+                isoMsg.set(6, ConstantsUtil.CAPTUREONLYREQUEST);
                 isoMsg.set(14, Long.toString(transaction.getAmtPreAuthorized()));
                 if (null != transaction.getTransactionId()) {
                     isoMsg.set(15, transaction.getTransactionId().substring(0, 4));
@@ -149,33 +90,32 @@ public class NBSRequestGenerator {
                 isoMsg.set(16, createDateAndTime());
                 isoMsg.set(21, transaction.getAuthNumber());
             }
-            isoMsg.set(17, "2");
             if (transaction.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
                 isoMsg.set(18, transaction.getTrack2());
+                isoMsg.set(17, ConstantsUtil.TRACKNUMBERWEXTWO);
             } else if (transaction.getInputType().equalsIgnoreCase(InputType.KEYED))//isoMsg.set(23, transaction.getTrack2());//Track0 formatt
             {
                 if (!(transaction.getRequestType().equals(RequestType.FINAL_AUTH))) {
                     isoMsg.set(19, Long.toString(t.getAmount()));
                 }
+                isoMsg.set(17, ConstantsUtil.TRACKNUMBERWEXZERO);
             }
-            if ("10".equalsIgnoreCase(transTypeFinalAndSale) || "30".equalsIgnoreCase(transTypeRefund)) {
-                isoMsg.set(20, (t.getTransactionId() + t.getTermId()));
-            }
+            if (!RequestType.PREAUTH.equalsIgnoreCase(t.getRequestType()))  isoMsg.set(20, (t.getTransactionId() + t.getTermId()));
             
             isoMsg.set(22, t.getPromptDetailCount().toString());
 
             //prompt details count
             if (null != t.getPromptDetailCount()) {
-                if (null != t.getVehicleId()) {
-                    isoMsg.set(23, "1");
+                if (null != t.getVehicleId() && !t.getVehicleId().isEmpty()) {
+                    isoMsg.set(23, ConstantsUtil.VEHICLEID);
                     isoMsg.set(24, t.getVehicleId());
                 }
-                if (null != t.getDriverId()) {
-                    isoMsg.set(23, "3");
+                if (null != t.getDriverId() && !t.getDriverId().isEmpty()) {
+                    isoMsg.set(23, ConstantsUtil.DRIVERID);
                     isoMsg.set(24, t.getDriverId());
                 }
-                if (null != t.getOdoMeter()) {
-                    isoMsg.set(23, "4");
+                if (null != t.getOdoMeter() && !t.getOdoMeter().isEmpty()) {
+                    isoMsg.set(23, ConstantsUtil.ODOMOETER);
                     isoMsg.set(24, t.getOdoMeter());
                 }
             }
@@ -185,8 +125,8 @@ public class NBSRequestGenerator {
             index = 25;
             if (null != t.getProducts() && (t.getProducts().size()) > 0) {
                 for (String nonFuelString : t.getProducts()) {
-                    if (nonFuelString.contains(":")) {
-                        productDetails = nonFuelString.split(":");
+                    if (nonFuelString.contains(ConstantsUtil.PRODUCTDELIMITOR)) {
+                        productDetails = nonFuelString.split(ConstantsUtil.PRODUCTDELIMITOR);
                     }
                     isoMsg.set(++index, productDetails[2]);
                     isoMsg.set(++index, productDetails[1]);
@@ -216,7 +156,7 @@ public class NBSRequestGenerator {
     public String createDateAndTime() {
         //        YYMMDDhhmmss
         //2017-08-03 09:31:54.316
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        DateFormat dateFormat = new SimpleDateFormat(ConstantsUtil.DATEFORMAT);
         Date date = new Date();
         String dt = dateFormat.format(date);
         dt = dt.substring(2, 4) + dt.substring(5, 7) + dt.substring(8, 10) + dt.substring(11, 13) + dt.substring(14, 16) + dt.substring(17, 19);
@@ -315,11 +255,11 @@ public class NBSRequestGenerator {
     }
     
     private String createDateFormat() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        DateFormat dateFormat = new SimpleDateFormat(ConstantsUtil.DATEFORMAT);
         Date date = new Date();
         String ts = dateFormat.format(date);
         //2017-08-08 08:39:30.967
-        ts = ts.substring(11, 13) + ts.substring(14, 16) + daylightSavingsTimeAtSiteOne;
+        ts = ts.substring(11, 13) + ts.substring(14, 16) + ConstantsUtil.DAYLIGHTSAVINGSTIMEATSITEONE;
         return ts;
     }
 
@@ -394,46 +334,6 @@ public class NBSRequestGenerator {
      */
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
-    }
-    
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
-    }
-    
-    public void setApplicationVersion(String applicationVersion) {
-        this.applicationVersion = applicationVersion;
-    }
-    
-    public void setDaylightSavingsTimeAtSiteOne(String daylightSavingsTimeAtSiteOne) {
-        this.daylightSavingsTimeAtSiteOne = daylightSavingsTimeAtSiteOne;
-    }
-    
-    public void setCaptureOnlyRequest(String captureOnlyRequest) {
-        this.captureOnlyRequest = captureOnlyRequest;
-    }
-    
-    public void setSessionTypeAuth(String sessionTypeAuth) {
-        this.sessionTypeAuth = sessionTypeAuth;
-    }
-    
-    public void setTransTypePreAuth(String transTypePreAuth) {
-        this.transTypePreAuth = transTypePreAuth;
-    }
-    
-    public void setTransTypeFinalAndSale(String transTypeFinalAndSale) {
-        this.transTypeFinalAndSale = transTypeFinalAndSale;
-    }
-    
-    public void setTransTypeRefund(String transTypeRefund) {
-        this.transTypeRefund = transTypeRefund;
-    }
-    
-    public void setCardTypeWex(String cardTypeWex) {
-        this.cardTypeWex = cardTypeWex;
-    }
-    
-    public void setServiceType(String serviceType) {
-        this.serviceType = serviceType;
     }
     
     public void setSCHEMA_PATH(String SCHEMA_PATH) {

@@ -17,6 +17,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.xml.ws.WebServiceException;
 import org.slf4j.LoggerFactory;
+import com.aafes.stargate.gateway.wex.simulator.NBSRequestFieldSeperatorImpl;
 
 /**
  *
@@ -40,6 +41,8 @@ public class WEXProcessor {
     String[] responseArr, iSOMsgResponse;
     boolean isTimeoutRetry = false;
     boolean logEnabled;
+    
+    NBSRequestFieldSeperatorImpl nrfsi;
 
     public Transaction processWexRequests(Transaction t) throws Exception {
         LOGGER.info("WEXProcessor.processWexRequests mothod started");
@@ -47,6 +50,9 @@ public class WEXProcessor {
             GenerateLogWexDetails generateLogWexDetails = new GenerateLogWexDetails();
             dupCheckCounter = 0;
             isTimeoutRetry = false;
+            
+          nrfsi = new NBSRequestFieldSeperatorImpl();
+           String req = nrfsi.createAsciiForNBS(t);
             if (nbsRequestGenerator == null) {
                 nbsRequestGenerator = new NBSRequestGenerator();
             }

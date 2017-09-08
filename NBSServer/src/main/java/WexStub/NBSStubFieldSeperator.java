@@ -8,8 +8,6 @@ package WexStub;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jpos.iso.ISOException;
-import org.jpos.iso.ISOMsg;
-import org.jpos.iso.packager.GenericPackager;
 
 /**
  *
@@ -18,10 +16,7 @@ import org.jpos.iso.packager.GenericPackager;
 public class NBSStubFieldSeperator {
 
     String[] requestDetails = new String[52];
-    ISOMsg isoMsg;
-    GenericPackager packager;
     String[] response = new String[2];
-    private String SCHEMA_PATH = "src/XML/NBSLogonPackager.xml";
 
     public String[] getResponse(byte[] request) {
         try {
@@ -29,7 +24,7 @@ public class NBSStubFieldSeperator {
             requestDetails = requestString.split("<FS>");
             response[0] = generateAcknowledgment();
             response[1] = generateResponse();
-            
+
         } catch (ISOException ex) {
             Logger.getLogger(NBSStubFieldSeperator.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -37,36 +32,28 @@ public class NBSStubFieldSeperator {
     }
 
     private String generateAcknowledgment() throws ISOException {
-        isoMsg = new ISOMsg();
-        SCHEMA_PATH = "src/XML/ResponseAcknowledgment.xml";
-        try {
-            packager = new GenericPackager(SCHEMA_PATH);
-        } catch (Exception e) {
-            SCHEMA_PATH = System.getProperty("jboss.server.config.dir") + "/ResponseAcknowledgment.xml";
-            packager = new GenericPackager(SCHEMA_PATH);
-        }
-
-        isoMsg.setPackager(packager);
-        isoMsg.setMTI("0200");
         if (requestDetails[17].equals("6006496628299904508=20095004100210123")) {
-            isoMsg.set(2,"<SX>"+"c$"+ "<FS>");
-            isoMsg.set(3, "100");
+            return "<SX>c$<FS>100<EX>";
         } else if (requestDetails[17].equals("6006496628299904508=20095004100219999")) {
-            isoMsg.set(2, "c?");
-            isoMsg.set(3, "200");
+            return "<SX>c?<FS>200<EX>";
         } else if (requestDetails[17].equals("6006496628299904508=20095004100210000")) {
-            isoMsg.set(2, "c!");
+            return "<SX>c!<FS><EX>";
+            //isoMsg.set(2, "c!");
             //isoMsg.set(3, "200");
         } else {
-            isoMsg.set(2, "c$");
-            isoMsg.set(3, "100");
+            return "<SX>c$<FS>100<EX>";
         }
-        byte[] byteResult = isoMsg.pack();
-        String result = new String(byteResult);
-        return result;
     }
 
     private String generateResponse() {
-return null;
+        if (requestDetails[17].equals("6006496628299904508=20095004100210123")) {
+            return "<SX>A<FS>0278<FS>3170621071655<FS>N<FS>00<FS>APPROVED<FS>WEX<FS><FS><FS><FS><FS><FS>5<FS>0<FS>308339<FS>75.00<FS>1<FS>75.0000<FS>001<EX>";
+        } else if (requestDetails[17].equals("6006496628299904508=20095004100219999")) {
+            return "<SX>A<FS>0278<FS>3170621071655<FS>N<FS>01<FS>CANCELED<FS>WEX<FS><FS><FS><FS><FS><FS>5<FS>0<FS>308339<FS>75.00<FS>1<FS>75.0000<FS>001<EX>";
+        } else if (requestDetails[17].equals("6006496628299904508=20095004100210000")) {
+            return "<SX>A<FS>0278<FS>3170621071655<FS>N<FS>01<FS>REJECTED<FS>WEX<FS><FS><FS><FS><FS><FS>5<FS>0<FS>308339<FS>75.00<FS>1<FS>75.0000<FS>001<EX>";
+        } else {
+            return "<SX>A<FS>0278<FS>3170621071655<FS>N<FS>00<FS>APPROVED<FS>WEX<FS><FS><FS><FS><FS><FS>5<FS>0<FS>308339<FS>75.00<FS>1<FS>75.0000<FS>001<EX>";
+        }
     }
 }

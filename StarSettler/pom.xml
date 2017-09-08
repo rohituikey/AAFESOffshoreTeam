@@ -320,7 +320,7 @@
                     <generateDirectory>${project.build.directory}/generated-sources/xjc</generateDirectory>
                     <verbose>true</verbose>
                 </configuration>
-            </plugin>-->
+            </plugin>
         </plugins>
     </build>
 

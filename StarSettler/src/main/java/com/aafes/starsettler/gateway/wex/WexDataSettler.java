@@ -8,13 +8,10 @@ package com.aafes.starsettler.gateway.wex;
 import com.aafes.stargate.imported.WexSettleEntity;
 import com.aafes.starsettler.control.BaseSettler;
 import com.aafes.starsettler.entity.SettleEntity;
+import com.aafes.starsettler.util.FomatedDateTime;
 import com.aafes.starsettler.util.SettleStatus;
 import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +33,7 @@ public class WexDataSettler extends BaseSettler {
                     getSimpleName());
 
     @EJB
-    private WexDataGatewayBean wexGatewayBean;
+    private WexTransactionFileBuilder wexGatewayBean;
 
     @EJB
     private WexService wexService;
@@ -49,7 +46,7 @@ public class WexDataSettler extends BaseSettler {
     public void run(String identityUUID, String processDate) {
 
         wexService = new WexService();
-        wexGatewayBean = new WexDataGatewayBean();
+        wexGatewayBean = new WexTransactionFileBuilder();
         log.info(" Wex Settlement process started ");
         try {
             String xmlString = null;
@@ -57,8 +54,8 @@ public class WexDataSettler extends BaseSettler {
             terminalIdList = super.getWexTIDList();
             if (terminalIdList.size() > 0) {
                 Transactionfile file = getFileContent(terminalIdList, processDate);
-                file.setDate(getformatedDate());
-                file.setTime(getformatedTime());
+                file.setDate(FomatedDateTime.getformatedDate());
+                file.setTime(FomatedDateTime.getformatedTime());
                 String fileSeqNo = null;
                 fileSeqNo = super.fileWexSequenceId();
                 fileSeqNo = wexGatewayBean.makeFileSequenceId(fileSeqNo);
@@ -87,21 +84,8 @@ public class WexDataSettler extends BaseSettler {
     /**
      * @param settlegatewayBean the settlegatewayBean to set
      */
-    public void setSettlegatewayBean(WexDataGatewayBean settlegatewayBean) {
+    public void setSettlegatewayBean(WexTransactionFileBuilder settlegatewayBean) {
         this.wexGatewayBean = settlegatewayBean;
-    }
-
-    private String getformatedDate() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        Date date = new Date();
-        String ts = dateFormat.format(date);
-        return ts;
-    }
-
-    private String getformatedTime() {
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("HHmmss");
-        return sdf.format(cal.getTime());
     }
 
     /**
@@ -115,8 +99,8 @@ public class WexDataSettler extends BaseSettler {
 
         for (String tid : tids) {
             List<WexSettleEntity> transactionSettleData = super.getWexsettleTransaction(tid, processDate, SettleStatus.Ready_to_settle);
-            if (transactionSettleData.size() != 0) {
-                Transactionfile.Batch batch = wexGatewayBean.buildWexBachTag(tid, transactionSettleData);
+            if (transactionSettleData.size() > 0) {
+                Transactionfile.Batch batch = wexGatewayBean.buildBatchRecord(tid, transactionSettleData);
                 wexSettlelist.addAll(transactionSettleData);
                 file.getBatch().add(batch);
             }
@@ -124,4 +108,8 @@ public class WexDataSettler extends BaseSettler {
         return file;
     }
 
+    public static void main(String args[]) {
+        WexDataSettler wexDataSettler = new WexDataSettler();
+        wexDataSettler.run(args[0], args[1]);
+    }
 }

@@ -28,7 +28,7 @@ public class WexService {
     private WexSFTP sftp;
 
     @EJB
-    private WexFile wexFile;
+    private WexTransactionBean wexFile;
 
     private final DateFormat dateFormat;
 
@@ -131,7 +131,7 @@ public class WexService {
         this.sftp = sftp;
     }
 
-    public void setVisionFile(WexFile wexFile) {
+    public void setVisionFile(WexTransactionBean wexFile) {
         this.wexFile = wexFile;
     }
 

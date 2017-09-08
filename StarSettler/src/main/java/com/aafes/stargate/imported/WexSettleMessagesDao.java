@@ -155,9 +155,10 @@ public class WexSettleMessagesDao {
 
         factory = new CassandraSessionFactory();
         LOG.info("Entry in getWexTIDList method of WexSettlemessagedao..");
+        String date="2017-08-23";
         List<String> tidList = new ArrayList<String>();
         String query = "select tid from starsettler.wexsettlemessages "
-                + "where receiveddate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
+                + "where receiveddate = '" + date + "' ALLOW FILTERING ;";
         ResultSet result = factory.getSession().execute(query);
 
         for (Row rs : result) {
@@ -171,7 +172,7 @@ public class WexSettleMessagesDao {
 
     public String getfileWexSequenceId() {
         
-        LOG.info("Entry in getfileWexSequenceId method of WexSettlemessagedao..");
+            LOG.info("Entry in getfileWexSequenceId method of WexSettlemessagedao..");
         String query = "select filesequenceid from starsettler.fileidref "
                 + "where processdate = '" + this.getProcessDate() + "' ALLOW FILTERING ;";
         ResultSet result = factory.getSession().execute(query);

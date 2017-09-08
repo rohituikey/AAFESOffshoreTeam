@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
  * @author singha
  */
 @Stateless
-public class WexFile {
+public class WexTransactionBean {
 
-    private static final Logger log = LoggerFactory.getLogger(WexFile.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(WexTransactionBean.class.getName());
     
     private final DateFormat dateFormat =new SimpleDateFormat("yyyyMMddHHmmss");
 //    @EJB

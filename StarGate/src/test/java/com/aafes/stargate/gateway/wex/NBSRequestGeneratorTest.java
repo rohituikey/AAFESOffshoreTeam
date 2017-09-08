@@ -84,12 +84,12 @@ public class NBSRequestGeneratorTest {
 //        } catch (Exception ex) {
 //            fail(ex.getMessage());
 //        }
-//            byte[] result=testSubject.generateLogOnPacketRequest(t);
-//            NBSConnector nBSConnector = new NBSConnector();
-//            nBSConnector.sendRequest(new String(result));
-            String[] results = testSubject.seperateResponse("02006000000000000000002c$00310002007FFFF80000000000001A00402780133170621071655001N00200008Approved003WEX0000000000000000015001000630833900575.00001100775.000000300100578965".getBytes());
-            testSubject.unmarshalAcknowledgment(results[0]);
-            testSubject.unmarshalNbsResponse(results[1]);
+            byte[] result=testSubject.generateLogOnPacketRequest(t,false);
+            NBSConnector nBSConnector = new NBSConnector();
+            nBSConnector.sendRequest(result);
+  //          String[] results = testSubject.seperateResponse("02006000000000000000002c$00310002007FFFF80000000000001A00402780133170621071655001N00200008Approved003WEX0000000000000000015001000630833900575.00001100775.000000300100578965".getBytes());
+//            testSubject.unmarshalAcknowledgment(result[0]);
+//            testSubject.unmarshalNbsResponse(result[1]);
     }
 
 //        @Test

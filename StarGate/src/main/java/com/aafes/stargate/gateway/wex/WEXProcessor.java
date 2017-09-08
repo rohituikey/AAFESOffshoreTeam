@@ -17,6 +17,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.xml.ws.WebServiceException;
 import org.slf4j.LoggerFactory;
+import com.aafes.stargate.gateway.wex.simulator.NBSRequestFieldSeperatorImpl;
 
 /**
  *
@@ -39,15 +40,19 @@ public class WEXProcessor {
     byte[] iSOMsg;
     String[] responseArr, iSOMsgResponse;
     boolean isTimeoutRetry = false;
-    boolean logEnabled ;
+    boolean logEnabled;
+    
+    NBSRequestFieldSeperatorImpl nrfsi;
 
     public Transaction processWexRequests(Transaction t) throws Exception {
         LOGGER.info("WEXProcessor.processWexRequests mothod started");
         try {
-            logEnabled = Boolean.parseBoolean(configurator.get("IS_LOG_ENABLED"));
             GenerateLogWexDetails generateLogWexDetails = new GenerateLogWexDetails();
             dupCheckCounter = 0;
             isTimeoutRetry = false;
+            
+          nrfsi = new NBSRequestFieldSeperatorImpl();
+           String req = nrfsi.createAsciiForNBS(t);
             if (nbsRequestGenerator == null) {
                 nbsRequestGenerator = new NBSRequestGenerator();
             }
@@ -71,6 +76,9 @@ public class WEXProcessor {
                     buildErrorResponse(t, configurator.get("NBS_AUTH_UNAVAILABLE"), "NBS_AUTH_UNAVAILABLE");
                 }
                 t = nbsRequestGenerator.unmarshalNbsResponse(iSOMsgResponse[1]);
+                
+                iSOMsg = nbsRequestGenerator.logOffRequest();
+                
 //                }else{
 //                    LOGGER.info("Invalid response from NBS.");
 //                    buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
@@ -80,7 +88,7 @@ public class WEXProcessor {
                 buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
             }
             if (logEnabled) {
-                generateLogWexDetails.generateDetails(t.getRequestType(), iSOMsgResponse[0]+iSOMsgResponse[1], new String(iSOMsg));
+                generateLogWexDetails.generateDetails(t.getRequestType(), iSOMsgResponse.toString(), iSOMsg.toString());
             }
             return t;
         } catch (SocketTimeoutException e) {
@@ -91,8 +99,6 @@ public class WEXProcessor {
                 retryReason = "Exception : " + e.getMessage();
                 handleRequestTimeOutScenaio(t);
             } else {
-                LOGGER.info("Invalid response from NBS.");
-                buildErrorResponse(t, configurator.get("INVALID_RESPONSE"), "INVALID_RESPONSE");
                 throw e;
             }
         }

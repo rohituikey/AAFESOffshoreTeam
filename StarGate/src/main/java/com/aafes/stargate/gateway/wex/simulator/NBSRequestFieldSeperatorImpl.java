@@ -12,12 +12,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.ejb.EJB;
 
-
 /**
  *
  * @author uikuyr
  */
 public class NBSRequestFieldSeperatorImpl {
+
     private String applicationName;
     private String applicationVersion;
     private String daylightSavingsTimeAtSiteOne;
@@ -32,13 +32,13 @@ public class NBSRequestFieldSeperatorImpl {
     String[] productDetails;
     @EJB
     private Configurator configurator;
-    
-    public String createAsciiForNBS(Transaction t){
+
+    public String createAsciiForNBS(Transaction t) {
         if (configurator == null) {
             configurator = new Configurator();
             configurator.postConstruct();
         }
-        
+
         applicationName = configurator.get("APPLICATION_NAME");
         applicationVersion = configurator.get("APPLICATION_VERSION");
         daylightSavingsTimeAtSiteOne = configurator.get("DAYLIGHT_SAVINGS_TIME_AT_SITE_ONE");
@@ -49,14 +49,43 @@ public class NBSRequestFieldSeperatorImpl {
         transTypeRefund = configurator.get("TRANS_TYPE_REFUND");
         cardTypeWex = configurator.get("CARD_TYPE_WEX");
         serviceType = configurator.get("SERVICE_TYPE");
-        String request = "<SX>"+t.getTermId()+"<FS>"+applicationName+"<FS>"+applicationVersion+"<FS>"+createDateFormat()
-                +"<FS>"+sessionTypeAuth+"<FS>"+t.getTransactionId().substring(0, 4)+"<FS>"+transTypePreAuth+"<FS>"+cardTypeWex+"<FS>"+
-                t.getCatFlag()+"<FS>"+t.getPumpNmbr()+"<FS>"+serviceType+"<FS>"+"2"+"<FS>"+t.getTrack2()+"<FS>"
-                +t.getAmount()+"<FS>"+t.getPromptDetailCount().toString()+"<FS>"+"1"+"<FS>"+t.getVehicleId()+"<FS>"+"3"+"<FS>"
-                +t.getDriverId()+"<FS>"+"4"+"<FS>"+t.getOdoMeter()+"<FS>"+t.getProdDetailCount()+"<FS>"+t.getProducts().get(2)
-                +"<FS>"+t.getProducts().get(1)+"<FS>"+t.getProducts().get(0)+"<FS>"+t.getProducts().get(3)+"<SX>";
-    return request;
+
+        StringBuilder str = new StringBuilder();
+        if (null != t.getTermId() || !t.getTermId().isEmpty()) {
+            str.append("<SX>" + t.getTermId());
+        }
+        str.append("<FS>" + applicationName);
+        str.append("<FS>" + applicationVersion);
+        str.append("<FS>" + createDateFormat());
+        str.append("<FS>" + sessionTypeAuth);
+        if (null != t.getTransactionId() || !t.getTransactionId().isEmpty()) {
+            str.append("<FS>" + t.getTransactionId().substring(0, 4));
+        }
+        str.append("<FS>" + transTypePreAuth);
+        str.append("<FS>" + cardTypeWex);
+        if (null != t.getCatFlag() || !t.getCatFlag().isEmpty()) {
+            str.append("<FS>" + t.getCatFlag());
+        }
+        if (null != t.getPumpNmbr() || !t.getPumpNmbr().isEmpty()) {
+            str.append("<FS>" + t.getPumpNmbr());
+        }
+        str.append("<FS>" + serviceType);
+        str.append("<FS>" + "2");
+        str.append("<FS>" + t.getTrack2());
+        str.append("<FS>" + t.getAmount());
+        str.append("<FS>" + t.getPromptDetailCount().toString());
+        str.append("<FS>" + "1");
+        str.append("<FS>" + t.getVehicleId());
+        str.append("<FS>" + "3");
+        str.append("<FS>" + t.getDriverId());
+        str.append("<FS>" + "4");
+        str.append("<FS>" + t.getOdoMeter());
+        str.append("<FS>" + t.getProdDetailCount());
+        str.append("<FS>" + t.getProducts().get(2));
+        str.append("<FS>" + t.getProducts().get(1) + "<FS>" + t.getProducts().get(0) + "<FS>" + t.getProducts().get(3) + "<SX>");
+        return str;
     }
+
     private String createDateFormat() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Date date = new Date();
@@ -65,6 +94,7 @@ public class NBSRequestFieldSeperatorImpl {
         ts = ts.substring(11, 13) + ts.substring(14, 16) + daylightSavingsTimeAtSiteOne;
         return ts;
     }
+
     public Configurator getConfigurator() {
         return configurator;
     }
@@ -75,45 +105,44 @@ public class NBSRequestFieldSeperatorImpl {
     public void setConfigurator(Configurator configurator) {
         this.configurator = configurator;
     }
-    
+
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
     }
-    
+
     public void setApplicationVersion(String applicationVersion) {
         this.applicationVersion = applicationVersion;
     }
-    
+
     public void setDaylightSavingsTimeAtSiteOne(String daylightSavingsTimeAtSiteOne) {
         this.daylightSavingsTimeAtSiteOne = daylightSavingsTimeAtSiteOne;
     }
-    
+
     public void setCaptureOnlyRequest(String captureOnlyRequest) {
         this.captureOnlyRequest = captureOnlyRequest;
     }
-    
+
     public void setSessionTypeAuth(String sessionTypeAuth) {
         this.sessionTypeAuth = sessionTypeAuth;
     }
-    
+
     public void setTransTypePreAuth(String transTypePreAuth) {
         this.transTypePreAuth = transTypePreAuth;
     }
-    
+
     public void setTransTypeFinalAndSale(String transTypeFinalAndSale) {
         this.transTypeFinalAndSale = transTypeFinalAndSale;
     }
-    
+
     public void setTransTypeRefund(String transTypeRefund) {
         this.transTypeRefund = transTypeRefund;
     }
-    
+
     public void setCardTypeWex(String cardTypeWex) {
         this.cardTypeWex = cardTypeWex;
     }
-    
+
     public void setServiceType(String serviceType) {
         this.serviceType = serviceType;
     }
 }
-

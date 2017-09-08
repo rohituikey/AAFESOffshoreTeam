@@ -552,6 +552,9 @@ public class Authorizer {
             }
 
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
+            if (wexReqPayAtPump.getRestrictCode() != null) {
+                transaction.setRestrictCode(wexReqPayAtPump.getRestrictCode());
+            }
             if (wexValidateFlag) {
                 StringBuilder prodCodeDetailsStr = null;
                 List<String> prodDataList = new ArrayList<>();

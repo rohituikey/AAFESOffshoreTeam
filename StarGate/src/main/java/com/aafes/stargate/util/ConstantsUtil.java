@@ -14,7 +14,7 @@ package com.aafes.stargate.util;
 public class ConstantsUtil {
     
     public static final String APPLICATIONNAME = "AUTHREQ";
-    public static final String APPLICATIONVERSION = "002";
+    public static final String APPLICATIONVERSION = "0002";
     public static final String DAYLIGHTSAVINGSTIMEATSITEONE = "1";
     public static final String CAPTUREONLYREQUEST = "C";
     public static final String SESSIONTYPEAUTH = "A";

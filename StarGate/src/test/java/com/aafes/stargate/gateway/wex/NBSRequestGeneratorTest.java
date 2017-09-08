@@ -11,6 +11,7 @@ import com.aafes.stargate.util.InputType;
 import java.math.BigDecimal;
 import java.net.SocketTimeoutException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -71,7 +72,7 @@ public class NBSRequestGeneratorTest {
 
         testSubject = new NBSRequestGenerator();
     }
-
+    @Ignore
     @Test
     public void testGenerateLogOnPacketRequest() throws SocketTimeoutException {
 //        System.out.println("generateLogOnPacketRequest");

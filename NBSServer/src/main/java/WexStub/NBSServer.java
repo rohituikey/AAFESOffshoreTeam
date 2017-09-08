@@ -32,7 +32,7 @@ public class NBSServer {
             DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length);
             DatagramSocket datagramSocket;
             datagramSocket = new DatagramSocket(PORT);
-            NBSStub nBSStub = new NBSStubImpl();
+            NBSStubFieldSeperator nBSStub = new NBSStubFieldSeperator();
             System.out.println("Server started");
             datagramSocket.receive(datagramPacket);
             String results[];

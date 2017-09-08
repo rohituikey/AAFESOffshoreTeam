@@ -553,9 +553,9 @@ public class Authorizer {
 
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
             if (wexValidateFlag) {
+                StringBuilder prodCodeDetailsStr = null;
+                List<String> prodDataList = new ArrayList<>();
                 if (wexReqPayAtPump.getFuelProdGroup() != null && wexReqPayAtPump.getFuelProdGroup().size() > 0) {
-                    StringBuilder prodCodeDetailsStr = null;
-                    List<String> ProdDataList = new ArrayList<>();
                     List<FuelProdGroup> list = wexReqPayAtPump.getFuelProdGroup();
                     //list.size()>2 throws exception
                     for (FuelProdGroup tmp : list) {
@@ -567,9 +567,11 @@ public class Authorizer {
                         prodCodeDetailsStr.append(tmp.getPricePerUnit());
                         prodCodeDetailsStr.append(":");
                         prodCodeDetailsStr.append(tmp.getFuelDollarAmount());
-                        ProdDataList.add(prodCodeDetailsStr.toString());
+                        prodDataList.add(prodCodeDetailsStr.toString());
                         prodCodeDetailsStr = null;
                     }
+                }
+                 if (wexReqPayAtPump.getNonFuelProductGroup() != null && wexReqPayAtPump.getNonFuelProductGroup().size() > 0) {
                     List<NonFuelProductGroup> nList = wexReqPayAtPump.getNonFuelProductGroup();
                     //  //list.size()>4 throws exception
                     for (NonFuelProductGroup tmp : nList) {
@@ -581,12 +583,12 @@ public class Authorizer {
                         prodCodeDetailsStr.append(tmp.getNonFuelPricePerUnit());
                         prodCodeDetailsStr.append(":");
                         prodCodeDetailsStr.append(tmp.getNonFuelAmount());
-                        ProdDataList.add(prodCodeDetailsStr.toString());
+                        prodDataList.add(prodCodeDetailsStr.toString());
                         prodCodeDetailsStr = null;
                     }
-                    transaction.setProducts(ProdDataList);
-                    ProdDataList = null;
                 }
+                transaction.setProducts(prodDataList);
+                if(!prodDataList.isEmpty()) prodDataList = null;
             }
 
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - end */

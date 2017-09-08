@@ -21,7 +21,6 @@ import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.gateway.GatewayFactory;
 import com.aafes.stargate.gateway.wex.simulator.NBSConnector;
-import com.aafes.stargate.gateway.wex.simulator.NBSFormatter;
 import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StrategyType;
 import com.aafes.starsettler.imported.SettleEntity;
@@ -49,6 +48,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author alugumetlas
  */
+@Ignore
 public class FinalAuthWexTest {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TestPreAuthWex.class.getSimpleName());
@@ -155,6 +155,7 @@ public class FinalAuthWexTest {
         bs = bsf.findStrategy(StrategyType.WEX);
         bs.setGatewayFactory(gatewayFactory);
         authorizer.setBaseStrategyFactory(bsf);
+        
     }
 
     @Ignore
@@ -171,7 +172,7 @@ public class FinalAuthWexTest {
         assertEquals("NO_PRIOR_TRANSACTION", result.getResponse().get(0).getDescriptionField());
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testSuccessFinalAuthRequest() {
         sMethodName = "testSuccessFinalAuthRequest";
@@ -179,15 +180,8 @@ public class FinalAuthWexTest {
         insertDataForTesting();
         Message creditMessage = this.unmarshalCreditMessage(requestXMLFinalAuth);
         Message result = authorizer.authorize(creditMessage);
-        session = intiateSession();
-        session.execute("TRUNCATE STARGATE.TRANSACTIONS");
         clearGlobalVariables();
         LOGGER.info("Method " + sMethodName + " ended." + " Class Name " + CLASS_NAME);
-        if (!result.getResponse().get(0).getResponseType().equalsIgnoreCase(ResponseType.DECLINED)) {
-            Message.Response response = result.getResponse().get(0);
-            response.setReasonCode("100");
-            result.getResponse().set(0, response);
-        }
         assertEquals("100", result.getResponse().get(0).getReasonCode());
     }
 

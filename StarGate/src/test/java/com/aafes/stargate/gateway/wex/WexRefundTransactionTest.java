@@ -122,16 +122,16 @@ public class WexRefundTransactionTest {
         nbsRequestGeneratorObj.setConfigurator(configurator);
         
         //wexProcessor.setNbsRequestGeneratorObj(nbsRequestGeneratorObj);
-        nbsRequestGeneratorObj.setApplicationName("AUTHREQ");
-        nbsRequestGeneratorObj.setApplicationVersion("2");
-        nbsRequestGeneratorObj.setDaylightSavingsTimeAtSiteOne("1");
-        nbsRequestGeneratorObj.setCaptureOnlyRequest("C");
-        nbsRequestGeneratorObj.setSessionTypeAuth("A");
-        nbsRequestGeneratorObj.setTransTypePreAuth("8");
-        nbsRequestGeneratorObj.setTransTypeFinalAndSale("10");
-        nbsRequestGeneratorObj.setTransTypeRefund("30");
-        nbsRequestGeneratorObj.setCardTypeWex("WI");
-        nbsRequestGeneratorObj.setServiceType("S");
+//        nbsRequestGeneratorObj.setApplicationName("AUTHREQ");
+//        nbsRequestGeneratorObj.setApplicationVersion("2");
+//        nbsRequestGeneratorObj.setDaylightSavingsTimeAtSiteOne("1");
+//        nbsRequestGeneratorObj.setCaptureOnlyRequest("C");
+//        nbsRequestGeneratorObj.setSessionTypeAuth("A");
+//        nbsRequestGeneratorObj.setTransTypePreAuth("8");
+//        nbsRequestGeneratorObj.setTransTypeFinalAndSale("10");
+//        nbsRequestGeneratorObj.setTransTypeRefund("30");
+//        nbsRequestGeneratorObj.setCardTypeWex("WI");
+//        nbsRequestGeneratorObj.setServiceType("S");
         
         wexGateway.setwEXProcessor(wexProcessor);
         settleMessageDAO = new SettleMessageDAO();

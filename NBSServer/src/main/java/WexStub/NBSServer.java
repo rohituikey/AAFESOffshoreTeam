@@ -32,18 +32,21 @@ public class NBSServer {
             DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length);
             DatagramSocket datagramSocket;
             datagramSocket = new DatagramSocket(PORT);
-            NBSStub nBSStub = new NBSStubImpl();
+            NBSStubFieldSeperator nBSStub = new NBSStubFieldSeperator();
             System.out.println("Server started");
             datagramSocket.receive(datagramPacket);
             String results[];
-            results = nBSStub.getResponse(datagramPacket.getData());
+            results = nBSStub.createResponse(datagramPacket.getData());
             int index = 0;
             while (index < 2) {
                 byte[] result = results[index].getBytes();
                 DatagramPacket acknowledgment = new DatagramPacket(result, result.length, datagramPacket.getAddress(), datagramPacket.getPort());
                 System.out.println(results[index]);
                 datagramSocket.send(acknowledgment);
+                if(results[index].contains("c$"))
                 index++;
+                else
+                    index=index+2;
             }
 //            try {
 //                

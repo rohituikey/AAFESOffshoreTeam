@@ -57,6 +57,7 @@ public abstract class BaseSettler {
     }
 
     public String fileWexSequenceId() {
+        wexRepository=new WexRepository();
         return wexRepository.getfileWexSequenceId();
     }
 

@@ -28,7 +28,7 @@ public class WexService {
     private WexSFTP sftp;
 
     @EJB
-    private WexFile wexFile;
+    private WexTransactionBean wexTransactionBean;
 
     private final DateFormat dateFormat;
 
@@ -71,8 +71,9 @@ public class WexService {
         try {
 
             Date date = new Date();
+            wexTransactionBean=new WexTransactionBean();
             String createdDate = dateFormat.format(date);
-            wexFile.createFile(sourcePath,settlexmlrecord, fileSeqNo);
+            wexTransactionBean.createFile(sourcePath,settlexmlrecord, fileSeqNo);
             sftp.setSFTPUSER(this.user);
             sftp.setSFTPHOST(this.host);
             sftp.setSFTPPORT(SFTPPORT);
@@ -131,8 +132,8 @@ public class WexService {
         this.sftp = sftp;
     }
 
-    public void setVisionFile(WexFile wexFile) {
-        this.wexFile = wexFile;
+    public void setVisionFile(WexTransactionBean wexFile) {
+        this.wexTransactionBean = wexFile;
     }
 
 }

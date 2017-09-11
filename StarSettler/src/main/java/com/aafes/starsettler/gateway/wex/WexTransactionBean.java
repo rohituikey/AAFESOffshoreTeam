@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
  * @author singha
  */
 @Stateless
-public class WexFile {
+public class WexTransactionBean {
 
-    private static final Logger log = LoggerFactory.getLogger(WexFile.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(WexTransactionBean.class.getName());
     
     private final DateFormat dateFormat =new SimpleDateFormat("yyyyMMddHHmmss");
 //    @EJB
@@ -39,7 +39,7 @@ public class WexFile {
           log.info("Entry in createFile method of WexFile..");
              Date date = new Date();
            // String createdDate = dateFormat.format(date);
-        log.info("Entry in createXmlFile method of WexDataGatewayBean..");
+        log.info("Entry in createFile method of WexTransactionBean..");
        
         if (null != settlexmlrecord && !settlexmlrecord.isEmpty()) {
              String filename = sourcePath +fileSeqNo; //"wexSFTP_" + createdDate;
@@ -51,9 +51,9 @@ public class WexFile {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile())));
             bw.write(settlexmlrecord);
             bw.close();
-            log.info("Exit from createFile method of WexDataGatewayBean..");
+            log.info("Exit from createFile method of WexTransactionBean..");
         }
-        log.info("Exit from createFile method of WexFile..");
+        log.info("Exit from createFile method of WexTransactionBean..");
     }
     
     

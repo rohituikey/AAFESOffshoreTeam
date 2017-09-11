@@ -116,21 +116,11 @@ public class Authorizer {
                 } else {
                     storedTran = null;
                 }
-            } else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia()) && RequestType.REFUND.equalsIgnoreCase(t.getRequestType())) {
+            } else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia()) && RequestType.REFUND.equalsIgnoreCase(t.getRequestType())
+                    || RequestType.FINAL_AUTH.equalsIgnoreCase(t.getRequestType())) {
                 LOG.info("Wex Refund........");
-                storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.REFUND);
-
-                if (storedTran != null && storedTran.getResponseType() != null
-                        && storedTran.getResponseType().trim().equalsIgnoreCase(ResponseType.APPROVED)) {
-                    storedTran.setReasonCode(configurator.get("TRANSACTION_ALREADY_REFUNDED"));
-                    storedTran.setResponseType(ResponseType.DECLINED);
-                    storedTran.setDescriptionField("TRANSACTION_ALREADY_REFUNDED");
-                } else {
-                    storedTran = null;
-                }
-            } else if (StrategyType.WEX.equalsIgnoreCase(t.getMedia()) && RequestType.FINAL_AUTH.equalsIgnoreCase(t.getRequestType())) {
-                LOG.info("Wex FianlAuth........");
-                storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), RequestType.FINAL_AUTH);
+                String requestType = t.getRequestType();
+                storedTran = tranRepository.find(t.getIdentityUuid(), t.getRrn(), requestType);
 
                 if (storedTran != null && storedTran.getResponseType() != null
                         && storedTran.getResponseType().trim().equalsIgnoreCase(ResponseType.APPROVED)) {
@@ -552,9 +542,7 @@ public class Authorizer {
             }
 
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
-            if (wexReqPayAtPump.getRestrictCode() != null) {
-                transaction.setRestrictCode(wexReqPayAtPump.getRestrictCode());
-            }
+            
             if (wexValidateFlag) {
                 StringBuilder prodCodeDetailsStr = null;
                 List<String> prodDataList = new ArrayList<>();

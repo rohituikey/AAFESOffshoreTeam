@@ -126,15 +126,10 @@ public class WEXSaleRequestTest {
 
         wexGateway.setwEXProcessor(wexProcessor);
         wexProcessor.setNbsRequestGenerator(nBSRequestGenerator);
-        settleMessageDAO = new SettleMessageDAO();
-        mapper1 = new MappingManager(session).mapper(SettleEntity.class);
-        settleMessageDAO.setMapper(mapper1);
-        settleMessageDAO.setCassandraSessionFactory(factory);
         mapper3 = new MappingManager(session).mapper(WexSettleEntity.class);
         wexSettleMessagesDao.setMapper(mapper3);
         wexSettleMessagesDao.setFactory(factory);
         wexStrategy.setWexSettleMessagesDao(wexSettleMessagesDao);
-        wexStrategy.setSettleMessageDAO(settleMessageDAO);
         wexStrategy.setConfigurator(configurator);
         wexValidator.setConfigurator(configurator);
         wexStrategy.setwEXValidator(wexValidator);

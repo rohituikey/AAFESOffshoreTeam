@@ -18,7 +18,7 @@ public class WexProcessor_FS {
   public Transaction processRequest(Transaction t) 
   {
       nBSFormatterFS = new NBSFormatterFS();
-     String request =  nBSFormatterFS.createPreAuthRequestForNBS(t);
+     String request =  nBSFormatterFS.createPreAuthRequest(t);
     return t;
   }  
 }

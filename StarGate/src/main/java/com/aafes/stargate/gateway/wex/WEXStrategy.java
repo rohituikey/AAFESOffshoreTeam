@@ -17,6 +17,7 @@ import com.aafes.stargate.tokenizer.TokenBusinessService;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.TransactionType;
+import com.aafes.stargate.util.WexConstants;
 import com.aafes.starsettler.imported.SettleEntity;
 import com.aafes.starsettler.imported.SettleMessageDAO;
 import com.aafes.starsettler.imported.SettleStatus;
@@ -41,14 +42,8 @@ public class WEXStrategy extends BaseStrategy {
     private Configurator configurator;
     @EJB
     private WEXValidator wEXValidator;
-
-    private SettleEntity settleEntity;
-    @EJB
-    private SettleMessageDAO settleMessageDAO;
     @EJB
     private WexSettleMessagesDao wexSettleMessagesDao;
-    @EJB
-    private TokenBusinessService tokenBusinessService;
     Transaction storedTran = null;
     private static final org.slf4j.Logger LOG
             = LoggerFactory.getLogger(WEXStrategy.class.getSimpleName());
@@ -60,7 +55,7 @@ public class WEXStrategy extends BaseStrategy {
         t = transaction;
         try {
 
-            boolean wexFieldsValid = this.validateTransactions(t);
+            boolean wexFieldsValid = this.validate(t);
             LOG.info("WEXFieldsValid " + wexFieldsValid + "..." + t.getRrn());
 
             if (!wexFieldsValid) {
@@ -79,8 +74,6 @@ public class WEXStrategy extends BaseStrategy {
                     && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())
                     ) {
                 LOG.info("WEXStrategy.processRequest settlements process");
-                getToken(t);
-                saveToSettle(t);
                 saveToWexSettle(t);
             }
             //ends  here
@@ -96,20 +89,15 @@ public class WEXStrategy extends BaseStrategy {
         return t;
     }
 
-    private boolean validateTransactions(Transaction t) {
+    private boolean validate(Transaction t) {
         LOG.info("Validating fields in WEXtrategy");
-        Validator validator = new Validator();
-
-        //PREAUTH/FINAL_AUTH request validation - start
         if (t.getRequestType() != null && (t.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)
                 || t.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH))) {
             return wEXValidator.validatePreAuthAndFinalAuth(t);
-        } //PREAUTH/FINAL_AUTH request validation - end
-        //sale request validation - start
+        } 
         else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.SALE)) {
             return wEXValidator.validateSale(t);
-        } //sale request validation - end
-        // ADDED FOR REFUND REQUEST VALIDATION - START
+        } 
         else if (t.getRequestType() != null && t.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
             return wEXValidator.validateRefundRequest(t);
         } // ADDED FOR REFUND REQUEST VALIDATION - END
@@ -128,105 +116,22 @@ public class WEXStrategy extends BaseStrategy {
         LOG.error("Exception/Error occured. reasonCode:" + reasonCode + " .description" + description);
     }
 
-    private void getToken(Transaction t) {
-        if ("Pan".equalsIgnoreCase(t.getPan())) {
-
-            if (tokenBusinessService != null
-                    && !t.getRequestType().equalsIgnoreCase(RequestType.ISSUE)) {
-                try {
-                    tokenBusinessService.issueToken(t);
-                } catch (ProcessingException e) {
-                    LOG.error("Cannot generate token. Token Service Error");
-                }
-
-            }
-        }
-    }
-
-    private void saveToSettle(Transaction t) {
-        LOG.info("WexStrategy.saveTOSettle method is started");
-        List<SettleEntity> settleEntityList = new ArrayList<SettleEntity>();
-        settleEntity = new SettleEntity();
-
-        settleEntity.setTransactionId(t.getTransactionId());
-        settleEntity.setReceiveddate(this.getSystemDate());
-        settleEntity.setOrderNumber(t.getOrderNumber());
-        settleEntity.setSettleDate(this.getSystemDate());
-        settleEntity.setOrderDate(this.getSystemDate());
-        settleEntity.setTransactionType(t.getTransactiontype());
-        if(settleEntity.getTransactionType() == null)
-          settleEntity.setTransactionType("10") ; 
-        settleEntity.setClientLineId(t.getTransactionId());
-        settleEntity.setIdentityUUID(t.getIdentityUuid());
-        settleEntity.setRrn(t.getRrn());
-        settleEntity.setPaymentAmount(Long.toString(t.getAmount()));
-
-        settleEntity.setSettlestatus(SettleStatus.Ready_to_settle);
-        settleEntity.setCardType(t.getMedia());
-        settleEntity.setSettlePlan(t.getPlanNumber());
-        settleEntity.setAuthNum(t.getAuthNumber());
-        settleEntity.setAuthreference(t.getAuthNumber());
-        if (t.getQuantity() != null) {
-            settleEntity.setQuantity(t.getQuantity().toString());
-        }
-        settleEntity.setProducts(t.getProducts());
-        settleEntity.setProductcode(t.getProductCode());
-        settleEntity.setReasonCode(t.getReasonCode());
-        settleEntity.setResponseType(t.getResponseType());
-        settleEntity.setCatflag(t.getCatFlag());
-        settleEntity.setOdometer(t.getOdoMeter());
-        settleEntity.setDescriptionField(t.getDriverId());
-        settleEntity.setVehicleId(t.getVehicleId());
-        settleEntity.setTrackdata2(t.getTrack2());
-        settleEntity.setService(t.getServiceCode());
-        settleEntity.setClientLineId("0000");
-        if (t.getLocalDateTime() != null && !t.getLocalDateTime().isEmpty() && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
-            settleEntity.setTime(t.getLocalDateTime().substring(6, 12));
-        }
-        settleEntity.setPumpNumber(t.getPumpNmbr());
-        if (t.getPricePerUnit() != null) {
-            settleEntity.setUnitCost(t.getPricePerUnit().toString());
-        }
-        if (t.getLocalDateTime() != null && !t.getLocalDateTime().isEmpty() && ResponseType.APPROVED.equalsIgnoreCase(t.getResponseType())) {
-            settleEntity.setDate(t.getLocalDateTime().substring(0, 6));
-        }
-        if (t.getAmount() < 0) {
-            settleEntity.setTransactionType(TransactionType.Refund);
-        } else if (t.getAmount() >= 0) {
-            settleEntity.setTransactionType(TransactionType.Deposit);
-        }
-
-        if (t.getTokenId() != null && !t.getTokenId().trim().isEmpty()) {
-            settleEntity.setCardToken(t.getTokenId());
-            settleEntity.setTokenBankName(t.getTokenBankName());
-        }
-
-        settleEntityList.add(settleEntity);
-        settleMessageDAO.save(settleEntityList);
-        LOG.debug("rrn number in WexStrategy.saveTOSettle is: " + t.getRrn());
-        LOG.info("WexStrategy.saveTOSettle method is ended");
-    }
-
-//To save in WexSett
     private void saveToWexSettle(Transaction t) {
         LOG.info("WexStrategy.saveToWexSettle method is started");
-
         List<WexSettleEntity> wexSettleEntityList = new ArrayList();
         WexSettleEntity wexSettleEntity = new WexSettleEntity();
 
         wexSettleEntity.setAmount(Long.toString(t.getAmount()));
         wexSettleEntity.setAuthRef(t.getAuthNumber());
-        if(t.getTransactiontype()== null)  wexSettleEntity.setTransactionCode("00");
+        if(t.getTransactiontype()== null)  wexSettleEntity.setTransactionCode(WexConstants.TRANSTYPEFINALANDSALE);
         else wexSettleEntity.setTransactionCode(t.getTransactiontype());
         wexSettleEntity.setTransactionId(t.getTransactionId());
-        wexSettleEntity.setAppName("AuthReq");
+        wexSettleEntity.setAppName(configurator.get("APPLICATIONNAME"));
         wexSettleEntity.setTransactionType(t.getRequestType());
         if(wexSettleEntity.getTransactionType() == null)
-        wexSettleEntity.setTransactionType("10");
-        wexSettleEntity.setAppVersion("");
+        wexSettleEntity.setTransactionType(RequestType.FINAL_AUTH);
+        wexSettleEntity.setAppVersion(configurator.get("APPLICATIONVERSION"));
         wexSettleEntity.setTid(t.getTid());
-        if(wexSettleEntity.getTid() == null)
-        wexSettleEntity.setTid("525454564");
         wexSettleEntity.setCardTrack(t.getTrack2());
         wexSettleEntity.setCatFlag(t.getCatFlag());
         wexSettleEntity.setDriverId(t.getDriverId());
@@ -253,11 +158,6 @@ public class WEXStrategy extends BaseStrategy {
         Date date = new Date();
         String ts = dateFormat.format(date);
         return ts;
-    }
-
-    /* ADDED COMMON CODE TO CHECK IF SETTLEMENT STATUS - START */
-    public void setSettleMessageDAO(SettleMessageDAO settleMessageDAO) {
-        this.settleMessageDAO = settleMessageDAO;
     }
 
     /**

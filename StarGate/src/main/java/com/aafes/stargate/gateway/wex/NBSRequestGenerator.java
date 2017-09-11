@@ -9,11 +9,11 @@ import com.aafes.nbsresponse.NBSResponse;
 import com.aafes.nbsresponseacknowledgmentschema.ResponseAcknowlegment;
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Configurator;
-import com.aafes.stargate.util.ConstantsUtil;
 import com.aafes.stargate.util.InputType;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.SvsUtil;
+import com.aafes.stargate.util.WexConstants;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -58,47 +58,47 @@ public class NBSRequestGenerator {
             }
             isoMsg = new ISOMsg();
             isoMsg.setPackager(packager);
-            isoMsg.setMTI(ConstantsUtil.MTI);
+            isoMsg.setMTI(WexConstants.MTI);
             if(!isTimeoutRetry){
                 isoMsg.set(2, transaction.getTermId());
-                isoMsg.set(3, ConstantsUtil.APPLICATIONNAME);
-                isoMsg.set(4, ConstantsUtil.APPLICATIONVERSION);
-                isoMsg.set(5, createDateFormat());
+                isoMsg.set(3, configurator.get("APPLICATION_NAME"));
+                isoMsg.set(4, configurator.get("APPLICATION_VERSION"));
+                isoMsg.set(5, WexConstants.createDateFormat());
             }
-            isoMsg.set(6, ConstantsUtil.SESSIONTYPEAUTH);
+            isoMsg.set(6, WexConstants.SESSIONTYPEAUTH);
             isoMsg.set(7, transaction.getTransactionId().substring(0, 4));
             if (transaction.getRequestType().equalsIgnoreCase(RequestType.PREAUTH)) {
-                isoMsg.set(8, ConstantsUtil.TRANSTYPEPREAUTH);
+                isoMsg.set(8, WexConstants.TRANSTYPEPREAUTH);
             } else if (transaction.getRequestType().equalsIgnoreCase(RequestType.FINAL_AUTH)
                     || transaction.getRequestType().equalsIgnoreCase(RequestType.SALE)) {
-                isoMsg.set(8, ConstantsUtil.TRANSTYPEFINALANDSALE);
+                isoMsg.set(8, WexConstants.TRANSTYPEFINALANDSALE);
             } else if (transaction.getRequestType().equalsIgnoreCase(RequestType.REFUND)) {
-                isoMsg.set(8, ConstantsUtil.TRANSTYPEREFUND);
+                isoMsg.set(8, WexConstants.TRANSTYPEREFUND);
             }
-            isoMsg.set(9, ConstantsUtil.CARDTYPEWEX);
+            isoMsg.set(9, WexConstants.CARDTYPEWEX);
             isoMsg.set(10, transaction.getCatFlag());
             isoMsg.set(11, transaction.getPumpNmbr());
-            isoMsg.set(12, ConstantsUtil.SERVICETYPE);
+            isoMsg.set(12, WexConstants.SERVICETYPE);
             isoMsg.set(13, Long.toString(transaction.getAmount()));
             
             if (transaction.getRequestType().equals(RequestType.FINAL_AUTH)) {
-                isoMsg.set(6, ConstantsUtil.CAPTUREONLYREQUEST);
+                isoMsg.set(6, WexConstants.CAPTUREONLYREQUEST);
                 isoMsg.set(14, Long.toString(transaction.getAmtPreAuthorized()));
                 if (null != transaction.getTransactionId()) {
                     isoMsg.set(15, transaction.getTransactionId().substring(0, 4));
                 }
-                isoMsg.set(16, createDateAndTime());
+                isoMsg.set(16, WexConstants.createDateAndTime());
                 isoMsg.set(21, transaction.getAuthNumber());
             }
             if (transaction.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
                 isoMsg.set(18, transaction.getTrack2());
-                isoMsg.set(17, ConstantsUtil.TRACKNUMBERWEXTWO);
+                isoMsg.set(17, WexConstants.TRACKNUMBERWEXTWO);
             } else if (transaction.getInputType().equalsIgnoreCase(InputType.KEYED))//isoMsg.set(23, transaction.getTrack2());//Track0 formatt
             {
                 if (!(transaction.getRequestType().equals(RequestType.FINAL_AUTH))) {
                     isoMsg.set(19, Long.toString(t.getAmount()));
                 }
-                isoMsg.set(17, ConstantsUtil.TRACKNUMBERWEXZERO);
+                isoMsg.set(17, WexConstants.TRACKNUMBERWEXZERO);
             }
             if (!RequestType.PREAUTH.equalsIgnoreCase(t.getRequestType()))  isoMsg.set(20, (t.getTransactionId() + t.getTermId()));
             
@@ -107,15 +107,15 @@ public class NBSRequestGenerator {
             //prompt details count
             if (null != t.getPromptDetailCount()) {
                 if (null != t.getVehicleId() && !t.getVehicleId().isEmpty()) {
-                    isoMsg.set(23, ConstantsUtil.VEHICLEID);
+                    isoMsg.set(23, WexConstants.VEHICLEID);
                     isoMsg.set(24, t.getVehicleId());
                 }
                 if (null != t.getDriverId() && !t.getDriverId().isEmpty()) {
-                    isoMsg.set(23, ConstantsUtil.DRIVERID);
+                    isoMsg.set(23, WexConstants.DRIVERID);
                     isoMsg.set(24, t.getDriverId());
                 }
                 if (null != t.getOdoMeter() && !t.getOdoMeter().isEmpty()) {
-                    isoMsg.set(23, ConstantsUtil.ODOMOETER);
+                    isoMsg.set(23, WexConstants.ODOMOETER);
                     isoMsg.set(24, t.getOdoMeter());
                 }
             }
@@ -125,8 +125,8 @@ public class NBSRequestGenerator {
             index = 25;
             if (null != t.getProducts() && (t.getProducts().size()) > 0) {
                 for (String nonFuelString : t.getProducts()) {
-                    if (nonFuelString.contains(ConstantsUtil.PRODUCTDELIMITOR)) {
-                        productDetails = nonFuelString.split(ConstantsUtil.PRODUCTDELIMITOR);
+                    if (nonFuelString.contains(WexConstants.PRODUCTDELIMITOR)) {
+                        productDetails = nonFuelString.split(WexConstants.PRODUCTDELIMITOR);
                     }
                     isoMsg.set(++index, productDetails[2]);
                     isoMsg.set(++index, productDetails[1]);
@@ -153,16 +153,6 @@ public class NBSRequestGenerator {
         return null;
     }
     
-    public String createDateAndTime() {
-        //        YYMMDDhhmmss
-        //2017-08-03 09:31:54.316
-        DateFormat dateFormat = new SimpleDateFormat(ConstantsUtil.DATEFORMAT);
-        Date date = new Date();
-        String dt = dateFormat.format(date);
-        dt = dt.substring(2, 4) + dt.substring(5, 7) + dt.substring(8, 10) + dt.substring(11, 13) + dt.substring(14, 16) + dt.substring(17, 19);
-        
-        return dt;
-    }
     
     public String[] seperateResponse(byte[] response) {
         String responseString = new String(response);
@@ -254,15 +244,6 @@ public class NBSRequestGenerator {
         return result;
     }
     
-    private String createDateFormat() {
-        DateFormat dateFormat = new SimpleDateFormat(ConstantsUtil.DATEFORMAT);
-        Date date = new Date();
-        String ts = dateFormat.format(date);
-        //2017-08-08 08:39:30.967
-        ts = ts.substring(11, 13) + ts.substring(14, 16) + ConstantsUtil.DAYLIGHTSAVINGSTIMEATSITEONE;
-        return ts;
-    }
-
 //    private String CreateDF_forTransaction(String df)
 //    {
 //        //yyyy-MM-dd HH:mm:ss.SSS

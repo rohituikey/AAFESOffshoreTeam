@@ -21,7 +21,6 @@ import com.aafes.stargate.dao.TransactionDAO;
 import com.aafes.stargate.gateway.GatewayException;
 import com.aafes.stargate.gateway.GatewayFactory;
 import com.aafes.stargate.gateway.wex.simulator.NBSConnector;
-import com.aafes.stargate.util.ResponseType;
 import com.aafes.stargate.util.StrategyType;
 import com.aafes.starsettler.imported.SettleEntity;
 import com.aafes.starsettler.imported.SettleMessageDAO;
@@ -135,15 +134,10 @@ public class FinalAuthWexTest {
 
         wexGateway.setwEXProcessor(wexProcessor);
         wexProcessor.setNbsRequestGenerator(nBSRequestGenerator);
-        settleMessageDAO = new SettleMessageDAO();
-        mapper1 = new MappingManager(session).mapper(SettleEntity.class);
-        settleMessageDAO.setMapper(mapper1);
-        settleMessageDAO.setCassandraSessionFactory(factory);
         mapper3 = new MappingManager(session).mapper(WexSettleEntity.class);
         wexSettleMessagesDao.setMapper(mapper3);
         wexSettleMessagesDao.setFactory(factory);
         wexStrategy.setWexSettleMessagesDao(wexSettleMessagesDao);
-        wexStrategy.setSettleMessageDAO(settleMessageDAO);
         wexStrategy.setConfigurator(configurator);
         wexValidator.setConfigurator(configurator);
         wexStrategy.setwEXValidator(wexValidator);

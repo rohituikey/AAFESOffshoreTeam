@@ -7,14 +7,11 @@ package com.aafes.stargate.gateway.wex.simulator;
 
 import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.Configurator;
-import com.aafes.stargate.util.ConstantsUtil;
+import com.aafes.stargate.util.WexConstants;
 import com.aafes.stargate.util.InputType;
-import static com.ibm.disthub2.impl.formats.Multi.Constants.numbers_table_type.table_type.number;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.ejb.EJB;
+
 /**
  *
  * @author alugumetlas
@@ -23,143 +20,270 @@ public class NBSFormatterFS {
 
     String[] productDetails;
     @EJB
+    String startOfText = WexConstants.DELIMITERSTARTOFTEXT;
+    String endOfText = WexConstants.DELIMITERENDOFTEXT;
+    String fieldSeparator = WexConstants.DELIMITERFIELDSEPARATOR;
+    @EJB
     private Configurator configurator;
 
-    public String createPreAuthRequestForNBS(Transaction t) {
-
-        StringBuilder str = new StringBuilder();
-        //LOGON Request
+    public String createLogOnRequest(Transaction t) {
+        StringBuilder sb = new StringBuilder();
         if (null != t.getTermId() || !t.getTermId().isEmpty()) {
-            str.append("<SX>").append(t.getTermId());//termID
+            sb.append(startOfText).append(t.getTermId());//termID
         }
-        str.append("<FS>" + ConstantsUtil.APPLICATIONNAME);//APPLICATIONNAME
-        str.append("<FS>" + ConstantsUtil.APPLICATIONVERSION);//APPLICATIONVERSION
-        str.append("<FS>").append(createDateFormat());
-        //ACTUAL AUTH REQUEST STARTS
-        str.append("<FS>" + ConstantsUtil.SESSIONTYPEAUTH);
-        if (null != t.getTransactionId() || !t.getTransactionId().isEmpty()) {
-            str.append("<FS>").append(t.getTransactionId().substring(0, 4));//key
-        }
-        str.append("<FS>" + ConstantsUtil.TRANSTYPEPREAUTH);//transtype
-        str.append("<FS>" + ConstantsUtil.CARDTYPEWEX);//cardType
-        if (null != t.getCatFlag() || !t.getCatFlag().isEmpty()) {
-            str.append("<FS>").append(t.getCatFlag());//catFlag
-        }
-        if (null != t.getPumpNmbr() || !t.getPumpNmbr().isEmpty()) {
-            str.append("<FS>").append(t.getPumpNmbr());//pumpNUMBER
-        }
-        str.append("<FS>" + ConstantsUtil.SERVICETYPE);//SERVICETYPE
-        if (t.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
-            str.append("<FS>" + ConstantsUtil.TRACKNUMBERWEXTWO);//track
-            if (null != t.getTrack2() || !t.getTrack2().isEmpty()) {
-                str.append("<FS>").append(t.getTrack2());//track2
-            }
-        }
-        if(t.getAmount()>0){
-          double d =  t.getAmount()/100;
-        DecimalFormat format = new DecimalFormat("0.00");
-        String formatted = format.format(d);
-        str.append("<FS>").append(formatted);//amount
-        }
-        str.append("<FS>").append(t.getPromptDetailCount().toString());
-        if (null != t.getVehicleId()&&t.getVehicleId().trim().length()>0 ) {
-            str.append("<FS>" + ConstantsUtil.VEHICLEID);//prompttype
-            str.append("<FS>").append(t.getVehicleId());//promptvalue
-        }
-        if (null != t.getDriverId() && t.getDriverId().trim().length()>0 ) {
-            str.append("<FS>" + ConstantsUtil.DRIVERID);//prompttype
-            str.append("<FS>").append(t.getDriverId());//promptvalue
-        }
-        if (null != t.getOdoMeter() || t.getOdoMeter().trim().length()>0 ) {
-            str.append("<FS>" + ConstantsUtil.ODOMOETER);//prompttype
-            str.append("<FS>").append(t.getOdoMeter());//promptvalue
-        }
-        str.append("<FS>").append(t.getProdDetailCount());//proDetailCount
-        if (null != t.getProducts() && (t.getProducts().size()) > 0) {
-            for (String nonFuelString : t.getProducts()) {
-                if (nonFuelString.contains(ConstantsUtil.PRODUCTDELIMITOR)) {
-                    productDetails = nonFuelString.split(ConstantsUtil.PRODUCTDELIMITOR);
-                    str.append("<FS>").append(productDetails[2]);//price
-                    str.append("<FS>").append(productDetails[1]);//quantity
-                    str.append("<FS>").append(productDetails[0]);//prodCode
-                    str.append("<FS>").append(productDetails[3]);//fdAmount
-                }
-            }
-            str.append("<EX><LF>");
-        }
-        return str.toString();
-    }
-    public String createFinalRequestForNbs(Transaction t)
-    {
-       StringBuilder str = new StringBuilder();
-        //LOGON Request
-        if (null != t.getTermId() || !t.getTermId().isEmpty()) {
-            str.append("<SX>").append(t.getTermId());//termID
-        }
-        str.append("<FS>" + ConstantsUtil.APPLICATIONNAME);//APPLICATIONNAME
-        str.append("<FS>" + ConstantsUtil.APPLICATIONVERSION);//APPLICATIONVERSION
-        str.append("<FS>").append(createDateFormat());
-        //ACTUAL AUTH REQUEST STARTS
-        str.append("<FS>" + ConstantsUtil.SESSIONTYPEAUTH);
-        if (null != t.getTransactionId() || !t.getTransactionId().isEmpty()) {
-            str.append("<FS>").append(t.getTransactionId().substring(0, 4));//key
-        }
-        str.append("<FS>" + ConstantsUtil.TRANSTYPEPREAUTH);//transtype
-        str.append("<FS>" + ConstantsUtil.CARDTYPEWEX);//cardType
-        if (null != t.getCatFlag() || !t.getCatFlag().isEmpty()) {
-            str.append("<FS>").append(t.getCatFlag());//catFlag
-        }
-        if (null != t.getPumpNmbr() || !t.getPumpNmbr().isEmpty()) {
-            str.append("<FS>").append(t.getPumpNmbr());//pumpNUMBER
-        }
-        str.append("<FS>" + ConstantsUtil.SERVICETYPE);//SERVICETYPE
-        if (t.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
-            str.append("<FS>" + ConstantsUtil.TRACKNUMBERWEXTWO);//track
-            if (null != t.getTrack2() || !t.getTrack2().isEmpty()) {
-                str.append("<FS>").append(t.getTrack2());//track2
-            }
-        }
-        if(t.getAmount()>0){
-          double d =  t.getAmount()/100;
-        DecimalFormat format = new DecimalFormat("0.00");
-        String formatted = format.format(d);
-        str.append("<FS>").append(formatted);//amount
-        }
-        str.append("<FS>").append(t.getPromptDetailCount().toString());
-        if (null != t.getVehicleId()&&t.getVehicleId().trim().length()>0 ) {
-            str.append("<FS>" + ConstantsUtil.VEHICLEID);//prompttype
-            str.append("<FS>").append(t.getVehicleId());//promptvalue
-        }
-        if (null != t.getDriverId() && t.getDriverId().trim().length()>0 ) {
-            str.append("<FS>" + ConstantsUtil.DRIVERID);//prompttype
-            str.append("<FS>").append(t.getDriverId());//promptvalue
-        }
-        if (null != t.getOdoMeter() || t.getOdoMeter().trim().length()>0 ) {
-            str.append("<FS>" + ConstantsUtil.ODOMOETER);//prompttype
-            str.append("<FS>").append(t.getOdoMeter());//promptvalue
-        }
-        str.append("<FS>").append(t.getProdDetailCount());//proDetailCount
-        if (null != t.getProducts() && (t.getProducts().size()) > 0) {
-            for (String nonFuelString : t.getProducts()) {
-                if (nonFuelString.contains(ConstantsUtil.PRODUCTDELIMITOR)) {
-                    productDetails = nonFuelString.split(ConstantsUtil.PRODUCTDELIMITOR);
-                    str.append("<FS>").append(productDetails[2]);//price
-                    str.append("<FS>").append(productDetails[1]);//quantity
-                    str.append("<FS>").append(productDetails[0]);//prodCode
-                    str.append("<FS>").append(productDetails[3]);//fdAmount
-                }
-            }
-            str.append("<EX><LF>");
-        }
-        return str.toString();
+        sb.append(fieldSeparator);
+        sb.append(configurator.get("APPLICATION_NAME"));//APPLICATIONNAME
+        sb.append(fieldSeparator);
+        sb.append(configurator.get("APPLICATION_VERSION"));//APPLICATIONVERSION
+        sb.append(fieldSeparator);
+        sb.append(WexConstants.createDateFormat());
+        return sb.toString();
     }
 
-    private String createDateFormat() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        Date date = new Date();
-        String ts = dateFormat.format(date);
-        //2017-08-08 08:39:30.967
-        ts = ts.substring(11, 13) + ts.substring(14, 16) + ConstantsUtil.DAYLIGHTSAVINGSTIMEATSITEONE;
-        return ts;
+    public String createPreAuthRequest(Transaction t) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(fieldSeparator);
+        sb.append(WexConstants.SESSIONTYPEAUTH);
+        if (t.getTransactionId().length() >= 4) {
+            sb.append(fieldSeparator);
+            sb.append(t.getTransactionId().substring(t.getTransactionId().length() - 4, t.getTransactionId().length()));//key
+        } else {
+        }
+        sb.append(fieldSeparator);
+        sb.append(WexConstants.TRANSTYPEPREAUTH);//transtype
+        sb.append(fieldSeparator);
+        sb.append(WexConstants.CARDTYPEWEX);//cardType
+        if (null != t.getCatFlag() || !t.getCatFlag().isEmpty()) {
+            sb.append(fieldSeparator);
+            sb.append(t.getCatFlag());//catFlag
+        }
+        if (null != t.getPumpNmbr() || !t.getPumpNmbr().isEmpty()) {
+            sb.append(fieldSeparator);
+            sb.append(t.getPumpNmbr());//pumpNUMBER
+        }
+        sb.append(fieldSeparator);
+        sb.append(WexConstants.SERVICETYPE);//SERVICETYPE
+        if (t.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
+            sb.append(fieldSeparator);
+            sb.append(WexConstants.TRACKNUMBERWEXTWO);//track
+            if (null != t.getTrack2() || !t.getTrack2().isEmpty()) {
+                sb.append(fieldSeparator);
+                sb.append(t.getTrack2());//track2
+            }
+        }
+        if (t.getAmount() > 0) {
+            double d = t.getAmount() / 100;
+            DecimalFormat format = new DecimalFormat("0.00");
+            String formatted = format.format(d);
+            sb.append(fieldSeparator);
+            sb.append(formatted);//amount
+        }
+        sb.append(fieldSeparator);
+        sb.append(t.getPromptDetailCount().toString());
+        if (null != t.getVehicleId() && t.getVehicleId().trim().length() > 0) {
+            sb.append(fieldSeparator);
+            sb.append(WexConstants.VEHICLEID);//prompttype
+            sb.append(fieldSeparator);
+            sb.append(t.getVehicleId());//promptvalue
+        }
+        if (null != t.getDriverId() && t.getDriverId().trim().length() > 0) {
+            sb.append(fieldSeparator);
+            sb.append(WexConstants.DRIVERID);//prompttype
+            sb.append(fieldSeparator);
+            sb.append(t.getDriverId());//promptvalue
+        }
+        if (null != t.getOdoMeter() || t.getOdoMeter().trim().length() > 0) {
+            sb.append(fieldSeparator);
+            sb.append(WexConstants.ODOMOETER);//prompttype
+            sb.append(fieldSeparator);
+            sb.append(t.getOdoMeter());//promptvalue
+        }
+        sb.append(fieldSeparator);
+        sb.append(t.getProdDetailCount());//proDetailCount
+        if (null != t.getProducts() && (t.getProducts().size()) > 0) {
+            for (String nonFuelString : t.getProducts()) {
+                if (nonFuelString.contains(WexConstants.PRODUCTDELIMITOR)) {
+                    productDetails = nonFuelString.split(WexConstants.PRODUCTDELIMITOR);
+                    sb.append(fieldSeparator);
+                    sb.append(productDetails[2]);//price
+                    sb.append(fieldSeparator).append(productDetails[1]);//quantity
+                    sb.append(fieldSeparator).append(productDetails[0]);//prodCode
+                    sb.append(fieldSeparator).append(productDetails[3]);//fdAmount
+                }
+            }
+            sb.append(endOfText);
+        }
+        return sb.toString();
     }
+
+    public String createFinalAuthRequest(Transaction t) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(fieldSeparator);
+        sb.append(WexConstants.CAPTUREONLYREQUEST);
+        if (t.getTransactionId().length() >= 4) {
+            sb.append(fieldSeparator).append(t.getTransactionId().substring(t.getTransactionId().length() - 4, t.getTransactionId().length()));//key
+        }
+        sb.append(fieldSeparator).append(WexConstants.TRANSTYPEFINALANDSALE);//transtype
+        sb.append(fieldSeparator).append(WexConstants.CARDTYPEWEX);//cardType
+        if (null != t.getCatFlag() || !t.getCatFlag().isEmpty()) {
+            sb.append(fieldSeparator).append(t.getCatFlag());//catFlag
+        }
+        if (null != t.getPumpNmbr() || !t.getPumpNmbr().isEmpty()) {
+            sb.append(fieldSeparator).append(t.getPumpNmbr());//pumpNUMBER
+        }
+        sb.append(fieldSeparator).append(WexConstants.SERVICETYPE);//SERVICETYPE
+        if (t.getAmount() > 0) {
+            double d = t.getAmount() / 100;
+            DecimalFormat format = new DecimalFormat("0.00");
+            String formatted = format.format(d);
+            sb.append(fieldSeparator);
+            sb.append(formatted);//amount
+        }
+        if (t.getAmtPreAuthorized() > 0) {
+            double d = t.getAmtPreAuthorized() / 100;
+            DecimalFormat format = new DecimalFormat("0.00");
+            String formatted = format.format(d);
+            sb.append(fieldSeparator);
+            sb.append(formatted);//amount
+        }
+        if (t.getTransactionId().length() >= 4) {
+            sb.append(fieldSeparator);
+            sb.append(t.getTransactionId().substring(t.getTransactionId().length() - 4, t.getTransactionId().length()));
+        }
+        //**for testing i commented and hardcoded value ///we have to unacomment  line no.156 and remove 157 line
+        //sb.append(fieldSeparator).append(WexConstants.createDateAndTime());
+        sb.append(fieldSeparator).append("170911123042");
+        if (t.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
+            sb.append(fieldSeparator).append(WexConstants.TRACKNUMBERWEXTWO);//track
+            if (null != t.getTrack2() || !t.getTrack2().isEmpty()) {
+                sb.append(fieldSeparator).append(t.getTrack2());//track2
+            }
+        }
+        //sb.append(fieldSeparator).append(t.getTransactionId()).append(t.getTermId());
+        sb.append(fieldSeparator);
+        sb.append("0230072");
+        sb.append(fieldSeparator);
+        sb.append(t.getOrigAuthCode());
+        sb.append(fieldSeparator);
+        sb.append(t.getPromptDetailCount().toString());
+        if (null != t.getVehicleId() && t.getVehicleId().trim().length() > 0) {
+            sb.append(fieldSeparator);
+            sb.append(WexConstants.VEHICLEID);//prompttype
+            sb.append(fieldSeparator);
+            sb.append(t.getVehicleId());//promptvalue
+        }
+        if (null != t.getDriverId() && t.getDriverId().trim().length() > 0) {
+            sb.append(fieldSeparator);
+            sb.append(WexConstants.DRIVERID);//prompttype
+            sb.append(fieldSeparator);
+            sb.append(t.getDriverId());//promptvalue
+        }
+        if (null != t.getOdoMeter() || t.getOdoMeter().trim().length() > 0) {
+            sb.append(fieldSeparator);
+            sb.append(WexConstants.ODOMOETER);//prompttype
+            sb.append(fieldSeparator);
+            sb.append(t.getOdoMeter());//promptvalue
+        }
+        sb.append(fieldSeparator);
+        sb.append(t.getProdDetailCount());//proDetailCount
+        if (null != t.getProducts() && (t.getProducts().size()) > 0) {
+            for (String nonFuelString : t.getProducts()) {
+                if (nonFuelString.contains(WexConstants.PRODUCTDELIMITOR)) {
+                    productDetails = nonFuelString.split(WexConstants.PRODUCTDELIMITOR);
+                    sb.append(fieldSeparator);
+                    sb.append(productDetails[2]);//price
+                    sb.append(fieldSeparator);
+                    sb.append(productDetails[1]);//quantity
+                    sb.append(fieldSeparator);
+                    sb.append(productDetails[0]);//prodCode
+                    sb.append(fieldSeparator);
+                    sb.append(productDetails[3]);//fdAmount
+                }
+            }
+            sb.append(endOfText);
+        }
+        return sb.toString();
+    }
+
+    public String createRefundRequest(Transaction t) {
+         StringBuilder sb = new StringBuilder();
+        sb.append(fieldSeparator);
+        sb.append(WexConstants.SESSIONTYPEAUTH);
+        if (t.getTransactionId().length() >= 4) {
+            sb.append(fieldSeparator);
+            sb.append(t.getTransactionId().substring(t.getTransactionId().length() - 4, t.getTransactionId().length()));//key
+        } else {
+        }
+        sb.append(fieldSeparator);
+        sb.append(WexConstants.TRANSTYPEREFUND);//transtype
+        sb.append(fieldSeparator);
+        sb.append(WexConstants.CARDTYPEWEX);//cardType
+        if (null != t.getCatFlag() || !t.getCatFlag().isEmpty()) {
+            sb.append(fieldSeparator);
+            sb.append(t.getCatFlag());//catFlag
+        }
+        if (null != t.getPumpNmbr() || !t.getPumpNmbr().isEmpty()) {
+            sb.append(fieldSeparator);
+            sb.append(t.getPumpNmbr());//pumpNUMBER
+        }
+        sb.append(fieldSeparator);
+        sb.append(WexConstants.SERVICETYPE);//SERVICETYPE
+        if (t.getInputType().equalsIgnoreCase(InputType.SWIPED)) {
+            sb.append(fieldSeparator);
+            sb.append(WexConstants.TRACKNUMBERWEXTWO);//track
+            if (null != t.getTrack2() || !t.getTrack2().isEmpty()) {
+                sb.append(fieldSeparator);
+                sb.append(t.getTrack2());//track2
+            }
+        }
+        if (t.getAmount() > 0) {
+            double d = t.getAmount() / 100;
+            DecimalFormat format = new DecimalFormat("0.00");
+            String formatted = format.format(d);
+            sb.append(fieldSeparator);
+            sb.append(formatted);//amount
+        }
+        sb.append(fieldSeparator);
+        sb.append(t.getPromptDetailCount().toString());
+        if (null != t.getVehicleId() && t.getVehicleId().trim().length() > 0) {
+            sb.append(fieldSeparator);
+            sb.append(WexConstants.VEHICLEID);//prompttype
+            sb.append(fieldSeparator);
+            sb.append(t.getVehicleId());//promptvalue
+        }
+        if (null != t.getDriverId() && t.getDriverId().trim().length() > 0) {
+            sb.append(fieldSeparator);
+            sb.append(WexConstants.DRIVERID);//prompttype
+            sb.append(fieldSeparator);
+            sb.append(t.getDriverId());//promptvalue
+        }
+        if (null != t.getOdoMeter() || t.getOdoMeter().trim().length() > 0) {
+            sb.append(fieldSeparator);
+            sb.append(WexConstants.ODOMOETER);//prompttype
+            sb.append(fieldSeparator);
+            sb.append(t.getOdoMeter());//promptvalue
+        }
+        sb.append(fieldSeparator);
+        sb.append(t.getProdDetailCount());//proDetailCount
+        if (null != t.getProducts() && (t.getProducts().size()) > 0) {
+            for (String nonFuelString : t.getProducts()) {
+                if (nonFuelString.contains(WexConstants.PRODUCTDELIMITOR)) {
+                    productDetails = nonFuelString.split(WexConstants.PRODUCTDELIMITOR);
+                    sb.append(fieldSeparator);
+                    sb.append(productDetails[2]);//price
+                    sb.append(fieldSeparator).append(productDetails[1]);//quantity
+                    sb.append(fieldSeparator).append(productDetails[0]);//prodCode
+                    sb.append(fieldSeparator).append(productDetails[3]);//fdAmount
+                }
+            }
+            sb.append(endOfText);
+        }
+        return sb.toString();
+    }
+
+    public void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
+
 }

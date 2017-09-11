@@ -10,9 +10,9 @@ import com.aafes.stargate.authorizer.entity.Transaction;
 import com.aafes.stargate.control.AuthorizerException;
 import com.aafes.stargate.control.Configurator;
 import com.aafes.stargate.gateway.wex.simulator.NBSFormatterFS;
-import com.aafes.stargate.util.ConstantsUtil;
 import com.aafes.stargate.util.RequestType;
 import com.aafes.stargate.util.SvsUtil;
+import com.aafes.stargate.util.WexConstants;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -35,11 +35,19 @@ public class TestNBSFormat {
 
     String requestXMLPreAuth;
     String requestXMLFinalAuth;
+    String requestXMLRefund;
+    private Configurator configurator;
+    private NBSFormatterFS nBSFormatterFS;
 
     @Before
     public void setUp() {
+        configurator = new Configurator();
+        nBSFormatterFS = new NBSFormatterFS();
+        configurator.postConstruct();
+        configurator.load();
+        nBSFormatterFS.setConfigurator(configurator);
         requestXMLPreAuth = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><cm:Message xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:cm='http://www.aafes.com/credit' xsi:schemaLocation='http://www.aafes.com/credit file:///D:/Users/alugumetlas/Downloads/wildfly-10.1.0.Final/wildfly-10.1.0.Final/standalone/configuration/CreditMessageGSA.xsd' TypeCode=\"Request\" MajorVersion=\"3\" MinorVersion=\"1\" FixVersion=\"0\"><cm:Header><cm:IdentityUUID>eacbc625-6fef-479e-8738-92adcfed7c65</cm:IdentityUUID><cm:LocalDateTime>2017-07-02T09:04:01</cm:LocalDateTime><cm:SettleIndicator>true</cm:SettleIndicator><cm:OrderNumber>54163254</cm:OrderNumber>"
-                + "<cm:transactionId>02464154</cm:transactionId>"
+                + "<cm:transactionId>02460072</cm:transactionId>"
                 + "<cm:termId>WE1055214503801</cm:termId></cm:Header>"
                 + "<cm:Request RRN=\"TkFwxJKiaTwf\">"
                 + "<cm:Media>WEX</cm:Media>  "
@@ -64,9 +72,9 @@ public class TestNBSFormat {
                 + "<cm:DescriptionField>PreAuth</cm:DescriptionField>"
                 + "<cm:origAuthCode>130362</cm:origAuthCode>"
                 + "<cm:AmtPreAuthorized>75.00</cm:AmtPreAuthorized></cm:Request></cm:Message>";
-        
-       requestXMLFinalAuth= "<?xml version=\"1.0\" encoding=\"utf-8\" ?><cm:Message xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:cm='http://www.aafes.com/credit' xsi:schemaLocation='http://www.aafes.com/credit file:///D:/Users/alugumetlas/Downloads/wildfly-10.1.0.Final/wildfly-10.1.0.Final/standalone/configuration/CreditMessageGSA.xsd' TypeCode=\"Request\" MajorVersion=\"3\" MinorVersion=\"1\" FixVersion=\"0\"><cm:Header><cm:IdentityUUID>eacbc625-6fef-479e-8738-92adcfed7c65</cm:IdentityUUID><cm:LocalDateTime>2017-07-02T09:04:01</cm:LocalDateTime><cm:SettleIndicator>true</cm:SettleIndicator><cm:OrderNumber>54163254</cm:OrderNumber>"
-                + "<cm:transactionId>00724154</cm:transactionId>"
+
+        requestXMLFinalAuth = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><cm:Message xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:cm='http://www.aafes.com/credit' xsi:schemaLocation='http://www.aafes.com/credit file:///D:/Users/alugumetlas/Downloads/wildfly-10.1.0.Final/wildfly-10.1.0.Final/standalone/configuration/CreditMessageGSA.xsd' TypeCode=\"Request\" MajorVersion=\"3\" MinorVersion=\"1\" FixVersion=\"0\"><cm:Header><cm:IdentityUUID>eacbc625-6fef-479e-8738-92adcfed7c65</cm:IdentityUUID><cm:LocalDateTime>2017-07-02T09:04:01</cm:LocalDateTime><cm:SettleIndicator>true</cm:SettleIndicator><cm:OrderNumber>54163254</cm:OrderNumber>"
+                + "<cm:transactionId>02460072</cm:transactionId>"
                 + "<cm:termId>WE1055366612301</cm:termId></cm:Header>"
                 + "<cm:Request RRN=\"TkFwxJKiaTwf\">"
                 + "<cm:Media>WEX</cm:Media>  "
@@ -83,44 +91,42 @@ public class TestNBSFormat {
                 + "<cm:ServiceCode>S</cm:ServiceCode> "
                 + "<cm:CATFlag>1</cm:CATFlag> "
                 + "<cm:PromptDetailCount>2</cm:PromptDetailCount>"
+                + " <cm:DriverId>430620</cm:DriverId> "
+                + "<cm:Odometer>35046</cm:Odometer>"
+                + "<cm:ProdDetailCount>2</cm:ProdDetailCount> <cm:FuelProdGroup>  <cm:PricePerUnit>1.970</cm:PricePerUnit><cm:Quantity>6.803</cm:Quantity>"
+                + "<cm:FuelProdCode>001</cm:FuelProdCode><cm:FuelDollarAmount>13.40</cm:FuelDollarAmount></cm:FuelProdGroup>"
+                + "<cm:FuelProdGroup>  <cm:PricePerUnit>1.970</cm:PricePerUnit><cm:Quantity>6.803</cm:Quantity>"
+                + "<cm:FuelProdCode>001</cm:FuelProdCode><cm:FuelDollarAmount>13.40</cm:FuelDollarAmount></cm:FuelProdGroup></cm:WEXRequestData>"
+                + "<cm:pumpNmbr>23</cm:pumpNmbr>"
+                + "<cm:DescriptionField>PreAuth</cm:DescriptionField>"
+                + "<cm:origAuthCode>658340</cm:origAuthCode>"
+                + "<cm:AmtPreAuthorized>75.00</cm:AmtPreAuthorized></cm:Request></cm:Message>";
+        requestXMLRefund = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><cm:Message xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:cm='http://www.aafes.com/credit' xsi:schemaLocation='http://www.aafes.com/credit file:///D:/Users/alugumetlas/Downloads/wildfly-10.1.0.Final/wildfly-10.1.0.Final/standalone/configuration/CreditMessageGSA.xsd' TypeCode=\"Request\" MajorVersion=\"3\" MinorVersion=\"1\" FixVersion=\"0\"><cm:Header><cm:IdentityUUID>eacbc625-6fef-479e-8738-92adcfed7c65</cm:IdentityUUID><cm:LocalDateTime>2017-07-02T09:04:01</cm:LocalDateTime><cm:SettleIndicator>true</cm:SettleIndicator><cm:OrderNumber>54163254</cm:OrderNumber>"
+                + "<cm:transactionId>02460072</cm:transactionId>"
+                + "<cm:termId>WE1055214503801</cm:termId></cm:Header>"
+                + "<cm:Request RRN=\"TkFwxJKiaTwf\">"
+                + "<cm:Media>WEX</cm:Media>  "
+                + "<cm:RequestType>Reversal</cm:RequestType>"
+                + "<cm:InputType>Swiped</cm:InputType>"
+                + "<cm:Pan>Pan</cm:Pan>"
+                + "<cm:Account>6006496628299904508</cm:Account>"
+                + "<cm:Expiration>2103</cm:Expiration>"
+                + "<cm:CardVerificationValue>837</cm:CardVerificationValue>  "
+                + "<cm:TrackData2>6006496628299904508=20095004100210123</cm:TrackData2>"
+                + "<cm:AmountField>75.00</cm:AmountField>"
+                + "<cm:WEXRequestData> "
+                + "<cm:CardSeqNumber>12345</cm:CardSeqNumber>"
+                + "<cm:ServiceCode>S</cm:ServiceCode> "
+                + "<cm:CATFlag>1</cm:CATFlag> "
+                + "<cm:PromptDetailCount>2</cm:PromptDetailCount>"
                 + " <cm:DriverId>3692</cm:DriverId> "
                 + "<cm:Odometer>28811</cm:Odometer>"
                 + "<cm:ProdDetailCount>1</cm:ProdDetailCount> <cm:FuelProdGroup>  <cm:PricePerUnit>0.000</cm:PricePerUnit><cm:Quantity>0.000</cm:Quantity>"
                 + "<cm:FuelProdCode>001</cm:FuelProdCode><cm:FuelDollarAmount>0.00</cm:FuelDollarAmount></cm:FuelProdGroup></cm:WEXRequestData>"
-                + "<cm:pumpNmbr>23</cm:pumpNmbr>"
+                + "<cm:pumpNmbr>36</cm:pumpNmbr>"
                 + "<cm:DescriptionField>PreAuth</cm:DescriptionField>"
                 + "<cm:origAuthCode>130362</cm:origAuthCode>"
                 + "<cm:AmtPreAuthorized>75.00</cm:AmtPreAuthorized></cm:Request></cm:Message>";
-       
-       //<SX>WE1055366612301
-//<FS>AUTHREQ
-//<FS>0001
-//<FS>06001
-//<FS>C
-//<FS>0072
-//<FS>10
-//<FS>WI
-//<FS>1
-//<FS>23
-//<FS>S
-//<FS>13.40//amount
-//<FS>75.00//catAmount
-//<FS>0072//transanumber tid(0,4)
-//<FS>170726000237//date and Time
-//<FS>2//track
-//<FS>6900460XXXXXXXX4262=1811*************//track 2
-//<FS>0230072//recieptNumber
-//<FS>658340//authref
-//<FS>2//
-//<FS>3
-//<FS>430620
-//<FS>4
-//<FS>35046
-//<FS>1
-//<FS>1.970
-//<FS>6.803
-//<FS>1
-//<FS>13.40<EX><LF>
     }
 
     @Test
@@ -128,55 +134,38 @@ public class TestNBSFormat {
         Transaction transaction = new Transaction();
         Message creditMessage = this.unmarshalCreditMessage(requestXMLPreAuth);
         transaction = mapRequest(transaction, creditMessage);
-        NBSFormatterFS nBSFormatterFS = new NBSFormatterFS();
-        String request = nBSFormatterFS.createPreAuthRequestForNBS(transaction);
-        String req = "<SX>WE1055214503801<FS>AUTHREQ<FS>0002<FS>"+createDateFormat()+"<FS>A<FS>0246<FS>08<FS>WI<FS>1<FS>36<FS>S<FS>2<FS>6006496628299904508=20095004100210123<FS>75.00<FS>2<FS>3<FS>3692<FS>4<FS>28811<FS>1<FS>0.000<FS>0.000<FS>001<FS>0.00<EX><LF>";
-        Assert.assertEquals(request ,req);
+        String logOnRequest = nBSFormatterFS.createLogOnRequest(transaction);
+        String preAuthRequest = nBSFormatterFS.createPreAuthRequest(transaction);
+        String request = logOnRequest + preAuthRequest;
+        String req = "<SX>WE1055214503801<FS>AUTHREQ<FS>0002<FS>" + WexConstants.createDateFormat() + "<FS>A<FS>0072<FS>08<FS>WI<FS>1<FS>36<FS>S<FS>2<FS>6006496628299904508=20095004100210123<FS>75.00<FS>2<FS>3<FS>3692<FS>4<FS>28811<FS>1<FS>0.000<FS>0.000<FS>001<FS>0.00<EX><LF>";
+        System.out.println(request);
+        System.out.println(req);
+        Assert.assertEquals(request, req);
     }
+
     @Test
     public void testNbsRequestFormat_FinalAuth() {
         Transaction transaction = new Transaction();
-        Message creditMessage = this.unmarshalCreditMessage(requestXMLPreAuth);
+        Message creditMessage = this.unmarshalCreditMessage(requestXMLFinalAuth);
         transaction = mapRequest(transaction, creditMessage);
-        NBSFormatterFS nBSFormatterFS = new NBSFormatterFS();
-        String request = nBSFormatterFS.createFinalRequestForNbs(transaction);
-        String req = "<SX>WE1055366612301<FS>AUTHREQ<FS>0001<FS>06001<FS>C<FS>0072<FS>10<FS>WI<FS>1<FS>23<FS>S<FS>13.40<FS>75.00<FS>0072<FS>170726000237<FS>2<FS>6900460XXXXXXXX4262=1811*************<FS>0230072<FS>658340<FS>2<FS>3<FS>430620<FS>4<FS>35046<FS>1<FS>1.970<FS>6.803<FS>1<FS>13.40<EX><LF>";
-        System.out.println(req);
-        System.out.println(request);
-        if(req == request)
-            System.out.println("sucess");
-        Assert.assertEquals(request ,req);
-//<SX>WE1055366612301
-//<FS>AUTHREQ
-//<FS>0001
-//<FS>06001
-//<FS>C
-//<FS>0072
-//<FS>10
-//<FS>WI
-//<FS>1
-//<FS>23
-//<FS>S
-//<FS>13.40
-//<FS>75.00
-//<FS>0072
-//<FS>170726000237
-//<FS>2
-//<FS>6900460XXXXXXXX4262=1811*************
-//<FS>0230072
-//<FS>658340
-//<FS>2
-//<FS>3
-//<FS>430620
-//<FS>4
-//<FS>35046
-//<FS>1
-//<FS>1.970
-//<FS>6.803
-//<FS>1
-//<FS>13.40<EX><LF>
+        String logOnRequest = nBSFormatterFS.createLogOnRequest(transaction);
+        String finalAuthRequest = nBSFormatterFS.createFinalAuthRequest(transaction);
+        String request = logOnRequest + finalAuthRequest;
+        String req = "<SX>WE1055366612301<FS>AUTHREQ<FS>0002<FS>" + WexConstants.createDateFormat() + "<FS>C<FS>0072<FS>10<FS>WI<FS>1<FS>23<FS>S<FS>13.00<FS>75.00<FS>0072<FS>170911123042<FS>2<FS>6006496628299904508=20095004100210123<FS>0230072<FS>658340<FS>2<FS>3<FS>430620<FS>4<FS>35046<FS>2<FS>1.970<FS>6.803<FS>001<FS>13.40<FS>1.970<FS>6.803<FS>001<FS>13.40<EX><LF>";
+        Assert.assertEquals(request, req);
     }
 
+    @Test
+    public void testNbsRequestFormat_Refund() {
+        Transaction transaction = new Transaction();
+        Message creditMessage = this.unmarshalCreditMessage(requestXMLRefund);
+        transaction = mapRequest(transaction, creditMessage);
+        String logOnRequest = nBSFormatterFS.createLogOnRequest(transaction);
+        String refundRequest = nBSFormatterFS.createRefundRequest(transaction);
+        String request = logOnRequest + refundRequest;
+        String req = "<SX>WE1055214503801<FS>AUTHREQ<FS>0002<FS>" + WexConstants.createDateFormat() + "<FS>A<FS>0072<FS>30<FS>WI<FS>1<FS>36<FS>S<FS>2<FS>6006496628299904508=20095004100210123<FS>75.00<FS>2<FS>3<FS>3692<FS>4<FS>28811<FS>1<FS>0.000<FS>0.000<FS>001<FS>0.00<EX><LF>";
+        Assert.assertEquals(request, req);
+    }
 
     private Message unmarshalCreditMessage(String content) {
         Message request = new Message();
@@ -194,7 +183,6 @@ public class TestNBSFormat {
     }
 
     private Transaction mapRequest(Transaction transaction, Message requestMessage) {
-        String[] decimalPart;
         transaction.setRequestXmlDateTime(SvsUtil.formatLocalDateTime());
 
         Message.Header header = requestMessage.getHeader();
@@ -317,10 +305,9 @@ public class TestNBSFormat {
             if (transaction.getDriverId() != null) {
                 transaction.setDriverId(wexReqPayAtPump.getDriverId());
             }
-            
-            if(wexReqPayAtPump.getCATFlag() != null)
-            {
-              transaction.setCatFlag(wexReqPayAtPump.getCATFlag().get(0));
+
+            if (wexReqPayAtPump.getCATFlag() != null) {
+                transaction.setCatFlag(wexReqPayAtPump.getCATFlag().get(0));
             }
             /* NEW FIELDS ADDED IN CLASS AFTER MODIFICATIONS IN CreditMessageGSA.XSD - start */
             if (wexReqPayAtPump.getRestrictCode() != null) {
@@ -429,15 +416,8 @@ public class TestNBSFormat {
         }
         return transaction;
     }
-       private String createDateFormat() {
-        DateFormat dateFormat = new SimpleDateFormat(ConstantsUtil.DATEFORMAT);
-        Date date = new Date();
-        String ts = dateFormat.format(date);
-        //2017-08-08 08:39:30.967
-        ts = ts.substring(11, 13) + ts.substring(14, 16) + "1";
-        return ts;
-    }
 }
+
 //                "<SX>WE1055214503801<FS>"//termID
 //                + "AUTHREQ<FS>"//app name
 //                + "0001<FS>"// appversion
@@ -463,3 +443,33 @@ public class TestNBSFormat {
 //                + "001<FS>"//prodCode
 //                + "0.00<EX><LF>";//fuelDolleramount
 //  
+//final Auth requst
+//<SX>WE1055366612301
+//<FS>AUTHREQ
+//<FS>0001
+//<FS>06001
+//<FS>C
+//<FS>0072
+//<FS>10
+//<FS>WI
+//<FS>1
+//<FS>23
+//<FS>S
+//<FS>13.40
+//<FS>75.00
+//<FS>0072
+//<FS>170726000237
+//<FS>2
+//<FS>6900460XXXXXXXX4262=1811*************
+//<FS>0230072
+//<FS>658340
+//<FS>2
+//<FS>3
+//<FS>430620
+//<FS>4
+//<FS>35046
+//<FS>1
+//<FS>1.970
+//<FS>6.803
+//<FS>1
+//<FS>13.40<EX><LF>

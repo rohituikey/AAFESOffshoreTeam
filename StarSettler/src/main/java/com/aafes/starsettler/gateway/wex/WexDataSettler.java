@@ -96,6 +96,7 @@ public class WexDataSettler extends BaseSettler {
     private Transactionfile getFileContent(List<String> tids, String processDate) {
         Transactionfile file = new Transactionfile();
         Map map = new HashMap();
+        wexGatewayBean=new WexTransactionFileBuilder();
 
         for (String tid : tids) {
             List<WexSettleEntity> transactionSettleData = super.getWexsettleTransaction(tid, processDate, SettleStatus.Ready_to_settle);

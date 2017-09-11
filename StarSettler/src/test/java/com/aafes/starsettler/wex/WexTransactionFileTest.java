@@ -47,6 +47,7 @@ public class WexTransactionFileTest {
         session = factory.getSession();
     }
 
+    //@Ignore
     @Test
     public void testSuccessFileGeneration() {
         sMethodName = "testSuccessFileGeneration";

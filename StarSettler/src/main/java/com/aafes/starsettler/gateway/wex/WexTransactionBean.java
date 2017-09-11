@@ -39,7 +39,7 @@ public class WexTransactionBean {
           log.info("Entry in createFile method of WexFile..");
              Date date = new Date();
            // String createdDate = dateFormat.format(date);
-        log.info("Entry in createXmlFile method of WexDataGatewayBean..");
+        log.info("Entry in createFile method of WexTransactionBean..");
        
         if (null != settlexmlrecord && !settlexmlrecord.isEmpty()) {
              String filename = sourcePath +fileSeqNo; //"wexSFTP_" + createdDate;
@@ -51,9 +51,9 @@ public class WexTransactionBean {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile())));
             bw.write(settlexmlrecord);
             bw.close();
-            log.info("Exit from createFile method of WexDataGatewayBean..");
+            log.info("Exit from createFile method of WexTransactionBean..");
         }
-        log.info("Exit from createFile method of WexFile..");
+        log.info("Exit from createFile method of WexTransactionBean..");
     }
     
     

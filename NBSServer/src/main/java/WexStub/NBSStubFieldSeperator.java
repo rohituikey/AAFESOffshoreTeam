@@ -28,9 +28,21 @@ public class NBSStubFieldSeperator {
     public String[] createResponse(byte[] request) {
         try {
             String requestString = new String(request);
-            if(requestString.contains("<!cs>"))
+            if(requestString.contains("<!1C>") || requestString.contains("<!02>")){
                 requestString = requestString.replaceAll("<!1C>", "<FS>");
+                requestString = requestString.replaceAll("<!02>", "<SX>");
+                requestString = requestString.replaceAll("<!03>", "<EX><LF>");
+            }
             requestDetails = requestString.split("<FS>");
+            if(requestString.contains("c$") || requestString.contains("c?") || requestString.contains("c!") || requestString.contains("a$") || requestString.contains("a?") || requestString.contains("a!")){
+                response[0]="";
+                response[1]="";
+                return response;
+            }
+            if(requestDetails[0].contains("<SX>O<EX><LF>")){
+                NBSServer.logOff=true;
+                return response;
+            }
             response[0] = getAcknowledgment();
             response[1] = getResponse();
 

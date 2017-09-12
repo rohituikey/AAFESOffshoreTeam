@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE j8583-config PUBLIC "-//J8583//DTD CONFIG 1.0//EN"
+	"http://j8583.sourceforge.net/j8583.dtd">
+<j8583-config>
+    
+    <header type="0200">ISO015000050</header>
+    <header type="0210">ISO015000055</header>
+    <header type="0400">ISO015000050</header>
+    <header type="0410">ISO015000055</header>
+    <header type="0800">ISO015000015</header>
+    <header type="0810">ISO015000015</header>
+    
+    <template type="0200">       
+        <field num="8" type="NUMERIC" length="4">0000</field> <!--  Merchant Type -->
+        <field num="9" type="NUMERIC" length="3">840</field> <!--  Merchant Country -->
+        <field num="7" type="ALPHA" length="4">0001</field> <!-- Card Seq Number -->
+        <field num="6" type="NUMERIC" length="3">840</field> <!-- Tran Curr Code -->                
+    </template>
+    
+    <parse type="0200">
+        <field num="8" type="NUMERIC" length="4"/> <!--  Merchant Type -->
+        <field num="9" type="NUMERIC" length="3"/> <!--  Merchant Country -->
+        <field num="7" type="ALPHA" length="4"/> <!-- Card Seq Number -->
+        <field num="6" type="NUMERIC" length="3"/> <!-- Tran Curr Code --> 
+        <field num="10" type="LLVAR" length="15" /> <!-- TermId -->
+        <field num="12" type="ALPHA" length="7" /> <!-- AppName -->
+        <field num="13" type="NUMERIC" length="4" /> <!-- AppVersion -->
+        <field num="14" type="LLVAR" length="5" /> <!-- TimeZone -->
+        <field num="15" type="ALPHA" length="15" /> <!-- HeaderRecordA -->
+        <field num="16" type="ALPHA" length="4" /> <!-- Key -->
+        <field num="17" type="ALPHA" length="2" /> <!-- TransType -->
+        <field num="18" type="ALPHA" length="2" /> <!-- CardType -->
+        <field num="19" type="ALPHA" length="1" /> <!-- CATFlag -->
+        <field num="110" type="NUMERIC" length="2" /> <!-- PumpNo -->
+        <field num="111" type="ALPHA" length="1" /> <!-- ServiceType -->
+        <field num="112" type="AMOUNT" length="9" /> <!-- Amount -->
+        <field num="113" type="AMOUNT" length="9" /> <!-- CATamount -->
+        <field num="114" type="NUMERIC" length="4" /> <!-- TransNumber -->
+        <field num="115" type="DATE10" length="12" /> <!-- DateTime -->
+        <field num="116" type="ALPHA" length="25" /> <!-- Track -->
+        <field num="117" type="ALPHA" length="79" /> <!-- CardSpecificDataAccountInfo -->
+        <field num="118" type="AMOUNT" length="9" /> <!-- CardSpecificDataAmount -->
+        <field num="119" type="ALPHA" length="12" /> <!-- CardSpecificDataRecieptNumber -->
+        <field num="120" type="ALPHA" length="6" /> <!-- CardSpecificDataAuthReference -->
+        <field num="121" type="NUMERIC" length="2" /> <!-- prompt details count -->
+        <field num="122" type="ALPHA" length="1" /> <!-- prompt type-->
+        <field num="123" type="ALPHA" length="10" /> <!-- prompt value-->
+        <field num="124" type="NUMERIC" length="2" /> <!-- product details count-->
+        <!-- FUEL PRODUCT CODES STARTS -->
+        <field num="125" type="AMOUNT" length="9" /> <!-- price-->
+        <field num="126" type="AMOUNT" length="10" /> <!-- quantity-->
+        <field num="127" type="NUMERIC" length="3" /> <!-- product code-->
+        <field num="128" type="AMOUNT" length="7" /> <!-- Amount-->
+        <!-- MODIFIED BELOW VALUES -->
+        <field num="20" type="AMOUNT" length="9" /> <!-- price-->
+        <field num="21" type="AMOUNT" length="10" /> <!-- quantity-->
+        <field num="22" type="NUMERIC" length="3" /> <!-- product code-->
+        <field num="23" type="AMOUNT" length="7" /> <!-- Amount-->
+        <!-- FUEL PRODUCT CODES ENDS -->
+        <!-- NON FUEL PRODUCT CODES STARTS -->
+        <field num="24" type="AMOUNT" length="9" /> <!-- price-->
+        <field num="25" type="AMOUNT" length="10" /> <!-- quantity-->
+        <field num="26" type="NUMERIC" length="3" /> <!-- product code-->
+        <field num="27" type="AMOUNT" length="7" /> <!-- Amount-->
+        <field num="28" type="AMOUNT" length="9" /> <!-- price-->
+        <field num="29" type="AMOUNT" length="10" /> <!-- quantity-->
+        <field num="30" type="NUMERIC" length="3" /> <!-- product code-->
+        <field num="31" type="AMOUNT" length="7" /> <!-- Amount-->
+        <field num="32" type="AMOUNT" length="9" /> <!-- price-->
+        <field num="33" type="AMOUNT" length="10" /> <!-- quantity-->
+        <field num="34" type="NUMERIC" length="3" /> <!-- product code-->
+        <field num="35" type="AMOUNT" length="7" /> <!-- Amount-->
+        <!-- NON FUEL PRODUCT CODES ENDS -->
+    </parse>
+    
+</j8583-config>

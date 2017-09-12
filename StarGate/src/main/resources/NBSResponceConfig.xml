@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE j8583-config PUBLIC "-//J8583//DTD CONFIG 1.0//EN"
+	"http://j8583.sourceforge.net/j8583.dtd">
+<j8583-config>
+    <parse type="0110">
+        <!--<field num="2" type="LLVAR" length="19" />  account number-->
+        <field num="10" length="1" type="ALPHA"/> <!--A-->
+        <field num="11" length="4"  type="NUMERIC"/><!--Key"-->
+        <field num="12" length="13"  type="ALPHA"/><!--timestamp"-->
+        <field num="13" length="1"  type="ALPHA"/><!--ApplicationUpdateNeeded"-->
+        <field num="14" length="2"  type="ALPHA"/><!--AuthCode"-->
+        <field num="15" length="32" type="ALPHA"/><!--Message-->
+        <field num="16" length="4"  type="ALPHA"/><!--CardType"-->
+        <field num="17" length="6"  type="ALPHA"/><!--Identity-->
+        <field num="18" length="4"  type="ALPHA"/> <!--hostNumber"-->
+        <field num="19" length="7"  type="ALPHA"/><!--CardNumber"-->
+        <field num="20" length="4"  type="ALPHA"/><!--VehicleNumber-->
+        <field num="21" length="4"  type="ALPHA"/><!--ServiceOption-->
+        <field num="22" length="2"  type="ALPHA"/><!--promptCount-->
+        <field num="23" length="1"  type="ALPHA"/><!--promptType"-->
+        <field num="24" length="6"  type="ALPHA"/> <!--authRef-->
+        <field num="25" length="10" type="AMOUNT"/> <!--maxAmount-->
+        <field num="26" length="2"  type="ALPHA"/><!--productAuthCount-->
+        <field num="27" length="10" type="ALPHA"/><!--maxQuantity-->
+        <field num="28" length="3"  type="ALPHA"/> <!--productCode"-->
+        <field num="29" length="7"  type="ALPHA"/> <!--productDeatailsMaxAmount-->
+</parse>
+</j8583-config>  

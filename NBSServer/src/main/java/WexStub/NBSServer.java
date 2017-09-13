@@ -34,6 +34,7 @@ public class NBSServer {
             datagramSocket = new DatagramSocket(PORT);
             NBSStubFieldSeperator nBSStub = new NBSStubFieldSeperator();
             System.out.println("Server started");
+            while(!logOff){
             datagramSocket.receive(datagramPacket);
             String results[];
             results = nBSStub.createResponse(datagramPacket.getData());
@@ -92,7 +93,8 @@ public class NBSServer {
 //        } catch (IOException ex) {
 //            Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
 //        }
-
+            }
+            datagramSocket.close();
         } catch (SocketException ex) {
             Logger.getLogger(NBSServer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

@@ -34,21 +34,22 @@ public class NBSServer {
             datagramSocket = new DatagramSocket(PORT);
             NBSStubFieldSeperator nBSStub = new NBSStubFieldSeperator();
             System.out.println("Server started");
-            while(!logOff){
-            datagramSocket.receive(datagramPacket);
-            String results[];
-            results = nBSStub.createResponse(datagramPacket.getData());
-            int index = 0;
-            while (index < 2) {
-                byte[] result = results[index].getBytes();
-                DatagramPacket acknowledgment = new DatagramPacket(result, result.length, datagramPacket.getAddress(), datagramPacket.getPort());
-                System.out.println(results[index]);
-                datagramSocket.send(acknowledgment);
-                if(results[index].contains("c$"))
-                index++;
-                else
-                    index=index+2;
-            }
+            while (!logOff) {
+                datagramSocket.receive(datagramPacket);
+                String results[];
+                results = nBSStub.createResponse(datagramPacket.getData());
+                int index = 0;
+                while (index < 2) {
+                    byte[] result = results[index].getBytes();
+                    DatagramPacket acknowledgment = new DatagramPacket(result, result.length, datagramPacket.getAddress(), datagramPacket.getPort());
+                    System.out.println(results[index]);
+                    datagramSocket.send(acknowledgment);
+                    //if (results[index].contains("c$")) {
+                    index++;
+                    //} else {
+//                        index = index + 2;
+//                  }
+                }
 //            try {
 //                
 //                LOG.info("Logging from NBS Server. Initiating Socket Server");

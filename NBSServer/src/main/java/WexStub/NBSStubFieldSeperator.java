@@ -16,8 +16,8 @@ import org.jpos.iso.ISOException;
 public class NBSStubFieldSeperator {
 
     String aknowApprove = "<SX>c$<FS>100<EX>";
-    String aknowDecline = "<SX>c?<FS>200<EX>";
-    String aknowCancel = "<SX>c!<FS><EX>";
+    String aknowCancel = "<SX>c?<FS>200<EX>";
+    String aknowDecline = "<SX>c!<FS><EX>";
 
     String resApprove = "<SX>A<FS>0278<FS>3170621071655<FS>N<FS>00<FS>APPROVED<FS>WEX<FS><FS><FS><FS><FS><FS>5<FS>0<FS>308339<FS>75.00<FS>1<FS>75.0000<FS>001<EX>";
     String finalAuthApprove = "<SX>C<FS>0353<FS>3170621060228<FS>N<FS>00<FS>APPROVED<EX>\"";
@@ -82,6 +82,6 @@ public class NBSStubFieldSeperator {
                 return finalAuthDeclined;
             }
         }
-        return resApprove;
+        return "";
     }
 }

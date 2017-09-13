@@ -60,7 +60,7 @@ public class NBSStubFieldSeperator {
         } else if (requestDetails[17].equals("6006496628299904508=20095004100219999")) {
             return aknowCancel;
         } else if (requestDetails[17].equals("6006496628299904508=20095004100210000")) {
-            return aknowCancel;
+            return aknowDecline;
             //isoMsg.set(2, "c!");
             //isoMsg.set(3, "200");
         } else {

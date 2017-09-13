@@ -15,6 +15,7 @@ import org.jpos.iso.ISOException;
  */
 public class NBSStubFieldSeperator {
 
+    LogGenerator logGenerator = new LogGenerator();
     String aknowApprove = "<SX>c$<FS>100<EX>";
     String aknowDecline = "<SX>c?<FS>200<EX>";
     String aknowCancel = "<SX>c!<FS><EX>";
@@ -30,6 +31,7 @@ public class NBSStubFieldSeperator {
     public String[] createResponse(byte[] request) {
         try {
             String requestString = new String(request);
+            logGenerator.generateLogFile("request recieved as "+new String(request));
             if (requestString.contains("<!1C>") || requestString.contains("<!02>")) {
                 requestString = requestString.replaceAll("<!1C>", "<FS>");
                 requestString = requestString.replaceAll("<!02>", "<SX>");
@@ -46,10 +48,13 @@ public class NBSStubFieldSeperator {
                 return response;
             }
             response[0] = getAcknowledgment();
+            logGenerator.generateLogFile("acknowledgment " + response[0]);
             response[1] = getResponse();
+            logGenerator.generateLogFile("acknowledgment " + response[1]);
 
         } catch (ISOException ex) {
             Logger.getLogger(NBSStubFieldSeperator.class.getName()).log(Level.SEVERE, null, ex);
+            logGenerator.generateLogFile("Exception Ocurred "+ex.getMessage());
         }
         return response;
     }

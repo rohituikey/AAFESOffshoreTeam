@@ -55,11 +55,11 @@ public class NBSStubFieldSeperator {
     }
 
     private String getAcknowledgment() throws ISOException {
-        if (requestDetails[17].equals("6006496628299904508=20095004100210123")) {
+        if (requestDetails[12].equals("6006496628299904508=20095004100210123")) {
             return aknowApprove;
-        } else if (requestDetails[17].equals("6006496628299904508=20095004100219999")) {
+        } else if (requestDetails[12].equals("6006496628299904508=20095004100219999")) {
             return aknowCancel;
-        } else if (requestDetails[17].equals("6006496628299904508=20095004100210000")) {
+        } else if (requestDetails[12].equals("6006496628299904508=20095004100210000")) {
             return aknowCancel;
             //isoMsg.set(2, "c!");
             //isoMsg.set(3, "200");
@@ -69,14 +69,14 @@ public class NBSStubFieldSeperator {
     }
 
     private String getResponse() {
-        if (requestDetails[17].equals("6006496628299904508=20095004100210123")) {
-            if (requestDetails[2].contains("08")) {
+        if (requestDetails[12].equals("6006496628299904508=20095004100210123")) {
+            if (requestDetails[6].contains("08")) {
                 return resApprove;
             } else {
                 return finalAuthApprove;
             }
-        } else if (requestDetails[17].equals("6006496628299904508=20095004100210124")) {
-            if (requestDetails[2].contains("08")) {
+        } else if (requestDetails[12].equals("6006496628299904508=20095004100210124")) {
+            if (requestDetails[6].contains("08")) {
                 return resDecline;
             } else {
                 return finalAuthDeclined;

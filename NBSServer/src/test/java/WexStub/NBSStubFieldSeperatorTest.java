@@ -58,4 +58,10 @@ public class NBSStubFieldSeperatorTest {
         assertTrue(NBSServer.logOff);
     }
     
+    @Test
+    public void testCreateResponse_firstRequest_declined() {
+        String[] result = subjectUnderTest.createResponse("<SX>WE1055010401101<FS>AUTHREQ<FS>0001<FS>06001<FS>A<FS>0278<FS>08<FS>WI<FS>1<FS>26<FS>S<FS>2<FS>6006496628299904508=20095004100210124<FS>75.00<FS>2<FS>3<FS>325781<FS>4<FS>19<FS>1<FS>0.000<FS>0.000<FS>001<FS>0.00<EX><LF>".getBytes());
+        assertEquals("<SX>c$<FS>100<EX>", result[0]);
+    }
+    
 }

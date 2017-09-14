@@ -26,10 +26,11 @@ public class NBSStubFieldSeperator {
     String resDecline = "<SX>A<FS>0278<FS>3170621071655<FS>N<FS>01<FS>DECLINED<FS>WEX<FS><FS><FS><FS><FS><FS>5<FS>0<FS>308339<FS>75.00<FS>1<FS>75.0000<FS>001<EX>";
 
     String[] requestDetails = new String[52];
-    String[] response = new String[2];
+    String[] response = null;
 
     public String[] createResponse(byte[] request) {
         try {
+            response = new String[2];
             String requestString = new String(request);
             logGenerator.generateLogFile("request recieved as "+new String(request));
             if (requestString.contains("<!1C>") || requestString.contains("<!02>")) {
@@ -45,6 +46,8 @@ public class NBSStubFieldSeperator {
             }
             if (requestDetails[0].contains("<SX>O<EX><LF>")) {
                 NBSServer.logOff = true;
+                response[0] = "";
+                response[1] = "";
                 return response;
             }
             response[0] = getAcknowledgment();
@@ -66,8 +69,12 @@ public class NBSStubFieldSeperator {
             return aknowCancel;
         } else if (requestDetails[12].equals("6006496628299904508=20095004100210000")) {
             return aknowDecline;
-            //isoMsg.set(2, "c!");
-            //isoMsg.set(3, "200");
+        } else if (requestDetails[9].equals("6006496628299904508=20095004100210123")) {
+            return aknowApprove;
+        } else if (requestDetails[9].equals("6006496628299904508=20095004100219999")) {
+            return aknowCancel;
+        } else if (requestDetails[9].equals("6006496628299904508=20095004100210000")) {
+            return aknowDecline;
         } else {
             return "<SX>c$<FS>100<EX>";
         }

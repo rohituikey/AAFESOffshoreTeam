@@ -28,8 +28,7 @@ public class NBSServer {
         try {
             //Socket connectionSocket = null;
             int PORT = 2000;
-            byte[] buf = new byte[1000];
-            DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length);
+            DatagramPacket datagramPacket = new DatagramPacket(new byte[1000], new byte[1000].length);
             DatagramSocket datagramSocket;
             datagramSocket = new DatagramSocket(PORT);
             NBSStubFieldSeperator nBSStub = new NBSStubFieldSeperator();
@@ -43,6 +42,7 @@ public class NBSServer {
                     byte[] result = results[index].getBytes();
                     DatagramPacket acknowledgment = new DatagramPacket(result, result.length, datagramPacket.getAddress(), datagramPacket.getPort());
                     System.out.println(results[index]);
+                    System.out.println("packet sent :" + new String(acknowledgment.getData()));
                     datagramSocket.send(acknowledgment);
                     //if (results[index].contains("c$")) {
                     index++;

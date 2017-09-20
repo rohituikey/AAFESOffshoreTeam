@@ -1,8 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 package WexStub;
 
 import java.util.logging.Level;
@@ -10,9 +10,9 @@ import java.util.logging.Logger;
 import org.jpos.iso.ISOException;
 
 /**
- *
- * @author uikuyr
- */
+*
+* @author uikuyr
+*/
 public class NBSStubFieldSeperator {
 
     LogGenerator logGenerator = new LogGenerator();
@@ -32,7 +32,7 @@ public class NBSStubFieldSeperator {
         try {
             response = new String[2];
             String requestString = new String(request);
-            logGenerator.generateLogFile("request recieved as "+new String(request));
+            logGenerator.generateLogFile("request recieved as " + new String(request));
             if (requestString.contains("<!1C>") || requestString.contains("<!02>")) {
                 requestString = requestString.replaceAll("<!1C>", "<FS>");
                 requestString = requestString.replaceAll("<!02>", "<SX>");
@@ -57,7 +57,7 @@ public class NBSStubFieldSeperator {
 
         } catch (ISOException ex) {
             Logger.getLogger(NBSStubFieldSeperator.class.getName()).log(Level.SEVERE, null, ex);
-            logGenerator.generateLogFile("Exception Ocurred "+ex.getMessage());
+            logGenerator.generateLogFile("Exception Ocurred " + ex.getMessage());
         }
         return response;
     }
@@ -65,9 +65,15 @@ public class NBSStubFieldSeperator {
     private String getAcknowledgment() throws ISOException {
         if (requestDetails[12].equals("6006496628299904508=20095004100210123")) {
             return aknowApprove;
+        } else if (requestDetails[16].equals("6006496628299904508=20095004100210123")) {
+            return aknowApprove;
         } else if (requestDetails[12].equals("6006496628299904508=20095004100219999")) {
             return aknowCancel;
+        } else if (requestDetails[16].equals("6006496628299904508=20095004100219999")) {
+            return aknowCancel;
         } else if (requestDetails[12].equals("6006496628299904508=20095004100210000")) {
+            return aknowDecline;
+        } else if (requestDetails[16].equals("6006496628299904508=20095004100210000")) {
             return aknowDecline;
         } else if (requestDetails[9].equals("6006496628299904508=20095004100210123")) {
             return aknowApprove;
@@ -75,19 +81,25 @@ public class NBSStubFieldSeperator {
             return aknowCancel;
         } else if (requestDetails[9].equals("6006496628299904508=20095004100210000")) {
             return aknowDecline;
+        } else if (requestDetails[13].equals("6006496628299904508=20095004100210123")) {
+            return aknowApprove;
+        } else if (requestDetails[13].equals("6006496628299904508=20095004100219999")) {
+            return aknowCancel;
+        } else if (requestDetails[13].equals("6006496628299904508=20095004100210000")) {
+            return aknowDecline;
         } else {
             return "<SX>c$<FS>100<EX>";
         }
     }
 
     private String getResponse() {
-        if (requestDetails[12].equals("6006496628299904508=20095004100210123")) {
+        if (requestDetails[12].equals("6006496628299904508=20095004100210123") || requestDetails[16].equals("6006496628299904508=20095004100210123")) {
             if (requestDetails[6].contains("08")) {
                 return resApprove;
             } else {
                 return finalAuthApprove;
             }
-        } else if (requestDetails[12].equals("6006496628299904508=20095004100210124")) {
+        } else if (requestDetails[12].equals("6006496628299904508=20095004100210124") || requestDetails[16].equals("6006496628299904508=20095004100210123")) {
             if (requestDetails[6].contains("08")) {
                 return resDecline;
             } else {
@@ -97,3 +109,4 @@ public class NBSStubFieldSeperator {
         return "";
     }
 }
+
